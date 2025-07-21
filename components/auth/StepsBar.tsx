@@ -57,27 +57,6 @@ export default function StepsBar({ currentStep, totalSteps, stepTitles }: StepsB
           );
         })}
       </View>
-      
-      {stepTitles && stepTitles.length > 0 && (
-        <View style={commonStyles.progressContainer}>
-          {stepTitles.map((title, index) => (
-            <Text
-              key={index}
-              style={[
-                commonStyles.stepTitle,
-                { 
-                  color: index <= currentStep 
-                    ? Colors[colorScheme].text 
-                    : '#666',
-                  flex: 1,
-                },
-              ]}
-            >
-              {title}
-            </Text>
-          ))}
-        </View>
-      )}
     </View>
   );
 }

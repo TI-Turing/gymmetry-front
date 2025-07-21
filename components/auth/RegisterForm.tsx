@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { View } from '../Themed';
+import { View, Text } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -14,12 +13,14 @@ import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
+import Step5 from './Step5';
 import { apiService } from '@/services/apiService';
+import { useAuthContext } from '@/components/auth/AuthContext';
+import { commonStyles } from './styles/common';
 
 interface RegisterFormProps {
   onRegister: (userData: any) => void;
   onSwitchToLogin: () => void;
-  onBack?: () => void;
 }
 
 interface RegistrationData {
@@ -45,21 +46,65 @@ interface RegistrationData {
   fitnessGoal?: string;
   healthRestrictions?: string;
   additionalInfo?: string;
+  // Step 5
+  username?: string;
+  profileImage?: string;
 }
 
-export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: RegisterFormProps) {
+export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [registrationData, setRegistrationData] = useState<RegistrationData>({
     email: '',
     password: '',
   });
   const colorScheme = useColorScheme();
+  const authContext = useAuthContext();
+
+  // Sincronizar con el contexto del layout
+  useEffect(() => {
+    console.log('🔄 [REGISTER FORM] Actualizando contexto - currentStep:', currentStep);
+    authContext.setIsInRegisterFlow(true);
+    authContext.setCurrentStep(currentStep);
+    
+    // TEMPORALMENTE COMENTADO - puede estar causando el problema
+    /*
+    // Configurar la función de omitir según el paso actual
+    const setupSkipFunction = () => {
+      switch (currentStep) {
+        case 1: // Step 2 - Datos básicos
+          console.log('⚙️ [REGISTER FORM] Configurando skip para Step 2');
+          authContext.setOnSkip(() => handleStep2Skip());
+          break;
+        case 2: // Step 3 - Información personal
+          console.log('⚙️ [REGISTER FORM] Configurando skip para Step 3');
+          authContext.setOnSkip(() => handleStep3Skip());
+          break;
+        case 3: // Step 4 - Datos fitness
+          console.log('⚙️ [REGISTER FORM] Configurando skip para Step 4');
+          authContext.setOnSkip(() => handleStep4Skip());
+          break;
+        default:
+          console.log('⚙️ [REGISTER FORM] Sin skip para Step 1');
+          authContext.setOnSkip(undefined);
+      }
+    };
+
+    setupSkipFunction();
+    */
+    
+    // Cleanup cuando se desmonta el componente
+    return () => {
+      authContext.setIsInRegisterFlow(false);
+      authContext.setOnSkip(undefined);
+    };
+  }, [currentStep]);
 
   const stepTitles = [
     'Credenciales',
     'Datos básicos',
     'Información personal',
     'Datos fitness',
+    'Perfil',
   ];
 
   const handleStep1Next = (data: { email: string; password: string; userId?: string; token?: string }) => {
@@ -78,11 +123,14 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: Re
   };
 
   const handleStep2Next = (data: { firstName: string; lastName: string; phone?: string; birthDate?: string }) => {
+    console.log('🔄 [REGISTER FORM] handleStep2Next llamado con data:', data);
+    console.log('🔄 [REGISTER FORM] registrationData actual:', registrationData);
     setRegistrationData(prev => ({ ...prev, ...data }));
     setCurrentStep(2);
   };
 
   const handleStep2Skip = () => {
+    console.log('🔄 [REGISTER FORM] handleStep2Skip llamado');
     setCurrentStep(2);
   };
 
@@ -95,7 +143,13 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: Re
     emergencyPhone?: string;
     address?: string;
   }) => {
+    console.log('🔄 [REGISTER FORM] handleStep3Next llamado con data:', data);
     setRegistrationData(prev => ({ ...prev, ...data }));
+    setCurrentStep(3);
+  };
+
+  const handleStep3Skip = () => {
+    console.log('🔄 [REGISTER FORM] handleStep3Skip llamado');
     setCurrentStep(3);
   };
 
@@ -104,16 +158,39 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: Re
     healthRestrictions?: string;
     additionalInfo?: string;
   }) => {
+    console.log('🔄 [REGISTER FORM] handleStep4Next llamado con data:', data);
+    setRegistrationData(prev => ({ ...prev, ...data }));
+    setCurrentStep(4);
+  };
+
+  const handleStep4Skip = () => {
+    console.log('🔄 [REGISTER FORM] handleStep4Skip llamado');
+    setCurrentStep(4);
+  };
+
+  const handleStep5Next = (data: {
+    username?: string;
+    profileImage?: string;
+  }) => {
+    console.log('🔄 [REGISTER FORM] handleStep5Next llamado con data:', data);
     const finalData = { ...registrationData, ...data };
+    console.log('🔄 [REGISTER FORM] Llamando onRegister con finalData:', finalData);
+    onRegister(finalData);
+  };
+
+  const handleStep5Skip = () => {
+    console.log('🔄 [REGISTER FORM] handleStep5Skip llamado');
+    // En el último paso, completar el registro sin datos adicionales
+    const finalData = { ...registrationData };
+    console.log('🔄 [REGISTER FORM] Llamando onRegister con finalData (skip):', finalData);
     onRegister(finalData);
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-    } else if (onBack) {
-      onBack();
     }
+    // El botón back ahora se maneja en el layout
   };
 
   const renderCurrentStep = () => {
@@ -131,9 +208,8 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: Re
       case 1:
         return (
           <Step2
-            userId={registrationData.userId!}
+            userId={registrationData.userId || ''}
             onNext={handleStep2Next}
-            onSkip={handleStep2Skip}
             initialData={{
               firstName: registrationData.firstName || '',
               lastName: registrationData.lastName || '',
@@ -145,28 +221,39 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: Re
       case 2:
         return (
           <Step3
-            userId={registrationData.userId!}
+            userId={registrationData.userId || ''}
             onNext={handleStep3Next}
             initialData={{
-              eps: registrationData.eps,
-              country: registrationData.country,
-              region: registrationData.region,
-              city: registrationData.city,
-              emergencyContact: registrationData.emergencyContact,
-              emergencyPhone: registrationData.emergencyPhone,
-              address: registrationData.address,
+              eps: registrationData.eps || '',
+              country: registrationData.country || '',
+              region: registrationData.region || '',
+              city: registrationData.city || '',
+              emergencyContact: registrationData.emergencyContact || '',
+              emergencyPhone: registrationData.emergencyPhone || '',
+              address: registrationData.address || '',
             }}
           />
         );
       case 3:
         return (
           <Step4
-            userId={registrationData.userId!}
+            userId={registrationData.userId || ''}
             onNext={handleStep4Next}
             initialData={{
-              fitnessGoal: registrationData.fitnessGoal,
-              healthRestrictions: registrationData.healthRestrictions,
-              additionalInfo: registrationData.additionalInfo,
+              fitnessGoal: registrationData.fitnessGoal || '',
+              healthRestrictions: registrationData.healthRestrictions || '',
+              additionalInfo: registrationData.additionalInfo || '',
+            }}
+          />
+        );
+      case 4:
+        return (
+          <Step5
+            userId={registrationData.userId || ''}
+            onNext={handleStep5Next}
+            initialData={{
+              username: registrationData.username || '',
+              profileImage: registrationData.profileImage || '',
             }}
           />
         );
@@ -177,41 +264,66 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, onBack }: Re
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={commonStyles.registerFormContainer}
     >
-      <View style={styles.topSection}>
-        <TouchableOpacity style={styles.backButton} onPress={handlePrevious}>
-          <FontAwesome 
-            name="arrow-left" 
-            size={24} 
-            color={Colors[colorScheme].text} 
-          />
-        </TouchableOpacity>
+      <View style={commonStyles.registerFormContainer}>
+        {/* Header */}
+        <View style={commonStyles.registerFormHeader}>
+          <View style={commonStyles.backButton}>
+            {currentStep === 0 && (
+              <TouchableOpacity 
+                onPress={handlePrevious}
+              >
+                <FontAwesome
+                  name="chevron-left"
+                  size={20}
+                  color="white"
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity 
+            style={commonStyles.skipButtonRegister}
+            onPress={() => {
+              switch (currentStep) {
+                case 1:
+                  handleStep2Skip();
+                  break;
+                case 2:
+                  handleStep3Skip();
+                  break;
+                case 3:
+                  handleStep4Skip();
+                  break;
+                case 4:
+                  handleStep5Skip();
+                  break;
+                default:
+                  break;
+              }
+            }}
+            disabled={currentStep === 0}
+          >
+            <Text style={[
+              commonStyles.headerButtonText, 
+              { 
+                color: currentStep === 0 ? 'transparent' : 'white' 
+              }
+            ]}>
+              {currentStep === 0 ? '' : 'Omitir'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <StepsBar
+          currentStep={currentStep}
+          totalSteps={stepTitles.length}
+          stepTitles={stepTitles}
+        />
+        {renderCurrentStep()}
       </View>
-
-      <StepsBar
-        currentStep={currentStep}
-        totalSteps={4}
-        stepTitles={stepTitles}
-      />
-
-      {renderCurrentStep()}
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  topSection: {
-    paddingTop: 50,
-    paddingLeft: 10,
-    paddingBottom: 10,
-  },
-  backButton: {
-    padding: 10,
-    alignSelf: 'flex-start',
-  },
-});

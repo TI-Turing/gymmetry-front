@@ -20,10 +20,9 @@ import { commonStyles } from './styles/common';
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
   onSwitchToRegister: () => void;
-  onBack?: () => void;
 }
 
-export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: LoginFormProps) {
+export default function LoginForm({ onLogin, onSwitchToRegister }: LoginFormProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,23 +57,10 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {onBack && (
-        <TouchableOpacity 
-          style={{ position: 'absolute', top: 50, left: 20, zIndex: 1, padding: 10 }} 
-          onPress={onBack}
-        >
-          <FontAwesome 
-            name="arrow-left" 
-            size={24} 
-            color={Colors[colorScheme].text} 
-          />
-        </TouchableOpacity>
-      )}
-      
       <ScrollView contentContainerStyle={[commonStyles.container, { justifyContent: 'center' }]}>
         <View style={[commonStyles.header, { marginBottom: 40 }]}>
-          <Text style={[commonStyles.title, { color: Colors[colorScheme].tint, fontSize: 32 }]}>
-            🏋️ GYMMETRY
+          <Text style={[commonStyles.title, { color: Colors[colorScheme].tint, fontSize: 34, fontWeight: 'bold' }]}>
+            GYMMETRY
           </Text>
           <Text style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}>
             Inicia sesión para continuar
@@ -164,7 +150,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
             </Text>
             <TouchableOpacity onPress={onSwitchToRegister}>
               <Text style={[{ color: Colors[colorScheme].tint, fontWeight: '600' }]}>
-                Crear cuenta
+                Registrate
               </Text>
             </TouchableOpacity>
           </View>

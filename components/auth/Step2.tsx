@@ -16,26 +16,26 @@ import { commonStyles } from './styles/common';
 interface Step2Props {
   userId: string;
   onNext: (data: Step2Data) => void;
-  onSkip: () => void;
   initialData?: Step2Data;
 }
 
-export default function Step2({ userId, onNext, onSkip, initialData }: Step2Props) {
+export default function Step2({ userId, onNext, initialData }: Step2Props) {
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
   const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
   const [phone, setPhone] = useState(initialData?.phone || '');
+
+  const handlePhoneChange = (text: string) => {
+    // Solo permitir números - filtrar cualquier carácter no numérico
+    const numericOnly = text.replace(/[^0-9]/g, '');
+    setPhone(numericOnly);
+  };
   const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
 
   const handleNext = async () => {
-    if (!firstName.trim() || !lastName.trim()) {
-      onSkip();
-      return;
-    }
-
     setIsLoading(true);
 
     const stepData: Step2Data = {
@@ -79,14 +79,6 @@ export default function Step2({ userId, onNext, onSkip, initialData }: Step2Prop
 
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
-      <View style={commonStyles.topBar}>
-        <TouchableOpacity style={commonStyles.skipButton} onPress={onSkip}>
-          <Text style={[commonStyles.skipButtonText, { color: Colors[colorScheme].text }]}>
-            Omitir
-          </Text>
-        </TouchableOpacity>
-      </View>
-      
       <View style={commonStyles.header}>
         <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
           Datos básicos
@@ -163,10 +155,11 @@ export default function Step2({ userId, onNext, onSkip, initialData }: Step2Prop
                   },
                 ]}
                 value={phone}
-                onChangeText={setPhone}
-                placeholder="300 123 4567"
+                keyboardType="number-pad"
+                onChangeText={handlePhoneChange}
+                placeholder="3001234567"
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
-                keyboardType="phone-pad"
+                maxLength={10}
               />
             </View>
           </View>

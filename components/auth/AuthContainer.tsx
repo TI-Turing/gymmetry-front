@@ -13,30 +13,30 @@ interface AuthContainerProps {
 export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerProps) {
   const [isLogin, setIsLogin] = useState(true);
 
-  const handleLogin = async (email: string, password: string) => {
-    // Simulamos una llamada de login exitosa
-    // En una app real, aquí harías la llamada a tu API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Datos simulados del usuario
-    const user = {
-      id: 1,
-      email,
-      firstName: 'Usuario',
-      lastName: 'Demo',
-      avatar: null,
-    };
+  const switchToRegister = () => setIsLogin(false);
+  const switchToLogin = () => setIsLogin(true);
 
-    Alert.alert(
-      '¡Bienvenido!',
-      `Has iniciado sesión exitosamente como ${email}`,
-      [
-        {
-          text: 'Continuar',
-          onPress: () => onAuthSuccess(user),
-        },
-      ]
-    );
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      // Simulamos una llamada de login exitosa
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const user: User = {
+        id: 1,
+        email,
+        firstName: 'Usuario',
+        lastName: 'Demo',
+        avatar: null,
+      };
+
+      Alert.alert(
+        '¡Bienvenido!',
+        `Has iniciado sesión exitosamente como ${email}`,
+        [{ text: 'Continuar', onPress: () => onAuthSuccess(user) }]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo iniciar sesión. Intenta nuevamente.');
+    }
   };
 
   const handleRegister = async (userData: {
@@ -45,32 +45,27 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
     email: string;
     password: string;
   }) => {
-    // Simulamos una llamada de registro exitosa
-    // En una app real, aquí harías la llamada a tu API
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // Simulamos una llamada de registro exitosa
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const user = {
-      id: Date.now(),
-      email: userData.email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      avatar: null,
-    };
+      const user: User = {
+        id: Date.now(),
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        avatar: null,
+      };
 
-    Alert.alert(
-      '¡Cuenta creada!',
-      `Bienvenido ${userData.firstName} ${userData.lastName}. Tu cuenta ha sido creada exitosamente.`,
-      [
-        {
-          text: 'Continuar',
-          onPress: () => onAuthSuccess(user),
-        },
-      ]
-    );
+      Alert.alert(
+        '¡Cuenta creada!',
+        `Bienvenido ${userData.firstName} ${userData.lastName}. Tu cuenta ha sido creada exitosamente.`,
+        [{ text: 'Continuar', onPress: () => onAuthSuccess(user) }]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo completar el registro. Intenta nuevamente.');
+    }
   };
-
-  const switchToRegister = () => setIsLogin(false);
-  const switchToLogin = () => setIsLogin(true);
 
   return (
     <View style={{ flex: 1 }}>
@@ -78,13 +73,11 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
         <LoginForm
           onLogin={handleLogin}
           onSwitchToRegister={switchToRegister}
-          onBack={onBack}
         />
       ) : (
         <RegisterForm
           onRegister={handleRegister}
           onSwitchToLogin={switchToLogin}
-          onBack={onBack}
         />
       )}
     </View>

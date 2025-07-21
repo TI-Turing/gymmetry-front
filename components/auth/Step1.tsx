@@ -21,6 +21,8 @@ interface Step1Props {
 
 export default function Step1({ onNext, initialData }: Step1Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const colorScheme = useColorScheme();
 
   const { email, setEmail, isEmailValid } = useFormValidation();
@@ -38,23 +40,39 @@ export default function Step1({ onNext, initialData }: Step1Props) {
     if (initialData) {
       setEmail(initialData.email);
       setPassword(initialData.password);
+      setConfirmPassword(initialData.password);
     }
   }, [initialData]);
 
-  const isFormValid = isEmailValid && isPasswordValid;
+  const passwordsMatch = password === confirmPassword;
+  const isFormValid = isEmailValid && isPasswordValid && passwordsMatch && confirmPassword.length > 0;
 
   const handleNext = async () => {
+    console.log('🔄 [STEP 1] handleNext llamado');
+    console.log('🔄 [STEP 1] isFormValid:', isFormValid);
+    
     if (!isFormValid) {
-      const passwordErrors = validatePassword(password, email);
-      const errorMessage = passwordErrors.length > 0 
-        ? passwordErrors.join('\n')
-        : 'Por favor completa todos los campos correctamente';
+      let errorMessage = '';
+      
+      if (!isEmailValid) {
+        errorMessage = 'Por favor ingresa un email válido';
+      } else if (!isPasswordValid) {
+        const passwordErrors = validatePassword(password, email);
+        errorMessage = passwordErrors.length > 0 
+          ? passwordErrors.join('\n')
+          : 'La contraseña no cumple los requisitos';
+      } else if (!passwordsMatch) {
+        errorMessage = 'Las contraseñas no coinciden';
+      } else if (confirmPassword.length === 0) {
+        errorMessage = 'Por favor confirma tu contraseña';
+      }
       
       Alert.alert('Error de validación', errorMessage);
       return;
     }
 
     setIsLoading(true);
+    console.log('🔄 [STEP 1] Iniciando creación de usuario...');
 
     try {
       const response = await userAPI.createUser({
@@ -62,22 +80,29 @@ export default function Step1({ onNext, initialData }: Step1Props) {
         Password: password
       }) as ApiResponse;
 
+      console.log('🔄 [STEP 1] Respuesta de la API:', response);
+
       if (!response.Success) {
         throw new Error(response.Message || 'Error al crear usuario');
       }
       
       if (response.Data?.Token) {
         apiService.setAuthToken(response.Data.Token);
+        console.log('🔑 [STEP 1] Token configurado');
       }
       
-      onNext({ 
+      const stepData = { 
         email, 
         password,
         userId: response.Data?.Id,
         token: response.Data?.Token
-      });
+      };
+      
+      console.log('🔄 [STEP 1] Llamando onNext con:', stepData);
+      onNext(stepData);
 
     } catch (error: any) {
+      console.error('❌ [STEP 1] Error:', error);
       const errorMessage = handleApiError(error);
       Alert.alert('Error', errorMessage);
     } finally {
@@ -87,7 +112,7 @@ export default function Step1({ onNext, initialData }: Step1Props) {
 
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
-      <View style={commonStyles.header}>
+      <View style={commonStyles.headerStep1}>
         <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
           Crear tu cuenta
         </Text>
@@ -159,8 +184,6 @@ export default function Step1({ onNext, initialData }: Step1Props) {
               { key: 'hasNumber', text: 'Al menos un número' },
               { key: 'notEqualToEmail', text: 'No puede ser igual al email' },
               { key: 'validChars', text: 'Solo caracteres del alfabeto inglés (sin espacios)' },
-              { key: 'noNumericSequence', text: 'No puede contener secuencias numéricas (12345)' },
-              { key: 'noLetterSequence', text: 'No puede contener secuencias de letras (ABCDEF)' },
             ].map(({ key, text }) => (
               <Text
                 key={key}
@@ -177,6 +200,51 @@ export default function Step1({ onNext, initialData }: Step1Props) {
               </Text>
             ))}
           </View>
+        </View>
+
+        <View style={commonStyles.inputContainer}>
+          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+            Confirmar contraseña *
+          </Text>
+          <View style={commonStyles.passwordContainer}>
+            <TextInput
+              style={[
+                commonStyles.passwordInput,
+                {
+                  backgroundColor: Colors[colorScheme].background,
+                  color: Colors[colorScheme].text,
+                  borderColor: passwordsMatch || confirmPassword.length === 0 ? '#666' : '#ff6b6b',
+                },
+              ]}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="Confirma tu contraseña"
+              placeholderTextColor={`${Colors[colorScheme].text}60`}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity
+              style={commonStyles.eyeButton}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              <FontAwesome
+                name={showConfirmPassword ? 'eye-slash' : 'eye'}
+                size={20}
+                color={Colors[colorScheme].text}
+              />
+            </TouchableOpacity>
+          </View>
+          
+          {confirmPassword.length > 0 && !passwordsMatch && (
+            <Text style={[commonStyles.requirement, { color: '#ff6b6b', marginTop: 4 }]}>
+              • Las contraseñas no coinciden
+            </Text>
+          )}
+          
+          {confirmPassword.length > 0 && passwordsMatch && (
+            <Text style={[commonStyles.requirement, { color: Colors[colorScheme].tint, marginTop: 4 }]}>
+              • Las contraseñas coinciden ✓
+            </Text>
+          )}
         </View>
 
         <TouchableOpacity

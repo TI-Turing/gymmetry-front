@@ -45,6 +45,11 @@ export interface Step4Data {
   additionalInfo?: string;
 }
 
+export interface Step5Data {
+  username?: string;
+  profileImage?: string;
+}
+
 export interface ApiResponse<T = any> {
   Success: boolean;
   Message?: string;

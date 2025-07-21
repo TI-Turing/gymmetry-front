@@ -12,6 +12,11 @@ export const commonStyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  headerStep1: {
+    alignItems: 'center',
+    marginBottom: 40,
+    marginTop: 20,
+  },
   form: {
     marginBottom: 10,
   },
@@ -130,7 +135,9 @@ export const commonStyles = StyleSheet.create({
   // Componentes de Steps Bar
   stepsContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 24,
+    marginBottom: 16,
+    marginHorizontal: 17,
     backgroundColor: 'transparent',
   },
   progressContainer: {
@@ -143,19 +150,19 @@ export const commonStyles = StyleSheet.create({
     alignItems: 'center',
   },
   stepCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepNumber: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   stepLine: {
-    width: 40,
+    width: 32,
     height: 2,
     marginHorizontal: 8,
   },
@@ -164,5 +171,69 @@ export const commonStyles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     opacity: 0.8,
+  },
+
+  // RegisterForm styles
+  registerFormContainer: {
+    flex: 1,
+  },
+  registerFormHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  skipButtonRegister: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  headerButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  registerFormTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  registerFormSubtitle: {
+    fontSize: 16,
+    opacity: 0.8,
+  },
+
+  // Step5 styles - Image picker
+  imagePickerContainer: {
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 120,
+    borderStyle: 'dashed',
+  },
+  imagePreviewContainer: {
+    alignItems: 'center',
+  },
+  imagePreview: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 8,
+  },
+  imagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageText: {
+    fontSize: 14,
+    textAlign: 'center',
+    opacity: 0.7,
   },
 });
