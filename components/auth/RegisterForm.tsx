@@ -3,6 +3,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from 'react-native';
 import { View, Text } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
@@ -14,6 +15,7 @@ import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
 import Step5 from './Step5';
+import { WelcomeScreen } from '../home';
 import { apiService } from '@/services/apiService';
 import { useAuthContext } from '@/components/auth/AuthContext';
 import { commonStyles } from './styles/common';
@@ -53,6 +55,7 @@ interface RegistrationData {
 
 export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   const [registrationData, setRegistrationData] = useState<RegistrationData>({
     email: '',
     password: '',
@@ -99,6 +102,35 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
     };
   }, [currentStep]);
 
+  // Manejar el botón físico del dispositivo (Android)
+  useEffect(() => {
+    const backAction = () => {
+      // Si estamos en un paso superior al 1, ir a la pantalla de bienvenida
+      if (currentStep > 0) {
+        handleSkipToWelcome();
+        return true; // Prevenir el comportamiento por defecto
+      }
+      // Si estamos en el paso 1, permitir el comportamiento por defecto (ir al login)
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    
+    return () => backHandler.remove();
+  }, [currentStep]);
+
+  // Función para manejar cuando el usuario omite o usa el botón físico
+  const handleSkipToWelcome = () => {
+    console.log('🏠 [REGISTER FORM] Redirigiendo a pantalla de bienvenida...');
+    
+    // Marcar al usuario como logueado con los datos que tengamos
+    if (registrationData.token) {
+      apiService.setAuthToken(registrationData.token);
+    }
+    
+    setShowWelcomeScreen(true);
+  };
+
   const stepTitles = [
     'Credenciales',
     'Datos básicos',
@@ -131,7 +163,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
 
   const handleStep2Skip = () => {
     console.log('🔄 [REGISTER FORM] handleStep2Skip llamado');
-    setCurrentStep(2);
+    handleSkipToWelcome();
   };
 
   const handleStep3Next = (data: {
@@ -150,7 +182,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
 
   const handleStep3Skip = () => {
     console.log('🔄 [REGISTER FORM] handleStep3Skip llamado');
-    setCurrentStep(3);
+    handleSkipToWelcome();
   };
 
   const handleStep4Next = (data: {
@@ -165,7 +197,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
 
   const handleStep4Skip = () => {
     console.log('🔄 [REGISTER FORM] handleStep4Skip llamado');
-    setCurrentStep(4);
+    handleSkipToWelcome();
   };
 
   const handleStep5Next = (data: {
@@ -174,16 +206,14 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
   }) => {
     console.log('🔄 [REGISTER FORM] handleStep5Next llamado con data:', data);
     const finalData = { ...registrationData, ...data };
-    console.log('🔄 [REGISTER FORM] Llamando onRegister con finalData:', finalData);
-    onRegister(finalData);
+    console.log('🔄 [REGISTER FORM] Registro completado. Redirigiendo a bienvenida...');
+    setRegistrationData(finalData);
+    setShowWelcomeScreen(true);
   };
 
   const handleStep5Skip = () => {
     console.log('🔄 [REGISTER FORM] handleStep5Skip llamado');
-    // En el último paso, completar el registro sin datos adicionales
-    const finalData = { ...registrationData };
-    console.log('🔄 [REGISTER FORM] Llamando onRegister con finalData (skip):', finalData);
-    onRegister(finalData);
+    handleSkipToWelcome();
   };
 
   const handlePrevious = () => {
@@ -261,6 +291,24 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
         return null;
     }
   };
+
+  // Si debemos mostrar la pantalla de bienvenida
+  if (showWelcomeScreen) {
+    return (
+      <WelcomeScreen
+        userData={{
+          email: registrationData.email,
+          firstName: registrationData.firstName,
+          lastName: registrationData.lastName,
+          username: registrationData.username,
+        }}
+        onContinue={() => {
+          console.log('🏠 [WELCOME SCREEN] Usuario continuó desde bienvenida');
+          onRegister(registrationData);
+        }}
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
