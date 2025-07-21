@@ -10,6 +10,7 @@ import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import Dropdown from './Dropdown';
 import { userAPI } from '@/services/apiExamples';
+import { filterEmptyFields } from '../../utils/objectUtils';
 
 interface Step4Props {
   userId: string;
@@ -70,14 +71,18 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
     console.log('📤 [STEP 4] Datos a enviar:', stepData);
     
     try {
-      // Mapear a los campos del backend
-      const updateData = {
+      // Mapear a los campos del backend y usar helper para filtrar campos vacíos
+      const rawUpdateData = {
+        id: userId,
         physicalExceptions: stepData.healthRestrictions,
-        // TODO: Agregar campos para fitnessGoal y additionalInfo si existen en el backend
-        // Estos campos podrían no existir en el schema actual del backend
+        fitnessGoal: stepData.fitnessGoal, // TODO: Verificar si existe en el backend
+        additionalInfo: stepData.additionalInfo // TODO: Verificar si existe en el backend
       };
       
-      console.log('📋 [STEP 4] Datos mapeados para API:', updateData);
+      // Filtrar campos vacíos usando la función helper
+      const updateData = filterEmptyFields(rawUpdateData);
+      
+      console.log('📋 [STEP 4] Datos filtrados para API:', updateData);
       
       const response = await userAPI.updateUser(userId, updateData);
       console.log('✅ [STEP 4] Actualización exitosa:', response);

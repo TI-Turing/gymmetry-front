@@ -10,6 +10,7 @@ import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import Dropdown from './Dropdown';
 import { userAPI } from '@/services/apiExamples';
+import { filterEmptyFields } from '../../utils/objectUtils';
 
 interface Step3Props {
   userId: string;
@@ -160,20 +161,18 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     console.log('📤 [STEP 3] Datos a enviar:', stepData);
     
     try {
-      // Mapear a los campos del backend
-      const updateData = {
-        // Mapear campos según el backend schema
+      // Mapear a los campos del backend y usar helper para filtrar campos vacíos
+      const rawUpdateData = {
+        id: userId,
         emergencyName: stepData.emergencyContact,
         emergencyPhone: stepData.emergencyPhone,
-        address: stepData.address,
-        // TODO: Mapear correctamente eps, country, region, city a sus IDs correspondientes
-        // idEps: eps se debe convertir a ID
-        // countryId: country se debe convertir a ID  
-        // regionId: region se debe convertir a ID
-        // cityId: city se debe convertir a ID
+        address: stepData.address
       };
       
-      console.log('📋 [STEP 3] Datos mapeados para API:', updateData);
+      // Filtrar campos vacíos usando la función helper
+      const updateData = filterEmptyFields(rawUpdateData);
+      
+      console.log('📋 [STEP 3] Datos filtrados para API:', updateData);
       
       const response = await userAPI.updateUser(userId, updateData);
       console.log('✅ [STEP 3] Actualización exitosa:', response);

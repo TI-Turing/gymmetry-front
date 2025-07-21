@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   ScrollView,
@@ -8,7 +7,13 @@ import {
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
-import { userAPI } from '@/services/apiExamples';
+import AuthContainer from './AuthContainer';
+import { userAPI } from '../../services/apiExamples';
+import { UpdateUserRequest } from '../../dto/user';
+import { filterEmptyFields } from '../../utils/objectUtils';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
+import { step2Styles as styles } from './styles';
 
 interface Step2Props {
   userId: string;
@@ -20,9 +25,46 @@ interface Step2Props {
 export default function Step2({ userId, onNext, onSkip, initialData }: Step2Props) {
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
+  const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
   const [phone, setPhone] = useState(initialData?.phone || '');
   const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const colorScheme = useColorScheme();
+
+  // Función para formatear fecha en formato DD/MM/YYYY
+  const formatDate = (date: Date): string => {
+    if (!date) return '';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Función para convertir fecha DD/MM/AAAA a objeto Date
+  const parseDate = (dateString: string): Date => {
+    if (!dateString) return new Date();
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Los meses van de 0-11
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    }
+    return new Date();
+  };
+
+  // Función para convertir fecha DD/MM/AAAA a YYYY-MM-DD para el backend
+  const convertDateForBackend = (dateString: string): string => {
+    if (!dateString) return '';
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      const day = parts[0];
+      const month = parts[1];
+      const year = parts[2];
+      return `${year}-${month}-${day}`;
+    }
+    return dateString;
+  };
 
   const handleNext = async () => {
     if (!firstName.trim() || !lastName.trim()) {
@@ -36,22 +78,26 @@ export default function Step2({ userId, onNext, onSkip, initialData }: Step2Prop
     const stepData = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      phone: phone.trim() || undefined,
-      birthDate: birthDate.trim() || undefined,
+      phone: (selectedCountry.dialCode + phone).trim() || undefined,
+      birthDate: birthDate ? convertDateForBackend(birthDate.trim()) : undefined,
     };
     
     console.log('📤 [STEP 2] Datos a enviar:', stepData);
     
     try {
-      // Mapear a los campos del backend
-      const updateData = {
+      // Mapear a los campos del backend y usar helper para filtrar campos vacíos
+      const rawUpdateData = {
+        id: userId,
         name: stepData.firstName,
         lastName: stepData.lastName,
         phone: stepData.phone,
-        birthDate: stepData.birthDate,
+        birthDate: stepData.birthDate
       };
       
-      console.log('📋 [STEP 2] Datos mapeados para API:', updateData);
+      // Filtrar campos vacíos usando la función helper
+      const updateData = filterEmptyFields(rawUpdateData);
+      
+      console.log('📋 [STEP 2] Datos filtrados para API:', updateData);
       
       const response = await userAPI.updateUser(userId, updateData);
       console.log('✅ [STEP 2] Actualización exitosa:', response);
@@ -66,6 +112,19 @@ export default function Step2({ userId, onNext, onSkip, initialData }: Step2Prop
       console.error('❌ [STEP 2] Error al actualizar usuario:', error);
       // Por ahora continuamos aunque falle la API
       onNext(stepData);
+    }
+  };
+
+  // Función para manejar cambio de fecha desde el DateTimePicker
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      // Formato DD/MM/AAAA
+      const day = selectedDate.getDate().toString().padStart(2, '0');
+      const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+      const year = selectedDate.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+      setBirthDate(formattedDate);
     }
   };
 
@@ -137,42 +196,54 @@ export default function Step2({ userId, onNext, onSkip, initialData }: Step2Prop
           <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
             Teléfono
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+57 300 123 4567"
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-            keyboardType="phone-pad"
-          />
+          <View style={styles.phoneRow}>
+            <View style={styles.prefixContainer}>
+              <CountryCodePicker
+                selectedCountry={selectedCountry}
+                onSelect={setSelectedCountry}
+              />
+            </View>
+            <View style={styles.phoneContainer}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: Colors[colorScheme].background,
+                    color: Colors[colorScheme].text,
+                    borderColor: '#666',
+                  },
+                ]}
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="300 123 4567"
+                placeholderTextColor={`${Colors[colorScheme].text}60`}
+                keyboardType="phone-pad"
+              />
+            </View>
+          </View>
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-            Fecha de nacimiento
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
-            value={birthDate}
-            onChangeText={setBirthDate}
-            placeholder="DD/MM/AAAA"
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-            keyboardType="numeric"
-          />
+          <Text style={[styles.label, { color: Colors[colorScheme].text }]}>Fecha de nacimiento</Text>
+          <TouchableOpacity
+            style={[styles.input, { backgroundColor: Colors[colorScheme].background, borderColor: '#666' }]}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={{ color: Colors[colorScheme].text }}>
+              {birthDate ? formatDate(parseDate(birthDate)) : 'Selecciona tu fecha de nacimiento'}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={parseDate(birthDate)}
+              mode="date"
+              display="default"
+              maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 10))}
+              onChange={handleDateChange}
+              themeVariant={colorScheme === 'dark' ? 'dark' : 'light'}
+              accentColor="#ff6300"
+            />
+          )}
         </View>
 
         <View style={styles.buttonContainer}>
@@ -192,91 +263,3 @@ export default function Step2({ userId, onNext, onSkip, initialData }: Step2Prop
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  topBar: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginBottom: 20,
-    paddingTop: 10,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.8,
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 20,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  halfWidth: {
-    width: '48%',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  nextButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    width: '100%',
-  },
-  nextButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  skipButtonTop: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-  },
-  skipButtonTopText: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-  skipButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  skipButtonText: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-});
