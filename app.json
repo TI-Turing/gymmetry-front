@@ -26,7 +26,16 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "Gymmetry",
+      "description": "Aplicación de gimnasio para móvil y web",
+      "lang": "es",
+      "scope": "/",
+      "themeColor": "#ff6600",
+      "backgroundColor": "#000000",
+      "display": "standalone",
+      "orientation": "portrait-primary",
+      "preferRelatedApplications": false
     },
     "plugins": [
       "expo-router"

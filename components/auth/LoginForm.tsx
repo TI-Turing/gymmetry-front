@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   Alert,
@@ -13,6 +12,11 @@ import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+// Imports locales
+import { useFormValidation } from './hooks/useValidation';
+import { handleApiError } from './utils/api';
+import { commonStyles } from './styles/common';
+
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
   onSwitchToRegister: () => void;
@@ -20,10 +24,12 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: LoginFormProps) {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
+  
+  const { email, setEmail, isEmailValid } = useFormValidation();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -31,7 +37,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
       return;
     }
 
-    if (!email.includes('@')) {
+    if (!isEmailValid) {
       Alert.alert('Error', 'Por favor ingresa un email válido');
       return;
     }
@@ -39,8 +45,9 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
     setIsLoading(true);
     try {
       await onLogin(email, password);
-    } catch (error) {
-      Alert.alert('Error', 'Credenciales incorrectas');
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -48,11 +55,14 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {onBack && (
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <TouchableOpacity 
+          style={{ position: 'absolute', top: 50, left: 20, zIndex: 1, padding: 10 }} 
+          onPress={onBack}
+        >
           <FontAwesome 
             name="arrow-left" 
             size={24} 
@@ -61,28 +71,28 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
         </TouchableOpacity>
       )}
       
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: Colors[colorScheme].tint }]}>
+      <ScrollView contentContainerStyle={[commonStyles.container, { justifyContent: 'center' }]}>
+        <View style={[commonStyles.header, { marginBottom: 40 }]}>
+          <Text style={[commonStyles.title, { color: Colors[colorScheme].tint, fontSize: 32 }]}>
             🏋️ GYMMETRY
           </Text>
-          <Text style={[styles.subtitle, { color: Colors[colorScheme].text }]}>
+          <Text style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}>
             Inicia sesión para continuar
           </Text>
         </View>
 
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+        <View style={commonStyles.form}>
+          <View style={commonStyles.inputContainer}>
+            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
               Email
             </Text>
             <TextInput
               style={[
-                styles.input,
+                commonStyles.input,
                 {
                   backgroundColor: Colors[colorScheme].background,
                   color: Colors[colorScheme].text,
-                  borderColor: '#666',
+                  borderColor: isEmailValid ? Colors[colorScheme].tint : '#666',
                 },
               ]}
               value={email}
@@ -95,141 +105,71 @@ export default function LoginForm({ onLogin, onSwitchToRegister, onBack }: Login
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+          <View style={commonStyles.inputContainer}>
+            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
               Contraseña
             </Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: Colors[colorScheme].background,
-                  color: Colors[colorScheme].text,
-                  borderColor: '#666',
-                },
-              ]}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              placeholderTextColor={`${Colors[colorScheme].text}60`}
-              secureTextEntry
-            />
+            <View style={{ position: 'relative' }}>
+              <TextInput
+                style={[
+                  commonStyles.input,
+                  {
+                    backgroundColor: Colors[colorScheme].background,
+                    color: Colors[colorScheme].text,
+                    borderColor: '#666',
+                    paddingRight: 50,
+                  },
+                ]}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Tu contraseña"
+                placeholderTextColor={`${Colors[colorScheme].text}60`}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  right: 16,
+                  top: 12,
+                  padding: 4,
+                }}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <FontAwesome
+                  name={showPassword ? 'eye-slash' : 'eye'}
+                  size={20}
+                  color={Colors[colorScheme].text}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <TouchableOpacity
             style={[
-              styles.loginButton,
+              commonStyles.button,
               { backgroundColor: Colors[colorScheme].tint },
-              isLoading && styles.buttonDisabled,
+              (isLoading || !email || !password) && commonStyles.buttonDisabled,
             ]}
             onPress={handleLogin}
-            disabled={isLoading}
+            disabled={isLoading || !email || !password}
           >
-            <Text style={styles.loginButtonText}>
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            <Text style={commonStyles.buttonText}>
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={[styles.forgotPasswordText, { color: Colors[colorScheme].tint }]}>
-              ¿Olvidaste tu contraseña?
+          <View style={{ alignItems: 'center', marginTop: 24 }}>
+            <Text style={[{ color: Colors[colorScheme].text, marginBottom: 8 }]}>
+              ¿No tienes cuenta?
             </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: Colors[colorScheme].text }]}>
-            ¿No tienes cuenta?{' '}
-          </Text>
-          <TouchableOpacity onPress={onSwitchToRegister}>
-            <Text style={[styles.linkText, { color: Colors[colorScheme].tint }]}>
-              Regístrate aquí
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={onSwitchToRegister}>
+              <Text style={[{ color: Colors[colorScheme].tint, fontWeight: '600' }]}>
+                Crear cuenta
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 1,
-    padding: 10,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.8,
-  },
-  form: {
-    marginBottom: 30,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  loginButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  forgotPassword: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  forgotPasswordText: {
-    fontSize: 16,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 16,
-  },
-  linkText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});

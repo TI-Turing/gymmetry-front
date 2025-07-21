@@ -1,0 +1,83 @@
+/* Estilos globales para la versión web */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000000;
+  overflow-x: hidden;
+}
+
+/* Contenedor principal responsivo */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: #000000;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para pantallas grandes */
+@media (min-width: 768px) {
+  #root {
+    margin-top: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: calc(100vh - 40px);
+  }
+}
+
+/* Mejorar los dropdowns en web */
+.dropdown-web {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Mejorar los inputs en web */
+input:focus {
+  outline: none;
+  border-color: #ff6600 !important;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Transiciones suaves */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Mejorar la experiencia del modal en web */
+.modal-web {
+  backdrop-filter: blur(5px);
+}
+
+/* Estilos para el country picker en web */
+.country-picker-web {
+  max-height: 300px;
+  overflow-y: auto;
+}

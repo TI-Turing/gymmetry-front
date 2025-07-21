@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import { View } from '../Themed';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
+import { User } from './types';
 
 interface AuthContainerProps {
-  onAuthSuccess: (user: any) => void;
+  onAuthSuccess: (user: User) => void;
   onBack?: () => void;
 }
 
@@ -72,7 +73,7 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
   const switchToLogin = () => setIsLogin(true);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       {isLogin ? (
         <LoginForm
           onLogin={handleLogin}
@@ -89,9 +90,3 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

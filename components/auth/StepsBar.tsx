@@ -1,112 +1,83 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Text } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
+import { commonStyles } from './styles/common';
 
 interface StepsBarProps {
   currentStep: number;
   totalSteps: number;
-  stepTitles: string[];
+  stepTitles?: string[];
 }
 
 export default function StepsBar({ currentStep, totalSteps, stepTitles }: StepsBarProps) {
   const colorScheme = useColorScheme();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.progressContainer}>
-        {Array.from({ length: totalSteps }, (_, index) => (
-          <View key={index} style={styles.stepContainer}>
-            <View
-              style={[
-                styles.stepCircle,
-                {
-                  backgroundColor: index < currentStep 
-                    ? Colors[colorScheme].tint 
-                    : index === currentStep 
-                    ? Colors[colorScheme].tint 
-                    : '#333',
-                  borderColor: index <= currentStep 
-                    ? Colors[colorScheme].tint 
-                    : '#666',
-                },
-              ]}
-            >
-              <Text
+    <View style={commonStyles.stepsContainer}>
+      <View style={commonStyles.progressContainer}>
+        {Array.from({ length: totalSteps }, (_, index) => {
+          const isActive = index <= currentStep;
+          
+          return (
+            <View key={index} style={commonStyles.stepContainer}>
+              <View
                 style={[
-                  styles.stepNumber,
+                  commonStyles.stepCircle,
                   {
-                    color: index <= currentStep ? '#fff' : '#999',
+                    backgroundColor: isActive ? Colors[colorScheme].tint : '#333',
+                    borderColor: isActive ? Colors[colorScheme].tint : '#666',
                   },
                 ]}
               >
-                {index + 1}
-              </Text>
+                <Text
+                  style={[
+                    commonStyles.stepNumber,
+                    { color: isActive ? '#fff' : '#999' },
+                  ]}
+                >
+                  {index + 1}
+                </Text>
+              </View>
+              
+              {index < totalSteps - 1 && (
+                <View
+                  style={[
+                    commonStyles.stepLine,
+                    {
+                      backgroundColor: index < currentStep 
+                        ? Colors[colorScheme].tint 
+                        : '#333',
+                    },
+                  ]}
+                />
+              )}
             </View>
-            {index < totalSteps - 1 && (
-              <View
-                style={[
-                  styles.stepLine,
-                  {
-                    backgroundColor: index < currentStep 
-                      ? Colors[colorScheme].tint 
-                      : '#333',
-                  },
-                ]}
-              />
-            )}
-          </View>
-        ))}
+          );
+        })}
       </View>
       
-      <Text
-        style={[
-          styles.stepTitle,
-          { color: Colors[colorScheme].text },
-        ]}
-      >
-        {stepTitles[currentStep]}
-      </Text>
+      {stepTitles && stepTitles.length > 0 && (
+        <View style={commonStyles.progressContainer}>
+          {stepTitles.map((title, index) => (
+            <Text
+              key={index}
+              style={[
+                commonStyles.stepTitle,
+                { 
+                  color: index <= currentStep 
+                    ? Colors[colorScheme].text 
+                    : '#666',
+                  flex: 1,
+                },
+              ]}
+            >
+              {title}
+            </Text>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15,
-  },
-  stepContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  stepCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  stepNumber: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  stepLine: {
-    width: 40,
-    height: 2,
-    marginHorizontal: 5,
-  },
-  stepTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-});

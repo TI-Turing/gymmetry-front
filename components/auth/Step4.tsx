@@ -1,119 +1,77 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import Dropdown from './Dropdown';
 import { userAPI } from '@/services/apiExamples';
-import { filterEmptyFields } from '../../utils/objectUtils';
+
+// Imports locales
+import { Step4Data } from './types';
+import { handleApiError } from './utils/api';
+import { commonStyles } from './styles/common';
+import { FITNESS_GOALS, HEALTH_CONDITIONS } from './data/fitness';
 
 interface Step4Props {
   userId: string;
-  onNext: (data: {
-    fitnessGoal?: string;
-    healthRestrictions?: string;
-    additionalInfo?: string;
-  }) => void;
-  initialData?: {
-    fitnessGoal?: string;
-    healthRestrictions?: string;
-    additionalInfo?: string;
-  };
+  onNext: (data: Step4Data) => void;
+  initialData?: Step4Data;
 }
-
-const FITNESS_GOALS = [
-  'Perder peso',
-  'Ganar masa muscular',
-  'Mantener peso actual',
-  'Mejorar resistencia cardiovascular',
-  'Aumentar fuerza',
-  'Mejorar flexibilidad',
-  'Rehabilitación',
-  'Preparación deportiva',
-  'Bienestar general',
-  'Otro',
-];
-
-const HEALTH_CONDITIONS = [
-  'Ninguna',
-  'Asma',
-  'Diabetes',
-  'Hipertensión',
-  'Problemas cardíacos',
-  'Lesiones articulares',
-  'Problemas de espalda',
-  'Alergias',
-  'Embarazo',
-  'Otra condición',
-];
 
 export default function Step4({ userId, onNext, initialData }: Step4Props) {
   const [fitnessGoal, setFitnessGoal] = useState(initialData?.fitnessGoal || '');
   const [healthRestrictions, setHealthRestrictions] = useState(initialData?.healthRestrictions || '');
   const [additionalInfo, setAdditionalInfo] = useState(initialData?.additionalInfo || '');
+  const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
 
   const handleNext = async () => {
-    console.log('🚀 [STEP 4] Iniciando actualización de información fitness...');
-    console.log('👤 [STEP 4] User ID:', userId);
+    setIsLoading(true);
     
-    const stepData = {
+    const stepData: Step4Data = {
       fitnessGoal: fitnessGoal || undefined,
       healthRestrictions: healthRestrictions || undefined,
       additionalInfo: additionalInfo.trim() || undefined,
     };
     
-    console.log('📤 [STEP 4] Datos a enviar:', stepData);
-    
     try {
-      // Mapear a los campos del backend y usar helper para filtrar campos vacíos
-      const rawUpdateData = {
-        id: userId,
-        physicalExceptions: stepData.healthRestrictions,
-        fitnessGoal: stepData.fitnessGoal, // TODO: Verificar si existe en el backend
-        additionalInfo: stepData.additionalInfo // TODO: Verificar si existe en el backend
+      const updateData = {
+        ...(stepData.fitnessGoal && { fitnessGoal: stepData.fitnessGoal }),
+        ...(stepData.healthRestrictions && { physicalExceptions: stepData.healthRestrictions }),
+        ...(stepData.additionalInfo && { additionalInfo: stepData.additionalInfo }),
       };
       
-      // Filtrar campos vacíos usando la función helper
-      const updateData = filterEmptyFields(rawUpdateData);
-      
-      console.log('📋 [STEP 4] Datos filtrados para API:', updateData);
-      
       const response = await userAPI.updateUser(userId, updateData);
-      console.log('✅ [STEP 4] Actualización exitosa:', response);
       
-      // Verificar que la respuesta sea exitosa
       if (!response.Success) {
         throw new Error(response.Message || 'Error al actualizar usuario');
       }
       
       onNext(stepData);
-    } catch (error) {
-      console.error('❌ [STEP 4] Error al actualizar usuario:', error);
-      // Por ahora continuamos aunque falle la API
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
+      console.error('❌ [STEP 4] Error:', errorMessage);
+      // Continuar aunque falle la API para no bloquear el flujo
       onNext(stepData);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
-          Información fitness
+    <ScrollView contentContainerStyle={commonStyles.container}>
+      <View style={commonStyles.header}>
+        <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
+          Objetivos de fitness
         </Text>
-        <Text style={[styles.subtitle, { color: Colors[colorScheme].text }]}>
-          Ayúdanos a personalizar tu experiencia
+        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}>
+          Personaliza tu experiencia (opcional)
         </Text>
       </View>
 
-      <View style={styles.form}>
+      <View style={commonStyles.form}>
         <Dropdown
-          label="Objetivo fitness principal"
+          label="Objetivo principal"
           placeholder="¿Cuál es tu objetivo?"
           options={FITNESS_GOALS}
           value={fitnessGoal}
@@ -121,22 +79,23 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
         />
 
         <Dropdown
-          label="Restricciones de salud"
-          placeholder="¿Tienes alguna condición médica?"
+          label="Condiciones de salud"
+          placeholder="¿Tienes alguna restricción?"
           options={HEALTH_CONDITIONS}
           value={healthRestrictions}
           onSelect={setHealthRestrictions}
         />
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+        <View style={commonStyles.inputContainer}>
+          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
             Información adicional
           </Text>
           <TextInput
             style={[
-              styles.input,
-              styles.multilineInput,
+              commonStyles.input,
               {
+                minHeight: 100,
+                textAlignVertical: 'top',
                 backgroundColor: Colors[colorScheme].background,
                 color: Colors[colorScheme].text,
                 borderColor: '#666',
@@ -144,97 +103,27 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
             ]}
             value={additionalInfo}
             onChangeText={setAdditionalInfo}
-            placeholder="Cuéntanos sobre tu experiencia con el ejercicio, lesiones previas, medicamentos que tomas, o cualquier otra información relevante..."
+            placeholder="Cuéntanos cualquier cosa que consideres importante..."
             placeholderTextColor={`${Colors[colorScheme].text}60`}
             multiline
-            numberOfLines={5}
-            textAlignVertical="top"
+            numberOfLines={4}
           />
-        </View>
-
-        <View style={styles.infoBox}>
-          <Text style={[styles.infoText, { color: Colors[colorScheme].text }]}>
-            ℹ️ Esta información nos ayuda a recomendarte ejercicios seguros y adecuados para ti. 
-            Siempre consulta con tu médico antes de comenzar cualquier programa de ejercicios.
-          </Text>
         </View>
 
         <TouchableOpacity
           style={[
-            styles.finishButton,
+            commonStyles.button,
             { backgroundColor: Colors[colorScheme].tint },
+            isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
+          disabled={isLoading}
         >
-          <Text style={styles.finishButtonText}>
-            Finalizar registro
+          <Text style={commonStyles.buttonText}>
+            {isLoading ? 'Finalizando...' : 'Finalizar registro'}
           </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.8,
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  multilineInput: {
-    minHeight: 120,
-  },
-  infoBox: {
-    backgroundColor: 'rgba(255, 99, 0, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 14,
-    lineHeight: 20,
-    opacity: 0.8,
-  },
-  finishButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  finishButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});

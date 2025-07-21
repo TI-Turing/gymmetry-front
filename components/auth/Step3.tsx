@@ -1,138 +1,23 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import Dropdown from './Dropdown';
+import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import { userAPI } from '@/services/apiExamples';
-import { filterEmptyFields } from '../../utils/objectUtils';
+
+// Imports locales
+import { Step3Data, Country } from './types';
+import { EPS_OPTIONS, COUNTRIES, COLOMBIA_REGIONS, COLOMBIA_CITIES } from './data/colombia';
+import { handleApiError } from './utils/api';
+import { commonStyles } from './styles/common';
 
 interface Step3Props {
   userId: string;
-  onNext: (data: {
-    eps?: string;
-    country?: string;
-    region?: string;
-    city?: string;
-    emergencyContact?: string;
-    emergencyPhone?: string;
-    address?: string;
-  }) => void;
-  initialData?: {
-    eps?: string;
-    country?: string;
-    region?: string;
-    city?: string;
-    emergencyContact?: string;
-    emergencyPhone?: string;
-    address?: string;
-  };
+  onNext: (data: Step3Data) => void;
+  initialData?: Step3Data;
 }
-
-const EPS_OPTIONS = [
-  'Sanitas',
-  'Sura',
-  'Nueva EPS',
-  'Compensar',
-  'Famisanar',
-  'Salud Total',
-  'Coomeva',
-  'Medimás',
-  'Capital Salud',
-  'Aliansalud',
-  'Cruz Blanca',
-  'Otra',
-];
-
-const COUNTRIES = [
-  'Colombia',
-  'Argentina',
-  'México',
-  'España',
-  'Estados Unidos',
-  'Chile',
-  'Perú',
-  'Ecuador',
-  'Venezuela',
-  'Uruguay',
-  'Paraguay',
-  'Bolivia',
-  'Brasil',
-  'Otro',
-];
-
-const COLOMBIA_REGIONS = [
-  'Amazonas',
-  'Antioquia',
-  'Arauca',
-  'Atlántico',
-  'Bolívar',
-  'Boyacá',
-  'Caldas',
-  'Caquetá',
-  'Casanare',
-  'Cauca',
-  'Cesar',
-  'Chocó',
-  'Córdoba',
-  'Cundinamarca',
-  'Guainía',
-  'Guaviare',
-  'Huila',
-  'La Guajira',
-  'Magdalena',
-  'Meta',
-  'Nariño',
-  'Norte de Santander',
-  'Putumayo',
-  'Quindío',
-  'Risaralda',
-  'San Andrés y Providencia',
-  'Santander',
-  'Sucre',
-  'Tolima',
-  'Valle del Cauca',
-  'Vaupés',
-  'Vichada',
-];
-
-const COLOMBIA_CITIES = [
-  'Bogotá',
-  'Medellín',
-  'Cali',
-  'Barranquilla',
-  'Cartagena',
-  'Cúcuta',
-  'Bucaramanga',
-  'Pereira',
-  'Santa Marta',
-  'Ibagué',
-  'Bello',
-  'Pasto',
-  'Manizales',
-  'Neiva',
-  'Soledad',
-  'Villavicencio',
-  'Armenia',
-  'Soacha',
-  'Valledupar',
-  'Montería',
-  'Itagüí',
-  'Palmira',
-  'Buenaventura',
-  'Floridablanca',
-  'Sincelejo',
-  'Popayán',
-  'Dosquebradas',
-  'Tunja',
-  'Envigado',
-  'Cartago',
-];
 
 export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const [eps, setEps] = useState(initialData?.eps || '');
@@ -140,68 +25,65 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const [region, setRegion] = useState(initialData?.region || '');
   const [city, setCity] = useState(initialData?.city || '');
   const [emergencyContact, setEmergencyContact] = useState(initialData?.emergencyContact || '');
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
   const [emergencyPhone, setEmergencyPhone] = useState(initialData?.emergencyPhone || '');
   const [address, setAddress] = useState(initialData?.address || '');
+  const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
 
   const handleNext = async () => {
-    console.log('🚀 [STEP 3] Iniciando actualización de datos personales...');
-    console.log('👤 [STEP 3] User ID:', userId);
+    setIsLoading(true);
     
-    const stepData = {
+    const stepData: Step3Data = {
       eps: eps || undefined,
       country: country || undefined,
       region: region || undefined,
       city: city || undefined,
       emergencyContact: emergencyContact.trim() || undefined,
-      emergencyPhone: emergencyPhone.trim() || undefined,
+      emergencyPhone: emergencyPhone.trim() ? `${selectedCountry.dialCode}${emergencyPhone.trim()}` : undefined,
       address: address.trim() || undefined,
     };
     
-    console.log('📤 [STEP 3] Datos a enviar:', stepData);
-    
     try {
-      // Mapear a los campos del backend y usar helper para filtrar campos vacíos
-      const rawUpdateData = {
-        id: userId,
+      const updateData = {
         emergencyName: stepData.emergencyContact,
         emergencyPhone: stepData.emergencyPhone,
-        address: stepData.address
+        address: stepData.address,
+        ...(stepData.eps && { eps: stepData.eps }),
+        ...(stepData.country && { country: stepData.country }),
+        ...(stepData.region && { region: stepData.region }),
+        ...(stepData.city && { city: stepData.city }),
       };
       
-      // Filtrar campos vacíos usando la función helper
-      const updateData = filterEmptyFields(rawUpdateData);
-      
-      console.log('📋 [STEP 3] Datos filtrados para API:', updateData);
-      
       const response = await userAPI.updateUser(userId, updateData);
-      console.log('✅ [STEP 3] Actualización exitosa:', response);
       
-      // Verificar que la respuesta sea exitosa
       if (!response.Success) {
         throw new Error(response.Message || 'Error al actualizar usuario');
       }
       
       onNext(stepData);
-    } catch (error) {
-      console.error('❌ [STEP 3] Error al actualizar usuario:', error);
-      // Por ahora continúamos aunque falle la API
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
+      console.error('❌ [STEP 3] Error:', errorMessage);
+      // Continuar aunque falle la API para no bloquear el flujo
       onNext(stepData);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
+    <ScrollView contentContainerStyle={commonStyles.container}>
+      <View style={commonStyles.header}>
+        <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
           Información personal
         </Text>
-        <Text style={[styles.subtitle, { color: Colors[colorScheme].text }]}>
+        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}>
           Datos adicionales para tu perfil (opcional)
         </Text>
       </View>
 
-      <View style={styles.form}>
+      <View style={commonStyles.form}>
         <Dropdown
           label="EPS"
           placeholder="Selecciona tu EPS"
@@ -237,13 +119,13 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
           searchable
         />
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-            Contacto de emergencia
+        <View style={commonStyles.inputContainer}>
+          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+            Nombre de un contacto de emergencia
           </Text>
           <TextInput
             style={[
-              styles.input,
+              commonStyles.input,
               {
                 backgroundColor: Colors[colorScheme].background,
                 color: Colors[colorScheme].text,
@@ -258,35 +140,45 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-            Teléfono de emergencia
+        <View style={commonStyles.inputContainer}>
+          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+            Teléfono del contacto de emergencia
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
-            value={emergencyPhone}
-            onChangeText={setEmergencyPhone}
-            placeholder="+57 300 123 4567"
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-            keyboardType="phone-pad"
-          />
+          <View style={commonStyles.phoneRow}>
+            <View style={commonStyles.prefixContainer}>
+              <CountryCodePicker
+                selectedCountry={selectedCountry}
+                onSelect={setSelectedCountry}
+              />
+            </View>
+            <View style={commonStyles.phoneContainer}>
+              <TextInput
+                style={[
+                  commonStyles.input,
+                  {
+                    backgroundColor: Colors[colorScheme].background,
+                    color: Colors[colorScheme].text,
+                    borderColor: '#666',
+                  },
+                ]}
+                value={emergencyPhone}
+                onChangeText={setEmergencyPhone}
+                placeholder="300 123 4567"
+                placeholderTextColor={`${Colors[colorScheme].text}60`}
+                keyboardType="phone-pad"
+              />
+            </View>
+          </View>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+        <View style={commonStyles.inputContainer}>
+          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
             Dirección
           </Text>
           <TextInput
             style={[
-              styles.input,
-              styles.multilineInput,
+              commonStyles.input,
+              commonStyles.multilineInput,
               {
                 backgroundColor: Colors[colorScheme].background,
                 color: Colors[colorScheme].text,
@@ -299,75 +191,23 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
             placeholderTextColor={`${Colors[colorScheme].text}60`}
             multiline
             numberOfLines={3}
-            textAlignVertical="top"
           />
         </View>
 
         <TouchableOpacity
           style={[
-            styles.nextButton,
+            commonStyles.button,
             { backgroundColor: Colors[colorScheme].tint },
+            isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
+          disabled={isLoading}
         >
-          <Text style={styles.nextButtonText}>
-            Continuar
+          <Text style={commonStyles.buttonText}>
+            {isLoading ? 'Guardando...' : 'Continuar'}
           </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.8,
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  multilineInput: {
-    minHeight: 80,
-  },
-  nextButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  nextButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
