@@ -6,12 +6,14 @@ import Colors from '@/constants/Colors';
 import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
+import Dropdown from './Dropdown';
 
 // Imports locales
 import { Step2Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
 import { commonStyles } from './styles/common';
+import { genders } from './data/formData';
 
 interface Step2Props {
   userId: string;
@@ -24,6 +26,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
   const [lastName, setLastName] = useState(initialData?.lastName || '');
   const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
   const [phone, setPhone] = useState(initialData?.phone || '');
+  const [selectedGender, setSelectedGender] = useState<number | undefined>(initialData?.idGender);
 
   const handlePhoneChange = (text: string) => {
     // Solo permitir números - filtrar cualquier carácter no numérico
@@ -43,6 +46,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       lastName: lastName.trim(),
       phone: phone.trim() ? `${selectedCountry.dialCode}${phone.trim()}` : undefined,
       birthDate: birthDate ? formatDateForBackend(birthDate.trim()) : undefined,
+      idGender: selectedGender,
     };
     
     try {
@@ -51,6 +55,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         lastName: stepData.lastName,
         ...(stepData.phone && { phone: stepData.phone }),
         ...(stepData.birthDate && { birthDate: stepData.birthDate }),
+        ...(stepData.idGender && { IdGender: stepData.idGender }),
       };
       
       const response = await userAPI.updateUser(userId, updateData);
@@ -196,6 +201,22 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               accentColor="#ff6300"
             />
           )}
+        </View>
+
+        <View style={commonStyles.inputContainer}>
+          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+            Género
+          </Text>
+          <Dropdown
+            label=""
+            options={genders.map(gender => gender.name)}
+            value={selectedGender ? genders.find(g => g.id === selectedGender)?.name || '' : ''}
+            onSelect={(genderName: string) => {
+              const gender = genders.find(g => g.name === genderName);
+              setSelectedGender(gender?.id);
+            }}
+            placeholder="Selecciona tu género"
+          />
         </View>
 
         <TouchableOpacity

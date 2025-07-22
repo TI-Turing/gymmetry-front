@@ -36,6 +36,7 @@ interface RegistrationData {
   lastName?: string;
   phone?: string;
   birthDate?: string;
+  idGender?: number;
   // Step 3
   eps?: string;
   country?: string;
@@ -44,10 +45,14 @@ interface RegistrationData {
   emergencyContact?: string;
   emergencyPhone?: string;
   address?: string;
+  documentType?: string;
+  documentTypeId?: number;
+  countryId?: number;
   // Step 4
   fitnessGoal?: string;
   healthRestrictions?: string;
   additionalInfo?: string;
+  rh?: string;
   // Step 5
   username?: string;
   profileImage?: string;
@@ -245,6 +250,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
               lastName: registrationData.lastName || '',
               phone: registrationData.phone,
               birthDate: registrationData.birthDate,
+              idGender: registrationData.idGender,
             }}
           />
         );
@@ -261,6 +267,9 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
               emergencyContact: registrationData.emergencyContact || '',
               emergencyPhone: registrationData.emergencyPhone || '',
               address: registrationData.address || '',
+              documentType: registrationData.documentType || '',
+              documentTypeId: registrationData.documentTypeId,
+              countryId: registrationData.countryId,
             }}
           />
         );
@@ -273,6 +282,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
               fitnessGoal: registrationData.fitnessGoal || '',
               healthRestrictions: registrationData.healthRestrictions || '',
               additionalInfo: registrationData.additionalInfo || '',
+              rh: registrationData.rh || '',
             }}
           />
         );
@@ -321,7 +331,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
           <View style={commonStyles.backButton}>
             {currentStep === 0 && (
               <TouchableOpacity 
-                onPress={handlePrevious}
+                onPress={onSwitchToLogin}
               >
                 <FontAwesome
                   name="chevron-left"

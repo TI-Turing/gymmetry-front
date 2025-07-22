@@ -17,6 +17,7 @@ export interface Step2Data {
   lastName: string;
   phone?: string;
   birthDate?: string;
+  idGender?: number;
 }
 
 export interface Step3Data {
@@ -27,6 +28,9 @@ export interface Step3Data {
   emergencyContact?: string;
   emergencyPhone?: string;
   address?: string;
+  documentTypeId?: number;
+  documentType?: string;
+  countryId?: number;
 }
 
 export interface PasswordValidation {
@@ -43,6 +47,7 @@ export interface Step4Data {
   fitnessGoal?: string;
   healthRestrictions?: string;
   additionalInfo?: string;
+  rh?: string;
 }
 
 export interface Step5Data {

@@ -10,6 +10,7 @@ import { userAPI } from '@/services/apiExamples';
 // Imports locales
 import { Step3Data, Country } from './types';
 import { EPS_OPTIONS, COUNTRIES, COLOMBIA_REGIONS, COLOMBIA_CITIES } from './data/colombia';
+import { documentTypes, countries } from './data/formData';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 
@@ -28,6 +29,12 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
   const [emergencyPhone, setEmergencyPhone] = useState(initialData?.emergencyPhone || '');
   const [address, setAddress] = useState(initialData?.address || '');
+  
+  // Nuevos campos
+  const [documentType, setDocumentType] = useState(initialData?.documentType || '');
+  const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState<number | undefined>(initialData?.documentTypeId);
+  const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>(initialData?.countryId);
+  
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
 
@@ -42,6 +49,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
       emergencyContact: emergencyContact.trim() || undefined,
       emergencyPhone: emergencyPhone.trim() ? `${selectedCountry.dialCode}${emergencyPhone.trim()}` : undefined,
       address: address.trim() || undefined,
+      documentType: documentType || undefined,
+      documentTypeId: selectedDocumentTypeId,
+      countryId: selectedCountryId,
     };
     
     try {
@@ -53,6 +63,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         ...(stepData.country && { country: stepData.country }),
         ...(stepData.region && { region: stepData.region }),
         ...(stepData.city && { city: stepData.city }),
+        ...(stepData.documentType && { DocumentType: stepData.documentType }),
+        ...(stepData.documentTypeId && { DocumentTypeId: stepData.documentTypeId }),
+        ...(stepData.countryId && { CountryId: stepData.countryId }),
       };
       
       const response = await userAPI.updateUser(userId, updateData);
@@ -85,6 +98,30 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
 
       <View style={commonStyles.form}>
         <Dropdown
+          label="Tipo de documento"
+          placeholder="Selecciona tu tipo de documento"
+          options={documentTypes.map(doc => doc.name)}
+          value={documentType}
+          onSelect={(docTypeName: string) => {
+            const docType = documentTypes.find(d => d.name === docTypeName);
+            setDocumentType(docTypeName);
+            setSelectedDocumentTypeId(docType?.id);
+          }}
+        />
+
+        <Dropdown
+          label="País de residencia"
+          placeholder="Selecciona tu país"
+          options={countries.map(country => country.name)}
+          value={selectedCountryId ? countries.find(c => c.id === selectedCountryId)?.name || '' : ''}
+          onSelect={(countryName: string) => {
+            const country = countries.find(c => c.name === countryName);
+            setSelectedCountryId(country?.id);
+          }}
+          searchable
+        />
+
+        <Dropdown
           label="EPS"
           placeholder="Selecciona tu EPS"
           options={EPS_OPTIONS}
@@ -93,8 +130,8 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         />
 
         <Dropdown
-          label="País"
-          placeholder="Selecciona tu país"
+          label="País (ubicación actual)"
+          placeholder="Selecciona tu país actual"
           options={COUNTRIES}
           value={country}
           onSelect={setCountry}

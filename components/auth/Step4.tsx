@@ -11,6 +11,7 @@ import { Step4Data } from './types';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 import { FITNESS_GOALS, HEALTH_CONDITIONS } from './data/fitness';
+import { rhTypes } from './data/formData';
 
 interface Step4Props {
   userId: string;
@@ -22,6 +23,7 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
   const [fitnessGoal, setFitnessGoal] = useState(initialData?.fitnessGoal || '');
   const [healthRestrictions, setHealthRestrictions] = useState(initialData?.healthRestrictions || '');
   const [additionalInfo, setAdditionalInfo] = useState(initialData?.additionalInfo || '');
+  const [rh, setRh] = useState(initialData?.rh || '');
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
 
@@ -32,6 +34,7 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
       fitnessGoal: fitnessGoal || undefined,
       healthRestrictions: healthRestrictions || undefined,
       additionalInfo: additionalInfo.trim() || undefined,
+      rh: rh || undefined,
     };
     
     try {
@@ -39,6 +42,7 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
         ...(stepData.fitnessGoal && { fitnessGoal: stepData.fitnessGoal }),
         ...(stepData.healthRestrictions && { physicalExceptions: stepData.healthRestrictions }),
         ...(stepData.additionalInfo && { additionalInfo: stepData.additionalInfo }),
+        ...(stepData.rh && { RH: stepData.rh }),
       };
       
       const response = await userAPI.updateUser(userId, updateData);
@@ -84,6 +88,14 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
           options={HEALTH_CONDITIONS}
           value={healthRestrictions}
           onSelect={setHealthRestrictions}
+        />
+
+        <Dropdown
+          label="Tipo de sangre (RH)"
+          placeholder="Selecciona tu tipo de sangre"
+          options={rhTypes}
+          value={rh}
+          onSelect={setRh}
         />
 
         <View style={commonStyles.inputContainer}>
