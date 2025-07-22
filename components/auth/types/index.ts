@@ -17,7 +17,7 @@ export interface Step2Data {
   lastName: string;
   phone?: string;
   birthDate?: string;
-  idGender?: number;
+  genderId?: string;
 }
 
 export interface Step3Data {

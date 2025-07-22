@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, ScrollView, Modal, FlatList } from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
-import Dropdown from './Dropdown';
 import { useGenders } from './hooks/useCatalogs';
 
 // Imports locales
@@ -22,24 +21,25 @@ interface Step2Props {
 }
 
 export default function Step2({ userId, onNext, initialData }: Step2Props) {
-  // Hook para obtener catálogos
+  // Hook para obtener géneros del servicio de catálogos
   const { genders, loading: gendersLoading, error: gendersError } = useGenders();
-  
+
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
   const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
   const [phone, setPhone] = useState(initialData?.phone || '');
-  const [selectedGender, setSelectedGender] = useState<number | undefined>(initialData?.idGender);
+  const [selectedGender, setSelectedGender] = useState<string>('');
+  const [showGenderPicker, setShowGenderPicker] = useState(false);
+  const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const colorScheme = useColorScheme();
 
   const handlePhoneChange = (text: string) => {
     // Solo permitir números - filtrar cualquier carácter no numérico
     const numericOnly = text.replace(/[^0-9]/g, '');
     setPhone(numericOnly);
   };
-  const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const colorScheme = useColorScheme();
 
   const handleNext = async () => {
     setIsLoading(true);
@@ -49,7 +49,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       lastName: lastName.trim(),
       phone: phone.trim() ? `${selectedCountry.dialCode}${phone.trim()}` : undefined,
       birthDate: birthDate ? formatDateForBackend(birthDate.trim()) : undefined,
-      idGender: selectedGender,
+      genderId: selectedGender || undefined,
     };
     
     try {
@@ -58,7 +58,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         lastName: stepData.lastName,
         ...(stepData.phone && { phone: stepData.phone }),
         ...(stepData.birthDate && { birthDate: stepData.birthDate }),
-        ...(stepData.idGender && { IdGender: stepData.idGender }),
+        ...(stepData.genderId && { IdGender: stepData.genderId }),
       };
       
       const response = await userAPI.updateUser(userId, updateData);
@@ -210,16 +210,89 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
             Género
           </Text>
-          <Dropdown
-            label=""
-            options={genders.map(gender => gender.Nombre)}
-            value={selectedGender ? genders.find(g => g.Id === selectedGender.toString())?.Nombre || '' : ''}
-            onSelect={(genderName: string) => {
-              const gender = genders.find(g => g.Nombre === genderName);
-              setSelectedGender(gender ? parseInt(gender.Id) : undefined);
-            }}
-            placeholder="Selecciona tu género"
-          />
+          {gendersLoading ? (
+            <View style={[
+              commonStyles.input,
+              {
+                backgroundColor: Colors[colorScheme].background,
+                borderColor: '#666',
+                justifyContent: 'center'
+              }
+            ]}>
+              <Text style={{ color: `${Colors[colorScheme].text}60` }}>
+                Cargando géneros...
+              </Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[
+                commonStyles.input,
+                {
+                  backgroundColor: Colors[colorScheme].background,
+                  borderColor: '#666',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }
+              ]}
+              onPress={() => {
+                console.log('🔍 [GENDER DROPDOWN] Pressed - genders available:', genders.length);
+                setShowGenderPicker(!showGenderPicker);
+              }}
+            >
+              <Text style={{
+                color: selectedGender 
+                  ? Colors[colorScheme].text 
+                  : `${Colors[colorScheme].text}60`
+              }}>
+                {selectedGender 
+                  ? genders.find(g => g.Id === selectedGender)?.Nombre || 'Género seleccionado'
+                  : 'Selecciona tu género'
+                }
+              </Text>
+              <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
+                {showGenderPicker ? '▲' : '▼'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {showGenderPicker && genders.length > 0 && (
+            <View style={{
+              backgroundColor: Colors[colorScheme].background,
+              borderColor: '#666',
+              borderWidth: 1,
+              borderRadius: 8,
+              marginTop: 4,
+              maxHeight: 200,
+            }}>
+              {genders.map((gender) => (
+                <TouchableOpacity
+                  key={gender.Id}
+                  style={{
+                    padding: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#333',
+                    backgroundColor: selectedGender === gender.Id 
+                      ? `${Colors[colorScheme].tint}20` 
+                      : 'transparent'
+                  }}
+                  onPress={() => {
+                    console.log('🔍 [GENDER DROPDOWN] Selected:', gender.Nombre, 'ID:', gender.Id);
+                    setSelectedGender(gender.Id);
+                    setShowGenderPicker(false);
+                  }}
+                >
+                  <Text style={{
+                    color: selectedGender === gender.Id 
+                      ? Colors[colorScheme].tint 
+                      : Colors[colorScheme].text
+                  }}>
+                    {gender.Nombre}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         <TouchableOpacity

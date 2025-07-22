@@ -21,6 +21,7 @@ interface CatalogsState {
 }
 
 export const useCatalogs = () => {
+  console.log('🔍 [USE CATALOGS] Hook called');
   const [state, setState] = useState<CatalogsState>({
     genders: [],
     documentTypes: [],
@@ -33,6 +34,7 @@ export const useCatalogs = () => {
   });
 
   const loadCatalogs = async () => {
+    console.log('🔍 [USE CATALOGS] Loading catalogs...');
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -46,6 +48,10 @@ export const useCatalogs = () => {
         catalogService.getCountries(),
         catalogService.getEPS()
       ]);
+
+      console.log('🔍 [USE CATALOGS] Genders response:', gendersResponse);
+      console.log('🔍 [USE CATALOGS] Countries response:', countriesResponse);
+      console.log('🔍 [USE CATALOGS] EPS response:', epsResponse);
 
       // Cargar tipos de documento para Colombia por defecto
       const colombiaId = catalogService.getColombiaId();
@@ -106,6 +112,7 @@ export const useCatalogs = () => {
   };
 
   useEffect(() => {
+    console.log('🔍 [USE CATALOGS] useEffect called - loading catalogs');
     loadCatalogs();
   }, []);
 
@@ -120,6 +127,8 @@ export const useCatalogs = () => {
 
 // Hook específico para géneros (para Step2)
 export const useGenders = () => {
+  console.log('🔍 [USE GENDERS] Hook called');
   const { genders, loading, error } = useCatalogs();
+  console.log('🔍 [USE GENDERS] Result - genders:', genders, 'loading:', loading, 'error:', error);
   return { genders, loading, error };
 };
