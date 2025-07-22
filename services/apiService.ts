@@ -45,16 +45,6 @@ class ApiService {
         }
         
         const fullUrl = `${config.baseURL}${config.url}`;
-        console.log(`🌐 [API REQUEST] ${config.method?.toUpperCase()} ${fullUrl}`);
-        console.log(`📦 [REQUEST DATA]`, config.data || 'No data');
-        console.log(`📋 [REQUEST HEADERS]`, config.headers);
-        
-        // Verificar si el token está presente en los headers
-        if (config.headers?.Authorization) {
-          console.log(`🔑 [AUTH TOKEN] Token presente en la petición: ${config.headers.Authorization}`);
-        } else {
-          console.log(`⚠️ [AUTH TOKEN] No se encontró token en la petición`);
-        }
         
         // Generar y mostrar comando cURL equivalente (multilínea, fácil de copiar)
         const curlCommand = generateCurlCommand(
@@ -67,9 +57,6 @@ class ApiService {
         console.log(curlCommand);
         console.log('================ END CURL REQUEST ================');
         
-        if (Environment.DEBUG) {
-          console.log(`${config.method?.toUpperCase()} ${config.url}`, config.data || '');
-        }
         return config;
       },
       (error) => {
@@ -121,12 +108,6 @@ function generateCurlCommand(
     // Interceptor de response para logging y manejo de errores
     this.axiosInstance.interceptors.response.use(
       (response: AxiosResponse) => {
-        console.log(`✅ [API RESPONSE] ${response.status} ${response.config.method?.toUpperCase()} ${response.config.baseURL}${response.config.url}`);
-        console.log(`📥 [RESPONSE DATA]`, response.data);
-        
-        if (Environment.DEBUG) {
-          console.log('API Response:', response.data);
-        }
         return response;
       },
       (error: AxiosError) => {

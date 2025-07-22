@@ -5,7 +5,6 @@ import LoginForm from '@/components/auth/LoginForm';
 
 export default function LoginPage() {
   const handleLogin = (email: string, password: string) => {
-    console.log('Login:', email, password);
     // Aquí iría tu lógica de autenticación
     // Después del login exitoso, navegar a la app principal
     router.replace('/(tabs)');

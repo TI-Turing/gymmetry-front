@@ -20,13 +20,7 @@ export const userAPI = {
   // Crear usuario inicial (Step 1 del registro)
   createUser: async (userData: CreateUserRequest): Promise<CreateUserResponse> => {
     try {
-      console.log('🚀 [USER API] Iniciando creación de usuario...');
-      console.log('🔗 [USER API] URL que se va a llamar: /user/add');
-      console.log('📤 [USER API] Datos a enviar:', userData);
-      
       const response = await apiService.post<CreateUserResponse>('/user/add', userData);
-      
-      console.log('✅ [USER API] Usuario creado exitosamente:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ [USER API] Error al crear usuario:', error);
@@ -47,19 +41,12 @@ export const userAPI = {
   // Actualizar usuario (Steps 2-4 del registro)
   updateUser: async (userId: string, userData: Partial<UpdateUserRequest>): Promise<UpdateUserResponse> => {
     try {
-      console.log('🔄 [USER API] Iniciando actualización de usuario...');
-      console.log('🔗 [USER API] URL que se va a llamar: /user/update');
-      console.log('👤 [USER API] ID del usuario:', userId);
-      console.log('📤 [USER API] Datos a enviar:', userData);
-      
       const updateData = {
         ...userData,
         id: userId
       };
       
       const response = await apiService.put<UpdateUserResponse>('/user/update', updateData);
-      
-      console.log('✅ [USER API] Usuario actualizado exitosamente:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ [USER API] Error al actualizar usuario:', error);
@@ -106,7 +93,6 @@ const handleCreateUser = async (email: string, password: string) => {
       email, 
       Password: password 
     });
-    console.log('Usuario creado:', response);
     // Continuar con los siguientes pasos del registro
   } catch (error) {
     console.error('Error al crear usuario:', error.message);

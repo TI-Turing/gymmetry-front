@@ -11,8 +11,6 @@ export default function HeaderSkipButton() {
   // Mostrar el botón solo si estamos en registro y no en el primer paso
   const shouldShow = isInRegisterFlow && currentStep > 0;
 
-  console.log('🎯 [HEADER SKIP] Rendering - isInRegisterFlow:', isInRegisterFlow, 'currentStep:', currentStep, 'shouldShow:', shouldShow);
-
   if (!shouldShow) {
     return null;
   }
@@ -20,11 +18,8 @@ export default function HeaderSkipButton() {
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log('🔘 [HEADER SKIP] Button pressed');
         if (onSkip) {
           onSkip();
-        } else {
-          console.log('⚠️ [HEADER SKIP] No onSkip function available');
         }
       }}
       style={{

@@ -32,8 +32,6 @@ function setupEnvironmentFile() {
   
   // Check if the source file exists
   if (fs.existsSync(sourceFile)) {
-    console.log(`🌍 Setting up environment from: ${envFile}`);
-    
     try {
       // Copy the content to .env in project root
       let envContent = fs.readFileSync(sourceFile, 'utf8');
@@ -44,17 +42,6 @@ function setupEnvironmentFile() {
       }
       
       fs.writeFileSync(targetFile, envContent);
-      console.log(`✓ Environment file copied to .env`);
-      
-      // Also log the variables being set
-      const envLines = envContent.split('\n');
-      envLines.forEach(line => {
-        const trimmedLine = line.trim();
-        if (trimmedLine && !trimmedLine.startsWith('#') && trimmedLine.includes('=')) {
-          const [key] = trimmedLine.split('=');
-          console.log(`  ✓ ${key}`);
-        }
-      });
     } catch (err) {
       console.error(`❌ Error copying environment file: ${err.message}`);
     }

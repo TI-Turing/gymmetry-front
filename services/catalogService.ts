@@ -37,17 +37,6 @@ class CatalogService {
         }
 
         const fullUrl = `${config.baseURL}${config.url}`;
-        console.log(`🌐 [CATALOG API REQUEST] ${config.method?.toUpperCase()} ${fullUrl}`);
-        console.log(`📦 [CATALOG REQUEST DATA]`, config.data || 'No data');
-        console.log(`📋 [CATALOG REQUEST HEADERS]`, config.headers);
-        
-        // Verificar específicamente la x-functions-key
-        if (config.headers && config.headers['x-functions-key']) {
-          console.log(`🔑 [CATALOG API KEY] x-functions-key presente: ${config.headers['x-functions-key']}`);
-        } else {
-          console.log(`⚠️ [CATALOG API KEY] x-functions-key NO encontrada en headers`);
-          console.log(`🔍 [CATALOG ENV DEBUG] Environment.API_FUNCTIONS_KEY:`, Environment.API_FUNCTIONS_KEY);
-        }
         
         // Generar y mostrar comando cURL equivalente
         const curlCommand = this.generateCurlCommand(
@@ -70,8 +59,6 @@ class CatalogService {
 
     this.catalogsAPI.interceptors.response.use(
       (response) => {
-        console.log(`✅ [CATALOG API RESPONSE] ${response.status} ${response.config.method?.toUpperCase()} ${response.config.baseURL}${response.config.url}`);
-        console.log(`📥 [CATALOG RESPONSE DATA]`, response.data);
         return response;
       },
       (error) => {

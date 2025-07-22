@@ -48,9 +48,6 @@ export default function Step1({ onNext, initialData }: Step1Props) {
   const isFormValid = isEmailValid && isPasswordValid && passwordsMatch && confirmPassword.length > 0;
 
   const handleNext = async () => {
-    console.log('🔄 [STEP 1] handleNext llamado');
-    console.log('🔄 [STEP 1] isFormValid:', isFormValid);
-    
     if (!isFormValid) {
       let errorMessage = '';
       

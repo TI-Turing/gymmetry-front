@@ -76,8 +76,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         // Redimensionar imagen a 2MP
         const resizedUri = await resizeImageTo2MP(selectedImage.uri);
         setProfileImage(resizedUri);
-        
-        console.log('✅ [STEP 5] Imagen seleccionada y redimensionada');
       }
     } catch (error) {
       console.error('❌ [STEP 5] Error al seleccionar imagen:', error);
@@ -111,8 +109,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         // Redimensionar imagen a 2MP
         const resizedUri = await resizeImageTo2MP(takenPhoto.uri);
         setProfileImage(resizedUri);
-        
-        console.log('✅ [STEP 5] Foto tomada y redimensionada');
       }
     } catch (error) {
       console.error('❌ [STEP 5] Error al tomar foto:', error);
@@ -145,7 +141,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
     try {
       // Por ahora solo pasamos los datos sin hacer llamada a la API
       // ya que los tipos del API no incluyen estos campos
-      console.log('✅ [STEP 5] Datos del paso 5:', stepData);
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);

@@ -7,7 +7,6 @@ type EnvironmentType = 'local' | 'development' | 'production';
 // Leer el entorno desde variable de entorno o usar default
 const getEnvironmentFromProcess = (): EnvironmentType => {
   const envVar = process.env.EXPO_PUBLIC_ENV || process.env.NODE_ENV;
-  console.log('Current Environment:', envVar);
   switch (envVar) {
     case 'local':
     case 'development':
@@ -27,14 +26,6 @@ const createConfig = () => {
   const debug = (process.env.EXPO_PUBLIC_DEBUG || process.env.DEBUG) === 'true';
   const apiFunctionsKey = process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY || process.env.API_FUNCTIONS_KEY || '';
   const apiMainFunctionsKey = process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY || process.env.API_MAIN_FUNCTIONS_KEY || '';
-  
-  console.log('Environment Variables Debug:');
-  console.log('- EXPO_PUBLIC_API_BASE_URL:', process.env.EXPO_PUBLIC_API_BASE_URL);
-  console.log('- API_BASE_URL:', process.env.API_BASE_URL);
-  console.log('- Final API Base URL:', apiBaseUrl);
-  console.log('- EXPO_PUBLIC_API_FUNCTIONS_KEY:', process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY);
-  console.log('- API_FUNCTIONS_KEY:', process.env.API_FUNCTIONS_KEY);
-  console.log('- Final API Functions Key:', apiFunctionsKey);
   
   return {
     API_BASE_URL: apiBaseUrl,

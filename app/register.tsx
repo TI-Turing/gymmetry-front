@@ -6,7 +6,6 @@ import { AuthProvider } from '@/components/auth/AuthContext';
 
 export default function RegisterPage() {
   const handleRegister = (userData: any) => {
-    console.log('Registro completo:', userData);
     // Aquí iría tu lógica post-registro
     // Navegar a la app principal o pantalla de bienvenida
     router.replace('/(tabs)');
