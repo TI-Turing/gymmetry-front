@@ -7,7 +7,7 @@ type EnvironmentType = 'local' | 'development' | 'production';
 // Leer el entorno desde variable de entorno o usar default
 const getEnvironmentFromProcess = (): EnvironmentType => {
   const envVar = process.env.EXPO_PUBLIC_ENV || process.env.NODE_ENV;
-  
+  console.log('Current Environment:', envVar);
   switch (envVar) {
     case 'local':
     case 'development':
@@ -20,13 +20,29 @@ const getEnvironmentFromProcess = (): EnvironmentType => {
 
 // Configuration object using environment variables
 const createConfig = () => {
+  // En Expo, las variables deben tener prefijo EXPO_PUBLIC_ para estar disponibles en el cliente
+  const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:7160/api';
+  const catalogsApiBaseUrl = process.env.EXPO_PUBLIC_CATALOGS_API_BASE_URL || process.env.CATALOGS_API_BASE_URL || 'https://your-catalogs-api-url.com/api';
+  const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || process.env.ENVIRONMENT || 'local';
+  const debug = (process.env.EXPO_PUBLIC_DEBUG || process.env.DEBUG) === 'true';
+  const apiFunctionsKey = process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY || process.env.API_FUNCTIONS_KEY || '';
+  const apiMainFunctionsKey = process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY || process.env.API_MAIN_FUNCTIONS_KEY || '';
+  
+  console.log('Environment Variables Debug:');
+  console.log('- EXPO_PUBLIC_API_BASE_URL:', process.env.EXPO_PUBLIC_API_BASE_URL);
+  console.log('- API_BASE_URL:', process.env.API_BASE_URL);
+  console.log('- Final API Base URL:', apiBaseUrl);
+  console.log('- EXPO_PUBLIC_API_FUNCTIONS_KEY:', process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY);
+  console.log('- API_FUNCTIONS_KEY:', process.env.API_FUNCTIONS_KEY);
+  console.log('- Final API Functions Key:', apiFunctionsKey);
+  
   return {
-    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:7160/api',
-    CATALOGS_API_BASE_URL: process.env.CATALOGS_API_BASE_URL || 'https://your-catalogs-api-url.com/api',
-    ENVIRONMENT: process.env.ENVIRONMENT || 'local',
-    DEBUG: process.env.DEBUG === 'true',
-    API_FUNCTIONS_KEY: process.env.API_FUNCTIONS_KEY || '',
-    API_MAIN_FUNCTIONS_KEY: process.env.API_MAIN_FUNCTIONS_KEY || '',
+    API_BASE_URL: apiBaseUrl,
+    CATALOGS_API_BASE_URL: catalogsApiBaseUrl,
+    ENVIRONMENT: environment,
+    DEBUG: debug,
+    API_FUNCTIONS_KEY: apiFunctionsKey,
+    API_MAIN_FUNCTIONS_KEY: apiMainFunctionsKey,
   };
 };
 

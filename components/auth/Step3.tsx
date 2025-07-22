@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
@@ -6,11 +6,10 @@ import Colors from '@/constants/Colors';
 import Dropdown from './Dropdown';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import { userAPI } from '@/services/apiExamples';
+import { useCatalogs } from './hooks/useCatalogs';
 
 // Imports locales
 import { Step3Data, Country } from './types';
-import { EPS_OPTIONS, COUNTRIES, COLOMBIA_REGIONS, COLOMBIA_CITIES } from './data/colombia';
-import { documentTypes, countries } from './data/formData';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 
@@ -21,6 +20,19 @@ interface Step3Props {
 }
 
 export default function Step3({ userId, onNext, initialData }: Step3Props) {
+  // Hook para obtener catálogos
+  const { 
+    documentTypes, 
+    countries, 
+    regions, 
+    cities, 
+    eps: epsOptions, 
+    loading, 
+    loadRegionsByCountry, 
+    loadCitiesByRegion, 
+    loadDocumentTypesByCountry 
+  } = useCatalogs();
+
   const [eps, setEps] = useState(initialData?.eps || '');
   const [country, setCountry] = useState(initialData?.country || '');
   const [region, setRegion] = useState(initialData?.region || '');
@@ -32,11 +44,46 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   
   // Nuevos campos
   const [documentType, setDocumentType] = useState(initialData?.documentType || '');
-  const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState<number | undefined>(initialData?.documentTypeId);
-  const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>(initialData?.countryId);
+  const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState<string | undefined>(initialData?.documentTypeId);
+  const [selectedCountryId, setSelectedCountryId] = useState<string | undefined>(initialData?.countryId);
+  const [selectedRegionId, setSelectedRegionId] = useState<string | undefined>(initialData?.regionId);
+  const [selectedCityId, setSelectedCityId] = useState<string | undefined>(initialData?.cityId);
+  const [selectedEpsId, setSelectedEpsId] = useState<string | undefined>(initialData?.epsId);
   
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
+
+  // Handlers para cargas dinámicas
+  const handleCountryChange = async (countryName: string) => {
+    const country = countries.find(c => c.Nombre === countryName);
+    setSelectedCountryId(country?.Id);
+    setCountry(countryName);
+    
+    if (country?.Id) {
+      await loadDocumentTypesByCountry(country.Id);
+      await loadRegionsByCountry(country.Id);
+    }
+    
+    // Reset dependent fields
+    setRegion('');
+    setSelectedRegionId(undefined);
+    setCity('');
+    setSelectedCityId(undefined);
+  };
+
+  const handleRegionChange = async (regionName: string) => {
+    const region = regions.find(r => r.Nombre === regionName);
+    setSelectedRegionId(region?.Id);
+    setRegion(regionName);
+    
+    if (region?.Id) {
+      await loadCitiesByRegion(region.Id);
+    }
+    
+    // Reset dependent fields
+    setCity('');
+    setSelectedCityId(undefined);
+  };
 
   const handleNext = async () => {
     setIsLoading(true);
@@ -52,6 +99,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
       documentType: documentType || undefined,
       documentTypeId: selectedDocumentTypeId,
       countryId: selectedCountryId,
+      regionId: selectedRegionId,
+      cityId: selectedCityId,
+      epsId: selectedEpsId,
     };
     
     try {
@@ -100,39 +150,40 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         <Dropdown
           label="Tipo de documento"
           placeholder="Selecciona tu tipo de documento"
-          options={documentTypes.map(doc => doc.name)}
-          value={documentType}
+          options={documentTypes.map(doc => doc.Nombre)}
+          value={selectedDocumentTypeId ? documentTypes.find(d => d.Id === selectedDocumentTypeId)?.Nombre || '' : ''}
           onSelect={(docTypeName: string) => {
-            const docType = documentTypes.find(d => d.name === docTypeName);
+            const docType = documentTypes.find(d => d.Nombre === docTypeName);
             setDocumentType(docTypeName);
-            setSelectedDocumentTypeId(docType?.id);
+            setSelectedDocumentTypeId(docType?.Id);
           }}
         />
 
         <Dropdown
           label="País de residencia"
           placeholder="Selecciona tu país"
-          options={countries.map(country => country.name)}
-          value={selectedCountryId ? countries.find(c => c.id === selectedCountryId)?.name || '' : ''}
-          onSelect={(countryName: string) => {
-            const country = countries.find(c => c.name === countryName);
-            setSelectedCountryId(country?.id);
-          }}
+          options={countries.map(country => country.Nombre)}
+          value={selectedCountryId ? countries.find(c => c.Id === selectedCountryId)?.Nombre || '' : ''}
+          onSelect={handleCountryChange}
           searchable
         />
 
         <Dropdown
           label="EPS"
           placeholder="Selecciona tu EPS"
-          options={EPS_OPTIONS}
-          value={eps}
-          onSelect={setEps}
+          options={epsOptions.map(eps => eps.Nombre)}
+          value={selectedEpsId ? epsOptions.find(e => e.Id === selectedEpsId)?.Nombre || '' : ''}
+          onSelect={(epsName: string) => {
+            const epsItem = epsOptions.find(e => e.Nombre === epsName);
+            setEps(epsName);
+            setSelectedEpsId(epsItem?.Id);
+          }}
         />
 
         <Dropdown
           label="País (ubicación actual)"
           placeholder="Selecciona tu país actual"
-          options={COUNTRIES}
+          options={countries.map(country => country.Nombre)}
           value={country}
           onSelect={setCountry}
           searchable
@@ -141,18 +192,22 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         <Dropdown
           label="Región/Departamento"
           placeholder="Selecciona tu región"
-          options={COLOMBIA_REGIONS}
+          options={regions.map(region => region.Nombre)}
           value={region}
-          onSelect={setRegion}
+          onSelect={handleRegionChange}
           searchable
         />
 
         <Dropdown
           label="Ciudad"
           placeholder="Selecciona tu ciudad"
-          options={COLOMBIA_CITIES}
+          options={cities.map(city => city.Nombre)}
           value={city}
-          onSelect={setCity}
+          onSelect={(cityName: string) => {
+            const cityItem = cities.find(c => c.Nombre === cityName);
+            setCity(cityName);
+            setSelectedCityId(cityItem?.Id);
+          }}
           searchable
         />
 

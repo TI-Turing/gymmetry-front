@@ -28,9 +28,13 @@ export interface Step3Data {
   emergencyContact?: string;
   emergencyPhone?: string;
   address?: string;
-  documentTypeId?: number;
+  // IDs como strings para compatibilidad con el backend
+  documentTypeId?: string;
   documentType?: string;
-  countryId?: number;
+  countryId?: string;
+  regionId?: string;
+  cityId?: string;
+  epsId?: string;
 }
 
 export interface PasswordValidation {

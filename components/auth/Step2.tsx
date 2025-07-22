@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView, Modal, FlatList } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -7,13 +7,13 @@ import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import Dropdown from './Dropdown';
+import { useGenders } from './hooks/useCatalogs';
 
 // Imports locales
 import { Step2Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
 import { commonStyles } from './styles/common';
-import { genders } from './data/formData';
 
 interface Step2Props {
   userId: string;
@@ -22,6 +22,9 @@ interface Step2Props {
 }
 
 export default function Step2({ userId, onNext, initialData }: Step2Props) {
+  // Hook para obtener catálogos
+  const { genders, loading: gendersLoading, error: gendersError } = useGenders();
+  
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
   const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
@@ -209,11 +212,11 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           </Text>
           <Dropdown
             label=""
-            options={genders.map(gender => gender.name)}
-            value={selectedGender ? genders.find(g => g.id === selectedGender)?.name || '' : ''}
+            options={genders.map(gender => gender.Nombre)}
+            value={selectedGender ? genders.find(g => g.Id === selectedGender.toString())?.Nombre || '' : ''}
             onSelect={(genderName: string) => {
-              const gender = genders.find(g => g.name === genderName);
-              setSelectedGender(gender?.id);
+              const gender = genders.find(g => g.Nombre === genderName);
+              setSelectedGender(gender ? parseInt(gender.Id) : undefined);
             }}
             placeholder="Selecciona tu género"
           />

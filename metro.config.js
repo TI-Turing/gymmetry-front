@@ -1,3 +1,7 @@
+// Setup environment file before Metro starts
+const { setupEnvironmentFile } = require('./env-loader');
+setupEnvironmentFile();
+
 const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);

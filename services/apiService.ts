@@ -31,6 +31,7 @@ class ApiService {
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
         'User-Agent': 'ExpoApp/1.0.0',
+        //'x-functions-key': Environment.API_FUNCTIONS_KEY,
       },
     });
 
@@ -55,9 +56,16 @@ class ApiService {
           console.log(`⚠️ [AUTH TOKEN] No se encontró token en la petición`);
         }
         
-        // Generar comando cURL equivalente
-        const curlCommand = generateCurlCommand(config.method?.toUpperCase() || 'GET', fullUrl, config.headers, config.data);
-        console.log(`🔧 [CURL COMMAND]`, curlCommand);
+        // Generar y mostrar comando cURL equivalente (multilínea, fácil de copiar)
+        const curlCommand = generateCurlCommand(
+          (config.method?.toUpperCase() as HttpMethod) || 'GET',
+          fullUrl,
+          config.headers,
+          config.data
+        );
+        console.log('================== CURL REQUEST ==================');
+        console.log(curlCommand);
+        console.log('================ END CURL REQUEST ================');
         
         if (Environment.DEBUG) {
           console.log(`${config.method?.toUpperCase()} ${config.url}`, config.data || '');
@@ -74,28 +82,40 @@ class ApiService {
     );
 
 // Función helper para generar comando cURL
-function generateCurlCommand(method: string, url: string, headers: any, data: any): string {
-  let curl = `curl -X ${method}`;
-  
-  // Agregar headers
-  if (headers) {
-    Object.keys(headers).forEach(key => {
-      if (headers[key]) {
-        curl += ` -H "${key}: ${headers[key]}"`;
-      }
-    });
-  }
-  
-  // Agregar data para POST/PUT/PATCH
-  if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+/**
+ * Genera un comando cURL equivalente para una petición HTTP (formato Windows)
+ */
+function generateCurlCommand(
+  method: HttpMethod,
+  url: string,
+  headers: any = {},
+  data?: any
+): string {
+  let curlCommand = `curl -X ${method}`;
+  // Agregar headers (formato Windows con ^ para continuación de línea)
+  Object.keys(headers || {}).forEach(key => {
+    if (headers[key] && key !== 'common') {
+      const headerValue = String(headers[key]).replace(/"/g, '\\"');
+      curlCommand += ` ^
+  -H "${key}: ${headerValue}"`;
+    }
+  });
+  // Agregar datos si existen (para POST, PUT, PATCH)
+  if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
     const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
-    curl += ` -d '${jsonData}'`;
+    const escapedData = jsonData.replace(/"/g, '\\"');
+    curlCommand += ` ^
+  -d "${escapedData}"`;
+    // Agregar Content-Type si no está presente
+    if (!headers['Content-Type'] && !headers['content-type']) {
+      curlCommand += ` ^
+  -H "Content-Type: application/json"`;
+    }
   }
-  
-  // Agregar URL
-  curl += ` "${url}"`;
-  
-  return curl;
+  // Agregar URL al final
+  curlCommand += ` ^
+  "${url}"`;
+  return curlCommand;
 }
 
     // Interceptor de response para logging y manejo de errores
