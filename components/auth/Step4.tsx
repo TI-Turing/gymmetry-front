@@ -132,7 +132,7 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
           disabled={isLoading}
         >
           <Text style={commonStyles.buttonText}>
-            {isLoading ? 'Finalizando...' : 'Finalizar registro'}
+            {isLoading ? 'Cargando datos...' : 'Continuar'}
           </Text>
         </TouchableOpacity>
       </View>

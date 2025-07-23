@@ -10,6 +10,7 @@ import { userSessionService } from '@/services/userSessionService';
 import { Step3Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
+import { FontAwesome } from '@expo/vector-icons';
 import { 
   Country as CountryType,
   Region,
@@ -34,7 +35,7 @@ interface FilterableModalProps {
   onSelect: (item: any) => void;
   filter: string;
   onFilterChange: (text: string) => void;
-  placeholder: string;
+  placeholder?: string; // Opcional, por defecto será "Buscar"
 }
 
 const FilterableModal: React.FC<FilterableModalProps> = ({
@@ -46,7 +47,7 @@ const FilterableModal: React.FC<FilterableModalProps> = ({
   onSelect,
   filter,
   onFilterChange,
-  placeholder,
+  placeholder, // Ya no lo usamos, mantenemos para compatibilidad
 }) => {
   const colorScheme = useColorScheme();
 
@@ -115,21 +116,35 @@ const FilterableModal: React.FC<FilterableModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          <TextInput
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: Colors[colorScheme].background,
+            borderWidth: 1,
+            borderColor: '#666',
+            borderRadius: 8,
+            marginBottom: 16,
+            paddingHorizontal: 12,
+          }}>
+            <TextInput
+              style={{
+                flex: 1,
                 color: Colors[colorScheme].text,
-                borderColor: '#666',
-                marginBottom: 16,
-              },
-            ]}
-            value={filter}
-            onChangeText={onFilterChange}
-            placeholder={placeholder}
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-          />
+                paddingVertical: 12,
+                fontSize: 16,
+              }}
+              value={filter}
+              onChangeText={onFilterChange}
+              placeholder="Buscar"
+              placeholderTextColor={`${Colors[colorScheme].text}60`}
+            />
+            <FontAwesome 
+              name="search" 
+              size={16} 
+              color="white" 
+              style={{ marginLeft: 8 }}
+            />
+          </View>
 
           <ScrollView style={{ maxHeight: 300 }}>
             {data.map((item, index) => (
@@ -341,6 +356,11 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const handlePhoneChange = (text: string) => {
     const numericOnly = text.replace(/[^0-9]/g, '').slice(0, 10); // Límite de 10 caracteres
     setPhone(numericOnly);
+  };
+
+  const handleDocumentNumberChange = (text: string) => {
+    const numericOnly = text.replace(/[^0-9]/g, '').slice(0, 20); // Límite de 20 caracteres
+    setDocumentNumber(numericOnly);
   };
 
   const handleEmergencyPhoneChange = (text: string) => {
@@ -595,10 +615,11 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
               },
             ]}
             value={documentNumber}
-            onChangeText={setDocumentNumber}
+            onChangeText={handleDocumentNumberChange}
             placeholder="Ingresa tu número de documento"
             placeholderTextColor={`${Colors[colorScheme].text}60`}
-            keyboardType="default"
+            keyboardType="number-pad"
+            maxLength={20}
           />
         </View>
 
@@ -785,7 +806,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         }}
         filter={regionFilter}
         onFilterChange={setRegionFilter}
-        placeholder="Buscar región..."
       />
 
       <FilterableModal
@@ -805,7 +825,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         }}
         filter={cityFilter}
         onFilterChange={setCityFilter}
-        placeholder="Buscar ciudad..."
       />
 
       <FilterableModal
@@ -825,7 +844,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         }}
         filter={documentTypeFilter}
         onFilterChange={setDocumentTypeFilter}
-        placeholder="Buscar tipo de documento..."
       />
 
       <FilterableModal
@@ -845,7 +863,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         }}
         filter={epsFilter}
         onFilterChange={setEpsFilter}
-        placeholder="Buscar EPS..."
       />
     </ScrollView>
   );
