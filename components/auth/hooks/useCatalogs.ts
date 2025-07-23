@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { catalogService } from '@/services/catalogService';
+import { userSessionService } from '@/services/userSessionService';
 import { 
-  Gender,
-  Country,
-  Region,
-  City,
-  EPS,
-  DocumentType
-} from '@/dto/common';
-
-interface CatalogsState {
+  Gender, 
+  Country, 
+  Region, 
+  City, 
+  EPS, 
+  DocumentType 
+} from '@/dto/common';interface CatalogsState {
   genders: Gender[];
   documentTypes: DocumentType[];
   countries: Country[];

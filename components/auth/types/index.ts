@@ -25,6 +25,8 @@ export interface Step3Data {
   country?: string;
   region?: string;
   city?: string;
+  documentNumber?: string;
+  phone?: string;
   emergencyContact?: string;
   emergencyPhone?: string;
   address?: string;

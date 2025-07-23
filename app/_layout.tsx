@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { userSessionService } from '@/services/userSessionService';
 
 export {
   ErrorBoundary,
@@ -31,6 +32,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      // Inicializar país del usuario al cargar la app
+      userSessionService.initializeUserCountry();
     }
   }, [loaded]);
 

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { Environment } from '@/environment';
+import { userSessionService } from './userSessionService';
 import { 
   Gender,
   Country,
@@ -39,8 +40,9 @@ class CatalogService {
             config.headers,
             config.data
           );
+          //console.log('curl: ', curlCommand);
         }
-
+        
         return config;
       },
       (error) => {
@@ -110,7 +112,7 @@ class CatalogService {
 
   async getRegionsByCountry(countryId: string): Promise<Region[]> {
     try {
-      const response = await this.catalogsAPI.get<Region[]>(`/regiones/${countryId}`);
+      const response = await this.catalogsAPI.get<Region[]>(`/regiones?paisId=${countryId}`);
       const regions = response.data || [];
       return this.sortByName(regions);
     } catch (error) {
@@ -121,7 +123,7 @@ class CatalogService {
 
   async getCitiesByRegion(regionId: string): Promise<City[]> {
     try {
-      const response = await this.catalogsAPI.get<City[]>(`/ciudades/${regionId}`);
+      const response = await this.catalogsAPI.get<City[]>(`/ciudades?regionId=${regionId}`);
       const cities = response.data || [];
       return this.sortByName(cities);
     } catch (error) {
@@ -143,7 +145,10 @@ class CatalogService {
 
   async getDocumentTypes(countryId?: string): Promise<DocumentType[]> {
     try {
-      const url = countryId ? `/tipos-documento/${countryId}` : '/tipos-documento';
+      // Si no se proporciona countryId, usar el país del usuario de la sesión
+      const finalCountryId = countryId || userSessionService.getUserCountryId();
+      const url = finalCountryId ? `/tiposdocumento?paisId=${finalCountryId}` : '/tiposdocumento';
+
       const response = await this.catalogsAPI.get<DocumentType[]>(url);
       const documentTypes = response.data || [];
       return this.sortByName(documentTypes);
@@ -153,8 +158,10 @@ class CatalogService {
     }
   }
 
-  async getDocumentTypesByCountry(countryId: string): Promise<DocumentType[]> {
-    return this.getDocumentTypes(countryId);
+  async getDocumentTypesByCountry(countryId?: string): Promise<DocumentType[]> {
+    // Si no se proporciona countryId, usar el país del usuario de la sesión
+    const finalCountryId = countryId || userSessionService.getUserCountryId();
+    return this.getDocumentTypes(finalCountryId || undefined);
   }
 }
 

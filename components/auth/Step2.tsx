@@ -6,7 +6,7 @@ import Colors from '@/constants/Colors';
 import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
-import { useGenders } from './hooks/useCatalogs';
+import { useGenders } from './hooks/useLazyCatalogs';
 import { Step2Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
@@ -19,7 +19,7 @@ interface Step2Props {
 }
 
 export default function Step2({ userId, onNext, initialData }: Step2Props) {
-  const { genders, loading: gendersLoading, error: gendersError } = useGenders();
+  const { genders, loading: gendersLoading, error: gendersError, loadGenders } = useGenders(true); // autoLoad = true
   
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
