@@ -44,6 +44,13 @@ export interface OTPValidationResponse {
   verified: boolean;
 }
 
+export interface PhoneExistsResponse {
+  Success: boolean;
+  Message: string;
+  Data: boolean;
+  StatusCode: number;
+}
+
 export interface Step3Data {
   eps?: string;
   country?: string;

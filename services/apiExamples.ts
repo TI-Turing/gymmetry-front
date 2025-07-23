@@ -18,7 +18,8 @@ import {
   PhoneVerificationData,
   PhoneVerificationResponse,
   OTPValidationData,
-  OTPValidationResponse
+  OTPValidationResponse,
+  PhoneExistsResponse
 } from '@/components/auth/types';
 
 // API específica para usuarios
