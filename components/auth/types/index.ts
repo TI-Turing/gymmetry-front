@@ -18,6 +18,30 @@ export interface Step2Data {
   phone?: string;
   birthDate?: string;
   genderId?: string;
+  phoneVerified?: boolean;
+}
+
+export interface PhoneVerificationData {
+  phone: string;
+  method: 'whatsapp' | 'sms';
+}
+
+export interface PhoneVerificationResponse {
+  success: boolean;
+  message: string;
+  verificationId?: string;
+}
+
+export interface OTPValidationData {
+  phone: string;
+  code: string;
+  verificationId: string;
+}
+
+export interface OTPValidationResponse {
+  success: boolean;
+  message: string;
+  verified: boolean;
 }
 
 export interface Step3Data {
@@ -26,7 +50,6 @@ export interface Step3Data {
   region?: string;
   city?: string;
   documentNumber?: string;
-  phone?: string;
   emergencyContact?: string;
   emergencyPhone?: string;
   address?: string;

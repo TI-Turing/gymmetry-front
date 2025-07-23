@@ -14,6 +14,12 @@ import {
   RegisterRequest, 
   RegisterResponse 
 } from '@/dto/auth';
+import {
+  PhoneVerificationData,
+  PhoneVerificationResponse,
+  OTPValidationData,
+  OTPValidationResponse
+} from '@/components/auth/types';
 
 // API específica para usuarios
 export const userAPI = {
@@ -57,6 +63,28 @@ export const userAPI = {
   // Eliminar usuario
   deleteUser: async (id: number) => {
     return await apiService.delete(`/users/${id}`);
+  },
+
+  // Verificación de teléfono
+  sendPhoneVerification: async (data: PhoneVerificationData): Promise<PhoneVerificationResponse> => {
+    try {
+      const response = await apiService.post<PhoneVerificationResponse>('/user/phone/verify/send', data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ [USER API] Error al enviar verificación de teléfono:', error);
+      throw error;
+    }
+  },
+
+  // Validar código OTP
+  validateOTP: async (data: OTPValidationData): Promise<OTPValidationResponse> => {
+    try {
+      const response = await apiService.post<OTPValidationResponse>('/user/phone/verify/validate', data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ [USER API] Error al validar código OTP:', error);
+      throw error;
+    }
   },
 };
 

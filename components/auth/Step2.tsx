@@ -7,10 +7,11 @@ import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import { useGenders } from './hooks/useLazyCatalogs';
-import { Step2Data, Country } from './types';
+import { Step2Data, Country, PhoneVerificationData, OTPValidationData } from './types';
 import { handleApiError } from './utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
 import { commonStyles } from './styles/common';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface Step2Props {
   userId: string;
@@ -30,11 +31,105 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
   const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Estados para verificación de teléfono
+  const [phoneVerified, setPhoneVerified] = useState(initialData?.phoneVerified || false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verificationMethod, setVerificationMethod] = useState<'whatsapp' | 'sms' | null>(null);
+  const [verificationId, setVerificationId] = useState<string>('');
+  const [otpCode, setOtpCode] = useState<string>('');
+  const [isVerificationLoading, setIsVerificationLoading] = useState(false);
+  const [verificationStep, setVerificationStep] = useState<'method' | 'code'>('method');
+  
   const colorScheme = useColorScheme();
 
   const handlePhoneChange = (text: string) => {
     const numericOnly = text.replace(/[^0-9]/g, '');
     setPhone(numericOnly);
+    // Reset verification status when phone changes
+    if (phoneVerified) {
+      setPhoneVerified(false);
+    }
+  };
+
+  const handleVerifyPhone = () => {
+    if (!phone.trim()) {
+      alert('Por favor ingresa un número de teléfono primero');
+      return;
+    }
+    setShowVerificationModal(true);
+    setVerificationStep('method');
+    setVerificationMethod(null);
+    setOtpCode('');
+  };
+
+  const handleSendVerification = async (method: 'whatsapp' | 'sms') => {
+    setIsVerificationLoading(true);
+    setVerificationMethod(method);
+    
+    try {
+      const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
+      const data: PhoneVerificationData = {
+        phone: fullPhone,
+        method: method
+      };
+      
+      const response = await userAPI.sendPhoneVerification(data);
+      
+      if (response.success && response.verificationId) {
+        setVerificationId(response.verificationId);
+        setVerificationStep('code');
+      } else {
+        alert(response.message || 'Error al enviar verificación');
+      }
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsVerificationLoading(false);
+    }
+  };
+
+  const handleValidateOTP = async () => {
+    if (!otpCode.trim()) {
+      alert('Por favor ingresa el código de verificación');
+      return;
+    }
+
+    setIsVerificationLoading(true);
+    
+    try {
+      const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
+      const data: OTPValidationData = {
+        phone: fullPhone,
+        code: otpCode.trim(),
+        verificationId: verificationId
+      };
+      
+      const response = await userAPI.validateOTP(data);
+      
+      if (response.success && response.verified) {
+        setPhoneVerified(true);
+        setShowVerificationModal(false);
+        setOtpCode('');
+        alert('¡Teléfono verificado correctamente!');
+      } else {
+        alert(response.message || 'Código incorrecto');
+      }
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsVerificationLoading(false);
+    }
+  };
+
+  const closeVerificationModal = () => {
+    setShowVerificationModal(false);
+    setVerificationStep('method');
+    setVerificationMethod(null);
+    setOtpCode('');
+    setVerificationId('');
   };
 
   const handleNext = async () => {
@@ -46,6 +141,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       phone: phone.trim() ? `${selectedCountry.dialCode}${phone.trim()}` : undefined,
       birthDate: birthDate ? formatDateForBackend(birthDate.trim()) : undefined,
       genderId: selectedGender || undefined,
+      phoneVerified: phoneVerified,
     };
     
     try {
@@ -137,9 +233,39 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
-            Teléfono
-          </Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+              Teléfono
+            </Text>
+            {phone.trim() && (
+              <TouchableOpacity
+                onPress={handleVerifyPhone}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: phoneVerified ? '#28a745' : Colors[colorScheme].tint,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 6,
+                }}
+                disabled={phoneVerified}
+              >
+                <FontAwesome 
+                  name={phoneVerified ? "check" : "shield"} 
+                  size={14} 
+                  color="white" 
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 12,
+                  fontWeight: '600'
+                }}>
+                  {phoneVerified ? 'Verificado' : 'Verificar'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <View style={commonStyles.phoneRow}>
             <View style={commonStyles.prefixContainer}>
               <CountryCodePicker
@@ -154,7 +280,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   {
                     backgroundColor: Colors[colorScheme].background,
                     color: Colors[colorScheme].text,
-                    borderColor: '#666',
+                    borderColor: phoneVerified ? '#28a745' : '#666',
                   },
                 ]}
                 value={phone}
@@ -372,6 +498,219 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modal de Verificación de Teléfono */}
+      <Modal
+        visible={showVerificationModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeVerificationModal}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+          }}
+          activeOpacity={1}
+          onPress={closeVerificationModal}
+        >
+          <View
+            style={{
+              backgroundColor: Colors[colorScheme].background,
+              borderRadius: 12,
+              padding: 20,
+              width: '90%',
+              maxWidth: 400,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+            }}
+            onStartShouldSetResponder={() => true}
+          >
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 20,
+            }}>
+              <Text style={{
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: Colors[colorScheme].text,
+              }}>
+                Verificar Teléfono
+              </Text>
+              <TouchableOpacity 
+                onPress={closeVerificationModal}
+                style={{
+                  padding: 8,
+                  borderRadius: 20,
+                  backgroundColor: `${Colors[colorScheme].text}10`,
+                }}
+              >
+                <Text style={{
+                  fontSize: 16,
+                  color: Colors[colorScheme].text,
+                  fontWeight: 'bold',
+                }}>
+                  ✕
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {verificationStep === 'method' ? (
+              <>
+                <Text style={{
+                  color: Colors[colorScheme].text,
+                  marginBottom: 20,
+                  fontSize: 16,
+                  textAlign: 'center'
+                }}>
+                  ¿Cómo quieres recibir el código de verificación?
+                </Text>
+                <Text style={{
+                  color: `${Colors[colorScheme].text}80`,
+                  marginBottom: 20,
+                  fontSize: 14,
+                  textAlign: 'center'
+                }}>
+                  {selectedCountry.dialCode}{phone}
+                </Text>
+
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: '#25D366',
+                    padding: 16,
+                    borderRadius: 8,
+                    marginBottom: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => handleSendVerification('whatsapp')}
+                  disabled={isVerificationLoading}
+                >
+                  <FontAwesome name="whatsapp" size={20} color="white" style={{ marginRight: 8 }} />
+                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 16 }}>
+                    WhatsApp
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: Colors[colorScheme].tint,
+                    padding: 16,
+                    borderRadius: 8,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => handleSendVerification('sms')}
+                  disabled={isVerificationLoading}
+                >
+                  <FontAwesome name="comment" size={20} color="white" style={{ marginRight: 8 }} />
+                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 16 }}>
+                    SMS
+                  </Text>
+                </TouchableOpacity>
+
+                {isVerificationLoading && (
+                  <Text style={{
+                    color: Colors[colorScheme].text,
+                    textAlign: 'center',
+                    marginTop: 16,
+                    fontStyle: 'italic'
+                  }}>
+                    Enviando código...
+                  </Text>
+                )}
+              </>
+            ) : (
+              <>
+                <Text style={{
+                  color: Colors[colorScheme].text,
+                  marginBottom: 8,
+                  fontSize: 16,
+                  textAlign: 'center'
+                }}>
+                  Código enviado vía {verificationMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
+                </Text>
+                <Text style={{
+                  color: `${Colors[colorScheme].text}80`,
+                  marginBottom: 20,
+                  fontSize: 14,
+                  textAlign: 'center'
+                }}>
+                  Ingresa el código de 6 dígitos que recibiste
+                </Text>
+
+                <View style={{ marginBottom: 20 }}>
+                  <TextInput
+                    style={[
+                      commonStyles.input,
+                      {
+                        backgroundColor: Colors[colorScheme].background,
+                        color: Colors[colorScheme].text,
+                        borderColor: '#666',
+                        textAlign: 'center',
+                        fontSize: 18,
+                        letterSpacing: 2,
+                      },
+                    ]}
+                    value={otpCode}
+                    onChangeText={(text) => setOtpCode(text.replace(/[^0-9]/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    placeholderTextColor={`${Colors[colorScheme].text}60`}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  style={[
+                    commonStyles.button,
+                    { 
+                      backgroundColor: Colors[colorScheme].tint,
+                      marginBottom: 12,
+                    },
+                    (isVerificationLoading || !otpCode.trim()) && { opacity: 0.6 }
+                  ]}
+                  onPress={handleValidateOTP}
+                  disabled={isVerificationLoading || !otpCode.trim()}
+                >
+                  <Text style={commonStyles.buttonText}>
+                    {isVerificationLoading ? 'Verificando...' : 'Verificar Código'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    padding: 12,
+                    alignItems: 'center',
+                  }}
+                  onPress={() => {
+                    setVerificationStep('method');
+                    setOtpCode('');
+                  }}
+                >
+                  <Text style={{
+                    color: Colors[colorScheme].tint,
+                    fontSize: 14,
+                    textDecorationLine: 'underline'
+                  }}>
+                    Cambiar método de envío
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </ScrollView>
   );
 }

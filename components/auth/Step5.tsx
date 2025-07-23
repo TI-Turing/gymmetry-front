@@ -40,6 +40,9 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
   // Ref para prevenir que se cierre el teclado
   const preventKeyboardClose = useRef<boolean>(false);
 
+  // Cache temporal para usernames ya validados
+  const usernameCache = useRef<Map<string, { status: 'available' | 'taken', timestamp: number }>>(new Map());
+
   // Función para validar formato del nombre de usuario
   const validateUsernameFormat = (value: string): boolean => {
     // Solo permite letras inglesas, números y caracteres especiales básicos
@@ -56,10 +59,33 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       return;
     }
 
+    // Validar mínimo de caracteres
+    if (usernameToCheck.length < 4) {
+      setUsernameStatus('invalid');
+      setUsernameError('El nombre de usuario debe tener al menos 4 caracteres');
+      return;
+    }
+
     // Validar formato
     if (!validateUsernameFormat(usernameToCheck)) {
       setUsernameStatus('invalid');
       setUsernameError('Solo se permiten letras, números y caracteres especiales. No se permiten espacios.');
+      return;
+    }
+
+    // Verificar cache primero (válido por 5 minutos)
+    const cached = usernameCache.current.get(usernameToCheck);
+    const cacheValidTime = 5 * 60 * 1000; // 5 minutos en millisegundos
+    
+    if (cached && (Date.now() - cached.timestamp) < cacheValidTime) {
+      console.log('🗂️ [USERNAME CACHE] Usando resultado del cache:', usernameToCheck);
+      if (cached.status === 'available') {
+        setUsernameStatus('available');
+        setUsernameError('');
+      } else {
+        setUsernameStatus('taken');
+        setUsernameError('Este nombre de usuario ya está en uso');
+      }
       return;
     }
 
@@ -76,6 +102,8 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       const requestData: UsernameCheckRequest = {
         UserName: usernameToCheck
       };
+
+      console.log('🔍 [USERNAME CHECK] Validando:', usernameToCheck);
 
       // Usar apiService para incluir el token automáticamente
       const response = await apiService.post<UsernameCheckResponse>('/users/find', requestData);
@@ -94,10 +122,14 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         if (!response.data.Data || response.data.Data.length === 0) {
           setUsernameStatus('available');
           setUsernameError('');
+          // Guardar en cache
+          usernameCache.current.set(usernameToCheck, { status: 'available', timestamp: Date.now() });
         } else {
           // Si hay datos, el nombre de usuario ya está tomado
           setUsernameStatus('taken');
           setUsernameError('Este nombre de usuario ya está en uso');
+          // Guardar en cache
+          usernameCache.current.set(usernameToCheck, { status: 'taken', timestamp: Date.now() });
         }
       } else {
         setUsernameStatus('invalid');
@@ -137,10 +169,17 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       return;
     }
 
-    // Crear nuevo timeout para el debounce (500ms)
+    // Validar mínimo de caracteres antes de hacer cualquier verificación
+    if (username.length < 4) {
+      setUsernameStatus('invalid');
+      setUsernameError('El nombre de usuario debe tener al menos 4 caracteres');
+      return;
+    }
+
+    // Crear nuevo timeout para el debounce (750ms)
     debounceRef.current = setTimeout(() => {
       checkUsernameAvailability(username);
-    }, 500) as unknown as number;
+    }, 750) as unknown as number;
 
     // Cleanup
     return () => {

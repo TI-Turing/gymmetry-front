@@ -216,8 +216,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const [documentType, setDocumentType] = useState(initialData?.documentType || '');
   const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState(initialData?.documentTypeId || '');
   const [documentNumber, setDocumentNumber] = useState(initialData?.documentNumber || '');
-  const [phone, setPhone] = useState(initialData?.phone || '');
-  const [selectedPhoneCountry, setSelectedPhoneCountry] = useState<Country>(DEFAULT_COUNTRY);
   
   // Estados adicionales (no están en el orden principal)
   const [eps, setEps] = useState(initialData?.eps || '');
@@ -353,11 +351,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     }
   }, [userCountryData, initialData, country]);
 
-  const handlePhoneChange = (text: string) => {
-    const numericOnly = text.replace(/[^0-9]/g, '').slice(0, 10); // Límite de 10 caracteres
-    setPhone(numericOnly);
-  };
-
   const handleDocumentNumberChange = (text: string) => {
     const numericOnly = text.replace(/[^0-9]/g, '').slice(0, 20); // Límite de 20 caracteres
     setDocumentNumber(numericOnly);
@@ -383,7 +376,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
       documentType: documentType.trim() || undefined,
       documentTypeId: selectedDocumentTypeId || undefined,
       documentNumber: documentNumber.trim() || undefined,
-      phone: phone.trim() ? `${selectedPhoneCountry.dialCode}${phone.trim()}` : undefined,
       emergencyContact: emergencyContact.trim() || undefined,
       emergencyPhone: emergencyPhone.trim() ? `${selectedCountry.dialCode}${emergencyPhone.trim()}` : undefined,
       address: address.trim() || undefined,
@@ -395,7 +387,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         emergencyPhone: stepData.emergencyPhone,
         address: stepData.address,
         ...(stepData.documentNumber && { documentNumber: stepData.documentNumber }),
-        ...(stepData.phone && { phone: stepData.phone }),
         ...(stepData.eps && { eps: stepData.eps }),
         ...(stepData.country && { country: stepData.country }),
         ...(stepData.region && { region: stepData.region }),
@@ -621,39 +612,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
             keyboardType="number-pad"
             maxLength={20}
           />
-        </View>
-
-        {/* Teléfono */}
-        <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
-            Teléfono
-          </Text>
-          <View style={commonStyles.phoneRow}>
-            <View style={commonStyles.prefixContainer}>
-              <CountryCodePicker
-                selectedCountry={selectedPhoneCountry}
-                onSelect={setSelectedPhoneCountry}
-              />
-            </View>
-            <View style={commonStyles.phoneContainer}>
-              <TextInput
-                style={[
-                  commonStyles.input,
-                  {
-                    backgroundColor: Colors[colorScheme].background,
-                    color: Colors[colorScheme].text,
-                    borderColor: '#666',
-                  },
-                ]}
-                value={phone}
-                keyboardType="number-pad"
-                onChangeText={handlePhoneChange}
-                placeholder="3001234567"
-                placeholderTextColor={`${Colors[colorScheme].text}60`}
-                maxLength={10}
-              />
-            </View>
-          </View>
         </View>
 
         {/* Campos adicionales */}
