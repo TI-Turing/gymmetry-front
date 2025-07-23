@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
 import {
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -16,167 +16,80 @@ import Step3 from './Step3';
 import Step4 from './Step4';
 import Step5 from './Step5';
 import { WelcomeScreen } from '../home';
-import { apiService } from '@/services/apiService';
 import { useAuthContext } from '@/components/auth/AuthContext';
 import { commonStyles } from './styles/common';
+import { useRegisterForm } from './hooks/useRegisterForm';
+import { SkipButton } from './SkipButton';
 
 interface RegisterFormProps {
   onRegister: (userData: any) => void;
   onSwitchToLogin: () => void;
 }
 
-interface RegistrationData {
-  email: string;
-  password: string;
-  userId?: string;
-  token?: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  birthDate?: string;
-  genderId?: string;
-  eps?: string;
-  country?: string;
-  region?: string;
-  city?: string;
-  emergencyContact?: string;
-  emergencyPhone?: string;
-  address?: string;
-  documentType?: string;
-  documentTypeId?: string;
-  countryId?: string;
-  fitnessGoal?: string;
-  healthRestrictions?: string;
-  additionalInfo?: string;
-  rh?: string;
-  username?: string;
-  profileImage?: string;
-}
+const stepTitles = [
+  'Credenciales',
+  'Datos básicos', 
+  'Información personal',
+  'Datos fitness',
+  'Perfil',
+];
 
-export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFormProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
-  const [registrationData, setRegistrationData] = useState<RegistrationData>({
-    email: '',
-    password: '',
-  });
+const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) => {
   const colorScheme = useColorScheme();
   const authContext = useAuthContext();
+  
+  const {
+    currentStep,
+    showWelcomeScreen,
+    registrationData,
+    setCurrentStep,
+    handleSkipToWelcome,
+    handleStep1Next,
+    handleStep2Next,
+    handleStep3Next,
+    handleStep4Next,
+    handleStep5Next,
+    handleWelcomeContinue,
+  } = useRegisterForm({ onRegister });
 
   useEffect(() => {
     authContext.setIsInRegisterFlow(true);
     authContext.setCurrentStep(currentStep);
     
-    
     return () => {
       authContext.setIsInRegisterFlow(false);
       authContext.setOnSkip(undefined);
     };
-  }, [currentStep]);
+  }, [currentStep, authContext]);
 
   // Manejar el botón físico del dispositivo (Android)
   useEffect(() => {
     const backAction = () => {
-      
       if (currentStep > 0) {
         handleSkipToWelcome();
         return true; 
       }
-      
       return false;
     };
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-    
     return () => backHandler.remove();
-  }, [currentStep]);
+  }, [currentStep, handleSkipToWelcome]);
 
-  const handleSkipToWelcome = () => {
-    if (registrationData.token) {
-      apiService.setAuthToken(registrationData.token);
+  const handleSkipForCurrentStep = useCallback(() => {
+    switch (currentStep) {
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        handleSkipToWelcome();
+        break;
+      default:
+        break;
     }
-    
-    setShowWelcomeScreen(true);
-  };
+  }, [currentStep, handleSkipToWelcome]);
 
-  const stepTitles = [
-    'Credenciales',
-    'Datos básicos',
-    'Información personal',
-    'Datos fitness',
-    'Perfil',
-  ];
-
-  const handleStep1Next = (data: { email: string; password: string; userId?: string; token?: string }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    
-    if (data.token) {
-      apiService.setAuthToken(data.token);
-    }
-    
-    setCurrentStep(1);
-  };
-
-  const handleStep2Next = (data: { firstName: string; lastName: string; phone?: string; birthDate?: string }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    setCurrentStep(2);
-  };
-
-  const handleStep2Skip = () => {
-    handleSkipToWelcome();
-  };
-
-  const handleStep3Next = (data: {
-    eps?: string;
-    country?: string;
-    region?: string;
-    city?: string;
-    emergencyContact?: string;
-    emergencyPhone?: string;
-    address?: string;
-  }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    setCurrentStep(3);
-  };
-
-  const handleStep3Skip = () => {
-    handleSkipToWelcome();
-  };
-
-  const handleStep4Next = (data: {
-    fitnessGoal?: string;
-    healthRestrictions?: string;
-    additionalInfo?: string;
-  }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    setCurrentStep(4);
-  };
-
-  const handleStep4Skip = () => {
-    handleSkipToWelcome();
-  };
-
-  const handleStep5Next = (data: {
-    username?: string;
-    profileImage?: string;
-  }) => {
-    const finalData = { ...registrationData, ...data };
-    setRegistrationData(finalData);
-    setShowWelcomeScreen(true);
-  };
-
-  const handleStep5Skip = () => {
-    handleSkipToWelcome();
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-    // El botón back ahora se maneja en el layout
-  };
-
-  const renderCurrentStep = () => {
+  const renderCurrentStep = useMemo(() => {
     switch (currentStep) {
       case 0:
         return (
@@ -248,7 +161,15 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
       default:
         return null;
     }
-  };
+  }, [
+    currentStep,
+    registrationData,
+    handleStep1Next,
+    handleStep2Next,
+    handleStep3Next,
+    handleStep4Next,
+    handleStep5Next,
+  ]);
 
   // Si debemos mostrar la pantalla de bienvenida
   if (showWelcomeScreen) {
@@ -260,9 +181,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
           lastName: registrationData.lastName,
           username: registrationData.username,
         }}
-        onContinue={() => {
-          onRegister(registrationData);
-        }}
+        onContinue={handleWelcomeContinue}
       />
     );
   }
@@ -279,6 +198,8 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
             {currentStep === 0 && (
               <TouchableOpacity 
                 onPress={onSwitchToLogin}
+                accessibilityLabel="Volver al inicio de sesión"
+                accessibilityRole="button"
               >
                 <FontAwesome
                   name="chevron-left"
@@ -289,37 +210,10 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
             )}
           </View>
 
-          <TouchableOpacity 
-            style={commonStyles.skipButtonRegister}
-            onPress={() => {
-              switch (currentStep) {
-                case 1:
-                  handleStep2Skip();
-                  break;
-                case 2:
-                  handleStep3Skip();
-                  break;
-                case 3:
-                  handleStep4Skip();
-                  break;
-                case 4:
-                  handleStep5Skip();
-                  break;
-                default:
-                  break;
-              }
-            }}
-            disabled={currentStep === 0}
-          >
-            <Text style={[
-              commonStyles.headerButtonText, 
-              { 
-                color: currentStep === 0 ? 'transparent' : 'white' 
-              }
-            ]}>
-              {currentStep === 0 ? '' : 'Omitir'}
-            </Text>
-          </TouchableOpacity>
+          <SkipButton 
+            currentStep={currentStep} 
+            onSkip={handleSkipForCurrentStep} 
+          />
         </View>
 
         <StepsBar
@@ -327,8 +221,12 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
           totalSteps={stepTitles.length}
           stepTitles={stepTitles}
         />
-        {renderCurrentStep()}
+        {renderCurrentStep}
       </View>
     </KeyboardAvoidingView>
   );
-}
+});
+
+RegisterForm.displayName = 'RegisterForm';
+
+export default RegisterForm;

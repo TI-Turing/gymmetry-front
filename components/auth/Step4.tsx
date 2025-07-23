@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import React, { memo } from 'react';
+import { TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import Dropdown from './Dropdown';
-import { userAPI } from '@/services/apiExamples';
-
-// Imports locales
 import { Step4Data } from './types';
-import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 import { FITNESS_GOALS, HEALTH_CONDITIONS } from './data/fitness';
 import { rhTypes } from './data/formData';
+import { AdditionalInfoInput } from './AdditionalInfoInput';
+import { useStep4Form } from './hooks/useStep4Form';
 
 interface Step4Props {
   userId: string;
@@ -19,56 +17,28 @@ interface Step4Props {
   initialData?: Step4Data;
 }
 
-export default function Step4({ userId, onNext, initialData }: Step4Props) {
-  const [fitnessGoal, setFitnessGoal] = useState(initialData?.fitnessGoal || '');
-  const [healthRestrictions, setHealthRestrictions] = useState(initialData?.healthRestrictions || '');
-  const [additionalInfo, setAdditionalInfo] = useState(initialData?.additionalInfo || '');
-  const [rh, setRh] = useState(initialData?.rh || '');
-  const [isLoading, setIsLoading] = useState(false);
+const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
   const colorScheme = useColorScheme();
-
-  const handleNext = async () => {
-    setIsLoading(true);
-    
-    const stepData: Step4Data = {
-      fitnessGoal: fitnessGoal || undefined,
-      healthRestrictions: healthRestrictions || undefined,
-      additionalInfo: additionalInfo.trim() || undefined,
-      rh: rh || undefined,
-    };
-    
-    try {
-      const updateData = {
-        ...(stepData.fitnessGoal && { fitnessGoal: stepData.fitnessGoal }),
-        ...(stepData.healthRestrictions && { physicalExceptions: stepData.healthRestrictions }),
-        ...(stepData.additionalInfo && { additionalInfo: stepData.additionalInfo }),
-        ...(stepData.rh && { RH: stepData.rh }),
-      };
-      
-      const response = await userAPI.updateUser(userId, updateData);
-      
-      if (!response.Success) {
-        throw new Error(response.Message || 'Error al actualizar usuario');
-      }
-      
-      onNext(stepData);
-    } catch (error: any) {
-      const errorMessage = handleApiError(error);
-      console.error('❌ [STEP 4] Error:', errorMessage);
-      // Continuar aunque falle la API para no bloquear el flujo
-      onNext(stepData);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    fitnessGoal,
+    healthRestrictions,
+    additionalInfo,
+    rh,
+    isLoading,
+    setFitnessGoal,
+    setHealthRestrictions,
+    setAdditionalInfo,
+    setRh,
+    handleNext,
+  } = useStep4Form({ userId, onNext, initialData });
 
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
       <View style={commonStyles.header}>
-        <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
+        <Text style={[commonStyles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
           Objetivos de fitness
         </Text>
-        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}>
+        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme ?? 'light'].text }]}>
           Personaliza tu experiencia (opcional)
         </Text>
       </View>
@@ -98,38 +68,21 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
           onSelect={setRh}
         />
 
-        <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
-            Información adicional
-          </Text>
-          <TextInput
-            style={[
-              commonStyles.input,
-              {
-                minHeight: 100,
-                textAlignVertical: 'top',
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
-            value={additionalInfo}
-            onChangeText={setAdditionalInfo}
-            placeholder="Cuéntanos cualquier cosa que consideres importante..."
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-            multiline
-            numberOfLines={4}
-          />
-        </View>
+        <AdditionalInfoInput
+          value={additionalInfo}
+          onChangeText={setAdditionalInfo}
+        />
 
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { backgroundColor: Colors[colorScheme].tint },
+            { backgroundColor: Colors[colorScheme ?? 'light'].tint },
             isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
           disabled={isLoading}
+          accessibilityLabel="Continuar al siguiente paso"
+          accessibilityRole="button"
         >
           <Text style={commonStyles.buttonText}>
             {isLoading ? 'Cargando datos...' : 'Continuar'}
@@ -138,4 +91,8 @@ export default function Step4({ userId, onNext, initialData }: Step4Props) {
       </View>
     </ScrollView>
   );
-}
+});
+
+Step4.displayName = 'Step4';
+
+export default Step4;

@@ -78,7 +78,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
     const cacheValidTime = 5 * 60 * 1000; // 5 minutos en millisegundos
     
     if (cached && (Date.now() - cached.timestamp) < cacheValidTime) {
-      console.log('🗂️ [USERNAME CACHE] Usando resultado del cache:', usernameToCheck);
       if (cached.status === 'available') {
         setUsernameStatus('available');
         setUsernameError('');
@@ -102,8 +101,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       const requestData: UsernameCheckRequest = {
         UserName: usernameToCheck
       };
-
-      console.log('🔍 [USERNAME CHECK] Validando:', usernameToCheck);
 
       // Usar apiService para incluir el token automáticamente
       const response = await apiService.post<UsernameCheckResponse>('/users/find', requestData);
@@ -268,8 +265,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       const blob = await response.blob();
       const sizeInMB = blob.size / (1024 * 1024);
       
-      console.log(`📏 [IMAGE RESIZE] Tamaño actual: ${sizeInMB.toFixed(2)}MB con calidad ${quality}`);
-      
       if (sizeInMB <= 2) {
         break; // La imagen ya está dentro del límite
       }
@@ -327,7 +322,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
 
       if (response.data.Success) {
         Alert.alert('¡Éxito!', 'La imagen de perfil se subió correctamente');
-        console.log('✅ [IMAGE UPLOAD] URL de la imagen:', response.data.Data);
         return response.data.Data; // Retornar la URL de la imagen
       } else {
         Alert.alert('Error', response.data.Message || 'Error al subir la imagen');

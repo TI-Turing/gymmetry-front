@@ -40,7 +40,7 @@ class CatalogService {
             config.headers,
             config.data
           );
-          //console.log('curl: ', curlCommand);
+
         }
         
         return config;

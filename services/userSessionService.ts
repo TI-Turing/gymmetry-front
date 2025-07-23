@@ -33,7 +33,6 @@ class UserSessionService {
         // Verificar si la detección es reciente (menos de 24 horas)
         const isRecent = this.userCountryData && (Date.now() - this.userCountryData.detectedAt < 24 * 60 * 60 * 1000);
         if (isRecent && this.userCountryData) {
-          console.log(`🌍 País cargado de sesión: ${this.userCountryData.name} (ID: ${this.userCountryId})`);
           return;
         }
       }
@@ -50,7 +49,6 @@ class UserSessionService {
       // Detectar país actual del usuario
       const detectedCountry = await this.detectUserCountry();
       if (!detectedCountry) {
-        console.log('⚠️ No se pudo detectar el país del usuario');
         return;
       }
 
@@ -61,7 +59,6 @@ class UserSessionService {
       // Buscar el país en la lista del catálogo
       const matchedCountry = this.findCountryInCatalog(detectedCountry, countries);
       if (!matchedCountry) {
-        console.log(`⚠️ País detectado "${detectedCountry.name}" no encontrado en catálogo`);
         return;
       }
 
@@ -78,8 +75,6 @@ class UserSessionService {
       if (this.userCountryId) {
         await AsyncStorage.setItem(USER_COUNTRY_ID_KEY, this.userCountryId);
       }
-
-      console.log(`✅ País detectado y guardado: ${this.userCountryData.name} (ID: ${this.userCountryId})`);
     } catch (error) {
       console.error('❌ Error detectando y guardando país:', error);
     }

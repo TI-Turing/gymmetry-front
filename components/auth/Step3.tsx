@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { TextInput, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -10,7 +10,8 @@ import { userSessionService } from '@/services/userSessionService';
 import { Step3Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
-import { FontAwesome } from '@expo/vector-icons';
+import { FilterableModal } from './FilterableModal';
+import { useStep3Form } from './hooks/useStep3Form';
 import { 
   Country as CountryType,
   Region,
@@ -25,360 +26,181 @@ interface Step3Props {
   initialData?: Step3Data;
 }
 
-// Modal filtrable reutilizable
-interface FilterableModalProps {
-  visible: boolean;
-  onClose: () => void;
-  title: string;
-  data: any[];
-  selectedId: string;
-  onSelect: (item: any) => void;
-  filter: string;
-  onFilterChange: (text: string) => void;
-  placeholder?: string; // Opcional, por defecto será "Buscar"
+interface CatalogData {
+  countries: CountryType[];
+  regions: Region[];
+  cities: City[];
+  epsOptions: EPS[];
+  documentTypes: DocumentType[];
+  userCountryData: { id: string; name: string } | null;
 }
 
-const FilterableModal: React.FC<FilterableModalProps> = ({
-  visible,
-  onClose,
-  title,
-  data,
-  selectedId,
-  onSelect,
-  filter,
-  onFilterChange,
-  placeholder, // Ya no lo usamos, mantenemos para compatibilidad
-}) => {
-  const colorScheme = useColorScheme();
-
-  return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 20,
-        }}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <View
-          style={{
-            backgroundColor: Colors[colorScheme].background,
-            borderRadius: 12,
-            padding: 20,
-            width: '90%',
-            maxWidth: 400,
-            maxHeight: '80%',
-            elevation: 5,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-          }}
-          onStartShouldSetResponder={() => true}
-        >
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 20,
-          }}>
-            <Text style={{
-              fontSize: 18,
-              fontWeight: 'bold',
-              color: Colors[colorScheme].text,
-            }}>
-              {title}
-            </Text>
-            <TouchableOpacity 
-              onPress={onClose}
-              style={{
-                padding: 8,
-                borderRadius: 20,
-                backgroundColor: `${Colors[colorScheme].text}10`,
-              }}
-            >
-              <Text style={{
-                fontSize: 16,
-                color: Colors[colorScheme].text,
-                fontWeight: 'bold',
-              }}>
-                ✕
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: Colors[colorScheme].background,
-            borderWidth: 1,
-            borderColor: '#666',
-            borderRadius: 8,
-            marginBottom: 16,
-            paddingHorizontal: 12,
-          }}>
-            <TextInput
-              style={{
-                flex: 1,
-                color: Colors[colorScheme].text,
-                paddingVertical: 12,
-                fontSize: 16,
-              }}
-              value={filter}
-              onChangeText={onFilterChange}
-              placeholder="Buscar"
-              placeholderTextColor={`${Colors[colorScheme].text}60`}
-            />
-            <FontAwesome 
-              name="search" 
-              size={16} 
-              color="white" 
-              style={{ marginLeft: 8 }}
-            />
-          </View>
-
-          <ScrollView style={{ maxHeight: 300 }}>
-            {data.map((item, index) => (
-              <TouchableOpacity
-                key={item.Id}
-                style={{
-                  padding: 16,
-                  borderRadius: 8,
-                  marginBottom: index === data.length - 1 ? 0 : 8,
-                  backgroundColor: selectedId === item.Id 
-                    ? `${Colors[colorScheme].tint}10` 
-                    : 'transparent',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-                onPress={() => onSelect(item)}
-              >
-                <Text style={{
-                  color: selectedId === item.Id 
-                    ? Colors[colorScheme].tint 
-                    : Colors[colorScheme].text,
-                  fontWeight: selectedId === item.Id ? '600' : 'normal',
-                  fontSize: 16,
-                }}>
-                  {item.Nombre}
-                </Text>
-                {selectedId === item.Id && (
-                  <Text style={{
-                    color: Colors[colorScheme].tint,
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                  }}>
-                    ✓
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
-};
+interface LoadingStates {
+  countries: boolean;
+  regions: boolean;
+  cities: boolean;
+  eps: boolean;
+  documentTypes: boolean;
+}
 
 export default function Step3({ userId, onNext, initialData }: Step3Props) {
-  // Estados para los catálogos
-  const [countries, setCountries] = useState<CountryType[]>([]);
-  const [regions, setRegions] = useState<Region[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
-  const [epsOptions, setEpsOptions] = useState<EPS[]>([]);
-  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
-  const [userCountryData, setUserCountryData] = useState<{ id: string; name: string } | null>(null);
-  
-  // Estados de loading
-  const [loadingCountries, setLoadingCountries] = useState(false);
-  const [loadingRegions, setLoadingRegions] = useState(false);
-  const [loadingCities, setLoadingCities] = useState(false);
-  const [loadingEPS, setLoadingEPS] = useState(false);
-  const [loadingDocumentTypes, setLoadingDocumentTypes] = useState(false);
-
-  // Estados del formulario - en el orden solicitado
-  const [country, setCountry] = useState(initialData?.country || '');
-  const [selectedCountryId, setSelectedCountryId] = useState(initialData?.countryId || '');
-  const [region, setRegion] = useState(initialData?.region || '');
-  const [selectedRegionId, setSelectedRegionId] = useState(initialData?.regionId || '');
-  const [city, setCity] = useState(initialData?.city || '');
-  const [selectedCityId, setSelectedCityId] = useState(initialData?.cityId || '');
-  const [documentType, setDocumentType] = useState(initialData?.documentType || '');
-  const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState(initialData?.documentTypeId || '');
-  const [documentNumber, setDocumentNumber] = useState(initialData?.documentNumber || '');
-  
-  // Estados adicionales (no están en el orden principal)
-  const [eps, setEps] = useState(initialData?.eps || '');
-  const [selectedEpsId, setSelectedEpsId] = useState(initialData?.epsId || '');
-  const [emergencyContact, setEmergencyContact] = useState(initialData?.emergencyContact || '');
-  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
-  const [emergencyPhone, setEmergencyPhone] = useState(initialData?.emergencyPhone || '');
-  const [address, setAddress] = useState(initialData?.address || '');
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Estados de los modales
-  const [showRegionModal, setShowRegionModal] = useState(false);
-  const [showCityModal, setShowCityModal] = useState(false);
-  const [showDocumentTypeModal, setShowDocumentTypeModal] = useState(false);
-  const [showEpsModal, setShowEpsModal] = useState(false);
-
-  // Estados de filtros
-  const [regionFilter, setRegionFilter] = useState('');
-  const [cityFilter, setCityFilter] = useState('');
-  const [documentTypeFilter, setDocumentTypeFilter] = useState('');
-  const [epsFilter, setEpsFilter] = useState('');
-
   const colorScheme = useColorScheme();
+  const formData = useStep3Form(initialData);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
+  
+  // Catalog data
+  const [catalogData, setCatalogData] = useState<CatalogData>({
+    countries: [],
+    regions: [],
+    cities: [],
+    epsOptions: [],
+    documentTypes: [],
+    userCountryData: null,
+  });
+  
+  // Loading states
+  const [loadingStates, setLoadingStates] = useState<LoadingStates>({
+    countries: false,
+    regions: false,
+    cities: false,
+    eps: false,
+    documentTypes: false,
+  });
 
-  // Funciones para cargar catálogos
-  const loadCountries = async () => {
-    if (loadingCountries || countries.length > 0) return;
-    setLoadingCountries(true);
+  const loadCountries = useCallback(async () => {
+    if (loadingStates.countries || catalogData.countries.length > 0) return;
+    
+    setLoadingStates(prev => ({ ...prev, countries: true }));
     try {
       const data = await catalogService.getCountries();
-      setCountries(data);
+      setCatalogData(prev => ({ ...prev, countries: data }));
     } catch (error) {
       console.error('Error loading countries:', error);
     } finally {
-      setLoadingCountries(false);
+      setLoadingStates(prev => ({ ...prev, countries: false }));
     }
-  };
+  }, [loadingStates.countries, catalogData.countries.length]);
 
-  const loadRegions = async (countryId: string) => {
-    if (loadingRegions) return;
-    setLoadingRegions(true);
+  const loadRegions = useCallback(async (countryId: string) => {
+    if (loadingStates.regions) return;
+    
+    setLoadingStates(prev => ({ ...prev, regions: true }));
     try {
       const data = await catalogService.getRegionsByCountry(countryId);
-      setRegions(data);
-      setCities([]); // Limpiar ciudades cuando cambia el país
+      setCatalogData(prev => ({ ...prev, regions: data, cities: [] }));
     } catch (error) {
       console.error('Error loading regions:', error);
     } finally {
-      setLoadingRegions(false);
+      setLoadingStates(prev => ({ ...prev, regions: false }));
     }
-  };
+  }, [loadingStates.regions]);
 
-  const loadCities = async (regionId: string) => {
-    if (loadingCities) return;
-    setLoadingCities(true);
+  const loadCities = useCallback(async (regionId: string) => {
+    if (loadingStates.cities) return;
+    
+    setLoadingStates(prev => ({ ...prev, cities: true }));
     try {
       const data = await catalogService.getCitiesByRegion(regionId);
-      setCities(data);
+      setCatalogData(prev => ({ ...prev, cities: data }));
     } catch (error) {
       console.error('Error loading cities:', error);
     } finally {
-      setLoadingCities(false);
+      setLoadingStates(prev => ({ ...prev, cities: false }));
     }
-  };
+  }, [loadingStates.cities]);
 
-  const loadEPS = async () => {
-    if (loadingEPS || epsOptions.length > 0) return;
-    setLoadingEPS(true);
+  const loadEPS = useCallback(async () => {
+    if (loadingStates.eps || catalogData.epsOptions.length > 0) return;
+    
+    setLoadingStates(prev => ({ ...prev, eps: true }));
     try {
       const data = await catalogService.getEPS();
-      setEpsOptions(data);
+      setCatalogData(prev => ({ ...prev, epsOptions: data }));
     } catch (error) {
       console.error('Error loading EPS:', error);
     } finally {
-      setLoadingEPS(false);
+      setLoadingStates(prev => ({ ...prev, eps: false }));
     }
-  };
+  }, [loadingStates.eps, catalogData.epsOptions.length]);
 
-  const loadDocumentTypes = async (countryId?: string) => {
-    if (loadingDocumentTypes) return;
-    setLoadingDocumentTypes(true);
+  const loadDocumentTypes = useCallback(async (countryId?: string) => {
+    if (loadingStates.documentTypes) return;
+    
+    setLoadingStates(prev => ({ ...prev, documentTypes: true }));
     try {
       const data = countryId 
         ? await catalogService.getDocumentTypesByCountry(countryId)
         : await catalogService.getDocumentTypes();
-      setDocumentTypes(data);
+      setCatalogData(prev => ({ ...prev, documentTypes: data }));
     } catch (error) {
       console.error('Error loading document types:', error);
     } finally {
-      setLoadingDocumentTypes(false);
+      setLoadingStates(prev => ({ ...prev, documentTypes: false }));
     }
-  };
+  }, [loadingStates.documentTypes]);
 
-  // Cargar país del usuario
-  const loadUserCountry = async () => {
+  const loadUserCountry = useCallback(async () => {
     try {
       const sessionData = userSessionService.getUserCountryData();
       if (sessionData) {
-        setUserCountryData(sessionData);
+        setCatalogData(prev => ({ ...prev, userCountryData: sessionData }));
       }
     } catch (error) {
       console.error('Error loading user country:', error);
     }
-  };
+  }, []);
 
-  // Efectos para cargar datos iniciales
+  // Load initial data
   useEffect(() => {
     loadUserCountry();
     loadCountries();
     loadEPS();
-  }, []);
+  }, [loadUserCountry, loadCountries, loadEPS]);
 
-  // Efectos para cargar datos dependientes
+  // Load dependent data
   useEffect(() => {
-    if (selectedCountryId) {
-      loadRegions(selectedCountryId);
-      loadDocumentTypes(selectedCountryId);
+    if (formData.selectedCountryId) {
+      loadRegions(formData.selectedCountryId);
+      loadDocumentTypes(formData.selectedCountryId);
     }
-  }, [selectedCountryId]);
+  }, [formData.selectedCountryId, loadRegions, loadDocumentTypes]);
 
   useEffect(() => {
-    if (selectedRegionId) {
-      loadCities(selectedRegionId);
+    if (formData.selectedRegionId) {
+      loadCities(formData.selectedRegionId);
     }
-  }, [selectedRegionId]);
+  }, [formData.selectedRegionId, loadCities]);
 
-  // Auto-preseleccionar país del usuario si no hay datos iniciales
+  // Auto-select user's country
   useEffect(() => {
-    if (userCountryData && !initialData?.country && !country) {
-      setCountry(userCountryData.name);
-      setSelectedCountryId(userCountryData.id);
-      console.log(`🌍 País auto-seleccionado: ${userCountryData.name}`);
+    if (catalogData.userCountryData && !initialData?.country && !formData.country) {
+      formData.setCountry(catalogData.userCountryData.name);
+      formData.setSelectedCountryId(catalogData.userCountryData.id);
     }
-  }, [userCountryData, initialData, country]);
+  }, [catalogData.userCountryData, initialData, formData.country]);
 
-  const handleDocumentNumberChange = (text: string) => {
-    const numericOnly = text.replace(/[^0-9]/g, '').slice(0, 20); // Límite de 20 caracteres
-    setDocumentNumber(numericOnly);
-  };
-
-  const handleEmergencyPhoneChange = (text: string) => {
-    const numericOnly = text.replace(/[^0-9]/g, '');
-    setEmergencyPhone(numericOnly);
-  };
-
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     setIsLoading(true);
 
     const stepData: Step3Data = {
-      eps: eps.trim() || undefined,
-      epsId: selectedEpsId || undefined,
-      country: country.trim() || undefined,
-      countryId: selectedCountryId || undefined,
-      region: region.trim() || undefined,
-      regionId: selectedRegionId || undefined,
-      city: city.trim() || undefined,
-      cityId: selectedCityId || undefined,
-      documentType: documentType.trim() || undefined,
-      documentTypeId: selectedDocumentTypeId || undefined,
-      documentNumber: documentNumber.trim() || undefined,
-      emergencyContact: emergencyContact.trim() || undefined,
-      emergencyPhone: emergencyPhone.trim() ? `${selectedCountry.dialCode}${emergencyPhone.trim()}` : undefined,
-      address: address.trim() || undefined,
+      eps: formData.eps.trim() || undefined,
+      epsId: formData.selectedEpsId || undefined,
+      country: formData.country.trim() || undefined,
+      countryId: formData.selectedCountryId || undefined,
+      region: formData.region.trim() || undefined,
+      regionId: formData.selectedRegionId || undefined,
+      city: formData.city.trim() || undefined,
+      cityId: formData.selectedCityId || undefined,
+      documentType: formData.documentType.trim() || undefined,
+      documentTypeId: formData.selectedDocumentTypeId || undefined,
+      documentNumber: formData.documentNumber.trim() || undefined,
+      emergencyContact: formData.emergencyContact.trim() || undefined,
+      emergencyPhone: formData.emergencyPhone.trim() 
+        ? `${selectedCountry.dialCode}${formData.emergencyPhone.trim()}` 
+        : undefined,
+      address: formData.address.trim() || undefined,
     };
     
     try {
@@ -410,23 +232,55 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [formData, selectedCountry, userId, onNext]);
 
-  // Funciones para filtrar opciones
-  const getFilteredRegions = () => regions.filter((region: Region) => 
-    region.Nombre.toLowerCase().includes(regionFilter.toLowerCase())
+  const handleRegionSelect = useCallback((item: Region) => {
+    formData.setRegion(item.Nombre);
+    formData.setSelectedRegionId(item.Id);
+    formData.setShowRegionModal(false);
+    formData.setRegionFilter('');
+    formData.clearCityData();
+  }, [formData]);
+
+  const handleCitySelect = useCallback((item: City) => {
+    formData.setCity(item.Nombre);
+    formData.setSelectedCityId(item.Id);
+    formData.setShowCityModal(false);
+    formData.setCityFilter('');
+  }, [formData]);
+
+  const handleDocumentTypeSelect = useCallback((item: DocumentType) => {
+    formData.setDocumentType(item.Nombre);
+    formData.setSelectedDocumentTypeId(item.Id);
+    formData.setShowDocumentTypeModal(false);
+    formData.setDocumentTypeFilter('');
+  }, [formData]);
+
+  const handleEpsSelect = useCallback((item: EPS) => {
+    formData.setEps(item.Nombre);
+    formData.setSelectedEpsId(item.Id);
+    formData.setShowEpsModal(false);
+    formData.setEpsFilter('');
+  }, [formData]);
+
+  const filteredRegions = useMemo(() => 
+    formData.getFilteredRegions(catalogData.regions), 
+    [formData.getFilteredRegions, catalogData.regions]
   );
 
-  const getFilteredCities = () => cities.filter((city: City) => 
-    city.Nombre.toLowerCase().includes(cityFilter.toLowerCase())
+  const filteredCities = useMemo(() => 
+    formData.getFilteredCities(catalogData.cities), 
+    [formData.getFilteredCities, catalogData.cities]
   );
 
-  const getFilteredEps = () => epsOptions.filter((eps: EPS) => 
-    eps.Nombre.toLowerCase().includes(epsFilter.toLowerCase())
+  const filteredEps = useMemo(() => 
+    formData.getFilteredEps(catalogData.epsOptions), 
+    [formData.getFilteredEps, catalogData.epsOptions]
   );
 
-  const getFilteredDocumentTypes = () => documentTypes.filter((docType: DocumentType) => 
-    docType.Nombre.toLowerCase().includes(documentTypeFilter.toLowerCase())
+  const filteredDocumentTypes = useMemo(() => 
+    formData.getFilteredDocumentTypes(catalogData.documentTypes), 
+    [formData.getFilteredDocumentTypes, catalogData.documentTypes]
   );
 
   return (
@@ -457,9 +311,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
             ]}
           >
             <Text style={{ 
-              color: country ? Colors[colorScheme].text : `${Colors[colorScheme].text}60` 
+              color: formData.country ? Colors[colorScheme].text : `${Colors[colorScheme].text}60` 
             }}>
-              {country || 'Cargando país...'}
+              {formData.country || 'Cargando país...'}
             </Text>
           </View>
         </View>
@@ -481,25 +335,22 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
               }
             ]}
             onPress={() => {
-              if (!selectedCountryId) {
-                console.log('Debe seleccionar un país primero');
-                return;
-              }
-              setShowRegionModal(true);
-              if (regions.length === 0) {
-                loadRegions(selectedCountryId);
+              if (!formData.selectedCountryId) return;
+              formData.setShowRegionModal(true);
+              if (catalogData.regions.length === 0) {
+                loadRegions(formData.selectedCountryId);
               }
             }}
-            disabled={!selectedCountryId}
+            disabled={!formData.selectedCountryId}
           >
             <Text style={{
-              color: selectedRegionId 
+              color: formData.selectedRegionId 
                 ? Colors[colorScheme].text 
                 : `${Colors[colorScheme].text}60`
             }}>
-              {selectedRegionId 
-                ? regions.find((r: Region) => r.Id === selectedRegionId)?.Nombre || 'Región seleccionada'
-                : selectedCountryId ? 'Selecciona una región' : 'Selecciona un país primero'
+              {formData.selectedRegionId 
+                ? catalogData.regions.find((r: Region) => r.Id === formData.selectedRegionId)?.Nombre || 'Región seleccionada'
+                : formData.selectedCountryId ? 'Selecciona una región' : 'Selecciona un país primero'
               }
             </Text>
             <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
@@ -525,25 +376,22 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
               }
             ]}
             onPress={() => {
-              if (!selectedRegionId) {
-                console.log('Debe seleccionar una región primero');
-                return;
-              }
-              setShowCityModal(true);
-              if (cities.length === 0) {
-                loadCities(selectedRegionId);
+              if (!formData.selectedRegionId) return;
+              formData.setShowCityModal(true);
+              if (catalogData.cities.length === 0) {
+                loadCities(formData.selectedRegionId);
               }
             }}
-            disabled={!selectedRegionId}
+            disabled={!formData.selectedRegionId}
           >
             <Text style={{
-              color: selectedCityId 
+              color: formData.selectedCityId 
                 ? Colors[colorScheme].text 
                 : `${Colors[colorScheme].text}60`
             }}>
-              {selectedCityId 
-                ? cities.find((c: City) => c.Id === selectedCityId)?.Nombre || 'Ciudad seleccionada'
-                : selectedRegionId ? 'Selecciona una ciudad' : 'Selecciona una región primero'
+              {formData.selectedCityId 
+                ? catalogData.cities.find((c: City) => c.Id === formData.selectedCityId)?.Nombre || 'Ciudad seleccionada'
+                : formData.selectedRegionId ? 'Selecciona una ciudad' : 'Selecciona una región primero'
               }
             </Text>
             <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
@@ -569,19 +417,19 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
               }
             ]}
             onPress={() => {
-              setShowDocumentTypeModal(true);
-              if (documentTypes.length === 0) {
+              formData.setShowDocumentTypeModal(true);
+              if (catalogData.documentTypes.length === 0) {
                 loadDocumentTypes();
               }
             }}
           >
             <Text style={{
-              color: selectedDocumentTypeId 
+              color: formData.selectedDocumentTypeId 
                 ? Colors[colorScheme].text 
                 : `${Colors[colorScheme].text}60`
             }}>
-              {selectedDocumentTypeId 
-                ? documentTypes.find((d: DocumentType) => d.Id === selectedDocumentTypeId)?.Nombre || 'Documento seleccionado'
+              {formData.selectedDocumentTypeId 
+                ? catalogData.documentTypes.find((d: DocumentType) => d.Id === formData.selectedDocumentTypeId)?.Nombre || 'Documento seleccionado'
                 : 'Selecciona tipo de documento'
               }
             </Text>
@@ -605,8 +453,8 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
                 borderColor: '#666',
               },
             ]}
-            value={documentNumber}
-            onChangeText={handleDocumentNumberChange}
+            value={formData.documentNumber}
+            onChangeText={formData.handleDocumentNumberChange}
             placeholder="Ingresa tu número de documento"
             placeholderTextColor={`${Colors[colorScheme].text}60`}
             keyboardType="number-pad"
@@ -614,7 +462,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
           />
         </View>
 
-        {/* Campos adicionales */}
         {/* EPS */}
         <View style={commonStyles.inputContainer}>
           <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
@@ -631,15 +478,15 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
                 alignItems: 'center'
               }
             ]}
-            onPress={() => setShowEpsModal(true)}
+            onPress={() => formData.setShowEpsModal(true)}
           >
             <Text style={{
-              color: selectedEpsId 
+              color: formData.selectedEpsId 
                 ? Colors[colorScheme].text 
                 : `${Colors[colorScheme].text}60`
             }}>
-              {selectedEpsId 
-                ? epsOptions.find((e: EPS) => e.Id === selectedEpsId)?.Nombre || 'EPS seleccionada'
+              {formData.selectedEpsId 
+                ? catalogData.epsOptions.find((e: EPS) => e.Id === formData.selectedEpsId)?.Nombre || 'EPS seleccionada'
                 : 'Selecciona tu EPS'
               }
             </Text>
@@ -663,8 +510,8 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
                 borderColor: '#666',
               },
             ]}
-            value={emergencyContact}
-            onChangeText={setEmergencyContact}
+            value={formData.emergencyContact}
+            onChangeText={formData.setEmergencyContact}
             placeholder="Nombre del contacto"
             placeholderTextColor={`${Colors[colorScheme].text}60`}
             autoCapitalize="words"
@@ -693,9 +540,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
                     borderColor: '#666',
                   },
                 ]}
-                value={emergencyPhone}
+                value={formData.emergencyPhone}
                 keyboardType="number-pad"
-                onChangeText={handleEmergencyPhoneChange}
+                onChangeText={formData.handleEmergencyPhoneChange}
                 placeholder="3001234567"
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
                 maxLength={10}
@@ -718,8 +565,8 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
                 borderColor: '#666',
               },
             ]}
-            value={address}
-            onChangeText={setAddress}
+            value={formData.address}
+            onChangeText={formData.setAddress}
             placeholder="Ingresa tu dirección"
             placeholderTextColor={`${Colors[colorScheme].text}60`}
             multiline
@@ -742,85 +589,69 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         </TouchableOpacity>
       </View>
 
-      {/* Modales */}
+      {/* Modals */}
       <FilterableModal
-        visible={showRegionModal}
+        visible={formData.showRegionModal}
         onClose={() => {
-          setShowRegionModal(false);
-          setRegionFilter('');
+          formData.setShowRegionModal(false);
+          formData.setRegionFilter('');
         }}
         title="Seleccionar Región"
-        data={getFilteredRegions()}
-        selectedId={selectedRegionId}
-        onSelect={(item) => {
-          setRegion(item.Nombre);
-          setSelectedRegionId(item.Id);
-          setShowRegionModal(false);
-          setRegionFilter('');
-          // Limpiar ciudades cuando cambia la región
-          setCities([]);
-          setCity('');
-          setSelectedCityId('');
-        }}
-        filter={regionFilter}
-        onFilterChange={setRegionFilter}
+        data={filteredRegions}
+        selectedId={formData.selectedRegionId}
+        onSelect={handleRegionSelect}
+        filter={formData.regionFilter}
+        onFilterChange={formData.setRegionFilter}
+        getItemId={(item: Region) => item.Id}
+        getItemName={(item: Region) => item.Nombre}
       />
 
       <FilterableModal
-        visible={showCityModal}
+        visible={formData.showCityModal}
         onClose={() => {
-          setShowCityModal(false);
-          setCityFilter('');
+          formData.setShowCityModal(false);
+          formData.setCityFilter('');
         }}
         title="Seleccionar Ciudad"
-        data={getFilteredCities()}
-        selectedId={selectedCityId}
-        onSelect={(item) => {
-          setCity(item.Nombre);
-          setSelectedCityId(item.Id);
-          setShowCityModal(false);
-          setCityFilter('');
-        }}
-        filter={cityFilter}
-        onFilterChange={setCityFilter}
+        data={filteredCities}
+        selectedId={formData.selectedCityId}
+        onSelect={handleCitySelect}
+        filter={formData.cityFilter}
+        onFilterChange={formData.setCityFilter}
+        getItemId={(item: City) => item.Id}
+        getItemName={(item: City) => item.Nombre}
       />
 
       <FilterableModal
-        visible={showDocumentTypeModal}
+        visible={formData.showDocumentTypeModal}
         onClose={() => {
-          setShowDocumentTypeModal(false);
-          setDocumentTypeFilter('');
+          formData.setShowDocumentTypeModal(false);
+          formData.setDocumentTypeFilter('');
         }}
         title="Seleccionar Tipo de Documento"
-        data={getFilteredDocumentTypes()}
-        selectedId={selectedDocumentTypeId}
-        onSelect={(item) => {
-          setDocumentType(item.Nombre);
-          setSelectedDocumentTypeId(item.Id);
-          setShowDocumentTypeModal(false);
-          setDocumentTypeFilter('');
-        }}
-        filter={documentTypeFilter}
-        onFilterChange={setDocumentTypeFilter}
+        data={filteredDocumentTypes}
+        selectedId={formData.selectedDocumentTypeId}
+        onSelect={handleDocumentTypeSelect}
+        filter={formData.documentTypeFilter}
+        onFilterChange={formData.setDocumentTypeFilter}
+        getItemId={(item: DocumentType) => item.Id}
+        getItemName={(item: DocumentType) => item.Nombre}
       />
 
       <FilterableModal
-        visible={showEpsModal}
+        visible={formData.showEpsModal}
         onClose={() => {
-          setShowEpsModal(false);
-          setEpsFilter('');
+          formData.setShowEpsModal(false);
+          formData.setEpsFilter('');
         }}
         title="Seleccionar EPS"
-        data={getFilteredEps()}
-        selectedId={selectedEpsId}
-        onSelect={(item) => {
-          setEps(item.Nombre);
-          setSelectedEpsId(item.Id);
-          setShowEpsModal(false);
-          setEpsFilter('');
-        }}
-        filter={epsFilter}
-        onFilterChange={setEpsFilter}
+        data={filteredEps}
+        selectedId={formData.selectedEpsId}
+        onSelect={handleEpsSelect}
+        filter={formData.epsFilter}
+        onFilterChange={formData.setEpsFilter}
+        getItemId={(item: EPS) => item.Id}
+        getItemName={(item: EPS) => item.Nombre}
       />
     </ScrollView>
   );
