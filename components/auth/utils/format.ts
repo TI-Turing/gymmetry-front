@@ -1,6 +1,3 @@
-/**
- * Formatea una fecha al formato DD/MM/YYYY para mostrar al usuario
- */
 export const formatDateToDisplay = (date: Date): string => {
   if (!date || isNaN(date.getTime())) return '';
   
@@ -11,9 +8,6 @@ export const formatDateToDisplay = (date: Date): string => {
   return `${day}/${month}/${year}`;
 };
 
-/**
- * Convierte una fecha del formato DD/MM/YYYY al formato YYYY-MM-DD para el backend
- */
 export const formatDateForBackend = (dateString: string): string => {
   if (!dateString) return '';
   
@@ -26,16 +20,13 @@ export const formatDateForBackend = (dateString: string): string => {
   return dateString;
 };
 
-/**
- * Convierte una fecha del formato DD/MM/YYYY a un objeto Date
- */
 export const parseDisplayDate = (dateString: string): Date => {
   if (!dateString) return new Date();
   
   const parts = dateString.split('/');
   if (parts.length === 3) {
     const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; // Los meses van de 0-11
+    const month = parseInt(parts[1], 10) - 1;
     const year = parseInt(parts[2], 10);
     
     const date = new Date(year, month, day);
@@ -45,7 +36,6 @@ export const parseDisplayDate = (dateString: string): Date => {
   return new Date();
 };
 
-// Mantener funciones legacy para compatibilidad
 export const formatDate = formatDateToDisplay;
 export const parseDate = parseDisplayDate;
 

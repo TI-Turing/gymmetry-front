@@ -69,7 +69,6 @@ export default function Step1({ onNext, initialData }: Step1Props) {
     }
 
     setIsLoading(true);
-    console.log('🔄 [STEP 1] Iniciando creación de usuario...');
 
     try {
       const response = await userAPI.createUser({
@@ -77,15 +76,12 @@ export default function Step1({ onNext, initialData }: Step1Props) {
         Password: password
       }) as ApiResponse;
 
-      console.log('🔄 [STEP 1] Respuesta de la API:', response);
-
       if (!response.Success) {
         throw new Error(response.Message || 'Error al crear usuario');
       }
       
       if (response.Data?.Token) {
         apiService.setAuthToken(response.Data.Token);
-        console.log('🔑 [STEP 1] Token configurado');
       }
       
       const stepData = { 
@@ -95,7 +91,6 @@ export default function Step1({ onNext, initialData }: Step1Props) {
         token: response.Data?.Token
       };
       
-      console.log('🔄 [STEP 1] Llamando onNext con:', stepData);
       onNext(stepData);
 
     } catch (error: any) {

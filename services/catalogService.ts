@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 import { Environment } from '@/environment';
-import { apiService } from './apiService';
 import { 
   Gender,
   Country,
@@ -14,7 +13,6 @@ class CatalogService {
   private catalogsAPI: AxiosInstance;
   
   constructor() {
-    // Crear una instancia específica para catálogos que use la misma base del apiService
     this.catalogsAPI = axios.create({
       baseURL: Environment.CATALOGS_API_BASE_URL,
       headers: {
@@ -23,32 +21,26 @@ class CatalogService {
       },
     });
 
-    // Agregar los mismos interceptors que el apiService para logging de cURL
     this.catalogsAPI.interceptors.request.use(
       (config) => {
-        // Asegurarse de que el header x-functions-key esté presente
         if (!config.headers) {
           config.headers = {} as any;
         }
         
-        // Forzar el header si no está presente
         if (!config.headers['x-functions-key']) {
           config.headers['x-functions-key'] = Environment.API_FUNCTIONS_KEY;
         }
 
-        const fullUrl = `${config.baseURL}${config.url}`;
-        
-        // Generar y mostrar comando cURL equivalente
-        const curlCommand = this.generateCurlCommand(
-          config.method?.toUpperCase() || 'GET',
-          fullUrl,
-          config.headers,
-          config.data
-        );
-        console.log('================== CATALOG CURL REQUEST ==================');
-        console.log(curlCommand);
-        console.log('================ END CATALOG CURL REQUEST ================');
-        
+        if (Environment.DEBUG) {
+          const fullUrl = `${config.baseURL}${config.url}`;
+          const curlCommand = this.generateCurlCommand(
+            config.method?.toUpperCase() || 'GET',
+            fullUrl,
+            config.headers,
+            config.data
+          );
+        }
+
         return config;
       },
       (error) => {
@@ -58,9 +50,7 @@ class CatalogService {
     );
 
     this.catalogsAPI.interceptors.response.use(
-      (response) => {
-        return response;
-      },
+      (response) => response,
       (error) => {
         console.error(`❌ [CATALOG API ERROR] ${error.response?.status || 'No Status'} ${error.config?.method?.toUpperCase()} ${error.config?.baseURL}${error.config?.url}`);
         console.error(`💥 [CATALOG ERROR DATA]`, error.response?.data || error.message);
@@ -69,13 +59,9 @@ class CatalogService {
     );
   }
 
-  /**
-   * Genera un comando cURL para peticiones de catálogos (formato Windows)
-   */
   private generateCurlCommand(method: string, url: string, headers: any = {}, data?: any): string {
     let curlCommand = `curl -X ${method}`;
     
-    // Agregar headers (formato Windows con comillas dobles)
     Object.keys(headers || {}).forEach(key => {
       if (headers[key] && key !== 'common') {
         const headerValue = String(headers[key]).replace(/"/g, '\\"');
@@ -83,126 +69,93 @@ class CatalogService {
   -H "${key}: ${headerValue}"`;
       }
     });
-    
-    // Agregar datos si existen (para POST, PUT, PATCH)
-    if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
-      const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
-      const escapedData = jsonData.replace(/"/g, '\\"');
+
+    if (data) {
+      const jsonData = JSON.stringify(data).replace(/"/g, '\\"');
       curlCommand += ` ^
-  -d "${escapedData}"`;
-      
-      // Agregar Content-Type si no está presente
-      if (!headers['Content-Type'] && !headers['content-type']) {
-        curlCommand += ` ^
-  -H "Content-Type: application/json"`;
-      }
+  -d "${jsonData}"`;
     }
-    
-    // Agregar URL al final
+
     curlCommand += ` ^
   "${url}"`;
-    
+
     return curlCommand;
   }
   
-  /**
-   * Ordena un array de objetos por el campo Nombre alfabéticamente
-   */
   private sortByName<T extends { Nombre: string }>(items: T[]): T[] {
     return items.sort((a, b) => a.Nombre.localeCompare(b.Nombre, 'es', { sensitivity: 'base' }));
   }
   
-  /**
-   * Obtiene la lista de géneros ordenada alfabéticamente
-   */
   async getGenders(): Promise<Gender[]> {
     try {
       const response = await this.catalogsAPI.get<Gender[]>('/generos');
       const genders = response.data || [];
       return this.sortByName(genders);
     } catch (error) {
-      console.error('❌ [CATALOG SERVICE] Error obteniendo géneros:', error);
+      console.error('Error fetching genders:', error);
       throw error;
     }
   }
 
-  /**
-   * Obtiene la lista de países ordenada alfabéticamente
-   */
   async getCountries(): Promise<Country[]> {
     try {
       const response = await this.catalogsAPI.get<Country[]>('/paises');
       const countries = response.data || [];
       return this.sortByName(countries);
     } catch (error) {
-      console.error('❌ [CATALOG SERVICE] Error obteniendo países:', error);
+      console.error('Error fetching countries:', error);
       throw error;
     }
   }
 
-  /**
-   * Obtiene la lista de tipos de documento para un país ordenada alfabéticamente
-   */
-  async getDocumentTypes(paisId: string): Promise<DocumentType[]> {
+  async getRegionsByCountry(countryId: string): Promise<Region[]> {
     try {
-      const response = await this.catalogsAPI.get<DocumentType[]>(`/tiposdocumento?paisId=${paisId}`);
-      const documentTypes = response.data || [];
-      return this.sortByName(documentTypes);
-    } catch (error) {
-      console.error('❌ [CATALOG SERVICE] Error obteniendo tipos de documento:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Obtiene la lista de EPS ordenada alfabéticamente
-   */
-  async getEPS(): Promise<EPS[]> {
-    try {
-      const response = await this.catalogsAPI.get<EPS[]>('/eps');
-      const eps = response.data || [];
-      return this.sortByName(eps);
-    } catch (error) {
-      console.error('❌ [CATALOG SERVICE] Error obteniendo EPS:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Obtiene las regiones filtradas por país ID ordenadas alfabéticamente
-   */
-  async getRegionsByCountry(paisId: string): Promise<Region[]> {
-    try {
-      const response = await this.catalogsAPI.get<Region[]>(`/regiones?paisId=${paisId}`);
+      const response = await this.catalogsAPI.get<Region[]>(`/regiones/${countryId}`);
       const regions = response.data || [];
       return this.sortByName(regions);
     } catch (error) {
-      console.error('❌ [CATALOG SERVICE] Error obteniendo regiones:', error);
+      console.error('Error fetching regions:', error);
       throw error;
     }
   }
 
-  /**
-   * Obtiene las ciudades filtradas por región ID ordenadas alfabéticamente
-   */
   async getCitiesByRegion(regionId: string): Promise<City[]> {
     try {
-      const response = await this.catalogsAPI.get<City[]>(`/ciudades?regionId=${regionId}`);
+      const response = await this.catalogsAPI.get<City[]>(`/ciudades/${regionId}`);
       const cities = response.data || [];
       return this.sortByName(cities);
     } catch (error) {
-      console.error('❌ [CATALOG SERVICE] Error obteniendo ciudades:', error);
+      console.error('Error fetching cities:', error);
       throw error;
     }
   }
 
-  /**
-   * Obtiene el ID de Colombia para usar como país por defecto
-   */
-  getColombiaId(): string {
-    return '01B4E9D1-A84E-41C9-8768-253209225A21';
+  async getEPS(): Promise<EPS[]> {
+    try {
+      const response = await this.catalogsAPI.get<EPS[]>('/eps');
+      const epsOptions = response.data || [];
+      return this.sortByName(epsOptions);
+    } catch (error) {
+      console.error('Error fetching EPS:', error);
+      throw error;
+    }
+  }
+
+  async getDocumentTypes(countryId?: string): Promise<DocumentType[]> {
+    try {
+      const url = countryId ? `/tipos-documento/${countryId}` : '/tipos-documento';
+      const response = await this.catalogsAPI.get<DocumentType[]>(url);
+      const documentTypes = response.data || [];
+      return this.sortByName(documentTypes);
+    } catch (error) {
+      console.error('Error fetching document types:', error);
+      throw error;
+    }
+  }
+
+  async getDocumentTypesByCountry(countryId: string): Promise<DocumentType[]> {
+    return this.getDocumentTypes(countryId);
   }
 }
 
 export const catalogService = new CatalogService();
-export default catalogService;

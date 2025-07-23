@@ -12,7 +12,6 @@ import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-// Imports locales
 import { useFormValidation } from './hooks/useValidation';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';

@@ -1,5 +1,3 @@
-// Interfaces para las respuestas de autenticación
-
 import { User } from '../user/responses';
 
 export interface LoginResponse {

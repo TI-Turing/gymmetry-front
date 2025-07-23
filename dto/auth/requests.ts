@@ -1,5 +1,3 @@
-// Interfaces para las peticiones de autenticación
-
 export interface LoginRequest {
   email: string;
   password: string;

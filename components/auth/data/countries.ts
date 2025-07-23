@@ -23,4 +23,4 @@ export const COUNTRIES: Country[] = [
   { code: 'NL', name: 'Países Bajos', dialCode: '+31', flag: '🇳🇱' },
 ];
 
-export const DEFAULT_COUNTRY = COUNTRIES[0]; // Colombia por defecto
+export const DEFAULT_COUNTRY = COUNTRIES[0];

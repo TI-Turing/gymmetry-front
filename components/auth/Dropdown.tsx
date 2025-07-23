@@ -35,9 +35,7 @@ export default function Dropdown({
 
   // Debug: agregar logs para verificar las opciones
   React.useEffect(() => {
-    console.log('🔍 [DROPDOWN DEBUG] Options:', options);
-    console.log('🔍 [DROPDOWN DEBUG] Options length:', options.length);
-    console.log('🔍 [DROPDOWN DEBUG] Current value:', value);
+    
   }, [options, value]);
 
   const filteredOptions = searchable
@@ -47,14 +45,13 @@ export default function Dropdown({
     : options;
 
   const handleSelect = (option: string) => {
-    console.log('🔍 [DROPDOWN DEBUG] Selected option:', option);
+    
     onSelect(option);
     setIsOpen(false);
     setSearchText('');
   };
 
   const handleOpen = () => {
-    console.log('🔍 [DROPDOWN DEBUG] Opening dropdown with options:', options);
     if (options.length === 0) {
       Alert.alert('Sin opciones', 'No hay opciones disponibles para seleccionar');
       return;

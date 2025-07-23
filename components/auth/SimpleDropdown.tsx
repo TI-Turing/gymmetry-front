@@ -24,10 +24,7 @@ export default function SimpleDropdown({
   const colorScheme = useColorScheme();
 
   const handlePress = () => {
-    console.log('🔍 [SIMPLE DROPDOWN] Pressed with options:', options);
-    console.log('🔍 [SIMPLE DROPDOWN] Options length:', options.length);
-    console.log('🔍 [SIMPLE DROPDOWN] Current value:', value);
-    console.log('🔍 [SIMPLE DROPDOWN] Platform:', Platform.OS);
+    
     
     if (options.length === 0) {
       Alert.alert('Sin opciones', 'No hay opciones disponibles');
@@ -50,23 +47,18 @@ export default function SimpleDropdown({
       );
     } else {
       // En Android usar Alert con botones
-      console.log('🔍 [SIMPLE DROPDOWN] Creating Android alert buttons');
       const buttons = options.map((option) => ({
         text: option,
         onPress: () => {
-          console.log('🔍 [SIMPLE DROPDOWN] Android Selection:', option);
           onSelect(option);
         },
       }));
       buttons.push({ 
         text: 'Cancelar', 
         onPress: () => {
-          console.log('🔍 [SIMPLE DROPDOWN] Android Selection cancelled');
         }
       });
 
-      console.log('🔍 [SIMPLE DROPDOWN] About to show Alert with title:', `Seleccionar ${label}`);
-      console.log('🔍 [SIMPLE DROPDOWN] Button options:', buttons.map(b => b.text));
       Alert.alert(`Seleccionar ${label}`, '', buttons);
     }
   };

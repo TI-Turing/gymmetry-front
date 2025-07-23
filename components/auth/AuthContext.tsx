@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// Contexto para manejar el estado del proceso de autenticación
 interface AuthContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;

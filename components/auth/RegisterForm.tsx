@@ -26,18 +26,15 @@ interface RegisterFormProps {
 }
 
 interface RegistrationData {
-  // Step 1
   email: string;
   password: string;
   userId?: string;
   token?: string;
-  // Step 2
   firstName?: string;
   lastName?: string;
   phone?: string;
   birthDate?: string;
-  idGender?: number;
-  // Step 3
+  genderId?: string;
   eps?: string;
   country?: string;
   region?: string;
@@ -46,14 +43,12 @@ interface RegistrationData {
   emergencyPhone?: string;
   address?: string;
   documentType?: string;
-  documentTypeId?: number;
-  countryId?: number;
-  // Step 4
+  documentTypeId?: string;
+  countryId?: string;
   fitnessGoal?: string;
   healthRestrictions?: string;
   additionalInfo?: string;
   rh?: string;
-  // Step 5
   username?: string;
   profileImage?: string;
 }
@@ -68,39 +63,11 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
   const colorScheme = useColorScheme();
   const authContext = useAuthContext();
 
-  // Sincronizar con el contexto del layout
   useEffect(() => {
-    console.log('🔄 [REGISTER FORM] Actualizando contexto - currentStep:', currentStep);
     authContext.setIsInRegisterFlow(true);
     authContext.setCurrentStep(currentStep);
     
-    // TEMPORALMENTE COMENTADO - puede estar causando el problema
-    /*
-    // Configurar la función de omitir según el paso actual
-    const setupSkipFunction = () => {
-      switch (currentStep) {
-        case 1: // Step 2 - Datos básicos
-          console.log('⚙️ [REGISTER FORM] Configurando skip para Step 2');
-          authContext.setOnSkip(() => handleStep2Skip());
-          break;
-        case 2: // Step 3 - Información personal
-          console.log('⚙️ [REGISTER FORM] Configurando skip para Step 3');
-          authContext.setOnSkip(() => handleStep3Skip());
-          break;
-        case 3: // Step 4 - Datos fitness
-          console.log('⚙️ [REGISTER FORM] Configurando skip para Step 4');
-          authContext.setOnSkip(() => handleStep4Skip());
-          break;
-        default:
-          console.log('⚙️ [REGISTER FORM] Sin skip para Step 1');
-          authContext.setOnSkip(undefined);
-      }
-    };
-
-    setupSkipFunction();
-    */
     
-    // Cleanup cuando se desmonta el componente
     return () => {
       authContext.setIsInRegisterFlow(false);
       authContext.setOnSkip(undefined);
@@ -110,12 +77,12 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
   // Manejar el botón físico del dispositivo (Android)
   useEffect(() => {
     const backAction = () => {
-      // Si estamos en un paso superior al 1, ir a la pantalla de bienvenida
+      
       if (currentStep > 0) {
         handleSkipToWelcome();
-        return true; // Prevenir el comportamiento por defecto
+        return true; 
       }
-      // Si estamos en el paso 1, permitir el comportamiento por defecto (ir al login)
+      
       return false;
     };
 
@@ -124,11 +91,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
     return () => backHandler.remove();
   }, [currentStep]);
 
-  // Función para manejar cuando el usuario omite o usa el botón físico
   const handleSkipToWelcome = () => {
-    console.log('🏠 [REGISTER FORM] Redirigiendo a pantalla de bienvenida...');
-    
-    // Marcar al usuario como logueado con los datos que tengamos
     if (registrationData.token) {
       apiService.setAuthToken(registrationData.token);
     }
@@ -147,27 +110,19 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
   const handleStep1Next = (data: { email: string; password: string; userId?: string; token?: string }) => {
     setRegistrationData(prev => ({ ...prev, ...data }));
     
-    // Si recibimos un token, guardarlo en el servicio API
     if (data.token) {
-      console.log('🔑 [REGISTER FORM] Token recibido, configurando para futuras peticiones...');
       apiService.setAuthToken(data.token);
-      console.log('✅ [REGISTER FORM] Token configurado en apiService');
-    } else {
-      console.log('⚠️ [REGISTER FORM] No se recibió token del Step 1');
     }
     
     setCurrentStep(1);
   };
 
   const handleStep2Next = (data: { firstName: string; lastName: string; phone?: string; birthDate?: string }) => {
-    console.log('🔄 [REGISTER FORM] handleStep2Next llamado con data:', data);
-    console.log('🔄 [REGISTER FORM] registrationData actual:', registrationData);
     setRegistrationData(prev => ({ ...prev, ...data }));
     setCurrentStep(2);
   };
 
   const handleStep2Skip = () => {
-    console.log('🔄 [REGISTER FORM] handleStep2Skip llamado');
     handleSkipToWelcome();
   };
 
@@ -180,13 +135,11 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
     emergencyPhone?: string;
     address?: string;
   }) => {
-    console.log('🔄 [REGISTER FORM] handleStep3Next llamado con data:', data);
     setRegistrationData(prev => ({ ...prev, ...data }));
     setCurrentStep(3);
   };
 
   const handleStep3Skip = () => {
-    console.log('🔄 [REGISTER FORM] handleStep3Skip llamado');
     handleSkipToWelcome();
   };
 
@@ -195,13 +148,11 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
     healthRestrictions?: string;
     additionalInfo?: string;
   }) => {
-    console.log('🔄 [REGISTER FORM] handleStep4Next llamado con data:', data);
     setRegistrationData(prev => ({ ...prev, ...data }));
     setCurrentStep(4);
   };
 
   const handleStep4Skip = () => {
-    console.log('🔄 [REGISTER FORM] handleStep4Skip llamado');
     handleSkipToWelcome();
   };
 
@@ -209,15 +160,12 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
     username?: string;
     profileImage?: string;
   }) => {
-    console.log('🔄 [REGISTER FORM] handleStep5Next llamado con data:', data);
     const finalData = { ...registrationData, ...data };
-    console.log('🔄 [REGISTER FORM] Registro completado. Redirigiendo a bienvenida...');
     setRegistrationData(finalData);
     setShowWelcomeScreen(true);
   };
 
   const handleStep5Skip = () => {
-    console.log('🔄 [REGISTER FORM] handleStep5Skip llamado');
     handleSkipToWelcome();
   };
 
@@ -250,7 +198,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
               lastName: registrationData.lastName || '',
               phone: registrationData.phone,
               birthDate: registrationData.birthDate,
-              idGender: registrationData.idGender,
+              genderId: registrationData.genderId,
             }}
           />
         );
@@ -313,7 +261,6 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }: RegisterFo
           username: registrationData.username,
         }}
         onContinue={() => {
-          console.log('🏠 [WELCOME SCREEN] Usuario continuó desde bienvenida');
           onRegister(registrationData);
         }}
       />

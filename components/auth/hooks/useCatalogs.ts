@@ -21,7 +21,6 @@ interface CatalogsState {
 }
 
 export const useCatalogs = () => {
-  console.log('🔍 [USE CATALOGS] Hook called');
   const [state, setState] = useState<CatalogsState>({
     genders: [],
     documentTypes: [],
@@ -34,11 +33,9 @@ export const useCatalogs = () => {
   });
 
   const loadCatalogs = async () => {
-    console.log('🔍 [USE CATALOGS] Loading catalogs...');
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
-      // Cargar géneros, países y EPS primero
       const [
         gendersResponse,
         countriesResponse,
@@ -49,14 +46,12 @@ export const useCatalogs = () => {
         catalogService.getEPS()
       ]);
 
-      console.log('🔍 [USE CATALOGS] Genders response:', gendersResponse);
-      console.log('🔍 [USE CATALOGS] Countries response:', countriesResponse);
-      console.log('🔍 [USE CATALOGS] EPS response:', epsResponse);
-
-      // Cargar tipos de documento para Colombia por defecto
-      const colombiaId = catalogService.getColombiaId();
+      const colombiaCountry = countriesResponse.status === 'fulfilled' 
+        ? countriesResponse.value.find((country: any) => country.Nombre === 'Colombia')
+        : null;
+      
       const documentTypesResponse = await Promise.allSettled([
-        catalogService.getDocumentTypes(colombiaId)
+        colombiaCountry ? catalogService.getDocumentTypes(colombiaCountry.Id) : Promise.resolve([])
       ]);
 
       setState(prev => ({
@@ -112,7 +107,6 @@ export const useCatalogs = () => {
   };
 
   useEffect(() => {
-    console.log('🔍 [USE CATALOGS] useEffect called - loading catalogs');
     loadCatalogs();
   }, []);
 
@@ -125,10 +119,7 @@ export const useCatalogs = () => {
   };
 };
 
-// Hook específico para géneros (para Step2)
 export const useGenders = () => {
-  console.log('🔍 [USE GENDERS] Hook called');
   const { genders, loading, error } = useCatalogs();
-  console.log('🔍 [USE GENDERS] Result - genders:', genders, 'loading:', loading, 'error:', error);
   return { genders, loading, error };
 };

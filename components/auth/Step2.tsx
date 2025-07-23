@@ -7,8 +7,6 @@ import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import { useGenders } from './hooks/useCatalogs';
-
-// Imports locales
 import { Step2Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
@@ -232,10 +230,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   alignItems: 'center'
                 }
               ]}
-              onPress={() => {
-                console.log('🔍 [GENDER MODAL] Opening - genders available:', genders.length);
-                setShowGenderModal(true);
-              }}
+              onPress={() => setShowGenderModal(true)}
             >
               <Text style={{
                 color: selectedGender 
@@ -334,7 +329,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                       alignItems: 'center',
                     }}
                     onPress={() => {
-                      console.log('🔍 [GENDER MODAL] Selected:', gender.Nombre, 'ID:', gender.Id);
                       setSelectedGender(gender.Id);
                       setShowGenderModal(false);
                     }}

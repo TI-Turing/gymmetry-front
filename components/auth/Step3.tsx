@@ -6,8 +6,6 @@ import Colors from '@/constants/Colors';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import { userAPI } from '@/services/apiExamples';
 import { useCatalogs } from './hooks/useCatalogs';
-
-// Imports locales
 import { Step3Data, Country } from './types';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
@@ -19,20 +17,17 @@ interface Step3Props {
 }
 
 export default function Step3({ userId, onNext, initialData }: Step3Props) {
-  // Hook para obtener catálogos
   const { 
     documentTypes, 
     countries, 
     regions, 
     cities, 
     eps: epsOptions, 
-    loading, 
     loadRegionsByCountry, 
     loadCitiesByRegion, 
     loadDocumentTypesByCountry 
   } = useCatalogs();
 
-  // Estados básicos
   const [eps, setEps] = useState(initialData?.eps || '');
   const [selectedEpsId, setSelectedEpsId] = useState(initialData?.epsId || '');
   const [country, setCountry] = useState(initialData?.country || '');
@@ -49,14 +44,12 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const [address, setAddress] = useState(initialData?.address || '');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Estados para modales
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showEpsModal, setShowEpsModal] = useState(false);
   const [showDocumentTypeModal, setShowDocumentTypeModal] = useState(false);
 
-  // Estados para filtros
   const [countryFilter, setCountryFilter] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
@@ -134,35 +127,25 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   };
 
   // Funciones para filtrar opciones
-  const getFilteredCountries = () => {
-    return countries.filter(country => 
-      country.Nombre.toLowerCase().includes(countryFilter.toLowerCase())
-    );
-  };
+  const getFilteredCountries = () => countries.filter(country => 
+    country.Nombre.toLowerCase().includes(countryFilter.toLowerCase())
+  );
 
-  const getFilteredRegions = () => {
-    return regions.filter(region => 
-      region.Nombre.toLowerCase().includes(regionFilter.toLowerCase())
-    );
-  };
+  const getFilteredRegions = () => regions.filter(region => 
+    region.Nombre.toLowerCase().includes(regionFilter.toLowerCase())
+  );
 
-  const getFilteredCities = () => {
-    return cities.filter(city => 
-      city.Nombre.toLowerCase().includes(cityFilter.toLowerCase())
-    );
-  };
+  const getFilteredCities = () => cities.filter(city => 
+    city.Nombre.toLowerCase().includes(cityFilter.toLowerCase())
+  );
 
-  const getFilteredEps = () => {
-    return epsOptions.filter(eps => 
-      eps.Nombre.toLowerCase().includes(epsFilter.toLowerCase())
-    );
-  };
+  const getFilteredEps = () => epsOptions.filter(eps => 
+    eps.Nombre.toLowerCase().includes(epsFilter.toLowerCase())
+  );
 
-  const getFilteredDocumentTypes = () => {
-    return documentTypes.filter(docType => 
-      docType.Nombre.toLowerCase().includes(documentTypeFilter.toLowerCase())
-    );
-  };
+  const getFilteredDocumentTypes = () => documentTypes.filter(docType => 
+    docType.Nombre.toLowerCase().includes(documentTypeFilter.toLowerCase())
+  );
 
   // Componente modal reutilizable con filtro
   const FilterableModal = ({ 
@@ -250,7 +233,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
             </TouchableOpacity>
           </View>
 
-          {/* Campo de filtro */}
           <TextInput
             style={[
               commonStyles.input,
@@ -611,7 +593,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
           onSelect={(country) => {
             setSelectedCountryId(country.Id);
             setCountry(country.Nombre);
-            // Reset dependent fields
             setSelectedRegionId('');
             setRegion('');
             setSelectedCityId('');
@@ -636,7 +617,6 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
           onSelect={(region) => {
             setSelectedRegionId(region.Id);
             setRegion(region.Nombre);
-            // Reset dependent fields
             setSelectedCityId('');
             setCity('');
             setShowRegionModal(false);

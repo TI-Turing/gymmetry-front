@@ -18,7 +18,6 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      // Simulamos una llamada de login exitosa
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const user: User = {
@@ -46,7 +45,6 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
     password: string;
   }) => {
     try {
-      // Simulamos una llamada de registro exitosa
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       const user: User = {

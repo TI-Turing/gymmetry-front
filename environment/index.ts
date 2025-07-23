@@ -1,10 +1,5 @@
-// Configuration using environment variables
-// Make sure to load the appropriate .env file before importing this
-
-// Tipos de entorno permitidos
 type EnvironmentType = 'local' | 'development' | 'production';
 
-// Leer el entorno desde variable de entorno o usar default
 const getEnvironmentFromProcess = (): EnvironmentType => {
   const envVar = process.env.EXPO_PUBLIC_ENV || process.env.NODE_ENV;
   switch (envVar) {
@@ -13,13 +8,11 @@ const getEnvironmentFromProcess = (): EnvironmentType => {
     case 'production':
       return envVar as EnvironmentType;
     default:
-      return 'local'; // Default environment
+      return 'local';
   }
 };
 
-// Configuration object using environment variables
 const createConfig = () => {
-  // En Expo, las variables deben tener prefijo EXPO_PUBLIC_ para estar disponibles en el cliente
   const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:7160/api';
   const catalogsApiBaseUrl = process.env.EXPO_PUBLIC_CATALOGS_API_BASE_URL || process.env.CATALOGS_API_BASE_URL || 'https://your-catalogs-api-url.com/api';
   const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || process.env.ENVIRONMENT || 'local';

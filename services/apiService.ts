@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { Environment } from '../environment';
 
-// Tipos para las respuestas de la API
 export interface ApiResponse<T = any> {
   data: T;
   success: boolean;
@@ -9,13 +8,11 @@ export interface ApiResponse<T = any> {
   errors?: string[];
 }
 
-// Tipos para las opciones de las peticiones
 export interface RequestOptions {
   headers?: Record<string, string>;
   timeout?: number;
 }
 
-// Tipos para los métodos HTTP
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 class ApiService {
@@ -24,21 +21,18 @@ class ApiService {
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: Environment.API_BASE_URL,
-      timeout: 10000, // 10 segundos
+      timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
         'User-Agent': 'ExpoApp/1.0.0',
-        //'x-functions-key': Environment.API_FUNCTIONS_KEY,
       },
     });
 
-    // Interceptor de request para logging
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        // Agregar headers adicionales para coincidir con Postman
         if (config.headers) {
           config.headers['Host'] = '192.168.0.16:7160';
           config.headers['Cache-Control'] = 'no-cache';
@@ -46,32 +40,21 @@ class ApiService {
         
         const fullUrl = `${config.baseURL}${config.url}`;
         
-        // Generar y mostrar comando cURL equivalente (multilínea, fácil de copiar)
         const curlCommand = generateCurlCommand(
           (config.method?.toUpperCase() as HttpMethod) || 'GET',
           fullUrl,
           config.headers,
           config.data
         );
-        console.log('================== CURL REQUEST ==================');
-        console.log(curlCommand);
-        console.log('================ END CURL REQUEST ================');
         
         return config;
       },
       (error) => {
         console.error('❌ [REQUEST ERROR]', error);
-        if (Environment.DEBUG) {
-          console.error('Request Error:', error);
-        }
         return Promise.reject(error);
       }
     );
 
-// Función helper para generar comando cURL
-/**
- * Genera un comando cURL equivalente para una petición HTTP (formato Windows)
- */
 function generateCurlCommand(
   method: HttpMethod,
   url: string,
@@ -79,7 +62,6 @@ function generateCurlCommand(
   data?: any
 ): string {
   let curlCommand = `curl -X ${method}`;
-  // Agregar headers (formato Windows con ^ para continuación de línea)
   Object.keys(headers || {}).forEach(key => {
     if (headers[key] && key !== 'common') {
       const headerValue = String(headers[key]).replace(/"/g, '\\"');
@@ -87,13 +69,11 @@ function generateCurlCommand(
   -H "${key}: ${headerValue}"`;
     }
   });
-  // Agregar datos si existen (para POST, PUT, PATCH)
   if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
     const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
     const escapedData = jsonData.replace(/"/g, '\\"');
     curlCommand += ` ^
   -d "${escapedData}"`;
-    // Agregar Content-Type si no está presente
     if (!headers['Content-Type'] && !headers['content-type']) {
       curlCommand += ` ^
   -H "Content-Type: application/json"`;
