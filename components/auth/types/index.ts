@@ -68,6 +68,26 @@ export interface ApiResponse<T = any> {
   StatusCode?: number;
 }
 
+// Interfaces para validación de nombre de usuario
+export interface UsernameCheckRequest {
+  UserName: string;
+}
+
+export interface UsernameCheckResponse {
+  Success: boolean;
+  Message: string;
+  Data: any[];
+  StatusCode: number;
+}
+
+// Interfaces para upload de imagen de perfil
+export interface UploadProfileImageResponse {
+  Success: boolean;
+  Message: string;
+  Data: string; // URL de la imagen subida
+  ErrorCode: string | null;
+}
+
 // Tipos adicionales
 export interface User {
   id: number;
