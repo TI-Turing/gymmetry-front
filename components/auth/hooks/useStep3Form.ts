@@ -142,6 +142,7 @@ export const useStep3Form = (initialData?: any): UseStep3FormResult => {
     setRegion('');
     setSelectedRegionId('');
     clearCityData();
+    
   }, []);
 
   const clearCityData = useCallback(() => {

@@ -9,6 +9,7 @@ import {
   EPS,
   DocumentType
 } from '../dto/common';
+import { createJSReanimatedModule } from 'react-native-reanimated/lib/typescript/ReanimatedModule/js-reanimated';
 
 class CatalogService {
   private catalogsAPI: AxiosInstance;
@@ -92,6 +93,7 @@ class CatalogService {
     try {
       const response = await this.catalogsAPI.get<Gender[]>('/generos');
       const genders = response.data || [];
+      console.log('Fetched genders:', genders);
       return this.sortByName(genders);
     } catch (error) {
       console.error('Error fetching genders:', error);
@@ -103,6 +105,7 @@ class CatalogService {
     try {
       const response = await this.catalogsAPI.get<Country[]>('/paises');
       const countries = response.data || [];
+      console.log('Fetched countries:', countries);
       return this.sortByName(countries);
     } catch (error) {
       console.error('Error fetching countries:', error);
@@ -114,6 +117,7 @@ class CatalogService {
     try {
       const response = await this.catalogsAPI.get<Region[]>(`/regiones?paisId=${countryId}`);
       const regions = response.data || [];
+      console.log('Fetched regions:', regions);
       return this.sortByName(regions);
     } catch (error) {
       console.error('Error fetching regions:', error);
@@ -125,6 +129,7 @@ class CatalogService {
     try {
       const response = await this.catalogsAPI.get<City[]>(`/ciudades?regionId=${regionId}`);
       const cities = response.data || [];
+      console.log('Fetched cities:', cities);
       return this.sortByName(cities);
     } catch (error) {
       console.error('Error fetching cities:', error);
@@ -136,6 +141,7 @@ class CatalogService {
     try {
       const response = await this.catalogsAPI.get<EPS[]>('/eps');
       const epsOptions = response.data || [];
+      console.log('Fetched EPS options:', epsOptions);
       return this.sortByName(epsOptions);
     } catch (error) {
       console.error('Error fetching EPS:', error);
@@ -151,6 +157,7 @@ class CatalogService {
 
       const response = await this.catalogsAPI.get<DocumentType[]>(url);
       const documentTypes = response.data || [];
+      console.log('Fetched document types:', documentTypes);
       return this.sortByName(documentTypes);
     } catch (error) {
       console.error('Error fetching document types:', error);

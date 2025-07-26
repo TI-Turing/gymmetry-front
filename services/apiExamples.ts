@@ -87,6 +87,17 @@ export const userAPI = {
       throw error;
     }
   },
+  // Validar si telefono existe
+  checkPhoneExists: async (phone: string): Promise<PhoneExistsResponse> => {
+    try {
+      const response = await apiService.post<PhoneExistsResponse>('/user/phone-exists', { phone });
+      return response.data;
+    } catch (error) {
+      console.error('❌ [USER API] Error al verificar existencia de teléfono:', error);
+      throw error;
+    }
+  },
+
 };
 
 // Ejemplo de funciones para autenticación (cuando esté disponible en la API)

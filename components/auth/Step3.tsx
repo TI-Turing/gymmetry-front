@@ -35,14 +35,6 @@ interface CatalogData {
   userCountryData: { id: string; name: string } | null;
 }
 
-interface LoadingStates {
-  countries: boolean;
-  regions: boolean;
-  cities: boolean;
-  eps: boolean;
-  documentTypes: boolean;
-}
-
 export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const colorScheme = useColorScheme();
   const formData = useStep3Form(initialData);
@@ -60,75 +52,73 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     userCountryData: null,
   });
   
-  // Loading states
-  const [loadingStates, setLoadingStates] = useState<LoadingStates>({
-    countries: false,
-    regions: false,
-    cities: false,
-    eps: false,
-    documentTypes: false,
-  });
+  // Individual loading states to avoid object reference changes
+  const [countriesLoading, setCountriesLoading] = useState(false);
+  const [regionsLoading, setRegionsLoading] = useState(false);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+  const [epsLoading, setEpsLoading] = useState(false);
+  const [documentTypesLoading, setDocumentTypesLoading] = useState(false);
 
   const loadCountries = useCallback(async () => {
-    if (loadingStates.countries || catalogData.countries.length > 0) return;
+    if (countriesLoading || catalogData.countries.length > 0) return;
     
-    setLoadingStates(prev => ({ ...prev, countries: true }));
+    setCountriesLoading(true);
     try {
       const data = await catalogService.getCountries();
       setCatalogData(prev => ({ ...prev, countries: data }));
     } catch (error) {
       console.error('Error loading countries:', error);
     } finally {
-      setLoadingStates(prev => ({ ...prev, countries: false }));
+      setCountriesLoading(false);
     }
-  }, [loadingStates.countries, catalogData.countries.length]);
+  }, [countriesLoading, catalogData.countries.length]);
 
   const loadRegions = useCallback(async (countryId: string) => {
-    if (loadingStates.regions) return;
+    if (regionsLoading) return;
     
-    setLoadingStates(prev => ({ ...prev, regions: true }));
+    setRegionsLoading(true);
     try {
       const data = await catalogService.getRegionsByCountry(countryId);
       setCatalogData(prev => ({ ...prev, regions: data, cities: [] }));
     } catch (error) {
       console.error('Error loading regions:', error);
     } finally {
-      setLoadingStates(prev => ({ ...prev, regions: false }));
+      setRegionsLoading(false);
     }
-  }, [loadingStates.regions]);
+  }, [regionsLoading]);
 
   const loadCities = useCallback(async (regionId: string) => {
-    if (loadingStates.cities) return;
+    if (citiesLoading) return;
     
-    setLoadingStates(prev => ({ ...prev, cities: true }));
+    setCitiesLoading(true);
     try {
       const data = await catalogService.getCitiesByRegion(regionId);
       setCatalogData(prev => ({ ...prev, cities: data }));
     } catch (error) {
       console.error('Error loading cities:', error);
     } finally {
-      setLoadingStates(prev => ({ ...prev, cities: false }));
+      setCitiesLoading(false);
     }
-  }, [loadingStates.cities]);
+  }, [citiesLoading]);
 
   const loadEPS = useCallback(async () => {
-    if (loadingStates.eps || catalogData.epsOptions.length > 0) return;
+    if (epsLoading || catalogData.epsOptions.length > 0) return;
     
-    setLoadingStates(prev => ({ ...prev, eps: true }));
+    setEpsLoading(true);
     try {
       const data = await catalogService.getEPS();
       setCatalogData(prev => ({ ...prev, epsOptions: data }));
     } catch (error) {
       console.error('Error loading EPS:', error);
     } finally {
-      setLoadingStates(prev => ({ ...prev, eps: false }));
+      setEpsLoading(false);
     }
-  }, [loadingStates.eps, catalogData.epsOptions.length]);
+  }, [epsLoading, catalogData.epsOptions.length]);
 
   const loadDocumentTypes = useCallback(async (countryId?: string) => {
-    if (loadingStates.documentTypes) return;
+    if (documentTypesLoading) return;
     
-    setLoadingStates(prev => ({ ...prev, documentTypes: true }));
+    setDocumentTypesLoading(true);
     try {
       const data = countryId 
         ? await catalogService.getDocumentTypesByCountry(countryId)
@@ -137,9 +127,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     } catch (error) {
       console.error('Error loading document types:', error);
     } finally {
-      setLoadingStates(prev => ({ ...prev, documentTypes: false }));
+      setDocumentTypesLoading(false);
     }
-  }, [loadingStates.documentTypes]);
+  }, [documentTypesLoading]);
 
   const loadUserCountry = useCallback(async () => {
     try {
@@ -157,21 +147,21 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     loadUserCountry();
     loadCountries();
     loadEPS();
-  }, [loadUserCountry, loadCountries, loadEPS]);
+  }, []); // Sin dependencias para que solo se ejecute una vez
 
-  // Load dependent data
+  // Load dependent data - solo depende del selectedCountryId, no de las funciones
   useEffect(() => {
     if (formData.selectedCountryId) {
       loadRegions(formData.selectedCountryId);
       loadDocumentTypes(formData.selectedCountryId);
     }
-  }, [formData.selectedCountryId, loadRegions, loadDocumentTypes]);
+  }, [formData.selectedCountryId]); // Solo depende del countryId
 
   useEffect(() => {
     if (formData.selectedRegionId) {
       loadCities(formData.selectedRegionId);
     }
-  }, [formData.selectedRegionId, loadCities]);
+  }, [formData.selectedRegionId]); // Solo depende del regionId
 
   // Auto-select user's country
   useEffect(() => {
