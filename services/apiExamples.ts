@@ -69,7 +69,7 @@ export const userAPI = {
   // Verificación de teléfono
   sendPhoneVerification: async (data: PhoneVerificationData): Promise<PhoneVerificationResponse> => {
     try {
-      const response = await apiService.post<PhoneVerificationResponse>('/user/phone/verify/send', data);
+      const response = await apiService.post<PhoneVerificationResponse>('/otp/generate-otp', data);
       return response.data;
     } catch (error) {
       console.error('❌ [USER API] Error al enviar verificación de teléfono:', error);
@@ -80,7 +80,8 @@ export const userAPI = {
   // Validar código OTP
   validateOTP: async (data: OTPValidationData): Promise<OTPValidationResponse> => {
     try {
-      const response = await apiService.post<OTPValidationResponse>('/user/phone/verify/validate', data);
+      const response = await apiService.post<OTPValidationResponse>('/otp/validate-otp', data);
+      console.log('✅ [USER API] Código OTP validado:', response);
       return response.data;
     } catch (error) {
       console.error('❌ [USER API] Error al validar código OTP:', error);
@@ -90,7 +91,8 @@ export const userAPI = {
   // Validar si telefono existe
   checkPhoneExists: async (phone: string): Promise<PhoneExistsResponse> => {
     try {
-      const response = await apiService.post<PhoneExistsResponse>('/user/phone-exists', { phone });
+      const response = await apiService.get<PhoneExistsResponse>('/user/phone-exists/'+  phone  );
+      console.log('✅ [USER API] Verificación de teléfono exitosa:', response);
       return response.data;
     } catch (error) {
       console.error('❌ [USER API] Error al verificar existencia de teléfono:', error);

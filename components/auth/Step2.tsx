@@ -12,6 +12,7 @@ import { handleApiError } from './utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
 import { commonStyles } from './styles/common';
 import { FontAwesome } from '@expo/vector-icons';
+import { useCustomAlert } from './CustomAlert';
 
 interface Step2Props {
   userId: string;
@@ -21,6 +22,7 @@ interface Step2Props {
 
 export default function Step2({ userId, onNext, initialData }: Step2Props) {
   const { genders, loading: gendersLoading, error: gendersError, loadGenders } = useGenders(true); // autoLoad = true
+  const { showAlert, AlertComponent } = useCustomAlert();
   
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
@@ -36,10 +38,10 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
   const [phoneVerified, setPhoneVerified] = useState(initialData?.phoneVerified || false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [verificationMethod, setVerificationMethod] = useState<'whatsapp' | 'sms' | null>(null);
-  const [verificationId, setVerificationId] = useState<string>('');
   const [otpCode, setOtpCode] = useState<string>('');
   const [isVerificationLoading, setIsVerificationLoading] = useState(false);
-  const [verificationStep, setVerificationStep] = useState<'method' | 'code'>('method');
+  const [verificationStep, setVerificationStep] = useState<'checking' | 'method' | 'code' | 'error'>('method');
+  const [phoneExists, setPhoneExists] = useState<boolean | null>(null);
   
   const colorScheme = useColorScheme();
 
@@ -52,75 +54,117 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     }
   };
 
-  const handleVerifyPhone = () => {
+  const handleVerifyPhone = async () => {
     if (!phone.trim()) {
-      alert('Por favor ingresa un número de teléfono primero');
+      showAlert('error', 'Error', 'Por favor ingresa un número de teléfono primero');
       return;
     }
+    
+    if (phone.length < 7) {
+      showAlert('error', 'Error', 'El número de teléfono debe tener al menos 7 dígitos');
+      return;
+    }
+    
+    // Abrir modal inmediatamente y mostrar loading
     setShowVerificationModal(true);
-    setVerificationStep('method');
+    setVerificationStep('checking');
+    setIsVerificationLoading(true);
     setVerificationMethod(null);
     setOtpCode('');
+    
+    // Verificar si el teléfono existe
+    try {
+      const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
+      const response = await userAPI.checkPhoneExists(fullPhone);
+      
+      if (response.Success && response.Data === true) {
+        // El teléfono ya existe, mostrar mensaje de error en el modal
+        setPhoneExists(true);
+        setVerificationStep('error');
+      } else {
+        // El teléfono no existe, mostrar opciones de verificación
+        setPhoneExists(false);
+        setVerificationStep('method');
+      }
+      
+    } catch (error) {
+      console.error('Error checking phone existence:', error);
+      setVerificationStep('error');
+      setPhoneExists(null);
+    } finally {
+      setIsVerificationLoading(false);
+    }
   };
 
   const handleSendVerification = async (method: 'whatsapp' | 'sms') => {
     setIsVerificationLoading(true);
     setVerificationMethod(method);
-    
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const data: PhoneVerificationData = {
-        phone: fullPhone,
-        method: method
+        UserId: userId,
+        VerificationType: 'Phone',
+        Recipient: fullPhone,
+        Method: method
       };
-      
       const response = await userAPI.sendPhoneVerification(data);
-      
-      if (response.success && response.verificationId) {
-        setVerificationId(response.verificationId);
+      if (response.Success || response.Success) {
         setVerificationStep('code');
       } else {
-        alert(response.message || 'Error al enviar verificación');
+        showAlert('error', 'Error', response.Message || response.Message || 'Error al enviar verificación');
       }
     } catch (error: any) {
       const errorMessage = handleApiError(error);
-      alert(`Error: ${errorMessage}`);
+      showAlert('error', 'Error', errorMessage);
     } finally {
       setIsVerificationLoading(false);
     }
   };
 
   const handleValidateOTP = async () => {
+    console.log('🔍 [STEP2] handleValidateOTP iniciado');
+    console.log('🔍 [STEP2] otpCode:', otpCode);
+    console.log('🔍 [STEP2] otpCode.length:', otpCode.length);
+    console.log('🔍 [STEP2] isVerificationLoading:', isVerificationLoading);
+    
     if (!otpCode.trim()) {
-      alert('Por favor ingresa el código de verificación');
+      console.log('❌ [STEP2] Código OTP vacío');
+      showAlert('error', 'Error', 'Por favor ingresa el código de verificación');
       return;
     }
 
     setIsVerificationLoading(true);
+    console.log('📤 [STEP2] Enviando validación OTP...');
     
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const data: OTPValidationData = {
-        phone: fullPhone,
-        code: otpCode.trim(),
-        verificationId: verificationId
+        UserId: userId,
+        Otp: otpCode.trim(),
+        VerificationType: 'Phone'
       };
       
+      console.log('📤 [STEP2] Datos a enviar:', data);
       const response = await userAPI.validateOTP(data);
+      console.log('📥 [STEP2] Respuesta recibida:', response);
       
-      if (response.success && response.verified) {
+      if (response.Success) {
+        console.log('✅ [STEP2] Verificación exitosa');
         setPhoneVerified(true);
         setShowVerificationModal(false);
         setOtpCode('');
-        alert('¡Teléfono verificado correctamente!');
+        showAlert('success', 'Éxito', '¡Teléfono verificado correctamente!');
       } else {
-        alert(response.message || 'Código incorrecto');
+        console.log('❌ [STEP2] Verificación fallida:', response.Message);
+        showAlert('error', 'Error', response.Message || 'Código incorrecto');
       }
     } catch (error: any) {
+      console.error('❌ [STEP2] Error en validación OTP:', error);
       const errorMessage = handleApiError(error);
-      alert(`Error: ${errorMessage}`);
+      showAlert('error', 'Error', errorMessage);
     } finally {
       setIsVerificationLoading(false);
+      console.log('🔍 [STEP2] handleValidateOTP finalizado');
     }
   };
 
@@ -129,7 +173,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     setVerificationStep('method');
     setVerificationMethod(null);
     setOtpCode('');
-    setVerificationId('');
   };
 
   const handleNext = async () => {
@@ -233,9 +276,49 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
-            Teléfono
-          </Text>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 8,
+          }}>
+            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+              Teléfono
+            </Text>
+            
+            {/* Botón de verificación pequeño al lado del label */}
+            {phone.length >= 7 && (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 6,
+                  paddingHorizontal: 12,
+                  backgroundColor: phoneVerified 
+                    ? '#4CAF50' 
+                    : Colors[colorScheme].tint,
+                  borderRadius: 6,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+                onPress={handleVerifyPhone}
+                disabled={phoneVerified}
+              >
+                <FontAwesome 
+                  name={phoneVerified ? "check-circle" : "phone"} 
+                  size={12} 
+                  color="white" 
+                  style={{ marginRight: 4 }}
+                />
+                <Text style={{
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: 12,
+                }}>
+                  {phoneVerified ? 'Verificado' : 'Verificar'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          
           <View style={commonStyles.phoneRow}>
             <View style={commonStyles.prefixContainer}>
               <CountryCodePicker
@@ -262,40 +345,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               />
             </View>
           </View>
-          
-          {/* Botón de verificación de teléfono */}
-          {phone.length >= 7 && (
-            <TouchableOpacity
-              style={{
-                marginTop: 8,
-                paddingVertical: 12,
-                paddingHorizontal: 16,
-                backgroundColor: phoneVerified 
-                  ? '#4CAF50' 
-                  : Colors[colorScheme].tint,
-                borderRadius: 8,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={handleVerifyPhone}
-              disabled={phoneVerified}
-            >
-              <FontAwesome 
-                name={phoneVerified ? "check-circle" : "phone"} 
-                size={16} 
-                color="white" 
-                style={{ marginRight: 8 }}
-              />
-              <Text style={{
-                color: 'white',
-                fontWeight: '600',
-                fontSize: 14,
-              }}>
-                {phoneVerified ? 'Teléfono verificado' : 'Verificar teléfono'}
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         <View style={commonStyles.inputContainer}>
@@ -567,7 +616,56 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               </TouchableOpacity>
             </View>
 
-            {verificationStep === 'method' ? (
+            {verificationStep === 'checking' ? (
+              <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                <FontAwesome 
+                  name="spinner" 
+                  size={32} 
+                  color={Colors[colorScheme].tint} 
+                  style={{ marginBottom: 16 }}
+                />
+                <Text style={{
+                  fontSize: 16,
+                  color: Colors[colorScheme].text,
+                  textAlign: 'center',
+                }}>
+                  Verificando disponibilidad del teléfono...
+                </Text>
+              </View>
+            ) : verificationStep === 'error' ? (
+              <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                <FontAwesome 
+                  name="exclamation-triangle" 
+                  size={32} 
+                  color="#FF6B6B" 
+                  style={{ marginBottom: 16 }}
+                />
+                <Text style={{
+                  fontSize: 16,
+                  color: Colors[colorScheme].text,
+                  textAlign: 'center',
+                  marginBottom: 20,
+                }}>
+                  {phoneExists ? 
+                    'Este número de teléfono ya está registrado. Por favor usa otro número.' : 
+                    'Hubo un error al verificar el teléfono. Por favor intenta nuevamente.'
+                  }
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    padding: 16,
+                    borderRadius: 8,
+                    backgroundColor: Colors[colorScheme].tint,
+                    alignItems: 'center',
+                  }}
+                  onPress={closeVerificationModal}
+                >
+                  <Text style={{ color: 'white', fontWeight: '600' }}>
+                    Cerrar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : verificationStep === 'method' ? (
               <View>
                 <Text style={{
                   fontSize: 16,
@@ -678,7 +776,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                       alignItems: 'center',
                     }}
                     onPress={handleValidateOTP}
-                    disabled={isVerificationLoading || otpCode.length < 6}
+                    disabled={isVerificationLoading || otpCode.length < 4}
                   >
                     <Text style={{ color: 'white', fontWeight: '600' }}>
                       {isVerificationLoading ? 'Verificando...' : 'Verificar'}
@@ -690,6 +788,9 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           </View>
         </TouchableOpacity>
       </Modal>
+      
+      {/* Componente de alertas personalizado */}
+      <AlertComponent />
     </ScrollView>
   );
 }

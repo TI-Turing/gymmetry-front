@@ -13,6 +13,7 @@ export { default as StepsBar } from './StepsBar';
 // Componentes auxiliares
 export { default as Dropdown } from './Dropdown';
 export { default as CountryCodePicker } from './CountryCodePicker';
+export { CustomAlert, useCustomAlert } from './CustomAlert';
 
 // Types
 export * from './types';

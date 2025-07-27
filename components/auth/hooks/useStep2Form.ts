@@ -1,11 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Alert } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Step2Data, Country, PhoneVerificationData, OTPValidationData } from '../types';
 import { DEFAULT_COUNTRY } from '../CountryCodePicker';
 import { useGenders } from './useLazyCatalogs';
 import { userAPI } from '@/services/apiExamples';
 import { handleApiError } from '../utils/api';
 import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from '../utils/format';
+import { useCustomAlert } from '../CustomAlert';
 
 interface UseStep2FormProps {
   userId: string;
@@ -42,6 +42,9 @@ interface UseStep2FormReturn {
   verificationStep: 'checking' | 'method' | 'code' | 'error';
   phoneExists: boolean | null;
   
+  // Sistema de alertas
+  AlertComponent: React.ComponentType;
+  
   // Handlers
   setFirstName: (value: string) => void;
   setLastName: (value: string) => void;
@@ -68,6 +71,7 @@ export const useStep2Form = ({
   initialData 
 }: UseStep2FormProps): UseStep2FormReturn => {
   const { genders, loading: gendersLoading, error: gendersError } = useGenders(true);
+  const { showAlert, AlertComponent } = useCustomAlert();
   
   // Estado básico
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
@@ -143,29 +147,29 @@ export const useStep2Form = ({
 
   const handleVerifyPhone = useCallback(async () => {
     if (!phone.trim()) {
-      Alert.alert('Error', 'Por favor ingresa un número de teléfono primero');
+      showAlert('error', 'Error', 'Por favor ingresa un número de teléfono primero');
       return;
     }
     
     if (phone.length < 7) {
-      Alert.alert('Error', 'El número de teléfono debe tener al menos 7 dígitos');
+      showAlert('error', 'Error', 'El número de teléfono debe tener al menos 7 dígitos');
       return;
     }
     
     // Abrir modal inmediatamente y mostrar loading
     setShowVerificationModal(true);
-    setVerificationStep('checking'); // Nuevo estado para checking
+    setVerificationStep('checking'); // Estado para mostrar loading
     setIsVerificationLoading(true);
     setVerificationMethod(null);
     setOtpCode('');
     
-    // Verificar si el teléfono existe
+    // Verificar si el teléfono existe usando la función checkPhoneExists
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const response = await userAPI.checkPhoneExists(fullPhone);
       
       if (response.Success && response.Data === true) {
-        // El teléfono ya existe, mostrar mensaje en el modal
+        // El teléfono ya existe, mostrar mensaje de error en el modal
         setPhoneExists(true);
         setVerificationStep('error');
       } else {
@@ -186,25 +190,23 @@ export const useStep2Form = ({
   const handleSendVerification = useCallback(async (method: 'whatsapp' | 'sms') => {
     setIsVerificationLoading(true);
     setVerificationMethod(method);
-    
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const data: PhoneVerificationData = {
-        phone: fullPhone,
-        method: method
+        UserId: userId,
+        VerificationType: 'Phone',
+        Recipient: fullPhone,
+        Method: method
       };
-      
       const response = await userAPI.sendPhoneVerification(data);
-      
-      if (response.success && response.verificationId) {
-        setVerificationId(response.verificationId);
+      if (response.Success || response.Success) {
         setVerificationStep('code');
       } else {
-        Alert.alert('Error', response.message || 'Error al enviar verificación');
+        showAlert('error', 'Error', response.Message || response.Message || 'Error al enviar verificación');
       }
     } catch (error: any) {
       const errorMessage = handleApiError(error);
-      Alert.alert('Error', errorMessage);
+      showAlert('error', 'Error', errorMessage);
     } finally {
       setIsVerificationLoading(false);
     }
@@ -212,7 +214,7 @@ export const useStep2Form = ({
 
   const handleValidateOTP = useCallback(async () => {
     if (!otpCode.trim()) {
-      Alert.alert('Error', 'Por favor ingresa el código de verificación');
+      showAlert('error', 'Error', 'Por favor ingresa el código de verificación');
       return;
     }
 
@@ -221,24 +223,24 @@ export const useStep2Form = ({
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const data: OTPValidationData = {
-        phone: fullPhone,
-        code: otpCode.trim(),
-        verificationId: verificationId
+        UserId: userId,
+        Otp: otpCode.trim(),
+        VerificationType: 'Phone'
       };
       
       const response = await userAPI.validateOTP(data);
       
-      if (response.success && response.verified) {
+      if (response.Success && response.Data) {
         setPhoneVerified(true);
         setShowVerificationModal(false);
         setOtpCode('');
-        Alert.alert('Éxito', '¡Teléfono verificado correctamente!');
+        showAlert('success', 'Éxito', '¡Teléfono verificado correctamente!');
       } else {
-        Alert.alert('Error', response.message || 'Código incorrecto');
+        showAlert('error', 'Error', response.Message || 'Código incorrecto');
       }
     } catch (error: any) {
       const errorMessage = handleApiError(error);
-      Alert.alert('Error', errorMessage);
+      showAlert('error', 'Error', errorMessage);
     } finally {
       setIsVerificationLoading(false);
     }
@@ -344,6 +346,9 @@ export const useStep2Form = ({
     isVerificationLoading,
     verificationStep,
     phoneExists,
+    
+    // Sistema de alertas
+    AlertComponent,
     
     // Handlers
     setFirstName,

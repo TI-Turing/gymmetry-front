@@ -22,26 +22,30 @@ export interface Step2Data {
 }
 
 export interface PhoneVerificationData {
-  phone: string;
-  method: 'whatsapp' | 'sms';
+  UserId: string;
+  VerificationType: 'Phone';
+  Recipient: string;
+  Method: 'whatsapp' | 'sms';
 }
 
 export interface PhoneVerificationResponse {
-  success: boolean;
-  message: string;
-  verificationId?: string;
+  Success: boolean;
+  Message: string;
+  Data: boolean;
+  StatusCode: number;
 }
 
 export interface OTPValidationData {
-  phone: string;
-  code: string;
-  verificationId: string;
+  UserId: string;
+  Otp: string;
+  VerificationType: string;
 }
 
 export interface OTPValidationResponse {
-  success: boolean;
-  message: string;
-  verified: boolean;
+  Success: boolean;
+  Message: string;
+  Data?: boolean;
+  StatusCode?: number;
 }
 
 export interface PhoneExistsResponse {
