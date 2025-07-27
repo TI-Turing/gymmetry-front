@@ -1,12 +1,9 @@
 import { ApiResponse } from '../types';
 
 export const handleApiError = (error: any): string => {
-  console.log('🔍 [API ERROR] Procesando error:', error);
-  
   // Si es un error de axios con respuesta del servidor
   if (error?.response?.data) {
     const { data, status } = error.response;
-    console.log('🔍 [API ERROR] Status:', status, 'Data:', data);
     
     // Para códigos 4xx que son errores esperados del servidor
     if (status >= 400 && status < 500) {
@@ -50,7 +47,6 @@ export const handleApiError = (error: any): string => {
   }
 
   // Error genérico
-  console.log('⚠️ [API ERROR] Error no identificado:', error);
   return 'Ocurrió un error inesperado. Inténtalo de nuevo.';
 };
 

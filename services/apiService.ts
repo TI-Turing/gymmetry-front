@@ -50,7 +50,6 @@ class ApiService {
         return config;
       },
       (error) => {
-        console.error('❌ [REQUEST ERROR]', error);
         return Promise.reject(error);
       }
     );
@@ -91,8 +90,6 @@ function generateCurlCommand(
         return response;
       },
       (error: AxiosError) => {
-        console.error(`❌ [API ERROR] ${error.response?.status || 'No Status'} ${error.config?.method?.toUpperCase()} ${error.config?.baseURL}${error.config?.url}`);
-        console.error(`💥 [ERROR DATA]`, error.response?.data || error.message);
         return this.handleError(error);
       }
     );
@@ -101,7 +98,6 @@ function generateCurlCommand(
   // Método privado para manejar errores
   private handleError(error: AxiosError): Promise<never> {
     if (Environment.DEBUG) {
-      console.error('API Error:', error);
     }
 
     if (error.code === 'ECONNABORTED') {
@@ -115,9 +111,24 @@ function generateCurlCommand(
     const status = error.response.status;
     const data = error.response.data as any;
     
-    // Si el servidor devuelve un mensaje específico, usarlo
+    // Si el servidor devuelve un mensaje específico, usarlo (revisar diferentes formatos)
+    if (data?.Message) {
+      throw new Error(data.Message);
+    }
     if (data?.message) {
       throw new Error(data.message);
+    }
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+    
+    // Si hay errores de validación específicos
+    if (data?.errors && typeof data.errors === 'object') {
+      const firstError = Object.values(data.errors)[0];
+      if (Array.isArray(firstError)) {
+        throw new Error(firstError[0] as string);
+      }
+      throw new Error(firstError as string);
     }
 
     // Mensajes por defecto según el código de estado
@@ -130,6 +141,8 @@ function generateCurlCommand(
         throw new Error('Acceso prohibido');
       case 404:
         throw new Error('Recurso no encontrado');
+      case 422:
+        throw new Error('Datos inválidos');
       case 500:
         throw new Error('Error interno del servidor');
       default:
