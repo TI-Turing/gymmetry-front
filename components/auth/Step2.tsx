@@ -212,7 +212,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       const response = await userAPI.updateUser(userId, updateData);
       
       if (!response.Success) {
-        Alert.alert('Error', response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
+        showError(response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
         return; // NO permitir avanzar si la API falla
       }
       
