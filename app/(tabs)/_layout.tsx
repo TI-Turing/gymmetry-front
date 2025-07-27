@@ -21,9 +21,16 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? 'light'].background,
-          borderTopColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+          backgroundColor: '#1E1E1E',
+          borderTopColor: '#333333',
           borderTopWidth: 1,
+          height: 80,
+          paddingBottom: 20,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
         },
       }}
     >
@@ -35,16 +42,34 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='option2'
+        name='gym'
         options={{
-          title: 'Opción 2',
-          tabBarIcon: ({ color }) => <TabBarIcon name='heart' color={color} />,
+          title: 'Gym',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name='building' color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name='option3'
+        name='progress'
         options={{
-          title: 'Opción 3',
+          title: 'Progreso',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name='bar-chart' color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='feed'
+        options={{
+          title: 'Feed',
+          tabBarIcon: ({ color }) => <TabBarIcon name='users' color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name='profile'
+        options={{
+          title: 'Perfil',
           tabBarIcon: ({ color }) => <TabBarIcon name='user' color={color} />,
         }}
       />

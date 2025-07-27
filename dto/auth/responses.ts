@@ -1,13 +1,18 @@
-import { User } from '../user/responses';
-
 export interface LoginResponse {
-  user: User;
-  token: string;
-  expiresIn?: number;
+  Success: boolean;
+  Message: string;
+  Data: {
+    UserId: string;
+    UserName: string;
+    Email: string;
+    Token: string;
+  };
+  StatusCode: number;
 }
 
 export interface RegisterResponse {
-  user: User;
-  token: string;
-  message?: string;
+  Success: boolean;
+  Message: string;
+  Data: any;
+  StatusCode: number;
 }

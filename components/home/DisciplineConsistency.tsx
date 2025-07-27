@@ -91,7 +91,7 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
@@ -101,9 +101,9 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 8,
   },
   header: {
     flexDirection: 'row',
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
   },
   percentage: {
     fontSize: 24,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   dayLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#B0B0B0',
     width: 24,
     textAlign: 'center',
   },
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   weekNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#B0B0B0',
     width: 24,
     textAlign: 'center',
   },
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: '#333333',
   },
   legendItem: {
     flexDirection: 'row',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: '#666',
+    color: '#B0B0B0',
   },
 });
 

@@ -1,13 +1,19 @@
 import React from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 import LoginForm from '@/components/auth/LoginForm';
 
 export default function LoginPage() {
-  const handleLogin = (email: string, password: string) => {
-    // Aquí iría tu lógica de autenticación
-    // Después del login exitoso, navegar a la app principal
-    router.replace('/(tabs)');
+  const { login } = useAuth();
+
+  const handleLogin = async (userNameOrEmail: string, password: string) => {
+    const success = await login(userNameOrEmail, password);
+    if (success) {
+      // Después del login exitoso, navegar a la app principal
+      router.replace('/(tabs)');
+    }
+    // Si falla, LoginForm manejará el error
   };
 
   const handleSwitchToRegister = () => {

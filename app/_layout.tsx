@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -13,6 +13,7 @@ import { LogBox } from 'react-native';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { userSessionService } from '@/services/userSessionService';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 // Suprimir warnings específicos que no son críticos
 LogBox.ignoreLogs([
@@ -56,11 +57,32 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
+  );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return; // No hacer nada mientras se carga
+
+    const inAuthGroup = segments[0] === '(tabs)';
+
+    if (!isAuthenticated && inAuthGroup) {
+      // Usuario no autenticado intentando acceder a la app, redirigir a login
+      router.replace('/login');
+    } else if (isAuthenticated && !inAuthGroup) {
+      // Usuario autenticado en pantallas de auth, redirigir a la app
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, segments, isLoading, router]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

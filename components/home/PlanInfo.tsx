@@ -49,7 +49,7 @@ const PlanInfo: React.FC<PlanInfoProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1E1E1E',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
@@ -59,14 +59,14 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 8,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 16,
   },
   infoContainer: {
@@ -82,26 +82,26 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#B0B0B0',
     marginBottom: 4,
   },
   dateValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFFFFF',
   },
   progressContainer: {
     alignItems: 'center',
   },
   progressLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#B0B0B0',
     marginBottom: 8,
   },
   progressBar: {
     width: '100%',
     height: 8,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#333333',
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 4,
@@ -113,23 +113,23 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    color: '#666',
+    color: '#B0B0B0',
   },
   gymContainer: {
     alignItems: 'center',
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: '#333333',
   },
   gymLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#B0B0B0',
     marginBottom: 4,
   },
   gymValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFFFFF',
   },
 });
 

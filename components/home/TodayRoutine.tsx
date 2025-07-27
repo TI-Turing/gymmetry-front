@@ -53,7 +53,7 @@ const TodayRoutine: React.FC<TodayRoutineProps> = ({
         </View>
 
         <View style={styles.arrowContainer}>
-          <FontAwesome name='chevron-right' size={16} color='#666' />
+          <FontAwesome name='chevron-right' size={16} color='#B0B0B0' />
         </View>
       </View>
     </TouchableOpacity>
@@ -70,17 +70,17 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 8,
   },
   completedContainer: {
-    backgroundColor: '#E8F5E8',
+    backgroundColor: '#1E2E1E',
     borderLeftWidth: 4,
     borderLeftColor: '#4CAF50',
   },
   pendingContainer: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#2E2E1E',
     borderLeftWidth: 4,
     borderLeftColor: '#FF9800',
   },
@@ -97,13 +97,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    color: '#666',
+    color: '#B0B0B0',
     marginBottom: 4,
   },
   routineName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   status: {

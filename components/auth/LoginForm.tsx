@@ -11,13 +11,12 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import { useCustomAlert } from './CustomAlert';
-import { useFormValidation } from './hooks/useValidation';
 import { handleApiError } from '@/utils';
 import { commonStyles } from './styles/common';
 import Colors from '@/constants/Colors';
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (userNameOrEmail: string, password: string) => void;
   onSwitchToRegister: () => void;
 }
 
@@ -25,42 +24,37 @@ export default function LoginForm({
   onLogin,
   onSwitchToRegister,
 }: LoginFormProps) {
+  const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const colorScheme = useColorScheme();
   const { showError, AlertComponent } = useCustomAlert();
-  const { email, setEmail, isEmailValid } = useFormValidation();
 
   const handleLogin = useCallback(async () => {
     // Validation
-    if (!email || !password) {
+    if (!userNameOrEmail || !password) {
       showError('Por favor completa todos los campos');
-      return;
-    }
-
-    if (!isEmailValid) {
-      showError('Por favor ingresa un email válido');
       return;
     }
 
     setIsLoading(true);
     try {
-      await onLogin(email, password);
+      await onLogin(userNameOrEmail, password);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       showError(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }, [email, password, isEmailValid, onLogin, showError]);
+  }, [userNameOrEmail, password, onLogin, showError]);
 
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword(prev => !prev);
   }, []);
 
-  const isFormValid = email && password && isEmailValid;
+  const isFormValid = userNameOrEmail && password;
 
   return (
     <>
@@ -106,7 +100,7 @@ export default function LoginForm({
                   { color: Colors[colorScheme].text },
                 ]}
               >
-                Email
+                Usuario o Email
               </Text>
               <TextInput
                 style={[
@@ -114,22 +108,20 @@ export default function LoginForm({
                   {
                     backgroundColor: Colors[colorScheme].background,
                     color: Colors[colorScheme].text,
-                    borderColor: isEmailValid
-                      ? Colors[colorScheme].tint
-                      : '#666',
+                    borderColor: Colors[colorScheme].tint,
                   },
                 ]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder='tu@email.com'
+                value={userNameOrEmail}
+                onChangeText={setUserNameOrEmail}
+                placeholder='usuario o tu@email.com'
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
                 keyboardType='email-address'
                 autoCapitalize='none'
                 autoCorrect={false}
                 autoComplete='email'
                 textContentType='emailAddress'
-                accessibilityLabel='Campo de email'
-                accessibilityHint='Ingresa tu dirección de correo electrónico'
+                accessibilityLabel='Campo de usuario o email'
+                accessibilityHint='Ingresa tu nombre de usuario o dirección de correo electrónico'
               />
             </View>
 
