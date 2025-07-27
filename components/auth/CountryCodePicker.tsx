@@ -148,10 +148,10 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
           styles.selector,
           {
             backgroundColor: disabled 
-              ? `${Colors[colorScheme].text}10` 
+              ? `${Colors[colorScheme].text}15` 
               : Colors[colorScheme].background,
-            borderColor: disabled ? `${Colors[colorScheme].text}30` : '#666',
-            opacity: disabled ? 0.6 : 1,
+            borderColor: disabled ? `${Colors[colorScheme].text}40` : '#666',
+            opacity: disabled ? 0.8 : 1,
           },
         ]}
         onPress={() => !disabled && setModalVisible(true)}
@@ -160,7 +160,7 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
         <Text style={styles.flag}>{selectedCountry.flag}</Text>
         <Text style={[styles.selectedDialCode, { 
           color: disabled 
-            ? `${Colors[colorScheme].text}60` 
+            ? Colors[colorScheme].text
             : Colors[colorScheme].text 
         }]}>
           {selectedCountry.dialCode}

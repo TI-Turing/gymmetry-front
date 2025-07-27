@@ -345,13 +345,14 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   commonStyles.input,
                   {
                     backgroundColor: phoneVerified 
-                      ? `${Colors[colorScheme].text}10` 
+                      ? `${Colors[colorScheme].text}15` 
                       : Colors[colorScheme].background,
                     color: phoneVerified 
-                      ? `${Colors[colorScheme].text}60` 
+                      ? Colors[colorScheme].text
                       : Colors[colorScheme].text,
-                    borderColor: phoneVerified ? `${Colors[colorScheme].text}30` : '#666',
+                    borderColor: phoneVerified ? `${Colors[colorScheme].text}40` : '#666',
                     paddingRight: phoneVerified ? 40 : 16,
+                    opacity: phoneVerified ? 0.8 : 1,
                   },
                 ]}
                 value={phone}
@@ -372,7 +373,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   <FontAwesome 
                     name="lock" 
                     size={16} 
-                    color={`${Colors[colorScheme].text}60`}
+                    color={`${Colors[colorScheme].text}80`}
                   />
                 </View>
               )}
