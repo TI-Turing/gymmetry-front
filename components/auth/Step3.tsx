@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -12,6 +12,7 @@ import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 import { FilterableModal } from './FilterableModal';
 import { useStep3Form } from './hooks/useStep3Form';
+import { useCustomAlert } from './CustomAlert';
 import { 
   Country as CountryType,
   Region,
@@ -23,6 +24,7 @@ import {
 interface Step3Props {
   userId: string;
   onNext: (data: Step3Data) => void;
+  onBack?: () => void;
   initialData?: Step3Data;
 }
 
@@ -37,6 +39,7 @@ interface CatalogData {
 
 export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const colorScheme = useColorScheme();
+  const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const formData = useStep3Form(initialData);
   
   const [isLoading, setIsLoading] = useState(false);
@@ -200,25 +203,31 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         address: stepData.address,
         ...(stepData.documentNumber && { documentNumber: stepData.documentNumber }),
         ...(stepData.eps && { eps: stepData.eps }),
+        ...(stepData.epsId && { epsId: stepData.epsId }),
         ...(stepData.country && { country: stepData.country }),
+        ...(stepData.countryId && { CountryId: stepData.countryId }),
         ...(stepData.region && { region: stepData.region }),
+        ...(stepData.regionId && { regionId: stepData.regionId }),
         ...(stepData.city && { city: stepData.city }),
+        ...(stepData.cityId && { cityId: stepData.cityId }),
         ...(stepData.documentType && { DocumentType: stepData.documentType }),
         ...(stepData.documentTypeId && { DocumentTypeId: stepData.documentTypeId }),
-        ...(stepData.countryId && { CountryId: stepData.countryId }),
       };
       
       const response = await userAPI.updateUser(userId, updateData);
       
       if (!response.Success) {
-        throw new Error(response.Message || 'Error al actualizar usuario');
+        showError(response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
+        return; // NO permitir avanzar si la API falla
       }
       
+      console.log('✅ [STEP 3] Datos actualizados correctamente');
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       console.error('❌ [STEP 3] Error:', errorMessage);
-      onNext(stepData);
+      showError('No se pudieron guardar los datos. Intenta de nuevo.');
+      // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
     }
@@ -567,7 +576,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { backgroundColor: Colors[colorScheme].tint },
+            { 
+              backgroundColor: Colors[colorScheme].tint,
+            },
             isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
@@ -643,6 +654,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         getItemId={(item: EPS) => item.Id}
         getItemName={(item: EPS) => item.Nombre}
       />
+      
+      {/* Componente de alertas personalizado */}
+      <AlertComponent />
     </ScrollView>
   );
 }

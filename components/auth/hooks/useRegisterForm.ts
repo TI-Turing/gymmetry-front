@@ -103,6 +103,13 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
     onRegister(registrationData);
   }, [onRegister, registrationData]);
 
+  // Funciones para retroceder
+  const handleGoBack = useCallback(() => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    }
+  }, [currentStep]);
+
   return {
     currentStep,
     showWelcomeScreen,
@@ -115,5 +122,6 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
     handleStep4Next,
     handleStep5Next,
     handleWelcomeContinue,
+    handleGoBack,
   };
 };

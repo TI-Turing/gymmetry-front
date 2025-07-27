@@ -10,15 +10,18 @@ import { FITNESS_GOALS, HEALTH_CONDITIONS } from './data/fitness';
 import { rhTypes } from './data/formData';
 import { AdditionalInfoInput } from './AdditionalInfoInput';
 import { useStep4Form } from './hooks/useStep4Form';
+import { useCustomAlert } from './CustomAlert';
 
 interface Step4Props {
   userId: string;
   onNext: (data: Step4Data) => void;
+  onBack?: () => void;
   initialData?: Step4Data;
 }
 
 const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
   const colorScheme = useColorScheme();
+  const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const {
     fitnessGoal,
     healthRestrictions,
@@ -30,7 +33,7 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
     setAdditionalInfo,
     setRh,
     handleNext,
-  } = useStep4Form({ userId, onNext, initialData });
+  } = useStep4Form({ userId, onNext, initialData, showError, showSuccess });
 
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
@@ -76,7 +79,9 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { backgroundColor: Colors[colorScheme ?? 'light'].tint },
+            { 
+              backgroundColor: Colors[colorScheme ?? 'light'].tint,
+            },
             isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
@@ -89,6 +94,9 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
           </Text>
         </TouchableOpacity>
       </View>
+      
+      {/* Componente de alertas personalizado */}
+      <AlertComponent />
     </ScrollView>
   );
 });

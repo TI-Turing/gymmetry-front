@@ -222,10 +222,12 @@ export const commonStyles = StyleSheet.create({
     alignItems: 'center',
   },
   imagePreview: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 8,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 12,
+    borderWidth: 3,
+    borderColor: '#E0E0E0',
   },
   imagePlaceholder: {
     alignItems: 'center',

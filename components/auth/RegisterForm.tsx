@@ -20,6 +20,7 @@ import { useAuthContext } from '@/components/auth/AuthContext';
 import { commonStyles } from './styles/common';
 import { useRegisterForm } from './hooks/useRegisterForm';
 import { SkipButton } from './SkipButton';
+import { useCustomAlert } from './CustomAlert';
 
 interface RegisterFormProps {
   onRegister: (userData: any) => void;
@@ -37,6 +38,7 @@ const stepTitles = [
 const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) => {
   const colorScheme = useColorScheme();
   const authContext = useAuthContext();
+  const { showError, showSuccess, AlertComponent } = useCustomAlert();
   
   const {
     currentStep,
@@ -50,6 +52,7 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
     handleStep4Next,
     handleStep5Next,
     handleWelcomeContinue,
+    handleGoBack,
   } = useRegisterForm({ onRegister });
 
   useEffect(() => {
@@ -89,7 +92,7 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
     }
   }, [currentStep, handleSkipToWelcome]);
 
-  const renderCurrentStep = useMemo(() => {
+  const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
         return (
@@ -99,6 +102,8 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
               email: registrationData.email,
               password: registrationData.password,
             }}
+            showError={showError}
+            showSuccess={showSuccess}
           />
         );
       case 1:
@@ -120,6 +125,7 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
           <Step3
             userId={registrationData.userId || ''}
             onNext={handleStep3Next}
+            onBack={handleGoBack}
             initialData={{
               eps: registrationData.eps || '',
               country: registrationData.country || '',
@@ -139,6 +145,7 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
           <Step4
             userId={registrationData.userId || ''}
             onNext={handleStep4Next}
+            onBack={handleGoBack}
             initialData={{
               fitnessGoal: registrationData.fitnessGoal || '',
               healthRestrictions: registrationData.healthRestrictions || '',
@@ -152,6 +159,7 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
           <Step5
             userId={registrationData.userId || ''}
             onNext={handleStep5Next}
+            onBack={handleGoBack}
             initialData={{
               username: registrationData.username || '',
               profileImage: registrationData.profileImage || '',
@@ -161,15 +169,7 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
       default:
         return null;
     }
-  }, [
-    currentStep,
-    registrationData,
-    handleStep1Next,
-    handleStep2Next,
-    handleStep3Next,
-    handleStep4Next,
-    handleStep5Next,
-  ]);
+  };
 
   // Si debemos mostrar la pantalla de bienvenida
   if (showWelcomeScreen) {
@@ -208,6 +208,19 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
                 />
               </TouchableOpacity>
             )}
+            {(currentStep === 2 || currentStep === 3 || currentStep === 4) && (
+              <TouchableOpacity 
+                onPress={handleGoBack}
+                accessibilityLabel="Volver al paso anterior"
+                accessibilityRole="button"
+              >
+                <FontAwesome
+                  name="chevron-left"
+                  size={20}
+                  color="white"
+                />
+              </TouchableOpacity>
+            )}
           </View>
 
           <SkipButton 
@@ -221,7 +234,8 @@ const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) =
           totalSteps={stepTitles.length}
           stepTitles={stepTitles}
         />
-        {renderCurrentStep}
+        {renderCurrentStep()}
+        <AlertComponent />
       </View>
     </KeyboardAvoidingView>
   );

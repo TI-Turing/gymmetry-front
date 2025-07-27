@@ -8,14 +8,23 @@ import { commonStyles } from './styles/common';
 import { PasswordInput } from './PasswordInput';
 import { PasswordRequirements } from './PasswordRequirements';
 import { useStep1Form } from './hooks/useStep1Form';
+import { useCustomAlert } from './CustomAlert';
 
 interface Step1Props {
   onNext: (data: Step1Data) => void;
   initialData?: { email: string; password: string };
+  showError?: (message: string) => void;
+  showSuccess?: (message: string) => void;
 }
 
-const Step1 = memo<Step1Props>(({ onNext, initialData }) => {
+const Step1 = memo<Step1Props>(({ onNext, initialData, showError: externalShowError, showSuccess: externalShowSuccess }) => {
   const colorScheme = useColorScheme();
+  const { showError: internalShowError, showSuccess: internalShowSuccess, AlertComponent } = useCustomAlert();
+  
+  // Usar las funciones externas si se proporcionan, sino usar las internas
+  const showError = externalShowError || internalShowError;
+  const showSuccess = externalShowSuccess || internalShowSuccess;
+  
   const {
     confirmPassword,
     showConfirmPassword,
@@ -32,7 +41,7 @@ const Step1 = memo<Step1Props>(({ onNext, initialData }) => {
     setConfirmPassword,
     setShowConfirmPassword,
     handleNext,
-  } = useStep1Form({ onNext, initialData });
+  } = useStep1Form({ onNext, initialData, showError, showSuccess });
 
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
@@ -122,6 +131,9 @@ const Step1 = memo<Step1Props>(({ onNext, initialData }) => {
           </Text>
         </TouchableOpacity>
       </View>
+      
+      {/* Solo renderizar AlertComponent si no hay funciones externas */}
+      {!externalShowError && <AlertComponent />}
     </ScrollView>
   );
 });

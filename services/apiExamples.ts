@@ -30,7 +30,6 @@ export const userAPI = {
       const response = await apiService.post<CreateUserResponse>('/user/add', userData);
       return response.data;
     } catch (error) {
-      console.error('❌ [USER API] Error al crear usuario:', error);
       throw error;
     }
   },
@@ -56,7 +55,6 @@ export const userAPI = {
       const response = await apiService.put<UpdateUserResponse>('/user/update', updateData);
       return response.data;
     } catch (error) {
-      console.error('❌ [USER API] Error al actualizar usuario:', error);
       throw error;
     }
   },
@@ -72,7 +70,6 @@ export const userAPI = {
       const response = await apiService.post<PhoneVerificationResponse>('/otp/generate-otp', data);
       return response.data;
     } catch (error) {
-      console.error('❌ [USER API] Error al enviar verificación de teléfono:', error);
       throw error;
     }
   },
@@ -84,7 +81,6 @@ export const userAPI = {
       console.log('✅ [USER API] Código OTP validado:', response);
       return response.data;
     } catch (error) {
-      console.error('❌ [USER API] Error al validar código OTP:', error);
       throw error;
     }
   },
@@ -95,7 +91,6 @@ export const userAPI = {
       console.log('✅ [USER API] Verificación de teléfono exitosa:', response);
       return response.data;
     } catch (error) {
-      console.error('❌ [USER API] Error al verificar existencia de teléfono:', error);
       throw error;
     }
   },

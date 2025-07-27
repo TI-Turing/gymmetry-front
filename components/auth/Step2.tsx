@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView, Modal, Alert } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -17,6 +17,7 @@ import { useCustomAlert } from './CustomAlert';
 interface Step2Props {
   userId: string;
   onNext: (data: Step2Data) => void;
+  onBack?: () => void;
   initialData?: Step2Data;
 }
 
@@ -211,14 +212,17 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       const response = await userAPI.updateUser(userId, updateData);
       
       if (!response.Success) {
-        throw new Error(response.Message || 'Error al actualizar usuario');
+        Alert.alert('Error', response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
+        return; // NO permitir avanzar si la API falla
       }
       
+      console.log('✅ [STEP 2] Datos actualizados correctamente');
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       console.error('❌ [STEP 2] Error:', errorMessage);
-      onNext(stepData);
+      Alert.alert('Error', errorMessage);
+      // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
     }
@@ -574,7 +578,9 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { backgroundColor: Colors[colorScheme].tint },
+            { 
+              backgroundColor: Colors[colorScheme].tint,
+            },
             isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
@@ -822,9 +828,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           </View>
         </TouchableOpacity>
       </Modal>
-      
-      {/* Componente de alertas personalizado */}
-      <AlertComponent />
     </ScrollView>
   );
 }

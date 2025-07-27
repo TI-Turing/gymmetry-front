@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Alert } from 'react-native';
 import { Step1Data, ApiResponse } from '../types';
 import { usePasswordValidation, useFormValidation } from './useValidation';
 import { validatePassword } from '../utils/validation';
@@ -10,6 +9,8 @@ import { apiService } from '@/services/apiService';
 interface UseStep1FormProps {
   onNext: (data: Step1Data) => void;
   initialData?: { email: string; password: string };
+  showError: (message: string) => void;
+  showSuccess: (message: string) => void;
 }
 
 interface UseStep1FormReturn {
@@ -39,7 +40,12 @@ interface UseStep1FormReturn {
   handleNext: () => Promise<void>;
 }
 
-export const useStep1Form = ({ onNext, initialData }: UseStep1FormProps): UseStep1FormReturn => {
+export const useStep1Form = ({ 
+  onNext, 
+  initialData,
+  showError,
+  showSuccess 
+}: UseStep1FormProps): UseStep1FormReturn => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +89,7 @@ export const useStep1Form = ({ onNext, initialData }: UseStep1FormProps): UseSte
         errorMessage = 'Por favor confirma tu contraseña';
       }
       
-      Alert.alert('Error de validación', errorMessage);
+      showError(errorMessage);
       return;
     }
 
@@ -115,7 +121,7 @@ export const useStep1Form = ({ onNext, initialData }: UseStep1FormProps): UseSte
     } catch (error: any) {
       console.error('❌ [STEP 1] Error:', error);
       const errorMessage = handleApiError(error);
-      Alert.alert('Error', errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }

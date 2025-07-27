@@ -7,6 +7,8 @@ interface UseStep4FormProps {
   userId: string;
   initialData?: Step4Data;
   onNext: (data: Step4Data) => void;
+  showError: (message: string) => void;
+  showSuccess: (message: string) => void;
 }
 
 interface UseStep4FormReturn {
@@ -28,7 +30,9 @@ interface UseStep4FormReturn {
 export const useStep4Form = ({ 
   userId, 
   initialData, 
-  onNext 
+  onNext,
+  showError,
+  showSuccess
 }: UseStep4FormProps): UseStep4FormReturn => {
   const [fitnessGoal, setFitnessGoal] = useState(initialData?.fitnessGoal || '');
   const [healthRestrictions, setHealthRestrictions] = useState(initialData?.healthRestrictions || '');
@@ -57,15 +61,17 @@ export const useStep4Form = ({
       const response = await userAPI.updateUser(userId, updateData);
       
       if (!response.Success) {
-        throw new Error(response.Message || 'Error al actualizar usuario');
+        showError(response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
+        return; // NO permitir avanzar si la API falla
       }
       
+      console.log('✅ [STEP 4] Datos actualizados correctamente');
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       console.error('❌ [STEP 4] Error:', errorMessage);
-      // Continuar aunque falle la API para no bloquear el flujo
-      onNext(stepData);
+      showError('No se pudieron guardar los datos. Intenta de nuevo.');
+      // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
     }

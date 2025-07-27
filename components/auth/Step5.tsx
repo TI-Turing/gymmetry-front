@@ -14,14 +14,18 @@ import { Environment } from '@/environment';
 import { Step5Data, UsernameCheckRequest, UsernameCheckResponse, UploadProfileImageResponse } from './types';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
+import { useCustomAlert } from './CustomAlert';
 
 interface Step5Props {
   userId: string;
   onNext: (data: Step5Data) => void;
+  onBack?: () => void;
   initialData?: Step5Data;
 }
 
 export default function Step5({ userId, onNext, initialData }: Step5Props) {
+  const colorScheme = useColorScheme();
+  const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const [username, setUsername] = useState(initialData?.username || '');
   const [profileImage, setProfileImage] = useState<string | null>(initialData?.profileImage || null);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +33,7 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'available' | 'taken' | 'invalid'>('idle');
   const [usernameError, setUsernameError] = useState<string>('');
-  const colorScheme = useColorScheme();
+  const [imageError, setImageError] = useState<boolean>(false);
   
   // Ref para el debounce
   const debounceRef = useRef<number>(0);
@@ -321,11 +325,12 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       });
 
       if (response.data.Success) {
+        console.log('✅ [IMAGE UPLOAD] Éxito. URL recibida:', response.data.Data);
         Alert.alert('¡Éxito!', 'La imagen de perfil se subió correctamente');
         return response.data.Data; // Retornar la URL de la imagen
       } else {
+        console.log('❌ [IMAGE UPLOAD] Error en respuesta:', response.data.Message);
         Alert.alert('Error', response.data.Message || 'Error al subir la imagen');
-        console.error('❌ [IMAGE UPLOAD] Error:', response.data.Message);
         return null;
       }
     } catch (error: any) {
@@ -358,17 +363,23 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
 
       if (!result.canceled && result.assets[0]) {
         const selectedImage = result.assets[0];
+        console.log('📷 [IMAGE PICKER] Imagen seleccionada:', selectedImage.uri);
         
         // Redimensionar imagen y validar tamaño
         const resizedUri = await resizeImageTo2MB(selectedImage.uri);
+        console.log('🔄 [IMAGE RESIZE] Imagen redimensionada:', resizedUri);
         
         // Subir imagen al servidor
         const uploadedImageUrl = await uploadProfileImage(resizedUri);
         
         if (uploadedImageUrl) {
+          console.log('✅ [IMAGE SET] Usando URL del servidor:', uploadedImageUrl);
           setProfileImage(uploadedImageUrl); // Usar la URL del servidor
+          setImageError(false);
         } else {
+          console.log('⚠️ [IMAGE SET] Usando imagen local como fallback:', resizedUri);
           setProfileImage(resizedUri); // Usar imagen local si falla el upload
+          setImageError(false);
         }
       }
     } catch (error) {
@@ -399,17 +410,23 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
 
       if (!result.canceled && result.assets[0]) {
         const takenPhoto = result.assets[0];
+        console.log('📸 [CAMERA] Foto tomada:', takenPhoto.uri);
         
         // Redimensionar imagen y validar tamaño
         const resizedUri = await resizeImageTo2MB(takenPhoto.uri);
+        console.log('🔄 [IMAGE RESIZE] Imagen redimensionada:', resizedUri);
         
         // Subir imagen al servidor
         const uploadedImageUrl = await uploadProfileImage(resizedUri);
         
         if (uploadedImageUrl) {
+          console.log('✅ [IMAGE SET] Usando URL del servidor:', uploadedImageUrl);
           setProfileImage(uploadedImageUrl); // Usar la URL del servidor
+          setImageError(false);
         } else {
+          console.log('⚠️ [IMAGE SET] Usando imagen local como fallback:', resizedUri);
           setProfileImage(resizedUri); // Usar imagen local si falla el upload
+          setImageError(false);
         }
       }
     } catch (error) {
@@ -421,6 +438,9 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
   };
 
   const showImageOptions = () => {
+    // Reset error state when user tries again
+    setImageError(false);
+    
     Alert.alert(
       'Seleccionar foto de perfil',
       'Elige una opción',
@@ -436,15 +456,15 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
     // Validar que si hay username, esté disponible
     if (username.trim() && usernameStatus !== 'available') {
       if (usernameStatus === 'taken') {
-        Alert.alert('Error', 'El nombre de usuario no está disponible');
+        showError('El nombre de usuario no está disponible');
         return;
       }
       if (usernameStatus === 'invalid') {
-        Alert.alert('Error', usernameError || 'El nombre de usuario no es válido');
+        showError(usernameError || 'El nombre de usuario no es válido');
         return;
       }
       if (usernameStatus === 'idle' || isCheckingUsername) {
-        Alert.alert('Espera', 'Se está verificando la disponibilidad del nombre de usuario');
+        showError('Se está verificando la disponibilidad del nombre de usuario');
         return;
       }
     }
@@ -457,14 +477,37 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
     };
     
     try {
-      // Por ahora solo pasamos los datos sin hacer llamada a la API
-      // ya que los tipos del API no incluyen estos campos
+      // Si hay datos para actualizar, validar que la API responda correctamente
+      if (stepData.username || stepData.profileImage) {
+        const updateData: any = {};
+        
+        if (stepData.username) {
+          updateData.username = stepData.username;
+        }
+        
+        // Para la imagen, ya se subió anteriormente en uploadProfileImage
+        // Solo necesitamos validar que se guardó correctamente
+        
+        // Solo llamar al API si hay datos que actualizar (username por ahora)
+        if (stepData.username) {
+          const response = await userAPI.updateUser(userId, updateData);
+          
+          if (!response.Success) {
+            showError(response.Message || 'Error al actualizar el perfil de usuario');
+            return; // NO permitir avanzar si la API falla
+          }
+          
+          console.log('✅ [STEP 5] Perfil actualizado correctamente');
+        }
+      }
+      
+      // Solo avanzar si todo fue exitoso
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       console.error('❌ [STEP 5] Error:', errorMessage);
-      // Continuar aunque falle para no bloquear el flujo
-      onNext(stepData);
+      showError('No se pudo completar el registro. Intenta de nuevo.');
+      // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
     }
@@ -564,28 +607,70 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
               {
                 backgroundColor: Colors[colorScheme].background,
                 borderColor: '#666',
+                opacity: isUploadingImage ? 0.7 : 1,
               },
             ]}
             onPress={showImageOptions}
             disabled={isUploadingImage}
           >
-            {profileImage ? (
+            {isUploadingImage ? (
+              <View style={commonStyles.imagePlaceholder}>
+                <FontAwesome
+                  name="spinner"
+                  size={40}
+                  color={Colors[colorScheme].tint}
+                />
+                <Text style={[commonStyles.imageText, { color: Colors[colorScheme].text, marginTop: 12 }]}>
+                  Procesando imagen...
+                </Text>
+              </View>
+            ) : profileImage && !imageError ? (
               <View style={commonStyles.imagePreviewContainer}>
-                <Image source={{ uri: profileImage }} style={commonStyles.imagePreview} />
+                <Image 
+                  source={{ uri: profileImage }} 
+                  style={commonStyles.imagePreview}
+                  onError={(error) => {
+                    console.error('❌ [IMAGE DISPLAY] Error al cargar imagen:', error.nativeEvent.error);
+                    console.log('❌ [IMAGE DISPLAY] URI problemática:', profileImage);
+                    setImageError(true);
+                  }}
+                  onLoad={() => {
+                    console.log('✅ [IMAGE DISPLAY] Imagen cargada exitosamente:', profileImage);
+                    setImageError(false);
+                  }}
+                />
                 <Text style={[commonStyles.imageText, { color: Colors[colorScheme].text }]}>
                   Tocar para cambiar
                 </Text>
               </View>
             ) : (
               <View style={commonStyles.imagePlaceholder}>
-                <FontAwesome
-                  name="camera"
-                  size={40}
-                  color={Colors[colorScheme].text + '60'}
-                />
-                <Text style={[commonStyles.imageText, { color: Colors[colorScheme].text }]}>
-                  {isUploadingImage ? 'Procesando...' : 'Subir foto de perfil'}
-                </Text>
+                {imageError && profileImage ? (
+                  <>
+                    <FontAwesome
+                      name="exclamation-triangle"
+                      size={40}
+                      color="#FF6B6B"
+                    />
+                    <Text style={[commonStyles.imageText, { color: '#FF6B6B', marginTop: 8 }]}>
+                      Error al cargar imagen
+                    </Text>
+                    <Text style={[commonStyles.imageText, { color: Colors[colorScheme].text, fontSize: 12 }]}>
+                      Tocar para intentar de nuevo
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <FontAwesome
+                      name="camera"
+                      size={40}
+                      color={Colors[colorScheme].text + '60'}
+                    />
+                    <Text style={[commonStyles.imageText, { color: Colors[colorScheme].text }]}>
+                      Subir foto de perfil
+                    </Text>
+                  </>
+                )}
               </View>
             )}
           </TouchableOpacity>
@@ -594,7 +679,9 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { backgroundColor: Colors[colorScheme].tint },
+            { 
+              backgroundColor: Colors[colorScheme].tint,
+            },
             (isLoading || isUploadingImage || isCheckingUsername) && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
@@ -608,6 +695,9 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
           </Text>
         </TouchableOpacity>
       </View>
+      
+      {/* Componente de alertas personalizado */}
+      <AlertComponent />
     </ScrollView>
   );
 }
