@@ -99,6 +99,10 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
 
   const iconConfig = getIconConfig();
 
+  if (!visible) {
+    return null;
+  }
+
   return (
     <Modal
       visible={visible}
@@ -122,9 +126,9 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           onPress={onClose}
         />
         
-        <Animated.View
+        <View
           style={{
-            backgroundColor: Colors[colorScheme].background,
+            backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#FFFFFF',
             borderRadius: 16,
             padding: 24,
             width: '100%',
@@ -134,7 +138,6 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 8,
-            transform: [{ scale: scaleAnim }],
           }}
         >
           {/* Icono */}
@@ -160,23 +163,27 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           </View>
 
           {/* Título */}
-          <Text style={{
-            fontSize: 20,
-            fontWeight: '700',
-            color: Colors[colorScheme].text,
-            textAlign: 'center',
-            marginBottom: 8,
-          }}>
-            {title}
-          </Text>
+          {!(type === 'error' && title === 'Error') && (
+            <Text style={{
+              fontSize: 20,
+              fontWeight: '700',
+              color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+              textAlign: 'center',
+              marginBottom: 8,
+            }}>
+              {title}
+            </Text>
+          )}
 
           {/* Mensaje */}
           <Text style={{
             fontSize: 16,
-            color: `${Colors[colorScheme].text}CC`,
+            color: colorScheme === 'dark' ? '#E0E0E0' : '#424242',
             textAlign: 'center',
-            lineHeight: 22,
-            marginBottom: 24,
+            lineHeight: 24,
+            marginBottom: 28,
+            marginTop: (type === 'error' && title === 'Error') ? 8 : 0,
+            fontWeight: '400',
           }}>
             {message}
           </Text>
@@ -193,7 +200,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   paddingVertical: 14,
                   paddingHorizontal: 20,
                   borderRadius: 12,
-                  backgroundColor: `${Colors[colorScheme].text}10`,
+                  backgroundColor: colorScheme === 'dark' ? '#404040' : '#F5F5F5',
                   alignItems: 'center',
                 }}
                 onPress={handleCancel}
@@ -201,7 +208,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                 <Text style={{
                   fontSize: 16,
                   fontWeight: '600',
-                  color: Colors[colorScheme].text,
+                  color: colorScheme === 'dark' ? '#FFFFFF' : '#424242',
                 }}>
                   {cancelText}
                 </Text>
@@ -214,7 +221,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                 paddingVertical: 14,
                 paddingHorizontal: 20,
                 borderRadius: 12,
-                backgroundColor: Colors[colorScheme].tint,
+                backgroundColor: type === 'success' ? Colors[colorScheme].tint : type === 'error' ? Colors[colorScheme].tint : type === 'warning' ? Colors[colorScheme].tint : Colors[colorScheme].tint,
                 alignItems: 'center',
               }}
               onPress={handleConfirm}
@@ -222,13 +229,13 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
               <Text style={{
                 fontSize: 16,
                 fontWeight: '600',
-                color: 'white',
+                color: '#FFFFFF',
               }}>
                 {confirmText}
               </Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
+        </View>
       </Animated.View>
     </Modal>
   );
@@ -274,19 +281,55 @@ export const useCustomAlert = () => {
     });
   }, []);
 
+  const showError = React.useCallback((
+    message: string,
+    options?: {
+      confirmText?: string;
+      showCancel?: boolean;
+      cancelText?: string;
+      onConfirm?: () => void;
+      onCancel?: () => void;
+    }
+  ) => {
+    showAlert('error', 'Error', message, options);
+  }, [showAlert]);
+
+  const showSuccess = React.useCallback((
+    message: string,
+    options?: {
+      confirmText?: string;
+      showCancel?: boolean;
+      cancelText?: string;
+      onConfirm?: () => void;
+      onCancel?: () => void;
+    }
+  ) => {
+    showAlert('success', 'Éxito', message, options);
+  }, [showAlert]);
+
   const hideAlert = React.useCallback(() => {
     setAlert(prev => ({ ...prev, visible: false }));
   }, []);
 
   const AlertComponent = React.useCallback(() => (
     <CustomAlert
-      {...alert}
+      visible={alert.visible}
+      type={alert.type}
+      title={alert.title}
+      message={alert.message}
+      confirmText={alert.confirmText}
+      showCancel={alert.showCancel}
+      cancelText={alert.cancelText}
+      onConfirm={alert.onConfirm}
+      onCancel={alert.onCancel}
       onClose={hideAlert}
     />
   ), [alert, hideAlert]);
 
   return {
     showAlert,
+    showError,
+    showSuccess,
     hideAlert,
     AlertComponent,
   };

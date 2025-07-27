@@ -22,7 +22,7 @@ interface Step2Props {
 
 export default function Step2({ userId, onNext, initialData }: Step2Props) {
   const { genders, loading: gendersLoading, error: gendersError, loadGenders } = useGenders(true); // autoLoad = true
-  const { showAlert, AlertComponent } = useCustomAlert();
+  const { showError, showSuccess, AlertComponent } = useCustomAlert();
   
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
@@ -56,12 +56,12 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
 
   const handleVerifyPhone = async () => {
     if (!phone.trim()) {
-      showAlert('error', 'Error', 'Por favor ingresa un número de teléfono primero');
+      showError('Por favor ingresa un número de teléfono primero');
       return;
     }
     
     if (phone.length < 7) {
-      showAlert('error', 'Error', 'El número de teléfono debe tener al menos 7 dígitos');
+      showError('El número de teléfono debe tener al menos 7 dígitos');
       return;
     }
     
@@ -111,11 +111,11 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       if (response.Success || response.Success) {
         setVerificationStep('code');
       } else {
-        showAlert('error', 'Error', response.Message || response.Message || 'Error al enviar verificación');
+        showError(response.Message || response.Message || 'Error al enviar verificación');
       }
     } catch (error: any) {
       const errorMessage = handleApiError(error);
-      showAlert('error', 'Error', errorMessage);
+      showError(errorMessage);
     } finally {
       setIsVerificationLoading(false);
     }
@@ -129,7 +129,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     
     if (!otpCode.trim()) {
       console.log('❌ [STEP2] Código OTP vacío');
-      showAlert('error', 'Error', 'Por favor ingresa el código de verificación');
+      showError('Por favor ingresa el código de verificación');
       return;
     }
 
@@ -153,15 +153,15 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         setPhoneVerified(true);
         setShowVerificationModal(false);
         setOtpCode('');
-        showAlert('success', 'Éxito', '¡Teléfono verificado correctamente!');
+        showSuccess('¡Teléfono verificado correctamente!');
       } else {
         console.log('❌ [STEP2] Verificación fallida:', response.Message);
-        showAlert('error', 'Error', response.Message || 'Código incorrecto');
+        showError(response.Message || 'Código incorrecto');
       }
     } catch (error: any) {
       console.error('❌ [STEP2] Error en validación OTP:', error);
       const errorMessage = handleApiError(error);
-      showAlert('error', 'Error', errorMessage);
+      showError(errorMessage);
     } finally {
       setIsVerificationLoading(false);
       console.log('🔍 [STEP2] handleValidateOTP finalizado');
