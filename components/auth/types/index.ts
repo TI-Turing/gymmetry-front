@@ -39,6 +39,7 @@ export interface OTPValidationData {
   UserId: string;
   Otp: string;
   VerificationType: string;
+  Recipient: string;
 }
 
 export interface OTPValidationResponse {

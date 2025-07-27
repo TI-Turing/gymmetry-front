@@ -105,9 +105,10 @@ const COUNTRIES: Country[] = [
 interface CountryCodePickerProps {
   selectedCountry: Country;
   onSelect: (country: Country) => void;
+  disabled?: boolean;
 }
 
-export default function CountryCodePicker({ selectedCountry, onSelect }: CountryCodePickerProps) {
+export default function CountryCodePicker({ selectedCountry, onSelect, disabled = false }: CountryCodePickerProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const colorScheme = useColorScheme();
@@ -146,14 +147,22 @@ export default function CountryCodePicker({ selectedCountry, onSelect }: Country
         style={[
           styles.selector,
           {
-            backgroundColor: Colors[colorScheme].background,
-            borderColor: '#666',
+            backgroundColor: disabled 
+              ? `${Colors[colorScheme].text}10` 
+              : Colors[colorScheme].background,
+            borderColor: disabled ? `${Colors[colorScheme].text}30` : '#666',
+            opacity: disabled ? 0.6 : 1,
           },
         ]}
-        onPress={() => setModalVisible(true)}
+        onPress={() => !disabled && setModalVisible(true)}
+        disabled={disabled}
       >
         <Text style={styles.flag}>{selectedCountry.flag}</Text>
-        <Text style={[styles.selectedDialCode, { color: Colors[colorScheme].text }]}>
+        <Text style={[styles.selectedDialCode, { 
+          color: disabled 
+            ? `${Colors[colorScheme].text}60` 
+            : Colors[colorScheme].text 
+        }]}>
           {selectedCountry.dialCode}
         </Text>
       </TouchableOpacity>

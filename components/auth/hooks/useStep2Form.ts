@@ -225,7 +225,8 @@ export const useStep2Form = ({
       const data: OTPValidationData = {
         UserId: userId,
         Otp: otpCode.trim(),
-        VerificationType: 'Phone'
+        VerificationType: 'Phone',
+        Recipient: fullPhone,
       };
       
       const response = await userAPI.validateOTP(data);

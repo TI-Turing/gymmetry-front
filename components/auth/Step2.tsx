@@ -75,20 +75,31 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     // Verificar si el teléfono existe
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
+      console.log('📞 [STEP2] Verificando teléfono:', fullPhone);
       const response = await userAPI.checkPhoneExists(fullPhone);
+      console.log('📞 [STEP2] Respuesta checkPhoneExists:', response);
       
-      if (response.Success && response.Data === true) {
-        // El teléfono ya existe, mostrar mensaje de error en el modal
-        setPhoneExists(true);
-        setVerificationStep('error');
+      if (response.Success) {
+        if (response.Data === true) {
+          // El teléfono YA EXISTE en la base de datos, NO permitir generar OTP
+          console.log('❌ [STEP2] Teléfono ya existe en BD, NO generar OTP');
+          setPhoneExists(true);
+          setVerificationStep('error');
+        } else {
+          // El teléfono NO EXISTE, permitir generar OTP
+          console.log('✅ [STEP2] Teléfono disponible, permitir generar OTP');
+          setPhoneExists(false);
+          setVerificationStep('method');
+        }
       } else {
-        // El teléfono no existe, mostrar opciones de verificación
-        setPhoneExists(false);
-        setVerificationStep('method');
+        // Error en la respuesta de la API
+        console.log('❌ [STEP2] Error en respuesta API:', response.Message);
+        setVerificationStep('error');
+        setPhoneExists(null);
       }
       
     } catch (error) {
-      console.error('Error checking phone existence:', error);
+      console.error('❌ [STEP2] Error checking phone existence:', error);
       setVerificationStep('error');
       setPhoneExists(null);
     } finally {
@@ -141,7 +152,8 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       const data: OTPValidationData = {
         UserId: userId,
         Otp: otpCode.trim(),
-        VerificationType: 'Phone'
+        VerificationType: 'Phone',
+        Recipient: fullPhone,
       };
       
       console.log('📤 [STEP2] Datos a enviar:', data);
@@ -324,16 +336,22 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               <CountryCodePicker
                 selectedCountry={selectedCountry}
                 onSelect={setSelectedCountry}
+                disabled={phoneVerified}
               />
             </View>
-            <View style={commonStyles.phoneContainer}>
+            <View style={[commonStyles.phoneContainer, { position: 'relative' }]}>
               <TextInput
                 style={[
                   commonStyles.input,
                   {
-                    backgroundColor: Colors[colorScheme].background,
-                    color: Colors[colorScheme].text,
-                    borderColor: '#666',
+                    backgroundColor: phoneVerified 
+                      ? `${Colors[colorScheme].text}10` 
+                      : Colors[colorScheme].background,
+                    color: phoneVerified 
+                      ? `${Colors[colorScheme].text}60` 
+                      : Colors[colorScheme].text,
+                    borderColor: phoneVerified ? `${Colors[colorScheme].text}30` : '#666',
+                    paddingRight: phoneVerified ? 40 : 16,
                   },
                 ]}
                 value={phone}
@@ -342,7 +360,22 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                 placeholder="3001234567"
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
                 maxLength={10}
+                editable={!phoneVerified}
               />
+              {phoneVerified && (
+                <View style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: [{ translateY: -8 }],
+                }}>
+                  <FontAwesome 
+                    name="lock" 
+                    size={16} 
+                    color={`${Colors[colorScheme].text}60`}
+                  />
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -647,7 +680,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   marginBottom: 20,
                 }}>
                   {phoneExists ? 
-                    'Este número de teléfono ya está registrado. Por favor usa otro número.' : 
+                    'Este número de teléfono ya está registrado en la base de datos. Por favor usa otro número.' : 
                     'Hubo un error al verificar el teléfono. Por favor intenta nuevamente.'
                   }
                 </Text>
