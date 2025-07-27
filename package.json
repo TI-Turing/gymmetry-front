@@ -111,6 +111,7 @@
     "eslint": "^8.57.1",
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-react": "^7.33.0",

@@ -27,7 +27,7 @@ export * from './utils/api';
 export * from './utils/format';
 
 // Data
-export { COUNTRIES } from './data/countries';
+export * from './data/countries';
 export * from './data/colombia';
 
 // Styles

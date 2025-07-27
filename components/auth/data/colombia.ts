@@ -13,7 +13,7 @@ export const EPS_OPTIONS = [
   'Otra',
 ];
 
-export const COUNTRIES = [
+export const COUNTRY_NAMES = [
   'Colombia',
   'Argentina',
   'México',

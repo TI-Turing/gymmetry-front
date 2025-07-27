@@ -14,6 +14,14 @@ module.exports = {
     node: true,
     jest: true,
   },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json',
+      },
+    },
+  },
   rules: {
     'prettier/prettier': 'error',
     'no-console': 'error',
@@ -22,6 +30,7 @@ module.exports = {
     'no-unused-vars': 'warn',
     'prefer-const': 'error',
     'no-var': 'error',
+    'import/no-unresolved': 'error',
   },
   ignorePatterns: ['node_modules/', '.expo/', 'dist/', '*.d.ts'],
 };

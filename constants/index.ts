@@ -1,2 +1,2 @@
-export * from './Colors';
+export { default as Colors } from './Colors';
 export * from './AppConstants';

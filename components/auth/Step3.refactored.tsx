@@ -228,7 +228,7 @@ const Step3 = memo<Step3Props>(
     const SelectorModal = memo<{
       visible: boolean;
       title: string;
-      data: Array<{ Id: string; Nombre: string }>;
+      data: { Id: string; Nombre: string }[];
       onSelect: (id: string) => void;
       onClose: () => void;
       loading?: boolean;
