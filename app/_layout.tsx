@@ -5,9 +5,22 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { LogBox } from 'react-native';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { userSessionService } from '@/services/userSessionService';
+
+// Suprimir warnings específicos que no son críticos
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+  'A non-serializable value was detected in an action',
+  'Require cycle',
+  'Module RNDeviceInfo requires main queue setup',
+  'Failed to fetch',
+  'Network request failed',
+  'timeout', 
+  'Deprecated Warning'
+]);
 
 export {
   ErrorBoundary,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, ScrollView, Modal, Alert } from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -76,31 +76,25 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     // Verificar si el teléfono existe
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
-      console.log('📞 [STEP2] Verificando teléfono:', fullPhone);
       const response = await userAPI.checkPhoneExists(fullPhone);
-      console.log('📞 [STEP2] Respuesta checkPhoneExists:', response);
       
       if (response.Success) {
         if (response.Data === true) {
           // El teléfono YA EXISTE en la base de datos, NO permitir generar OTP
-          console.log('❌ [STEP2] Teléfono ya existe en BD, NO generar OTP');
           setPhoneExists(true);
           setVerificationStep('error');
         } else {
           // El teléfono NO EXISTE, permitir generar OTP
-          console.log('✅ [STEP2] Teléfono disponible, permitir generar OTP');
           setPhoneExists(false);
           setVerificationStep('method');
         }
       } else {
         // Error en la respuesta de la API
-        console.log('❌ [STEP2] Error en respuesta API:', response.Message);
         setVerificationStep('error');
         setPhoneExists(null);
       }
       
     } catch (error) {
-      console.error('❌ [STEP2] Error checking phone existence:', error);
       setVerificationStep('error');
       setPhoneExists(null);
     } finally {
@@ -134,19 +128,12 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
   };
 
   const handleValidateOTP = async () => {
-    console.log('🔍 [STEP2] handleValidateOTP iniciado');
-    console.log('🔍 [STEP2] otpCode:', otpCode);
-    console.log('🔍 [STEP2] otpCode.length:', otpCode.length);
-    console.log('🔍 [STEP2] isVerificationLoading:', isVerificationLoading);
-    
     if (!otpCode.trim()) {
-      console.log('❌ [STEP2] Código OTP vacío');
       showError('Por favor ingresa el código de verificación');
       return;
     }
 
     setIsVerificationLoading(true);
-    console.log('📤 [STEP2] Enviando validación OTP...');
     
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
@@ -157,27 +144,21 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         Recipient: fullPhone,
       };
       
-      console.log('📤 [STEP2] Datos a enviar:', data);
       const response = await userAPI.validateOTP(data);
-      console.log('📥 [STEP2] Respuesta recibida:', response);
       
       if (response.Success) {
-        console.log('✅ [STEP2] Verificación exitosa');
         setPhoneVerified(true);
         setShowVerificationModal(false);
         setOtpCode('');
         showSuccess('¡Teléfono verificado correctamente!');
       } else {
-        console.log('❌ [STEP2] Verificación fallida:', response.Message);
         showError(response.Message || 'Código incorrecto');
       }
     } catch (error: any) {
-      console.error('❌ [STEP2] Error en validación OTP:', error);
       const errorMessage = handleApiError(error);
       showError(errorMessage);
     } finally {
       setIsVerificationLoading(false);
-      console.log('🔍 [STEP2] handleValidateOTP finalizado');
     }
   };
 
@@ -216,12 +197,10 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         return; // NO permitir avanzar si la API falla
       }
       
-      console.log('✅ [STEP 2] Datos actualizados correctamente');
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
-      console.error('❌ [STEP 2] Error:', errorMessage);
-      Alert.alert('Error', errorMessage);
+      showError(errorMessage);
       // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
@@ -828,6 +807,8 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           </View>
         </TouchableOpacity>
       </Modal>
+      
+      <AlertComponent />
     </ScrollView>
   );
 }
