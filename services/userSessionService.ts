@@ -25,13 +25,17 @@ class UserSessionService {
   async initializeUserCountry(): Promise<void> {
     try {
       // Cargar país guardado de la sesión anterior
-      const savedCountryData = await AsyncStorage.getItem(USER_COUNTRY_DATA_KEY);
+      const savedCountryData = await AsyncStorage.getItem(
+        USER_COUNTRY_DATA_KEY
+      );
       if (savedCountryData) {
         this.userCountryData = JSON.parse(savedCountryData);
         this.userCountryId = this.userCountryData?.id || null;
-        
+
         // Verificar si la detección es reciente (menos de 24 horas)
-        const isRecent = this.userCountryData && (Date.now() - this.userCountryData.detectedAt < 24 * 60 * 60 * 1000);
+        const isRecent =
+          this.userCountryData &&
+          Date.now() - this.userCountryData.detectedAt < 24 * 60 * 60 * 1000;
         if (isRecent && this.userCountryData) {
           return;
         }
@@ -39,9 +43,7 @@ class UserSessionService {
 
       // Si no hay datos guardados o son antiguos, detectar nuevamente
       await this.detectAndSaveUserCountry();
-    } catch (error) {
-      console.error('❌ Error inicializando país del usuario:', error);
-    }
+    } catch (error) {}
   }
 
   async detectAndSaveUserCountry(): Promise<void> {
@@ -57,7 +59,10 @@ class UserSessionService {
       const countries = await catalogService.getCountries();
 
       // Buscar el país en la lista del catálogo
-      const matchedCountry = this.findCountryInCatalog(detectedCountry, countries);
+      const matchedCountry = this.findCountryInCatalog(
+        detectedCountry,
+        countries
+      );
       if (!matchedCountry) {
         return;
       }
@@ -67,20 +72,24 @@ class UserSessionService {
         id: matchedCountry.Id,
         name: matchedCountry.Nombre,
         code: detectedCountry.code || '',
-        detectedAt: Date.now()
+        detectedAt: Date.now(),
       };
       this.userCountryId = matchedCountry.Id;
 
-      await AsyncStorage.setItem(USER_COUNTRY_DATA_KEY, JSON.stringify(this.userCountryData));
+      await AsyncStorage.setItem(
+        USER_COUNTRY_DATA_KEY,
+        JSON.stringify(this.userCountryData)
+      );
       if (this.userCountryId) {
         await AsyncStorage.setItem(USER_COUNTRY_ID_KEY, this.userCountryId);
       }
-    } catch (error) {
-      console.error('❌ Error detectando y guardando país:', error);
-    }
+    } catch (error) {}
   }
 
-  private async detectUserCountry(): Promise<{ name: string; code: string } | null> {
+  private async detectUserCountry(): Promise<{
+    name: string;
+    code: string;
+  } | null> {
     try {
       // Método 1: Detección por timezone
       const timezoneCountry = this.getCountryFromTimezone();
@@ -96,7 +105,6 @@ class UserSessionService {
 
       return null;
     } catch (error) {
-      console.error('Error en detección de país:', error);
       return null;
     }
   }
@@ -104,19 +112,21 @@ class UserSessionService {
   private getCountryFromTimezone(): { name: string; code: string } | null {
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const locale = typeof navigator !== 'undefined' ? navigator.language : 'es-ES';
-      
-      const timezoneToCountry: Record<string, { code: string; name: string }> = {
-        'America/Bogota': { code: 'CO', name: 'Colombia' },
-        'America/Mexico_City': { code: 'MX', name: 'México' },
-        'America/New_York': { code: 'US', name: 'Estados Unidos' },
-        'America/Los_Angeles': { code: 'US', name: 'Estados Unidos' },
-        'America/Argentina/Buenos_Aires': { code: 'AR', name: 'Argentina' },
-        'America/Sao_Paulo': { code: 'BR', name: 'Brasil' },
-        'America/Santiago': { code: 'CL', name: 'Chile' },
-        'America/Lima': { code: 'PE', name: 'Perú' },
-        'Europe/Madrid': { code: 'ES', name: 'España' },
-      };
+      const locale =
+        typeof navigator !== 'undefined' ? navigator.language : 'es-ES';
+
+      const timezoneToCountry: Record<string, { code: string; name: string }> =
+        {
+          'America/Bogota': { code: 'CO', name: 'Colombia' },
+          'America/Mexico_City': { code: 'MX', name: 'México' },
+          'America/New_York': { code: 'US', name: 'Estados Unidos' },
+          'America/Los_Angeles': { code: 'US', name: 'Estados Unidos' },
+          'America/Argentina/Buenos_Aires': { code: 'AR', name: 'Argentina' },
+          'America/Sao_Paulo': { code: 'BR', name: 'Brasil' },
+          'America/Santiago': { code: 'CL', name: 'Chile' },
+          'America/Lima': { code: 'PE', name: 'Perú' },
+          'Europe/Madrid': { code: 'ES', name: 'España' },
+        };
 
       const countryInfo = timezoneToCountry[timezone];
       if (countryInfo) {
@@ -128,66 +138,77 @@ class UserSessionService {
       if (localeCountry) {
         return {
           code: localeCountry,
-          name: this.getCountryNameFromCode(localeCountry)
+          name: this.getCountryNameFromCode(localeCountry),
         };
       }
-    } catch (error) {
-      console.error('Error en detección por timezone:', error);
-    }
+    } catch (error) {}
     return null;
   }
 
-  private async getCountryFromIP(): Promise<{ name: string; code: string } | null> {
+  private async getCountryFromIP(): Promise<{
+    name: string;
+    code: string;
+  } | null> {
     try {
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
-      
+
       return {
         name: data.country_name,
-        code: data.country_code
+        code: data.country_code,
       };
     } catch (error) {
-      console.error('Error en detección por IP:', error);
       return null;
     }
   }
 
-  private findCountryInCatalog(detectedCountry: { name: string; code: string }, catalogCountries: any[]) {
+  private findCountryInCatalog(
+    detectedCountry: { name: string; code: string },
+    catalogCountries: any[]
+  ) {
     // Buscar por código ISO primero
     if (detectedCountry.code) {
-      const byCode = catalogCountries.find(country => 
-        country.CodigoISO?.toUpperCase() === detectedCountry.code.toUpperCase()
+      const byCode = catalogCountries.find(
+        country =>
+          country.CodigoISO?.toUpperCase() ===
+          detectedCountry.code.toUpperCase()
       );
       if (byCode) return byCode;
     }
 
     // Buscar por nombre (coincidencia exacta)
-    const byExactName = catalogCountries.find(country => 
-      country.Nombre.toLowerCase() === detectedCountry.name.toLowerCase()
+    const byExactName = catalogCountries.find(
+      country =>
+        country.Nombre.toLowerCase() === detectedCountry.name.toLowerCase()
     );
     if (byExactName) return byExactName;
 
     // Buscar por nombre (coincidencia parcial)
-    const byPartialName = catalogCountries.find(country => 
-      country.Nombre.toLowerCase().includes(detectedCountry.name.toLowerCase()) ||
-      detectedCountry.name.toLowerCase().includes(country.Nombre.toLowerCase())
+    const byPartialName = catalogCountries.find(
+      country =>
+        country.Nombre.toLowerCase().includes(
+          detectedCountry.name.toLowerCase()
+        ) ||
+        detectedCountry.name
+          .toLowerCase()
+          .includes(country.Nombre.toLowerCase())
     );
-    
+
     return byPartialName;
   }
 
   private getCountryNameFromCode(code: string): string {
     const countryMap: Record<string, string> = {
-      'CO': 'Colombia',
-      'US': 'Estados Unidos',
-      'MX': 'México',
-      'AR': 'Argentina',
-      'BR': 'Brasil',
-      'CL': 'Chile',
-      'PE': 'Perú',
-      'EC': 'Ecuador',
-      'VE': 'Venezuela',
-      'ES': 'España',
+      CO: 'Colombia',
+      US: 'Estados Unidos',
+      MX: 'México',
+      AR: 'Argentina',
+      BR: 'Brasil',
+      CL: 'Chile',
+      PE: 'Perú',
+      EC: 'Ecuador',
+      VE: 'Venezuela',
+      ES: 'España',
     };
     return countryMap[code] || code;
   }

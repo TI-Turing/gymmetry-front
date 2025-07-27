@@ -9,7 +9,9 @@ interface UserLocationData {
 }
 
 export function useUserLocation() {
-  const [locationData, setLocationData] = useState<UserLocationData | null>(null);
+  const [locationData, setLocationData] = useState<UserLocationData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,22 +48,26 @@ export function useUserLocation() {
     }
   };
 
-  const getCountryFromTimezone = (): Omit<UserLocationData, 'source'> | null => {
+  const getCountryFromTimezone = (): Omit<
+    UserLocationData,
+    'source'
+  > | null => {
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const locale = navigator.language || 'es-ES';
-      
-      const timezoneToCountry: Record<string, { code: string; name: string }> = {
-        'America/Bogota': { code: 'CO', name: 'Colombia' },
-        'America/Mexico_City': { code: 'MX', name: 'México' },
-        'America/New_York': { code: 'US', name: 'Estados Unidos' },
-        'America/Los_Angeles': { code: 'US', name: 'Estados Unidos' },
-        'America/Argentina/Buenos_Aires': { code: 'AR', name: 'Argentina' },
-        'America/Sao_Paulo': { code: 'BR', name: 'Brasil' },
-        'America/Santiago': { code: 'CL', name: 'Chile' },
-        'America/Lima': { code: 'PE', name: 'Perú' },
-        'Europe/Madrid': { code: 'ES', name: 'España' },
-      };
+
+      const timezoneToCountry: Record<string, { code: string; name: string }> =
+        {
+          'America/Bogota': { code: 'CO', name: 'Colombia' },
+          'America/Mexico_City': { code: 'MX', name: 'México' },
+          'America/New_York': { code: 'US', name: 'Estados Unidos' },
+          'America/Los_Angeles': { code: 'US', name: 'Estados Unidos' },
+          'America/Argentina/Buenos_Aires': { code: 'AR', name: 'Argentina' },
+          'America/Sao_Paulo': { code: 'BR', name: 'Brasil' },
+          'America/Santiago': { code: 'CL', name: 'Chile' },
+          'America/Lima': { code: 'PE', name: 'Perú' },
+          'Europe/Madrid': { code: 'ES', name: 'España' },
+        };
 
       const countryInfo = timezoneToCountry[timezone];
       if (countryInfo) {
@@ -79,16 +85,19 @@ export function useUserLocation() {
         };
       }
     } catch (error) {
-      console.error('Error en detección por timezone:', error);
+      // Fallback silencioso en caso de error
     }
     return null;
   };
 
-  const getCountryFromIP = async (): Promise<Omit<UserLocationData, 'source'> | null> => {
+  const getCountryFromIP = async (): Promise<Omit<
+    UserLocationData,
+    'source'
+  > | null> => {
     try {
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
-      
+
       return {
         country: data.country_name,
         countryCode: data.country_code,
@@ -96,7 +105,7 @@ export function useUserLocation() {
         region: data.region,
       };
     } catch (error) {
-      console.error('Error en detección por IP:', error);
+      // Fallback silencioso en caso de error
     }
     return null;
   };
@@ -104,16 +113,16 @@ export function useUserLocation() {
   // Mapeo básico de códigos a nombres de países
   const getCountryNameFromCode = (code: string): string => {
     const countryMap: Record<string, string> = {
-      'CO': 'Colombia',
-      'US': 'Estados Unidos',
-      'MX': 'México',
-      'AR': 'Argentina',
-      'BR': 'Brasil',
-      'CL': 'Chile',
-      'PE': 'Perú',
-      'EC': 'Ecuador',
-      'VE': 'Venezuela',
-      'ES': 'España',
+      CO: 'Colombia',
+      US: 'Estados Unidos',
+      MX: 'México',
+      AR: 'Argentina',
+      BR: 'Brasil',
+      CL: 'Chile',
+      PE: 'Perú',
+      EC: 'Ecuador',
+      VE: 'Venezuela',
+      ES: 'España',
       // Agregar más países según necesites
     };
     return countryMap[code] || code;

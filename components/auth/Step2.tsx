@@ -7,9 +7,18 @@ import { userAPI } from '@/services/apiExamples';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CountryCodePicker, { DEFAULT_COUNTRY } from './CountryCodePicker';
 import { useGenders } from './hooks/useLazyCatalogs';
-import { Step2Data, Country, PhoneVerificationData, OTPValidationData } from './types';
+import {
+  Step2Data,
+  Country,
+  PhoneVerificationData,
+  OTPValidationData,
+} from './types';
 import { handleApiError } from './utils/api';
-import { formatDateToDisplay, formatDateForBackend, parseDisplayDate } from './utils/format';
+import {
+  formatDateToDisplay,
+  formatDateForBackend,
+  parseDisplayDate,
+} from './utils/format';
 import { commonStyles } from './styles/common';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCustomAlert } from './CustomAlert';
@@ -22,28 +31,46 @@ interface Step2Props {
 }
 
 export default function Step2({ userId, onNext, initialData }: Step2Props) {
-  const { genders, loading: gendersLoading, error: gendersError, loadGenders } = useGenders(true); // autoLoad = true
+  const {
+    genders,
+    loading: gendersLoading,
+    error: gendersError,
+    loadGenders,
+  } = useGenders(true); // autoLoad = true
   const { showError, showSuccess, AlertComponent } = useCustomAlert();
-  
+
   const [firstName, setFirstName] = useState(initialData?.firstName || '');
   const [lastName, setLastName] = useState(initialData?.lastName || '');
-  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    DEFAULT_COUNTRY || {
+      code: 'CO',
+      name: 'Colombia',
+      dialCode: '+57',
+      flag: '🇨🇴',
+    }
+  );
   const [phone, setPhone] = useState(initialData?.phone || '');
   const [selectedGender, setSelectedGender] = useState<string>('');
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Estados para verificación de teléfono
-  const [phoneVerified, setPhoneVerified] = useState(initialData?.phoneVerified || false);
+  const [phoneVerified, setPhoneVerified] = useState(
+    initialData?.phoneVerified || false
+  );
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [verificationMethod, setVerificationMethod] = useState<'whatsapp' | 'sms' | null>(null);
+  const [verificationMethod, setVerificationMethod] = useState<
+    'whatsapp' | 'sms' | null
+  >(null);
   const [otpCode, setOtpCode] = useState<string>('');
   const [isVerificationLoading, setIsVerificationLoading] = useState(false);
-  const [verificationStep, setVerificationStep] = useState<'checking' | 'method' | 'code' | 'error'>('method');
+  const [verificationStep, setVerificationStep] = useState<
+    'checking' | 'method' | 'code' | 'error'
+  >('method');
   const [phoneExists, setPhoneExists] = useState<boolean | null>(null);
-  
+
   const colorScheme = useColorScheme();
 
   const handlePhoneChange = (text: string) => {
@@ -60,24 +87,24 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       showError('Por favor ingresa un número de teléfono primero');
       return;
     }
-    
+
     if (phone.length < 7) {
       showError('El número de teléfono debe tener al menos 7 dígitos');
       return;
     }
-    
+
     // Abrir modal inmediatamente y mostrar loading
     setShowVerificationModal(true);
     setVerificationStep('checking');
     setIsVerificationLoading(true);
     setVerificationMethod(null);
     setOtpCode('');
-    
+
     // Verificar si el teléfono existe
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const response = await userAPI.checkPhoneExists(fullPhone);
-      
+
       if (response.Success) {
         if (response.Data === true) {
           // El teléfono YA EXISTE en la base de datos, NO permitir generar OTP
@@ -93,7 +120,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         setVerificationStep('error');
         setPhoneExists(null);
       }
-      
     } catch (error) {
       setVerificationStep('error');
       setPhoneExists(null);
@@ -111,13 +137,15 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         UserId: userId,
         VerificationType: 'Phone',
         Recipient: fullPhone,
-        Method: method
+        Method: method,
       };
       const response = await userAPI.sendPhoneVerification(data);
       if (response.Success || response.Success) {
         setVerificationStep('code');
       } else {
-        showError(response.Message || response.Message || 'Error al enviar verificación');
+        showError(
+          response.Message || response.Message || 'Error al enviar verificación'
+        );
       }
     } catch (error: any) {
       const errorMessage = handleApiError(error);
@@ -134,7 +162,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     }
 
     setIsVerificationLoading(true);
-    
+
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
       const data: OTPValidationData = {
@@ -143,9 +171,9 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         VerificationType: 'Phone',
         Recipient: fullPhone,
       };
-      
+
       const response = await userAPI.validateOTP(data);
-      
+
       if (response.Success) {
         setPhoneVerified(true);
         setShowVerificationModal(false);
@@ -175,12 +203,14 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     const stepData: Step2Data = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      phone: phone.trim() ? `${selectedCountry.dialCode}${phone.trim()}` : undefined,
+      phone: phone.trim()
+        ? `${selectedCountry.dialCode}${phone.trim()}`
+        : undefined,
       birthDate: birthDate ? formatDateForBackend(birthDate.trim()) : undefined,
       genderId: selectedGender || undefined,
       phoneVerified: phoneVerified,
     };
-    
+
     try {
       const updateData = {
         name: stepData.firstName,
@@ -189,14 +219,16 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         ...(stepData.birthDate && { birthDate: stepData.birthDate }),
         ...(stepData.genderId && { IdGender: stepData.genderId }),
       };
-      
+
       const response = await userAPI.updateUser(userId, updateData);
-      
+
       if (!response.Success) {
-        showError(response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
+        showError(
+          response.Message || 'Error al actualizar los datos. Intenta de nuevo.'
+        );
         return; // NO permitir avanzar si la API falla
       }
-      
+
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
@@ -220,7 +252,9 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
           Datos básicos
         </Text>
-        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}>
+        <Text
+          style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}
+        >
           Cuéntanos un poco sobre ti (opcional)
         </Text>
       </View>
@@ -228,7 +262,9 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       <View style={commonStyles.form}>
         <View style={commonStyles.row}>
           <View style={[commonStyles.inputContainer, commonStyles.halfWidth]}>
-            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+            <Text
+              style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+            >
               Nombre
             </Text>
             <TextInput
@@ -242,14 +278,16 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               ]}
               value={firstName}
               onChangeText={setFirstName}
-              placeholder="Juan"
+              placeholder='Juan'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
-              autoCapitalize="words"
+              autoCapitalize='words'
             />
           </View>
 
           <View style={[commonStyles.inputContainer, commonStyles.halfWidth]}>
-            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+            <Text
+              style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+            >
               Apellido
             </Text>
             <TextInput
@@ -263,32 +301,36 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               ]}
               value={lastName}
               onChangeText={setLastName}
-              placeholder="Pérez"
+              placeholder='Pérez'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
-              autoCapitalize="words"
+              autoCapitalize='words'
             />
           </View>
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 8,
-          }}>
-            <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 8,
+            }}
+          >
+            <Text
+              style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+            >
               Teléfono
             </Text>
-            
+
             {/* Botón de verificación pequeño al lado del label */}
             {phone.length >= 7 && (
               <TouchableOpacity
                 style={{
                   paddingVertical: 6,
                   paddingHorizontal: 12,
-                  backgroundColor: phoneVerified 
-                    ? '#4CAF50' 
+                  backgroundColor: phoneVerified
+                    ? '#4CAF50'
                     : Colors[colorScheme].tint,
                   borderRadius: 6,
                   flexDirection: 'row',
@@ -297,23 +339,25 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                 onPress={handleVerifyPhone}
                 disabled={phoneVerified}
               >
-                <FontAwesome 
-                  name={phoneVerified ? "check-circle" : "phone"} 
-                  size={12} 
-                  color="white" 
+                <FontAwesome
+                  name={phoneVerified ? 'check-circle' : 'phone'}
+                  size={12}
+                  color='white'
                   style={{ marginRight: 4 }}
                 />
-                <Text style={{
-                  color: 'white',
-                  fontWeight: '600',
-                  fontSize: 12,
-                }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: 12,
+                  }}
+                >
                   {phoneVerified ? 'Verificado' : 'Verificar'}
                 </Text>
               </TouchableOpacity>
             )}
           </View>
-          
+
           <View style={commonStyles.phoneRow}>
             <View style={commonStyles.prefixContainer}>
               <CountryCodePicker
@@ -322,40 +366,46 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                 disabled={phoneVerified}
               />
             </View>
-            <View style={[commonStyles.phoneContainer, { position: 'relative' }]}>
+            <View
+              style={[commonStyles.phoneContainer, { position: 'relative' }]}
+            >
               <TextInput
                 style={[
                   commonStyles.input,
                   {
-                    backgroundColor: phoneVerified 
-                      ? `${Colors[colorScheme].text}15` 
+                    backgroundColor: phoneVerified
+                      ? `${Colors[colorScheme].text}15`
                       : Colors[colorScheme].background,
-                    color: phoneVerified 
+                    color: phoneVerified
                       ? Colors[colorScheme].text
                       : Colors[colorScheme].text,
-                    borderColor: phoneVerified ? `${Colors[colorScheme].text}40` : '#666',
+                    borderColor: phoneVerified
+                      ? `${Colors[colorScheme].text}40`
+                      : '#666',
                     paddingRight: phoneVerified ? 40 : 16,
                     opacity: phoneVerified ? 0.8 : 1,
                   },
                 ]}
                 value={phone}
-                keyboardType="number-pad"
+                keyboardType='number-pad'
                 onChangeText={handlePhoneChange}
-                placeholder="3001234567"
+                placeholder='3001234567'
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
                 maxLength={10}
                 editable={!phoneVerified}
               />
               {phoneVerified && (
-                <View style={{
-                  position: 'absolute',
-                  right: 12,
-                  top: '50%',
-                  transform: [{ translateY: -8 }],
-                }}>
-                  <FontAwesome 
-                    name="lock" 
-                    size={16} 
+                <View
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: [{ translateY: -8 }],
+                  }}
+                >
+                  <FontAwesome
+                    name='lock'
+                    size={16}
                     color={`${Colors[colorScheme].text}80`}
                   />
                 </View>
@@ -365,17 +415,19 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+          >
             Fecha de nacimiento
           </Text>
           <TouchableOpacity
             style={[
-              commonStyles.input, 
-              { 
-                backgroundColor: Colors[colorScheme].background, 
+              commonStyles.input,
+              {
+                backgroundColor: Colors[colorScheme].background,
                 borderColor: '#666',
-                justifyContent: 'center'
-              }
+                justifyContent: 'center',
+              },
             ]}
             onPress={() => setShowDatePicker(true)}
           >
@@ -383,33 +435,39 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               {birthDate || 'Selecciona tu fecha de nacimiento'}
             </Text>
           </TouchableOpacity>
-          
+
           {showDatePicker && (
             <DateTimePicker
               value={birthDate ? parseDisplayDate(birthDate) : new Date()}
-              mode="date"
-              display="default"
-              maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 10))}
+              mode='date'
+              display='default'
+              maximumDate={
+                new Date(new Date().setFullYear(new Date().getFullYear() - 10))
+              }
               onChange={handleDateChange}
               themeVariant={colorScheme === 'dark' ? 'dark' : 'light'}
-              accentColor="#ff6300"
+              accentColor='#ff6300'
             />
           )}
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+          >
             Género
           </Text>
           {gendersLoading ? (
-            <View style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
-                justifyContent: 'center'
-              }
-            ]}>
+            <View
+              style={[
+                commonStyles.input,
+                {
+                  backgroundColor: Colors[colorScheme].background,
+                  borderColor: '#666',
+                  justifyContent: 'center',
+                },
+              ]}
+            >
               <Text style={{ color: `${Colors[colorScheme].text}60` }}>
                 Cargando géneros...
               </Text>
@@ -423,20 +481,22 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   borderColor: '#666',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
-                }
+                  alignItems: 'center',
+                },
               ]}
               onPress={() => setShowGenderModal(true)}
             >
-              <Text style={{
-                color: selectedGender 
-                  ? Colors[colorScheme].text 
-                  : `${Colors[colorScheme].text}60`
-              }}>
-                {selectedGender 
-                  ? genders.find(g => g.Id === selectedGender)?.Nombre || 'Género seleccionado'
-                  : 'Selecciona tu género'
-                }
+              <Text
+                style={{
+                  color: selectedGender
+                    ? Colors[colorScheme].text
+                    : `${Colors[colorScheme].text}60`,
+                }}
+              >
+                {selectedGender
+                  ? genders.find(g => g.Id === selectedGender)?.Nombre ||
+                    'Género seleccionado'
+                  : 'Selecciona tu género'}
               </Text>
               <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
                 ▼
@@ -449,7 +509,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         <Modal
           visible={showGenderModal}
           transparent={true}
-          animationType="slide"
+          animationType='slide'
           onRequestClose={() => setShowGenderModal(false)}
         >
           <TouchableOpacity
@@ -478,20 +538,24 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               }}
               onStartShouldSetResponder={() => true}
             >
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 20,
-              }}>
-                <Text style={{
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                  color: Colors[colorScheme].text,
-                }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    color: Colors[colorScheme].text,
+                  }}
+                >
                   Seleccionar Género
                 </Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => setShowGenderModal(false)}
                   style={{
                     padding: 8,
@@ -499,11 +563,13 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                     backgroundColor: `${Colors[colorScheme].text}10`,
                   }}
                 >
-                  <Text style={{
-                    fontSize: 16,
-                    color: Colors[colorScheme].text,
-                    fontWeight: 'bold',
-                  }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: Colors[colorScheme].text,
+                      fontWeight: 'bold',
+                    }}
+                  >
                     ✕
                   </Text>
                 </TouchableOpacity>
@@ -517,9 +583,10 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                       padding: 16,
                       borderRadius: 8,
                       marginBottom: index === genders.length - 1 ? 0 : 8,
-                      backgroundColor: selectedGender === gender.Id 
-                        ? `${Colors[colorScheme].tint}10` 
-                        : 'transparent',
+                      backgroundColor:
+                        selectedGender === gender.Id
+                          ? `${Colors[colorScheme].tint}10`
+                          : 'transparent',
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -529,21 +596,27 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                       setShowGenderModal(false);
                     }}
                   >
-                    <Text style={{
-                      color: selectedGender === gender.Id 
-                        ? Colors[colorScheme].tint 
-                        : Colors[colorScheme].text,
-                      fontWeight: selectedGender === gender.Id ? '600' : 'normal',
-                      fontSize: 16,
-                    }}>
+                    <Text
+                      style={{
+                        color:
+                          selectedGender === gender.Id
+                            ? Colors[colorScheme].tint
+                            : Colors[colorScheme].text,
+                        fontWeight:
+                          selectedGender === gender.Id ? '600' : 'normal',
+                        fontSize: 16,
+                      }}
+                    >
                       {gender.Nombre}
                     </Text>
                     {selectedGender === gender.Id && (
-                      <Text style={{
-                        color: Colors[colorScheme].tint,
-                        fontSize: 18,
-                        fontWeight: 'bold',
-                      }}>
+                      <Text
+                        style={{
+                          color: Colors[colorScheme].tint,
+                          fontSize: 18,
+                          fontWeight: 'bold',
+                        }}
+                      >
                         ✓
                       </Text>
                     )}
@@ -557,7 +630,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { 
+            {
               backgroundColor: Colors[colorScheme].tint,
             },
             isLoading && commonStyles.buttonDisabled,
@@ -575,7 +648,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       <Modal
         visible={showVerificationModal}
         transparent={true}
-        animationType="slide"
+        animationType='slide'
         onRequestClose={closeVerificationModal}
       >
         <TouchableOpacity
@@ -604,20 +677,24 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
             }}
             onStartShouldSetResponder={() => true}
           >
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 20,
-            }}>
-              <Text style={{
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: Colors[colorScheme].text,
-              }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  color: Colors[colorScheme].text,
+                }}
+              >
                 Verificar teléfono
               </Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={closeVerificationModal}
                 style={{
                   padding: 8,
@@ -625,11 +702,13 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   backgroundColor: `${Colors[colorScheme].text}10`,
                 }}
               >
-                <Text style={{
-                  fontSize: 16,
-                  color: Colors[colorScheme].text,
-                  fontWeight: 'bold',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: Colors[colorScheme].text,
+                    fontWeight: 'bold',
+                  }}
+                >
                   ✕
                 </Text>
               </TouchableOpacity>
@@ -637,38 +716,41 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
 
             {verificationStep === 'checking' ? (
               <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                <FontAwesome 
-                  name="spinner" 
-                  size={32} 
-                  color={Colors[colorScheme].tint} 
+                <FontAwesome
+                  name='spinner'
+                  size={32}
+                  color={Colors[colorScheme].tint}
                   style={{ marginBottom: 16 }}
                 />
-                <Text style={{
-                  fontSize: 16,
-                  color: Colors[colorScheme].text,
-                  textAlign: 'center',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: Colors[colorScheme].text,
+                    textAlign: 'center',
+                  }}
+                >
                   Verificando disponibilidad del teléfono...
                 </Text>
               </View>
             ) : verificationStep === 'error' ? (
               <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                <FontAwesome 
-                  name="exclamation-triangle" 
-                  size={32} 
-                  color="#FF6B6B" 
+                <FontAwesome
+                  name='exclamation-triangle'
+                  size={32}
+                  color='#FF6B6B'
                   style={{ marginBottom: 16 }}
                 />
-                <Text style={{
-                  fontSize: 16,
-                  color: Colors[colorScheme].text,
-                  textAlign: 'center',
-                  marginBottom: 20,
-                }}>
-                  {phoneExists ? 
-                    'Este número de teléfono ya está registrado en la base de datos. Por favor usa otro número.' : 
-                    'Hubo un error al verificar el teléfono. Por favor intenta nuevamente.'
-                  }
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: Colors[colorScheme].text,
+                    textAlign: 'center',
+                    marginBottom: 20,
+                  }}
+                >
+                  {phoneExists
+                    ? 'Este número de teléfono ya está registrado en la base de datos. Por favor usa otro número.'
+                    : 'Hubo un error al verificar el teléfono. Por favor intenta nuevamente.'}
                 </Text>
                 <TouchableOpacity
                   style={{
@@ -686,15 +768,17 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               </View>
             ) : verificationStep === 'method' ? (
               <View>
-                <Text style={{
-                  fontSize: 16,
-                  color: Colors[colorScheme].text,
-                  marginBottom: 20,
-                  textAlign: 'center',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: Colors[colorScheme].text,
+                    marginBottom: 20,
+                    textAlign: 'center',
+                  }}
+                >
                   ¿Cómo quieres recibir el código de verificación?
                 </Text>
-                
+
                 <TouchableOpacity
                   style={{
                     padding: 16,
@@ -708,12 +792,18 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   onPress={() => handleSendVerification('whatsapp')}
                   disabled={isVerificationLoading}
                 >
-                  <FontAwesome name="whatsapp" size={20} color="white" style={{ marginRight: 10 }} />
-                  <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                    {isVerificationLoading && verificationMethod === 'whatsapp' 
-                      ? 'Enviando...' 
-                      : 'WhatsApp'
-                    }
+                  <FontAwesome
+                    name='whatsapp'
+                    size={20}
+                    color='white'
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text
+                    style={{ color: 'white', fontSize: 16, fontWeight: '600' }}
+                  >
+                    {isVerificationLoading && verificationMethod === 'whatsapp'
+                      ? 'Enviando...'
+                      : 'WhatsApp'}
                   </Text>
                 </TouchableOpacity>
 
@@ -729,26 +819,35 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   onPress={() => handleSendVerification('sms')}
                   disabled={isVerificationLoading}
                 >
-                  <FontAwesome name="comment" size={20} color="white" style={{ marginRight: 10 }} />
-                  <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                    {isVerificationLoading && verificationMethod === 'sms' 
-                      ? 'Enviando...' 
-                      : 'SMS'
-                    }
+                  <FontAwesome
+                    name='comment'
+                    size={20}
+                    color='white'
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text
+                    style={{ color: 'white', fontSize: 16, fontWeight: '600' }}
+                  >
+                    {isVerificationLoading && verificationMethod === 'sms'
+                      ? 'Enviando...'
+                      : 'SMS'}
                   </Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <View>
-                <Text style={{
-                  fontSize: 16,
-                  color: Colors[colorScheme].text,
-                  marginBottom: 20,
-                  textAlign: 'center',
-                }}>
-                  Ingresa el código que recibiste por {verificationMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: Colors[colorScheme].text,
+                    marginBottom: 20,
+                    textAlign: 'center',
+                  }}
+                >
+                  Ingresa el código que recibiste por{' '}
+                  {verificationMethod === 'whatsapp' ? 'WhatsApp' : 'SMS'}
                 </Text>
-                
+
                 <TextInput
                   style={{
                     borderWidth: 1,
@@ -764,12 +863,12 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   }}
                   value={otpCode}
                   onChangeText={setOtpCode}
-                  placeholder="000000"
+                  placeholder='000000'
                   placeholderTextColor={`${Colors[colorScheme].text}60`}
-                  keyboardType="number-pad"
+                  keyboardType='number-pad'
                   maxLength={6}
                 />
-                
+
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                   <TouchableOpacity
                     style={{
@@ -781,11 +880,16 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                     }}
                     onPress={() => setVerificationStep('method')}
                   >
-                    <Text style={{ color: Colors[colorScheme].text, fontWeight: '600' }}>
+                    <Text
+                      style={{
+                        color: Colors[colorScheme].text,
+                        fontWeight: '600',
+                      }}
+                    >
                       Cambiar método
                     </Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     style={{
                       flex: 1,
@@ -807,7 +911,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
           </View>
         </TouchableOpacity>
       </Modal>
-      
+
       <AlertComponent />
     </ScrollView>
   );

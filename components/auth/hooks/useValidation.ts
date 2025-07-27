@@ -1,6 +1,10 @@
 import { useState, useMemo } from 'react';
 import { PasswordValidation } from '../types';
-import { getPasswordValidation, isValidEmail, isPasswordValid } from '../utils/validation';
+import {
+  getPasswordValidation,
+  isValidEmail,
+  isPasswordValid,
+} from '../utils/validation';
 
 export const usePasswordValidation = (email: string) => {
   const [password, setPassword] = useState('');
@@ -11,10 +15,7 @@ export const usePasswordValidation = (email: string) => {
     [password, email]
   );
 
-  const isValid = useMemo(
-    () => isPasswordValid(validation),
-    [validation]
-  );
+  const isValid = useMemo(() => isPasswordValid(validation), [validation]);
 
   return {
     password,
@@ -28,11 +29,8 @@ export const usePasswordValidation = (email: string) => {
 
 export const useFormValidation = () => {
   const [email, setEmail] = useState('');
-  
-  const isEmailValid = useMemo(
-    () => isValidEmail(email),
-    [email]
-  );
+
+  const isEmailValid = useMemo(() => isValidEmail(email), [email]);
 
   return {
     email,

@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   return (
     <View style={{ flex: 1 }}>
-      <LoginForm 
+      <LoginForm
         onLogin={handleLogin}
         onSwitchToRegister={handleSwitchToRegister}
       />

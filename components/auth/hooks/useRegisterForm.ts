@@ -49,55 +49,78 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
     setShowWelcomeScreen(true);
   }, [registrationData.token]);
 
-  const handleStep1Next = useCallback((data: { email: string; password: string; userId?: string; token?: string }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    
-    if (data.token) {
-      apiService.setAuthToken(data.token);
-    }
-    
-    setCurrentStep(1);
-  }, []);
+  const handleStep1Next = useCallback(
+    (data: {
+      email: string;
+      password: string;
+      userId?: string;
+      token?: string;
+    }) => {
+      setRegistrationData(prev => ({ ...prev, ...data }));
 
-  const handleStep2Next = useCallback((data: { firstName: string; lastName: string; phone?: string; birthDate?: string; genderId?: string }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    setCurrentStep(2);
-  }, []);
+      if (data.token) {
+        apiService.setAuthToken(data.token);
+      }
 
-  const handleStep3Next = useCallback((data: {
-    eps?: string;
-    country?: string;
-    region?: string;
-    city?: string;
-    emergencyContact?: string;
-    emergencyPhone?: string;
-    address?: string;
-    documentType?: string;
-    documentTypeId?: string;
-    countryId?: string;
-  }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    setCurrentStep(3);
-  }, []);
+      setCurrentStep(1);
+    },
+    []
+  );
 
-  const handleStep4Next = useCallback((data: {
-    fitnessGoal?: string;
-    healthRestrictions?: string;
-    additionalInfo?: string;
-    rh?: string;
-  }) => {
-    setRegistrationData(prev => ({ ...prev, ...data }));
-    setCurrentStep(4);
-  }, []);
+  const handleStep2Next = useCallback(
+    (data: {
+      firstName: string;
+      lastName: string;
+      phone?: string;
+      birthDate?: string;
+      genderId?: string;
+    }) => {
+      setRegistrationData(prev => ({ ...prev, ...data }));
+      setCurrentStep(2);
+    },
+    []
+  );
 
-  const handleStep5Next = useCallback((data: {
-    username?: string;
-    profileImage?: string;
-  }) => {
-    const finalData = { ...registrationData, ...data };
-    setRegistrationData(finalData);
-    setShowWelcomeScreen(true);
-  }, [registrationData]);
+  const handleStep3Next = useCallback(
+    (data: {
+      eps?: string;
+      country?: string;
+      region?: string;
+      city?: string;
+      emergencyContact?: string;
+      emergencyPhone?: string;
+      address?: string;
+      documentType?: string;
+      documentTypeId?: string;
+      countryId?: string;
+    }) => {
+      setRegistrationData(prev => ({ ...prev, ...data }));
+      setCurrentStep(3);
+    },
+    []
+  );
+
+  const handleStep4Next = useCallback(
+    (data: {
+      fitnessGoal?: string;
+      healthRestrictions?: string;
+      additionalInfo?: string;
+      rh?: string;
+    }) => {
+      setRegistrationData(prev => ({ ...prev, ...data }));
+      setCurrentStep(4);
+    },
+    []
+  );
+
+  const handleStep5Next = useCallback(
+    (data: { username?: string; profileImage?: string }) => {
+      const finalData = { ...registrationData, ...data };
+      setRegistrationData(finalData);
+      setShowWelcomeScreen(true);
+    },
+    [registrationData]
+  );
 
   const handleWelcomeContinue = useCallback(() => {
     onRegister(registrationData);

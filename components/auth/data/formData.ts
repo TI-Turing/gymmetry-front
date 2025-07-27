@@ -13,9 +13,7 @@ export const documentTypes = [
   { id: 5, name: 'NIT', code: 'NIT' },
 ];
 
-export const rhTypes = [
-  'O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'
-];
+export const rhTypes = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
 
 // Datos de países - simplificado para Colombia y algunos principales
 export const countries = [

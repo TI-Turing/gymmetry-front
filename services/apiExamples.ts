@@ -1,33 +1,38 @@
 // Ejemplo de uso del servicio de API
 
 import { apiService } from '../services';
-import { 
-  User, 
-  CreateUserRequest, 
+import {
+  User,
+  CreateUserRequest,
   CreateUserResponse,
   UpdateUserRequest,
-  UpdateUserResponse
+  UpdateUserResponse,
 } from '@/dto/user';
 import {
-  LoginRequest, 
+  LoginRequest,
   LoginResponse,
-  RegisterRequest, 
-  RegisterResponse 
+  RegisterRequest,
+  RegisterResponse,
 } from '@/dto/auth';
 import {
   PhoneVerificationData,
   PhoneVerificationResponse,
   OTPValidationData,
   OTPValidationResponse,
-  PhoneExistsResponse
+  PhoneExistsResponse,
 } from '@/components/auth/types';
 
 // API específica para usuarios
 export const userAPI = {
   // Crear usuario inicial (Step 1 del registro)
-  createUser: async (userData: CreateUserRequest): Promise<CreateUserResponse> => {
+  createUser: async (
+    userData: CreateUserRequest
+  ): Promise<CreateUserResponse> => {
     try {
-      const response = await apiService.post<CreateUserResponse>('/user/add', userData);
+      const response = await apiService.post<CreateUserResponse>(
+        '/user/add',
+        userData
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -45,14 +50,20 @@ export const userAPI = {
   },
 
   // Actualizar usuario (Steps 2-4 del registro)
-  updateUser: async (userId: string, userData: Partial<UpdateUserRequest>): Promise<UpdateUserResponse> => {
+  updateUser: async (
+    userId: string,
+    userData: Partial<UpdateUserRequest>
+  ): Promise<UpdateUserResponse> => {
     try {
       const updateData = {
         ...userData,
-        id: userId
+        id: userId,
       };
-      
-      const response = await apiService.put<UpdateUserResponse>('/user/update', updateData);
+
+      const response = await apiService.put<UpdateUserResponse>(
+        '/user/update',
+        updateData
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -65,9 +76,14 @@ export const userAPI = {
   },
 
   // Verificación de teléfono
-  sendPhoneVerification: async (data: PhoneVerificationData): Promise<PhoneVerificationResponse> => {
+  sendPhoneVerification: async (
+    data: PhoneVerificationData
+  ): Promise<PhoneVerificationResponse> => {
     try {
-      const response = await apiService.post<PhoneVerificationResponse>('/otp/generate-otp', data);
+      const response = await apiService.post<PhoneVerificationResponse>(
+        '/otp/generate-otp',
+        data
+      );
       return response.data;
     } catch (error) {
       throw error;
@@ -75,26 +91,31 @@ export const userAPI = {
   },
 
   // Validar código OTP
-  validateOTP: async (data: OTPValidationData): Promise<OTPValidationResponse> => {
+  validateOTP: async (
+    data: OTPValidationData
+  ): Promise<OTPValidationResponse> => {
     try {
-      const response = await apiService.post<OTPValidationResponse>('/otp/validate-otp', data);
-      console.log('✅ [USER API] Código OTP validado:', response);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-  // Validar si telefono existe
-  checkPhoneExists: async (phone: string): Promise<PhoneExistsResponse> => {
-    try {
-      const response = await apiService.get<PhoneExistsResponse>('/user/phone-exists/'+  phone  );
-      console.log('✅ [USER API] Verificación de teléfono exitosa:', response);
+      const response = await apiService.post<OTPValidationResponse>(
+        '/otp/validate-otp',
+        data
+      );
       return response.data;
     } catch (error) {
       throw error;
     }
   },
 
+  // Validar si telefono existe
+  checkPhoneExists: async (phone: string): Promise<PhoneExistsResponse> => {
+    try {
+      const response = await apiService.get<PhoneExistsResponse>(
+        '/user/phone-exists/' + phone
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 // Ejemplo de funciones para autenticación (cuando esté disponible en la API)
@@ -132,8 +153,8 @@ const handleCreateUser = async (email: string, password: string) => {
     });
     // Continuar con los siguientes pasos del registro
   } catch (error) {
-    console.error('Error al crear usuario:', error.message);
-    // Mostrar error al usuario
+    // Manejar error apropiadamente
+    throw error;
   }
 };
 */

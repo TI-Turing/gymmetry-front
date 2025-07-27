@@ -18,7 +18,7 @@ interface UseStep4FormReturn {
   additionalInfo: string;
   rh: string;
   isLoading: boolean;
-  
+
   // Handlers
   setFitnessGoal: (value: string) => void;
   setHealthRestrictions: (value: string) => void;
@@ -27,45 +27,56 @@ interface UseStep4FormReturn {
   handleNext: () => Promise<void>;
 }
 
-export const useStep4Form = ({ 
-  userId, 
-  initialData, 
+export const useStep4Form = ({
+  userId,
+  initialData,
   onNext,
   showError,
-  showSuccess
+  showSuccess,
 }: UseStep4FormProps): UseStep4FormReturn => {
-  const [fitnessGoal, setFitnessGoal] = useState(initialData?.fitnessGoal || '');
-  const [healthRestrictions, setHealthRestrictions] = useState(initialData?.healthRestrictions || '');
-  const [additionalInfo, setAdditionalInfo] = useState(initialData?.additionalInfo || '');
+  const [fitnessGoal, setFitnessGoal] = useState(
+    initialData?.fitnessGoal || ''
+  );
+  const [healthRestrictions, setHealthRestrictions] = useState(
+    initialData?.healthRestrictions || ''
+  );
+  const [additionalInfo, setAdditionalInfo] = useState(
+    initialData?.additionalInfo || ''
+  );
   const [rh, setRh] = useState(initialData?.rh || '');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = useCallback(async () => {
     setIsLoading(true);
-    
+
     const stepData: Step4Data = {
       fitnessGoal: fitnessGoal || undefined,
       healthRestrictions: healthRestrictions || undefined,
       additionalInfo: additionalInfo.trim() || undefined,
       rh: rh || undefined,
     };
-    
+
     try {
       const updateData = {
         ...(stepData.fitnessGoal && { fitnessGoal: stepData.fitnessGoal }),
-        ...(stepData.healthRestrictions && { physicalExceptions: stepData.healthRestrictions }),
-        ...(stepData.additionalInfo && { physicalExceptionsNotes: stepData.additionalInfo }),
+        ...(stepData.healthRestrictions && {
+          physicalExceptions: stepData.healthRestrictions,
+        }),
+        ...(stepData.additionalInfo && {
+          physicalExceptionsNotes: stepData.additionalInfo,
+        }),
         ...(stepData.rh && { RH: stepData.rh }),
       };
-      
+
       const response = await userAPI.updateUser(userId, updateData);
-      
+
       if (!response.Success) {
-        showError(response.Message || 'Error al actualizar los datos. Intenta de nuevo.');
+        showError(
+          response.Message || 'Error al actualizar los datos. Intenta de nuevo.'
+        );
         return; // NO permitir avanzar si la API falla
       }
-      
-      console.log('✅ [STEP 4] Datos actualizados correctamente');
+
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);

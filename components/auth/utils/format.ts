@@ -1,38 +1,45 @@
 export const formatDateToDisplay = (date: Date): string => {
   if (!date || isNaN(date.getTime())) return '';
-  
+
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear();
-  
+
   return `${day}/${month}/${year}`;
 };
 
 export const formatDateForBackend = (dateString: string): string => {
   if (!dateString) return '';
-  
+
   const parts = dateString.split('/');
   if (parts.length === 3) {
     const [day, month, year] = parts;
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    if (day && month && year) {
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
   }
-  
+
   return dateString;
 };
 
 export const parseDisplayDate = (dateString: string): Date => {
   if (!dateString) return new Date();
-  
+
   const parts = dateString.split('/');
   if (parts.length === 3) {
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    
-    const date = new Date(year, month, day);
-    return isNaN(date.getTime()) ? new Date() : date;
+    const dayStr = parts[0];
+    const monthStr = parts[1];
+    const yearStr = parts[2];
+    if (dayStr && monthStr && yearStr) {
+      const day = parseInt(dayStr, 10);
+      const month = parseInt(monthStr, 10) - 1;
+      const year = parseInt(yearStr, 10);
+
+      const date = new Date(year, month, day);
+      return isNaN(date.getTime()) ? new Date() : date;
+    }
   }
-  
+
   return new Date();
 };
 

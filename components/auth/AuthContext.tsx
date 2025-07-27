@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextType>({
   setCurrentStep: () => {},
   isInRegisterFlow: false,
   setIsInRegisterFlow: () => {},
-  onSkip: undefined,
+  onSkip: () => {},
   setOnSkip: () => {},
 });
 
@@ -39,8 +39,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }

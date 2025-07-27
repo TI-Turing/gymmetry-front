@@ -19,20 +19,20 @@ interface DropdownProps {
   searchable?: boolean;
 }
 
-export default function Dropdown({ 
-  label, 
-  placeholder, 
-  options, 
-  value, 
-  onSelect, 
-  searchable = false 
+export default function Dropdown({
+  label,
+  placeholder,
+  options,
+  value,
+  onSelect,
+  searchable = false,
 }: DropdownProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const colorScheme = useColorScheme();
 
-  const filteredOptions = searchable 
-    ? options.filter(option => 
+  const filteredOptions = searchable
+    ? options.filter(option =>
         option.toLowerCase().includes(searchText.toLowerCase())
       )
     : options;
@@ -45,7 +45,10 @@ export default function Dropdown({
 
   const renderOption = ({ item }: { item: string }) => (
     <TouchableOpacity
-      style={[styles.option, { borderBottomColor: Colors[colorScheme].text + '20' }]}
+      style={[
+        styles.option,
+        { borderBottomColor: Colors[colorScheme].text + '20' },
+      ]}
       onPress={() => handleSelect(item)}
     >
       <Text style={[styles.optionText, { color: Colors[colorScheme].text }]}>
@@ -67,16 +70,18 @@ export default function Dropdown({
             {
               backgroundColor: Colors[colorScheme].background,
               borderColor: '#666',
-            }
+            },
           ]}
           onPress={() => setIsModalVisible(true)}
         >
-          <Text 
+          <Text
             style={[
-              styles.dropdownText, 
-              { 
-                color: value ? Colors[colorScheme].text : `${Colors[colorScheme].text}60` 
-              }
+              styles.dropdownText,
+              {
+                color: value
+                  ? Colors[colorScheme].text
+                  : `${Colors[colorScheme].text}60`,
+              },
             ]}
           >
             {value || placeholder}
@@ -89,25 +94,34 @@ export default function Dropdown({
 
       <Modal
         visible={isModalVisible}
-        animationType="slide"
+        animationType='slide'
         transparent={true}
         onRequestClose={() => setIsModalVisible(false)}
       >
         <View style={[styles.modalOverlay, styles.modalOverlayWeb]}>
-          <View style={[
-            styles.modalContainer,
-            styles.modalContainerWeb,
-            { backgroundColor: Colors[colorScheme].background }
-          ]}>
+          <View
+            style={[
+              styles.modalContainer,
+              styles.modalContainerWeb,
+              { backgroundColor: Colors[colorScheme].background },
+            ]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: Colors[colorScheme].text }]}>
+              <Text
+                style={[styles.modalTitle, { color: Colors[colorScheme].text }]}
+              >
                 {label}
               </Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setIsModalVisible(false)}
               >
-                <Text style={[styles.closeButtonText, { color: Colors[colorScheme].text }]}>
+                <Text
+                  style={[
+                    styles.closeButtonText,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
                   ✕
                 </Text>
               </TouchableOpacity>
@@ -125,7 +139,7 @@ export default function Dropdown({
                 ]}
                 value={searchText}
                 onChangeText={setSearchText}
-                placeholder="Buscar..."
+                placeholder='Buscar...'
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
               />
             )}

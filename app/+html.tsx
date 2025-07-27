@@ -6,15 +6,24 @@ import { ScrollViewStyleReset } from 'expo-router/html';
 // do not have access to the DOM or browser APIs.
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang='es'>
       <head>
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no" />
-        <meta name="theme-color" content="#ff6600" />
-        <meta name="description" content="Gymmetry - Aplicación de gimnasio para móvil y web" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta charSet='utf-8' />
+        <meta httpEquiv='X-UA-Compatible' content='IE=edge' />
+        <meta
+          name='viewport'
+          content='width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no'
+        />
+        <meta name='theme-color' content='#ff6600' />
+        <meta
+          name='description'
+          content='Gymmetry - Aplicación de gimnasio para móvil y web'
+        />
+        <meta name='apple-mobile-web-app-capable' content='yes' />
+        <meta
+          name='apple-mobile-web-app-status-bar-style'
+          content='black-translucent'
+        />
         <title>Gymmetry</title>
 
         {/* 
@@ -24,7 +33,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <ScrollViewStyleReset />
 
         {/* Cargar estilos web personalizados */}
-        <link rel="stylesheet" href="/web.css" />
+        <link rel='stylesheet' href='/web.css' />
 
         {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />

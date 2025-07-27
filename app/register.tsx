@@ -18,7 +18,7 @@ export default function RegisterPage() {
   return (
     <AuthProvider>
       <View style={{ flex: 1 }}>
-        <RegisterForm 
+        <RegisterForm
           onRegister={handleRegister}
           onSwitchToLogin={handleSwitchToLogin}
         />

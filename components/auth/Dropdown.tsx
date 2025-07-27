@@ -21,22 +21,20 @@ interface DropdownProps {
   searchable?: boolean;
 }
 
-export default function Dropdown({ 
-  label, 
-  placeholder, 
-  options, 
-  value, 
-  onSelect, 
-  searchable = false 
+export default function Dropdown({
+  label,
+  placeholder,
+  options,
+  value,
+  onSelect,
+  searchable = false,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const colorScheme = useColorScheme();
 
   // Debug: agregar logs para verificar las opciones
-  React.useEffect(() => {
-    
-  }, [options, value]);
+  React.useEffect(() => {}, [options, value]);
 
   const filteredOptions = searchable
     ? options.filter(option =>
@@ -45,7 +43,6 @@ export default function Dropdown({
     : options;
 
   const handleSelect = (option: string) => {
-    
     onSelect(option);
     setIsOpen(false);
     setSearchText('');
@@ -53,7 +50,10 @@ export default function Dropdown({
 
   const handleOpen = () => {
     if (options.length === 0) {
-      Alert.alert('Sin opciones', 'No hay opciones disponibles para seleccionar');
+      Alert.alert(
+        'Sin opciones',
+        'No hay opciones disponibles para seleccionar'
+      );
       return;
     }
     setIsOpen(true);
@@ -64,7 +64,7 @@ export default function Dropdown({
       <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
         {label}
       </Text>
-      
+
       <TouchableOpacity
         style={[
           styles.dropdown,
@@ -80,14 +80,16 @@ export default function Dropdown({
           style={[
             styles.dropdownText,
             {
-              color: value ? Colors[colorScheme].text : `${Colors[colorScheme].text}60`,
+              color: value
+                ? Colors[colorScheme].text
+                : `${Colors[colorScheme].text}60`,
             },
           ]}
         >
           {value || placeholder}
         </Text>
         <FontAwesome
-          name="chevron-down"
+          name='chevron-down'
           size={16}
           color={Colors[colorScheme].text}
         />
@@ -96,7 +98,7 @@ export default function Dropdown({
       <Modal
         visible={isOpen}
         transparent={true}
-        animationType="slide"
+        animationType='slide'
         onRequestClose={() => setIsOpen(false)}
       >
         <TouchableOpacity
@@ -112,15 +114,20 @@ export default function Dropdown({
               ]}
             >
               <View style={styles.modalHeader}>
-                <Text style={[styles.modalTitle, { color: Colors[colorScheme].text }]}>
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
                   Seleccionar {label || 'opción'}
                 </Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => setIsOpen(false)}
                   style={styles.closeButton}
                 >
                   <FontAwesome
-                    name="times"
+                    name='times'
                     size={20}
                     color={Colors[colorScheme].text}
                   />
@@ -162,9 +169,10 @@ export default function Dropdown({
                       style={[
                         styles.optionText,
                         {
-                          color: item === value
-                            ? Colors[colorScheme].tint
-                            : Colors[colorScheme].text,
+                          color:
+                            item === value
+                              ? Colors[colorScheme].tint
+                              : Colors[colorScheme].text,
                         },
                       ]}
                     >
@@ -172,7 +180,7 @@ export default function Dropdown({
                     </Text>
                     {item === value && (
                       <FontAwesome
-                        name="check"
+                        name='check'
                         size={16}
                         color={Colors[colorScheme].tint}
                       />

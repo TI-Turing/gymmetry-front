@@ -10,7 +10,10 @@ interface AuthContainerProps {
   onBack?: () => void;
 }
 
-export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerProps) {
+export default function AuthContainer({
+  onAuthSuccess,
+  onBack,
+}: AuthContainerProps) {
   const [isLogin, setIsLogin] = useState(true);
 
   const switchToRegister = () => setIsLogin(false);
@@ -19,7 +22,7 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
   const handleLogin = async (email: string, password: string) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       const user: User = {
         id: 1,
         email,
@@ -61,7 +64,10 @@ export default function AuthContainer({ onAuthSuccess, onBack }: AuthContainerPr
         [{ text: 'Continuar', onPress: () => onAuthSuccess(user) }]
       );
     } catch (error) {
-      Alert.alert('Error', 'No se pudo completar el registro. Intenta nuevamente.');
+      Alert.alert(
+        'Error',
+        'No se pudo completar el registro. Intenta nuevamente.'
+      );
     }
   };
 

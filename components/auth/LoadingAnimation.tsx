@@ -7,9 +7,9 @@ interface LoadingAnimationProps {
   style?: object;
 }
 
-export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
-  size = 40, 
-  style 
+export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
+  size = 40,
+  style,
 }) => {
   return (
     <View style={[{ width: size, height: size }, style]}>
@@ -24,23 +24,25 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
 };
 
 // Fallback con animación CSS-like usando React Native
-export const FallbackLoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
-  size = 40, 
-  style 
+export const FallbackLoadingAnimation: React.FC<LoadingAnimationProps> = ({
+  size = 40,
+  style,
 }) => {
   return (
-    <View style={[
-      {
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        borderWidth: 3,
-        borderColor: '#ff6300',
-        borderTopColor: 'transparent',
-        backgroundColor: 'transparent',
-      }, 
-      style
-    ]}>
+    <View
+      style={[
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          borderWidth: 3,
+          borderColor: '#ff6300',
+          borderTopColor: 'transparent',
+          backgroundColor: 'transparent',
+        },
+        style,
+      ]}
+    >
       {/* Aquí podríamos agregar una animación rotativa con Animated API si es necesario */}
     </View>
   );

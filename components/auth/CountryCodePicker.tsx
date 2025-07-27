@@ -108,14 +108,19 @@ interface CountryCodePickerProps {
   disabled?: boolean;
 }
 
-export default function CountryCodePicker({ selectedCountry, onSelect, disabled = false }: CountryCodePickerProps) {
+export default function CountryCodePicker({
+  selectedCountry,
+  onSelect,
+  disabled = false,
+}: CountryCodePickerProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const colorScheme = useColorScheme();
 
-  const filteredCountries = COUNTRIES.filter(country =>
-    country.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    country.dialCode.includes(searchText)
+  const filteredCountries = COUNTRIES.filter(
+    country =>
+      country.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      country.dialCode.includes(searchText)
   );
 
   const handleSelect = (country: Country) => {
@@ -126,7 +131,10 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
 
   const renderCountryItem = ({ item }: { item: Country }) => (
     <TouchableOpacity
-      style={[styles.countryItem, { borderBottomColor: `${Colors[colorScheme].text}20` }]}
+      style={[
+        styles.countryItem,
+        { borderBottomColor: `${Colors[colorScheme].text}20` },
+      ]}
       onPress={() => handleSelect(item)}
     >
       <Text style={styles.flag}>{item.flag}</Text>
@@ -134,7 +142,12 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
         <Text style={[styles.countryName, { color: Colors[colorScheme].text }]}>
           {item.name}
         </Text>
-        <Text style={[styles.dialCode, { color: Colors[colorScheme].text, opacity: 0.7 }]}>
+        <Text
+          style={[
+            styles.dialCode,
+            { color: Colors[colorScheme].text, opacity: 0.7 },
+          ]}
+        >
           {item.dialCode}
         </Text>
       </View>
@@ -147,8 +160,8 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
         style={[
           styles.selector,
           {
-            backgroundColor: disabled 
-              ? `${Colors[colorScheme].text}15` 
+            backgroundColor: disabled
+              ? `${Colors[colorScheme].text}15`
               : Colors[colorScheme].background,
             borderColor: disabled ? `${Colors[colorScheme].text}40` : '#666',
             opacity: disabled ? 0.8 : 1,
@@ -158,31 +171,48 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
         disabled={disabled}
       >
         <Text style={styles.flag}>{selectedCountry.flag}</Text>
-        <Text style={[styles.selectedDialCode, { 
-          color: disabled 
-            ? Colors[colorScheme].text
-            : Colors[colorScheme].text 
-        }]}>
+        <Text
+          style={[
+            styles.selectedDialCode,
+            {
+              color: disabled
+                ? Colors[colorScheme].text
+                : Colors[colorScheme].text,
+            },
+          ]}
+        >
           {selectedCountry.dialCode}
         </Text>
       </TouchableOpacity>
 
       <Modal
         visible={modalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType='slide'
+        presentationStyle='pageSheet'
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={[styles.modal, { backgroundColor: Colors[colorScheme].background }]}>
+        <View
+          style={[
+            styles.modal,
+            { backgroundColor: Colors[colorScheme].background },
+          ]}
+        >
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: Colors[colorScheme].text }]}>
+            <Text
+              style={[styles.modalTitle, { color: Colors[colorScheme].text }]}
+            >
               Seleccionar País
             </Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
             >
-              <Text style={[styles.closeButtonText, { color: Colors[colorScheme].tint }]}>
+              <Text
+                style={[
+                  styles.closeButtonText,
+                  { color: Colors[colorScheme].tint },
+                ]}
+              >
                 Cerrar
               </Text>
             </TouchableOpacity>
@@ -200,7 +230,7 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
               ]}
               value={searchText}
               onChangeText={setSearchText}
-              placeholder="Buscar país o código..."
+              placeholder='Buscar país o código...'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
           </View>
@@ -208,7 +238,7 @@ export default function CountryCodePicker({ selectedCountry, onSelect, disabled 
           <FlatList
             data={filteredCountries}
             renderItem={renderCountryItem}
-            keyExtractor={(item) => item.code}
+            keyExtractor={item => item.code}
             style={styles.countryList}
             showsVerticalScrollIndicator={false}
           />
@@ -297,4 +327,5 @@ const styles = StyleSheet.create({
 
 // Exportar también la lista de países y el país por defecto
 export { COUNTRIES };
-export const DEFAULT_COUNTRY = COUNTRIES.find(c => c.code === 'CO') || COUNTRIES[0];
+export const DEFAULT_COUNTRY =
+  COUNTRIES.find(c => c.code === 'CO') || COUNTRIES[0];

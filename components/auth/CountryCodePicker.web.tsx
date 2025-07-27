@@ -39,21 +39,26 @@ const COUNTRIES: Country[] = [
   { code: 'GB', name: 'Reino Unido', dialCode: '+44', flag: '🇬🇧' },
 ];
 
-export const DEFAULT_COUNTRY = COUNTRIES.find(c => c.code === 'CO') || COUNTRIES[0];
+export const DEFAULT_COUNTRY =
+  COUNTRIES.find(c => c.code === 'CO') || COUNTRIES[0];
 
 interface CountryCodePickerProps {
   selectedCountry: Country;
   onSelect: (country: Country) => void;
 }
 
-export default function CountryCodePicker({ selectedCountry, onSelect }: CountryCodePickerProps) {
+export default function CountryCodePicker({
+  selectedCountry,
+  onSelect,
+}: CountryCodePickerProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const colorScheme = useColorScheme();
 
-  const filteredCountries = COUNTRIES.filter(country =>
-    country.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    country.dialCode.includes(searchText)
+  const filteredCountries = COUNTRIES.filter(
+    country =>
+      country.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      country.dialCode.includes(searchText)
   );
 
   const handleSelect = (country: Country) => {
@@ -64,10 +69,15 @@ export default function CountryCodePicker({ selectedCountry, onSelect }: Country
 
   const renderCountryItem = ({ item }: { item: Country }) => (
     <TouchableOpacity
-      style={[styles.countryItem, { borderBottomColor: Colors[colorScheme].text + '20' }]}
+      style={[
+        styles.countryItem,
+        { borderBottomColor: Colors[colorScheme].text + '20' },
+      ]}
       onPress={() => handleSelect(item)}
     >
-      <Text style={[styles.flag, Platform.OS === 'web' && styles.flagWeb]}>{item.flag}</Text>
+      <Text style={[styles.flag, Platform.OS === 'web' && styles.flagWeb]}>
+        {item.flag}
+      </Text>
       <View style={styles.countryInfo}>
         <Text style={[styles.countryName, { color: Colors[colorScheme].text }]}>
           {item.name}
@@ -88,7 +98,7 @@ export default function CountryCodePicker({ selectedCountry, onSelect }: Country
             backgroundColor: Colors[colorScheme].background,
             borderColor: '#666',
           },
-          Platform.OS === 'web' && styles.pickerWeb
+          Platform.OS === 'web' && styles.pickerWeb,
         ]}
         onPress={() => setIsModalVisible(true)}
       >
@@ -102,25 +112,39 @@ export default function CountryCodePicker({ selectedCountry, onSelect }: Country
 
       <Modal
         visible={isModalVisible}
-        animationType="slide"
+        animationType='slide'
         transparent={true}
         onRequestClose={() => setIsModalVisible(false)}
       >
-        <View style={[styles.modalOverlay, Platform.OS === 'web' && styles.modalOverlayWeb]}>
-          <View style={[
-            styles.modalContainer,
-            { backgroundColor: Colors[colorScheme].background },
-            Platform.OS === 'web' && styles.modalContainerWeb
-          ]}>
+        <View
+          style={[
+            styles.modalOverlay,
+            Platform.OS === 'web' && styles.modalOverlayWeb,
+          ]}
+        >
+          <View
+            style={[
+              styles.modalContainer,
+              { backgroundColor: Colors[colorScheme].background },
+              Platform.OS === 'web' && styles.modalContainerWeb,
+            ]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: Colors[colorScheme].text }]}>
+              <Text
+                style={[styles.modalTitle, { color: Colors[colorScheme].text }]}
+              >
                 Seleccionar país
               </Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setIsModalVisible(false)}
               >
-                <Text style={[styles.closeButtonText, { color: Colors[colorScheme].text }]}>
+                <Text
+                  style={[
+                    styles.closeButtonText,
+                    { color: Colors[colorScheme].text },
+                  ]}
+                >
                   ✕
                 </Text>
               </TouchableOpacity>
@@ -137,15 +161,18 @@ export default function CountryCodePicker({ selectedCountry, onSelect }: Country
               ]}
               value={searchText}
               onChangeText={setSearchText}
-              placeholder="Buscar país..."
+              placeholder='Buscar país...'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
 
             <FlatList
               data={filteredCountries}
               renderItem={renderCountryItem}
-              keyExtractor={(item) => item.code}
-              style={[styles.countryList, Platform.OS === 'web' && styles.countryListWeb]}
+              keyExtractor={item => item.code}
+              style={[
+                styles.countryList,
+                Platform.OS === 'web' && styles.countryListWeb,
+              ]}
               showsVerticalScrollIndicator={false}
             />
           </View>

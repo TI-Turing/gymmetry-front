@@ -1,19 +1,19 @@
 import axios, { AxiosInstance } from 'axios';
 import { Environment } from '@/environment';
 import { userSessionService } from './userSessionService';
-import { 
+import {
   Gender,
   Country,
   Region,
   City,
   EPS,
-  DocumentType
+  DocumentType,
 } from '../dto/common';
 import { createJSReanimatedModule } from 'react-native-reanimated/lib/typescript/ReanimatedModule/js-reanimated';
 
 class CatalogService {
   private catalogsAPI: AxiosInstance;
-  
+
   constructor() {
     this.catalogsAPI = axios.create({
       baseURL: Environment.CATALOGS_API_BASE_URL,
@@ -24,11 +24,11 @@ class CatalogService {
     });
 
     this.catalogsAPI.interceptors.request.use(
-      (config) => {
+      config => {
         if (!config.headers) {
           config.headers = {} as any;
         }
-        
+
         if (!config.headers['x-functions-key']) {
           config.headers['x-functions-key'] = Environment.API_FUNCTIONS_KEY;
         }
@@ -41,30 +41,36 @@ class CatalogService {
             config.headers,
             config.data
           );
-
         }
-        
+
         return config;
       },
-      (error) => {
-        console.error('❌ [CATALOG REQUEST ERROR]', error);
+      error => {
         return Promise.reject(error);
       }
     );
 
     this.catalogsAPI.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        console.error(`❌ [CATALOG API ERROR] ${error.response?.status || 'No Status'} ${error.config?.method?.toUpperCase()} ${error.config?.baseURL}${error.config?.url}`);
-        console.error(`💥 [CATALOG ERROR DATA]`, error.response?.data || error.message);
+      response => response,
+      error => {
+        // Error logging para depuración en desarrollo
+        if (__DEV__) {
+          // En producción usaríamos un servicio de logging como Sentry
+          // logError('CATALOG API ERROR', error);
+        }
         return Promise.reject(error);
       }
     );
   }
 
-  private generateCurlCommand(method: string, url: string, headers: any = {}, data?: any): string {
+  private generateCurlCommand(
+    method: string,
+    url: string,
+    headers: any = {},
+    data?: any
+  ): string {
     let curlCommand = `curl -X ${method}`;
-    
+
     Object.keys(headers || {}).forEach(key => {
       if (headers[key] && key !== 'common') {
         const headerValue = String(headers[key]).replace(/"/g, '\\"');
@@ -84,18 +90,19 @@ class CatalogService {
 
     return curlCommand;
   }
-  
+
   private sortByName<T extends { Nombre: string }>(items: T[]): T[] {
-    return items.sort((a, b) => a.Nombre.localeCompare(b.Nombre, 'es', { sensitivity: 'base' }));
+    return items.sort((a, b) =>
+      a.Nombre.localeCompare(b.Nombre, 'es', { sensitivity: 'base' })
+    );
   }
-  
+
   async getGenders(): Promise<Gender[]> {
     try {
       const response = await this.catalogsAPI.get<Gender[]>('/generos');
       const genders = response.data || [];
       return this.sortByName(genders);
     } catch (error) {
-      console.error('Error fetching genders:', error);
       throw error;
     }
   }
@@ -106,29 +113,30 @@ class CatalogService {
       const countries = response.data || [];
       return this.sortByName(countries);
     } catch (error) {
-      console.error('Error fetching countries:', error);
       throw error;
     }
   }
 
   async getRegionsByCountry(countryId: string): Promise<Region[]> {
     try {
-      const response = await this.catalogsAPI.get<Region[]>(`/regiones?paisId=${countryId}`);
+      const response = await this.catalogsAPI.get<Region[]>(
+        `/regiones?paisId=${countryId}`
+      );
       const regions = response.data || [];
       return this.sortByName(regions);
     } catch (error) {
-      console.error('Error fetching regions:', error);
       throw error;
     }
   }
 
   async getCitiesByRegion(regionId: string): Promise<City[]> {
     try {
-      const response = await this.catalogsAPI.get<City[]>(`/ciudades?regionId=${regionId}`);
+      const response = await this.catalogsAPI.get<City[]>(
+        `/ciudades?regionId=${regionId}`
+      );
       const cities = response.data || [];
       return this.sortByName(cities);
     } catch (error) {
-      console.error('Error fetching cities:', error);
       throw error;
     }
   }
@@ -139,7 +147,6 @@ class CatalogService {
       const epsOptions = response.data || [];
       return this.sortByName(epsOptions);
     } catch (error) {
-      console.error('Error fetching EPS:', error);
       throw error;
     }
   }
@@ -148,13 +155,14 @@ class CatalogService {
     try {
       // Si no se proporciona countryId, usar el país del usuario de la sesión
       const finalCountryId = countryId || userSessionService.getUserCountryId();
-      const url = finalCountryId ? `/tiposdocumento?paisId=${finalCountryId}` : '/tiposdocumento';
+      const url = finalCountryId
+        ? `/tiposdocumento?paisId=${finalCountryId}`
+        : '/tiposdocumento';
 
       const response = await this.catalogsAPI.get<DocumentType[]>(url);
       const documentTypes = response.data || [];
       return this.sortByName(documentTypes);
     } catch (error) {
-      console.error('Error fetching document types:', error);
       throw error;
     }
   }

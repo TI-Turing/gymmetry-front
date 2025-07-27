@@ -17,126 +17,168 @@ interface Step1Props {
   showSuccess?: (message: string) => void;
 }
 
-const Step1 = memo<Step1Props>(({ onNext, initialData, showError: externalShowError, showSuccess: externalShowSuccess }) => {
-  const colorScheme = useColorScheme();
-  const { showError: internalShowError, showSuccess: internalShowSuccess, AlertComponent } = useCustomAlert();
-  
-  // Usar las funciones externas si se proporcionan, sino usar las internas
-  const showError = externalShowError || internalShowError;
-  const showSuccess = externalShowSuccess || internalShowSuccess;
-  
-  const {
-    confirmPassword,
-    showConfirmPassword,
-    isLoading,
-    isFormValid,
-    passwordsMatch,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    showPassword,
-    setShowPassword,
-    validation,
-    setConfirmPassword,
-    setShowConfirmPassword,
-    handleNext,
-  } = useStep1Form({ onNext, initialData, showError, showSuccess });
+const Step1 = memo<Step1Props>(
+  ({
+    onNext,
+    initialData,
+    showError: externalShowError,
+    showSuccess: externalShowSuccess,
+  }) => {
+    const colorScheme = useColorScheme();
+    const {
+      showError: internalShowError,
+      showSuccess: internalShowSuccess,
+      AlertComponent,
+    } = useCustomAlert();
 
-  return (
-    <ScrollView contentContainerStyle={commonStyles.container}>
-      <View style={commonStyles.headerStep1}>
-        <Text style={[commonStyles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
-          Crear tu cuenta
-        </Text>
-        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme ?? 'light'].text }]}>
-          Comencemos con tus credenciales de acceso
-        </Text>
-      </View>
+    // Usar las funciones externas si se proporcionan, sino usar las internas
+    const showError = externalShowError || internalShowError;
+    const showSuccess = externalShowSuccess || internalShowSuccess;
 
-      <View style={commonStyles.form}>
-        <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: Colors[colorScheme ?? 'light'].text }]}>
-            Email *
-          </Text>
-          <TextInput
+    const {
+      confirmPassword,
+      showConfirmPassword,
+      isLoading,
+      isFormValid,
+      passwordsMatch,
+      email,
+      setEmail,
+      password,
+      setPassword,
+      showPassword,
+      setShowPassword,
+      validation,
+      setConfirmPassword,
+      setShowConfirmPassword,
+      handleNext,
+    } = useStep1Form({ onNext, initialData, showError, showSuccess });
+
+    return (
+      <ScrollView contentContainerStyle={commonStyles.container}>
+        <View style={commonStyles.headerStep1}>
+          <Text
             style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme ?? 'light'].background,
-                color: Colors[colorScheme ?? 'light'].text,
-                borderColor: '#666',
-              },
+              commonStyles.title,
+              { color: Colors[colorScheme ?? 'light'].text },
             ]}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="tu@email.com"
-            placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            accessibilityLabel="Campo de correo electrónico"
-            accessibilityRole="text"
-          />
+          >
+            Crear tu cuenta
+          </Text>
+          <Text
+            style={[
+              commonStyles.subtitle,
+              { color: Colors[colorScheme ?? 'light'].text },
+            ]}
+          >
+            Comencemos con tus credenciales de acceso
+          </Text>
         </View>
 
-        <PasswordInput
-          label="Contraseña *"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="8-50 caracteres, letras y números"
-          showPassword={showPassword}
-          onToggleVisibility={() => setShowPassword(!showPassword)}
-        >
-          <View style={commonStyles.requirementsContainer}>
-            <PasswordRequirements validation={validation} />
+        <View style={commonStyles.form}>
+          <View style={commonStyles.inputContainer}>
+            <Text
+              style={[
+                commonStyles.label,
+                { color: Colors[colorScheme ?? 'light'].text },
+              ]}
+            >
+              Email *
+            </Text>
+            <TextInput
+              style={[
+                commonStyles.input,
+                {
+                  backgroundColor: Colors[colorScheme ?? 'light'].background,
+                  color: Colors[colorScheme ?? 'light'].text,
+                  borderColor: '#666',
+                },
+              ]}
+              value={email}
+              onChangeText={setEmail}
+              placeholder='tu@email.com'
+              placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
+              keyboardType='email-address'
+              autoCapitalize='none'
+              autoCorrect={false}
+              accessibilityLabel='Campo de correo electrónico'
+              accessibilityRole='text'
+            />
           </View>
-        </PasswordInput>
 
-        <PasswordInput
-          label="Confirmar contraseña *"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          placeholder="Confirma tu contraseña"
-          showPassword={showConfirmPassword}
-          onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
-          borderColor={passwordsMatch || confirmPassword.length === 0 ? '#666' : '#ff6b6b'}
-        >
-          {confirmPassword.length > 0 && !passwordsMatch && (
-            <Text style={[commonStyles.requirement, { color: '#ff6b6b', marginTop: 4 }]}>
-              • Las contraseñas no coinciden
-            </Text>
-          )}
-          
-          {confirmPassword.length > 0 && passwordsMatch && (
-            <Text style={[commonStyles.requirement, { color: Colors[colorScheme ?? 'light'].tint, marginTop: 4 }]}>
-              • Las contraseñas coinciden ✓
-            </Text>
-          )}
-        </PasswordInput>
+          <PasswordInput
+            label='Contraseña *'
+            value={password}
+            onChangeText={setPassword}
+            placeholder='8-50 caracteres, letras y números'
+            showPassword={showPassword}
+            onToggleVisibility={() => setShowPassword(!showPassword)}
+          >
+            <View style={commonStyles.requirementsContainer}>
+              <PasswordRequirements validation={validation} />
+            </View>
+          </PasswordInput>
 
-        <TouchableOpacity
-          style={[
-            commonStyles.button,
-            { backgroundColor: Colors[colorScheme ?? 'light'].tint },
-            (isLoading || !isFormValid) && commonStyles.buttonDisabled,
-          ]}
-          onPress={handleNext}
-          disabled={isLoading || !isFormValid}
-          accessibilityLabel="Continuar al siguiente paso"
-          accessibilityRole="button"
-        >
-          <Text style={commonStyles.buttonText}>
-            {isLoading ? 'Creando cuenta...' : 'Continuar'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      
-      {/* Solo renderizar AlertComponent si no hay funciones externas */}
-      {!externalShowError && <AlertComponent />}
-    </ScrollView>
-  );
-});
+          <PasswordInput
+            label='Confirmar contraseña *'
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder='Confirma tu contraseña'
+            showPassword={showConfirmPassword}
+            onToggleVisibility={() =>
+              setShowConfirmPassword(!showConfirmPassword)
+            }
+            borderColor={
+              passwordsMatch || confirmPassword.length === 0
+                ? '#666'
+                : '#ff6b6b'
+            }
+          >
+            {confirmPassword.length > 0 && !passwordsMatch && (
+              <Text
+                style={[
+                  commonStyles.requirement,
+                  { color: '#ff6b6b', marginTop: 4 },
+                ]}
+              >
+                • Las contraseñas no coinciden
+              </Text>
+            )}
+
+            {confirmPassword.length > 0 && passwordsMatch && (
+              <Text
+                style={[
+                  commonStyles.requirement,
+                  { color: Colors[colorScheme ?? 'light'].tint, marginTop: 4 },
+                ]}
+              >
+                • Las contraseñas coinciden ✓
+              </Text>
+            )}
+          </PasswordInput>
+
+          <TouchableOpacity
+            style={[
+              commonStyles.button,
+              { backgroundColor: Colors[colorScheme ?? 'light'].tint },
+              (isLoading || !isFormValid) && commonStyles.buttonDisabled,
+            ]}
+            onPress={handleNext}
+            disabled={isLoading || !isFormValid}
+            accessibilityLabel='Continuar al siguiente paso'
+            accessibilityRole='button'
+          >
+            <Text style={commonStyles.buttonText}>
+              {isLoading ? 'Creando cuenta...' : 'Continuar'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Solo renderizar AlertComponent si no hay funciones externas */}
+        {!externalShowError && <AlertComponent />}
+      </ScrollView>
+    );
+  }
+);
 
 Step1.displayName = 'Step1';
 

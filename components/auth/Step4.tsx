@@ -38,34 +38,44 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
       <View style={commonStyles.header}>
-        <Text style={[commonStyles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
+        <Text
+          style={[
+            commonStyles.title,
+            { color: Colors[colorScheme ?? 'light'].text },
+          ]}
+        >
           Objetivos de fitness
         </Text>
-        <Text style={[commonStyles.subtitle, { color: Colors[colorScheme ?? 'light'].text }]}>
+        <Text
+          style={[
+            commonStyles.subtitle,
+            { color: Colors[colorScheme ?? 'light'].text },
+          ]}
+        >
           Personaliza tu experiencia (opcional)
         </Text>
       </View>
 
       <View style={commonStyles.form}>
         <Dropdown
-          label="Objetivo principal"
-          placeholder="¿Cuál es tu objetivo?"
+          label='Objetivo principal'
+          placeholder='¿Cuál es tu objetivo?'
           options={FITNESS_GOALS}
           value={fitnessGoal}
           onSelect={setFitnessGoal}
         />
 
         <Dropdown
-          label="Condiciones de salud"
-          placeholder="¿Tienes alguna restricción?"
+          label='Condiciones de salud'
+          placeholder='¿Tienes alguna restricción?'
           options={HEALTH_CONDITIONS}
           value={healthRestrictions}
           onSelect={setHealthRestrictions}
         />
 
         <Dropdown
-          label="Tipo de sangre (RH)"
-          placeholder="Selecciona tu tipo de sangre"
+          label='Tipo de sangre (RH)'
+          placeholder='Selecciona tu tipo de sangre'
           options={rhTypes}
           value={rh}
           onSelect={setRh}
@@ -79,22 +89,22 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { 
+            {
               backgroundColor: Colors[colorScheme ?? 'light'].tint,
             },
             isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
           disabled={isLoading}
-          accessibilityLabel="Continuar al siguiente paso"
-          accessibilityRole="button"
+          accessibilityLabel='Continuar al siguiente paso'
+          accessibilityRole='button'
         >
           <Text style={commonStyles.buttonText}>
             {isLoading ? 'Cargando datos...' : 'Continuar'}
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Componente de alertas personalizado */}
       <AlertComponent />
     </ScrollView>

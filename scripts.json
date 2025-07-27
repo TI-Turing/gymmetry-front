@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "expo export",
+    "type-check": "npx tsc --noEmit",
+    "format": "prettier --write .",
+    "format-check": "prettier --check .",
+    "clean": "expo start -c",
+    "doctor": "expo doctor",
+    "prebuild": "expo prebuild",
+    "lint-minimal": "echo 'ESLint disabled due to TypeScript version compatibility. Using type-check instead.' && npm run type-check"
+  }
+}

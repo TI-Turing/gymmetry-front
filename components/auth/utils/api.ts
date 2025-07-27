@@ -4,7 +4,7 @@ export const handleApiError = (error: any): string => {
   // Si es un error de axios con respuesta del servidor
   if (error?.response?.data) {
     const { data, status } = error.response;
-    
+
     // Para códigos 4xx que son errores esperados del servidor
     if (status >= 400 && status < 500) {
       // Si la respuesta tiene el formato estándar con Message
@@ -24,7 +24,7 @@ export const handleApiError = (error: any): string => {
         return firstError as string;
       }
     }
-    
+
     // Para otros errores del servidor
     if (data.Message) {
       return data.Message;
@@ -50,7 +50,9 @@ export const handleApiError = (error: any): string => {
   return 'Ocurrió un error inesperado. Inténtalo de nuevo.';
 };
 
-export const isApiResponseSuccess = <T>(response: any): response is ApiResponse<T> => {
+export const isApiResponseSuccess = <T>(
+  response: any
+): response is ApiResponse<T> => {
   return response && typeof response === 'object' && 'Success' in response;
 };
 

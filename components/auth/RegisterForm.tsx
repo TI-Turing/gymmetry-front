@@ -29,217 +29,216 @@ interface RegisterFormProps {
 
 const stepTitles = [
   'Credenciales',
-  'Datos básicos', 
+  'Datos básicos',
   'Información personal',
   'Datos fitness',
   'Perfil',
 ];
 
-const RegisterForm = memo<RegisterFormProps>(({ onRegister, onSwitchToLogin }) => {
-  const colorScheme = useColorScheme();
-  const authContext = useAuthContext();
-  const { showError, showSuccess, AlertComponent } = useCustomAlert();
-  
-  const {
-    currentStep,
-    showWelcomeScreen,
-    registrationData,
-    setCurrentStep,
-    handleSkipToWelcome,
-    handleStep1Next,
-    handleStep2Next,
-    handleStep3Next,
-    handleStep4Next,
-    handleStep5Next,
-    handleWelcomeContinue,
-    handleGoBack,
-  } = useRegisterForm({ onRegister });
+const RegisterForm = memo<RegisterFormProps>(
+  ({ onRegister, onSwitchToLogin }) => {
+    const colorScheme = useColorScheme();
+    const authContext = useAuthContext();
+    const { showError, showSuccess, AlertComponent } = useCustomAlert();
 
-  useEffect(() => {
-    authContext.setIsInRegisterFlow(true);
-    authContext.setCurrentStep(currentStep);
-    
-    return () => {
-      authContext.setIsInRegisterFlow(false);
-      authContext.setOnSkip(undefined);
-    };
-  }, [currentStep, authContext]);
+    const {
+      currentStep,
+      showWelcomeScreen,
+      registrationData,
+      setCurrentStep,
+      handleSkipToWelcome,
+      handleStep1Next,
+      handleStep2Next,
+      handleStep3Next,
+      handleStep4Next,
+      handleStep5Next,
+      handleWelcomeContinue,
+      handleGoBack,
+    } = useRegisterForm({ onRegister });
 
-  // Manejar el botón físico del dispositivo (Android)
-  useEffect(() => {
-    const backAction = () => {
-      if (currentStep > 0) {
-        handleSkipToWelcome();
-        return true; 
+    useEffect(() => {
+      authContext.setIsInRegisterFlow(true);
+      authContext.setCurrentStep(currentStep);
+
+      return () => {
+        authContext.setIsInRegisterFlow(false);
+        authContext.setOnSkip(undefined);
+      };
+    }, [currentStep, authContext]);
+
+    // Manejar el botón físico del dispositivo (Android)
+    useEffect(() => {
+      const backAction = () => {
+        if (currentStep > 0) {
+          handleSkipToWelcome();
+          return true;
+        }
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction
+      );
+      return () => backHandler.remove();
+    }, [currentStep, handleSkipToWelcome]);
+
+    const handleSkipForCurrentStep = useCallback(() => {
+      switch (currentStep) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+          handleSkipToWelcome();
+          break;
+        default:
+          break;
       }
-      return false;
+    }, [currentStep, handleSkipToWelcome]);
+
+    const renderCurrentStep = () => {
+      switch (currentStep) {
+        case 0:
+          return (
+            <Step1
+              onNext={handleStep1Next}
+              initialData={{
+                email: registrationData.email,
+                password: registrationData.password,
+              }}
+              showError={showError}
+              showSuccess={showSuccess}
+            />
+          );
+        case 1:
+          return (
+            <Step2
+              userId={registrationData.userId || ''}
+              onNext={handleStep2Next}
+              initialData={{
+                firstName: registrationData.firstName || '',
+                lastName: registrationData.lastName || '',
+                phone: registrationData.phone,
+                birthDate: registrationData.birthDate,
+                genderId: registrationData.genderId,
+              }}
+            />
+          );
+        case 2:
+          return (
+            <Step3
+              userId={registrationData.userId || ''}
+              onNext={handleStep3Next}
+              onBack={handleGoBack}
+              initialData={{
+                eps: registrationData.eps || '',
+                country: registrationData.country || '',
+                region: registrationData.region || '',
+                city: registrationData.city || '',
+                emergencyContact: registrationData.emergencyContact || '',
+                emergencyPhone: registrationData.emergencyPhone || '',
+                address: registrationData.address || '',
+                documentType: registrationData.documentType || '',
+                documentTypeId: registrationData.documentTypeId,
+                countryId: registrationData.countryId,
+              }}
+            />
+          );
+        case 3:
+          return (
+            <Step4
+              userId={registrationData.userId || ''}
+              onNext={handleStep4Next}
+              onBack={handleGoBack}
+              initialData={{
+                fitnessGoal: registrationData.fitnessGoal || '',
+                healthRestrictions: registrationData.healthRestrictions || '',
+                additionalInfo: registrationData.additionalInfo || '',
+                rh: registrationData.rh || '',
+              }}
+            />
+          );
+        case 4:
+          return (
+            <Step5
+              userId={registrationData.userId || ''}
+              onNext={handleStep5Next}
+              onBack={handleGoBack}
+              initialData={{
+                username: registrationData.username || '',
+                profileImage: registrationData.profileImage || '',
+              }}
+            />
+          );
+        default:
+          return null;
+      }
     };
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-    return () => backHandler.remove();
-  }, [currentStep, handleSkipToWelcome]);
-
-  const handleSkipForCurrentStep = useCallback(() => {
-    switch (currentStep) {
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-        handleSkipToWelcome();
-        break;
-      default:
-        break;
+    // Si debemos mostrar la pantalla de bienvenida
+    if (showWelcomeScreen) {
+      return (
+        <WelcomeScreen
+          userData={{
+            email: registrationData.email,
+            firstName: registrationData.firstName,
+            lastName: registrationData.lastName,
+            username: registrationData.username,
+          }}
+          onContinue={handleWelcomeContinue}
+        />
+      );
     }
-  }, [currentStep, handleSkipToWelcome]);
 
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <Step1
-            onNext={handleStep1Next}
-            initialData={{
-              email: registrationData.email,
-              password: registrationData.password,
-            }}
-            showError={showError}
-            showSuccess={showSuccess}
-          />
-        );
-      case 1:
-        return (
-          <Step2
-            userId={registrationData.userId || ''}
-            onNext={handleStep2Next}
-            initialData={{
-              firstName: registrationData.firstName || '',
-              lastName: registrationData.lastName || '',
-              phone: registrationData.phone,
-              birthDate: registrationData.birthDate,
-              genderId: registrationData.genderId,
-            }}
-          />
-        );
-      case 2:
-        return (
-          <Step3
-            userId={registrationData.userId || ''}
-            onNext={handleStep3Next}
-            onBack={handleGoBack}
-            initialData={{
-              eps: registrationData.eps || '',
-              country: registrationData.country || '',
-              region: registrationData.region || '',
-              city: registrationData.city || '',
-              emergencyContact: registrationData.emergencyContact || '',
-              emergencyPhone: registrationData.emergencyPhone || '',
-              address: registrationData.address || '',
-              documentType: registrationData.documentType || '',
-              documentTypeId: registrationData.documentTypeId,
-              countryId: registrationData.countryId,
-            }}
-          />
-        );
-      case 3:
-        return (
-          <Step4
-            userId={registrationData.userId || ''}
-            onNext={handleStep4Next}
-            onBack={handleGoBack}
-            initialData={{
-              fitnessGoal: registrationData.fitnessGoal || '',
-              healthRestrictions: registrationData.healthRestrictions || '',
-              additionalInfo: registrationData.additionalInfo || '',
-              rh: registrationData.rh || '',
-            }}
-          />
-        );
-      case 4:
-        return (
-          <Step5
-            userId={registrationData.userId || ''}
-            onNext={handleStep5Next}
-            onBack={handleGoBack}
-            initialData={{
-              username: registrationData.username || '',
-              profileImage: registrationData.profileImage || '',
-            }}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  // Si debemos mostrar la pantalla de bienvenida
-  if (showWelcomeScreen) {
     return (
-      <WelcomeScreen
-        userData={{
-          email: registrationData.email,
-          firstName: registrationData.firstName,
-          lastName: registrationData.lastName,
-          username: registrationData.username,
-        }}
-        onContinue={handleWelcomeContinue}
-      />
-    );
-  }
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={commonStyles.registerFormContainer}
+      >
+        <View style={commonStyles.registerFormContainer}>
+          {/* Header */}
+          <View style={commonStyles.registerFormHeader}>
+            <View style={commonStyles.backButton}>
+              {currentStep === 0 && (
+                <TouchableOpacity
+                  onPress={onSwitchToLogin}
+                  accessibilityLabel='Volver al inicio de sesión'
+                  accessibilityRole='button'
+                >
+                  <FontAwesome name='chevron-left' size={20} color='white' />
+                </TouchableOpacity>
+              )}
+              {(currentStep === 2 ||
+                currentStep === 3 ||
+                currentStep === 4) && (
+                <TouchableOpacity
+                  onPress={handleGoBack}
+                  accessibilityLabel='Volver al paso anterior'
+                  accessibilityRole='button'
+                >
+                  <FontAwesome name='chevron-left' size={20} color='white' />
+                </TouchableOpacity>
+              )}
+            </View>
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={commonStyles.registerFormContainer}
-    >
-      <View style={commonStyles.registerFormContainer}>
-        {/* Header */}
-        <View style={commonStyles.registerFormHeader}>
-          <View style={commonStyles.backButton}>
-            {currentStep === 0 && (
-              <TouchableOpacity 
-                onPress={onSwitchToLogin}
-                accessibilityLabel="Volver al inicio de sesión"
-                accessibilityRole="button"
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={20}
-                  color="white"
-                />
-              </TouchableOpacity>
-            )}
-            {(currentStep === 2 || currentStep === 3 || currentStep === 4) && (
-              <TouchableOpacity 
-                onPress={handleGoBack}
-                accessibilityLabel="Volver al paso anterior"
-                accessibilityRole="button"
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={20}
-                  color="white"
-                />
-              </TouchableOpacity>
-            )}
+            <SkipButton
+              currentStep={currentStep}
+              onSkip={handleSkipForCurrentStep}
+            />
           </View>
 
-          <SkipButton 
-            currentStep={currentStep} 
-            onSkip={handleSkipForCurrentStep} 
+          <StepsBar
+            currentStep={currentStep}
+            totalSteps={stepTitles.length}
+            stepTitles={stepTitles}
           />
+          {renderCurrentStep()}
+          <AlertComponent />
         </View>
-
-        <StepsBar
-          currentStep={currentStep}
-          totalSteps={stepTitles.length}
-          stepTitles={stepTitles}
-        />
-        {renderCurrentStep()}
-        <AlertComponent />
-      </View>
-    </KeyboardAvoidingView>
-  );
-});
+      </KeyboardAvoidingView>
+    );
+  }
+);
 
 RegisterForm.displayName = 'RegisterForm';
 

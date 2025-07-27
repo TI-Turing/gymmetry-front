@@ -11,7 +11,11 @@ interface StepsBarProps {
   stepTitles?: string[];
 }
 
-export default function StepsBar({ currentStep, totalSteps, stepTitles }: StepsBarProps) {
+export default function StepsBar({
+  currentStep,
+  totalSteps,
+  stepTitles,
+}: StepsBarProps) {
   const colorScheme = useColorScheme();
 
   return (
@@ -19,14 +23,16 @@ export default function StepsBar({ currentStep, totalSteps, stepTitles }: StepsB
       <View style={commonStyles.progressContainer}>
         {Array.from({ length: totalSteps }, (_, index) => {
           const isActive = index <= currentStep;
-          
+
           return (
             <View key={index} style={commonStyles.stepContainer}>
               <View
                 style={[
                   commonStyles.stepCircle,
                   {
-                    backgroundColor: isActive ? Colors[colorScheme].tint : '#333',
+                    backgroundColor: isActive
+                      ? Colors[colorScheme].tint
+                      : '#333',
                     borderColor: isActive ? Colors[colorScheme].tint : '#666',
                   },
                 ]}
@@ -40,15 +46,14 @@ export default function StepsBar({ currentStep, totalSteps, stepTitles }: StepsB
                   {index + 1}
                 </Text>
               </View>
-              
+
               {index < totalSteps - 1 && (
                 <View
                   style={[
                     commonStyles.stepLine,
                     {
-                      backgroundColor: index < currentStep 
-                        ? Colors[colorScheme].tint 
-                        : '#333',
+                      backgroundColor:
+                        index < currentStep ? Colors[colorScheme].tint : '#333',
                     },
                   ]}
                 />

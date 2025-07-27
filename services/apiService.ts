@@ -24,65 +24,65 @@ class ApiService {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': '*/*',
+        Accept: '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'User-Agent': 'ExpoApp/1.0.0',
       },
     });
 
     this.axiosInstance.interceptors.request.use(
-      (config) => {
+      config => {
         if (config.headers) {
           config.headers['Host'] = '192.168.0.16:7160';
           config.headers['Cache-Control'] = 'no-cache';
         }
-        
+
         const fullUrl = `${config.baseURL}${config.url}`;
-        
+
         const curlCommand = generateCurlCommand(
           (config.method?.toUpperCase() as HttpMethod) || 'GET',
           fullUrl,
           config.headers,
           config.data
         );
-        
+
         return config;
       },
-      (error) => {
+      error => {
         return Promise.reject(error);
       }
     );
 
-function generateCurlCommand(
-  method: HttpMethod,
-  url: string,
-  headers: any = {},
-  data?: any
-): string {
-  let curlCommand = `curl -X ${method}`;
-  Object.keys(headers || {}).forEach(key => {
-    if (headers[key] && key !== 'common') {
-      const headerValue = String(headers[key]).replace(/"/g, '\\"');
-      curlCommand += ` ^
+    function generateCurlCommand(
+      method: HttpMethod,
+      url: string,
+      headers: any = {},
+      data?: any
+    ): string {
+      let curlCommand = `curl -X ${method}`;
+      Object.keys(headers || {}).forEach(key => {
+        if (headers[key] && key !== 'common') {
+          const headerValue = String(headers[key]).replace(/"/g, '\\"');
+          curlCommand += ` ^
   -H "${key}: ${headerValue}"`;
-    }
-  });
-  if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
-    const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
-    const escapedData = jsonData.replace(/"/g, '\\"');
-    curlCommand += ` ^
+        }
+      });
+      if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
+        const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
+        const escapedData = jsonData.replace(/"/g, '\\"');
+        curlCommand += ` ^
   -d "${escapedData}"`;
-    if (!headers['Content-Type'] && !headers['content-type']) {
-      curlCommand += ` ^
+        if (!headers['Content-Type'] && !headers['content-type']) {
+          curlCommand += ` ^
   -H "Content-Type: application/json"`;
-    }
-  }
-  // Agregar URL al final
-  curlCommand += ` ^
+        }
+      }
+      // Agregar URL al final
+      curlCommand += ` ^
   "${url}"`;
-  return curlCommand;
-}
+      return curlCommand;
+    }
 
     // Interceptor de response para logging y manejo de errores
     this.axiosInstance.interceptors.response.use(
@@ -110,7 +110,7 @@ function generateCurlCommand(
 
     const status = error.response.status;
     const data = error.response.data as any;
-    
+
     // Si el servidor devuelve un mensaje específico, usarlo (revisar diferentes formatos)
     if (data?.Message) {
       throw new Error(data.Message);
@@ -121,7 +121,7 @@ function generateCurlCommand(
     if (data?.error) {
       throw new Error(data.error);
     }
-    
+
     // Si hay errores de validación específicos
     if (data?.errors && typeof data.errors === 'object') {
       const firstError = Object.values(data.errors)[0];
@@ -151,13 +151,16 @@ function generateCurlCommand(
   }
 
   // Métodos públicos para cada tipo de petición HTTP
-  async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async get<T>(
+    endpoint: string,
+    options?: RequestOptions
+  ): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.get<T>(endpoint, {
         headers: options?.headers,
         timeout: options?.timeout,
       });
-      
+
       return {
         data: response.data,
         success: true,
@@ -167,13 +170,17 @@ function generateCurlCommand(
     }
   }
 
-  async post<T>(endpoint: string, body: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async post<T>(
+    endpoint: string,
+    body: any,
+    options?: RequestOptions
+  ): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.post<T>(endpoint, body, {
         headers: options?.headers,
         timeout: options?.timeout,
       });
-      
+
       return {
         data: response.data,
         success: true,
@@ -183,13 +190,17 @@ function generateCurlCommand(
     }
   }
 
-  async put<T>(endpoint: string, body: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async put<T>(
+    endpoint: string,
+    body: any,
+    options?: RequestOptions
+  ): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.put<T>(endpoint, body, {
         headers: options?.headers,
         timeout: options?.timeout,
       });
-      
+
       return {
         data: response.data,
         success: true,
@@ -199,13 +210,17 @@ function generateCurlCommand(
     }
   }
 
-  async patch<T>(endpoint: string, body: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async patch<T>(
+    endpoint: string,
+    body: any,
+    options?: RequestOptions
+  ): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.patch<T>(endpoint, body, {
         headers: options?.headers,
         timeout: options?.timeout,
       });
-      
+
       return {
         data: response.data,
         success: true,
@@ -215,13 +230,16 @@ function generateCurlCommand(
     }
   }
 
-  async delete<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async delete<T>(
+    endpoint: string,
+    options?: RequestOptions
+  ): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.delete<T>(endpoint, {
         headers: options?.headers,
         timeout: options?.timeout,
       });
-      
+
       return {
         data: response.data,
         success: true,
@@ -233,7 +251,8 @@ function generateCurlCommand(
 
   // Método para agregar token de autenticación
   setAuthToken(token: string): void {
-    this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    this.axiosInstance.defaults.headers.common['Authorization'] =
+      `Bearer ${token}`;
   }
 
   // Método para remover token de autenticación

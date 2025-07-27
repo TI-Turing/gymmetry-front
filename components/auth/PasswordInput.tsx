@@ -17,57 +17,66 @@ interface PasswordInputProps {
   children?: React.ReactNode;
 }
 
-export const PasswordInput = memo<PasswordInputProps>(({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  showPassword,
-  onToggleVisibility,
-  borderColor = '#666',
-  children,
-}) => {
-  const colorScheme = useColorScheme();
+export const PasswordInput = memo<PasswordInputProps>(
+  ({
+    label,
+    value,
+    onChangeText,
+    placeholder,
+    showPassword,
+    onToggleVisibility,
+    borderColor = '#666',
+    children,
+  }) => {
+    const colorScheme = useColorScheme();
 
-  return (
-    <View style={commonStyles.inputContainer}>
-      <Text style={[commonStyles.label, { color: Colors[colorScheme ?? 'light'].text }]}>
-        {label}
-      </Text>
-      <View style={commonStyles.passwordContainer}>
-        <TextInput
+    return (
+      <View style={commonStyles.inputContainer}>
+        <Text
           style={[
-            commonStyles.passwordInput,
-            {
-              backgroundColor: Colors[colorScheme ?? 'light'].background,
-              color: Colors[colorScheme ?? 'light'].text,
-              borderColor,
-            },
+            commonStyles.label,
+            { color: Colors[colorScheme ?? 'light'].text },
           ]}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
-          secureTextEntry={!showPassword}
-          accessibilityLabel={label}
-          accessibilityRole="text"
-        />
-        <TouchableOpacity
-          style={commonStyles.eyeButton}
-          onPress={onToggleVisibility}
-          accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-          accessibilityRole="button"
         >
-          <FontAwesome
-            name={showPassword ? 'eye-slash' : 'eye'}
-            size={20}
-            color={Colors[colorScheme ?? 'light'].text}
+          {label}
+        </Text>
+        <View style={commonStyles.passwordContainer}>
+          <TextInput
+            style={[
+              commonStyles.passwordInput,
+              {
+                backgroundColor: Colors[colorScheme ?? 'light'].background,
+                color: Colors[colorScheme ?? 'light'].text,
+                borderColor,
+              },
+            ]}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+            placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
+            secureTextEntry={!showPassword}
+            accessibilityLabel={label}
+            accessibilityRole='text'
           />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={commonStyles.eyeButton}
+            onPress={onToggleVisibility}
+            accessibilityLabel={
+              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+            }
+            accessibilityRole='button'
+          >
+            <FontAwesome
+              name={showPassword ? 'eye-slash' : 'eye'}
+              size={20}
+              color={Colors[colorScheme ?? 'light'].text}
+            />
+          </TouchableOpacity>
+        </View>
+        {children}
       </View>
-      {children}
-    </View>
-  );
-});
+    );
+  }
+);
 
 PasswordInput.displayName = 'PasswordInput';

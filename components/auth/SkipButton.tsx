@@ -14,11 +14,11 @@ export const SkipButton = memo<SkipButtonProps>(({ currentStep, onSkip }) => {
   }
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={commonStyles.skipButtonRegister}
       onPress={onSkip}
-      accessibilityLabel="Omitir paso actual"
-      accessibilityRole="button"
+      accessibilityLabel='Omitir paso actual'
+      accessibilityRole='button'
     >
       <Text style={[commonStyles.headerButtonText, { color: 'white' }]}>
         Omitir

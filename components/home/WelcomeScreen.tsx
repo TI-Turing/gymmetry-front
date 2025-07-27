@@ -15,75 +15,101 @@ interface WelcomeScreenProps {
   onContinue?: () => void;
 }
 
-export default function WelcomeScreen({ userData, onContinue }: WelcomeScreenProps) {
+export default function WelcomeScreen({
+  userData,
+  onContinue,
+}: WelcomeScreenProps) {
   const colorScheme = useColorScheme();
-  
-  const displayName = userData?.firstName || userData?.username || userData?.email?.split('@')[0] || 'Usuario';
+
+  const displayName =
+    userData?.firstName ||
+    userData?.username ||
+    userData?.email?.split('@')[0] ||
+    'Usuario';
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Header de bienvenida */}
         <View style={styles.welcomeHeader}>
-          <View style={[styles.iconContainer, { backgroundColor: Colors[colorScheme].tint }]}>
-            <FontAwesome 
-              name="check-circle" 
-              size={60} 
-              color="white" 
-            />
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: Colors[colorScheme].tint },
+            ]}
+          >
+            <FontAwesome name='check-circle' size={60} color='white' />
           </View>
-          
-          <Text style={[styles.welcomeTitle, { color: Colors[colorScheme].text }]}>
+
+          <Text
+            style={[styles.welcomeTitle, { color: Colors[colorScheme].text }]}
+          >
             ¡Bienvenido a Gymmetry!
           </Text>
-          
-          <Text style={[styles.welcomeSubtitle, { color: Colors[colorScheme].text }]}>
+
+          <Text
+            style={[
+              styles.welcomeSubtitle,
+              { color: Colors[colorScheme].text },
+            ]}
+          >
             Hola {displayName}, tu cuenta ha sido creada exitosamente
           </Text>
         </View>
 
         {/* Información de la cuenta */}
-        <View style={[styles.infoCard, { 
-          backgroundColor: Colors[colorScheme].background,
-          borderColor: Colors[colorScheme].text + '20'
-        }]}>
+        <View
+          style={[
+            styles.infoCard,
+            {
+              backgroundColor: Colors[colorScheme].background,
+              borderColor: Colors[colorScheme].text + '20',
+            },
+          ]}
+        >
           <Text style={[styles.infoTitle, { color: Colors[colorScheme].text }]}>
             Tu cuenta está lista
           </Text>
-          
+
           <View style={styles.infoList}>
             <View style={styles.infoItem}>
-              <FontAwesome 
-                name="envelope" 
-                size={16} 
-                color={Colors[colorScheme].tint} 
+              <FontAwesome
+                name='envelope'
+                size={16}
+                color={Colors[colorScheme].tint}
               />
-              <Text style={[styles.infoText, { color: Colors[colorScheme].text }]}>
+              <Text
+                style={[styles.infoText, { color: Colors[colorScheme].text }]}
+              >
                 {userData?.email || 'Email registrado'}
               </Text>
             </View>
-            
+
             {userData?.firstName && (
               <View style={styles.infoItem}>
-                <FontAwesome 
-                  name="user" 
-                  size={16} 
-                  color={Colors[colorScheme].tint} 
+                <FontAwesome
+                  name='user'
+                  size={16}
+                  color={Colors[colorScheme].tint}
                 />
-                <Text style={[styles.infoText, { color: Colors[colorScheme].text }]}>
+                <Text
+                  style={[styles.infoText, { color: Colors[colorScheme].text }]}
+                >
                   {userData.firstName} {userData.lastName || ''}
                 </Text>
               </View>
             )}
-            
+
             {userData?.username && (
               <View style={styles.infoItem}>
-                <FontAwesome 
-                  name="at" 
-                  size={16} 
-                  color={Colors[colorScheme].tint} 
+                <FontAwesome
+                  name='at'
+                  size={16}
+                  color={Colors[colorScheme].tint}
                 />
-                <Text style={[styles.infoText, { color: Colors[colorScheme].text }]}>
+                <Text
+                  style={[styles.infoText, { color: Colors[colorScheme].text }]}
+                >
                   @{userData.username}
                 </Text>
               </View>
@@ -93,40 +119,57 @@ export default function WelcomeScreen({ userData, onContinue }: WelcomeScreenPro
 
         {/* Características principales */}
         <View style={styles.featuresContainer}>
-          <Text style={[styles.featuresTitle, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[styles.featuresTitle, { color: Colors[colorScheme].text }]}
+          >
             ¿Qué puedes hacer ahora?
           </Text>
-          
+
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
-              <FontAwesome 
-                name="calendar" 
-                size={20} 
-                color={Colors[colorScheme].tint} 
+              <FontAwesome
+                name='calendar'
+                size={20}
+                color={Colors[colorScheme].tint}
               />
-              <Text style={[styles.featureText, { color: Colors[colorScheme].text }]}>
+              <Text
+                style={[
+                  styles.featureText,
+                  { color: Colors[colorScheme].text },
+                ]}
+              >
                 Planifica tus entrenamientos
               </Text>
             </View>
-            
+
             <View style={styles.featureItem}>
-              <FontAwesome 
-                name="line-chart" 
-                size={20} 
-                color={Colors[colorScheme].tint} 
+              <FontAwesome
+                name='line-chart'
+                size={20}
+                color={Colors[colorScheme].tint}
               />
-              <Text style={[styles.featureText, { color: Colors[colorScheme].text }]}>
+              <Text
+                style={[
+                  styles.featureText,
+                  { color: Colors[colorScheme].text },
+                ]}
+              >
                 Rastrea tu progreso
               </Text>
             </View>
-            
+
             <View style={styles.featureItem}>
-              <FontAwesome 
-                name="users" 
-                size={20} 
-                color={Colors[colorScheme].tint} 
+              <FontAwesome
+                name='users'
+                size={20}
+                color={Colors[colorScheme].tint}
               />
-              <Text style={[styles.featureText, { color: Colors[colorScheme].text }]}>
+              <Text
+                style={[
+                  styles.featureText,
+                  { color: Colors[colorScheme].text },
+                ]}
+              >
                 Conecta con otros usuarios
               </Text>
             </View>
@@ -137,16 +180,17 @@ export default function WelcomeScreen({ userData, onContinue }: WelcomeScreenPro
       {/* Botón para continuar */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.continueButton, { backgroundColor: Colors[colorScheme].tint }]}
+          style={[
+            styles.continueButton,
+            { backgroundColor: Colors[colorScheme].tint },
+          ]}
           onPress={onContinue}
         >
-          <Text style={styles.continueButtonText}>
-            Comenzar mi experiencia
-          </Text>
-          <FontAwesome 
-            name="arrow-right" 
-            size={18} 
-            color="white" 
+          <Text style={styles.continueButtonText}>Comenzar mi experiencia</Text>
+          <FontAwesome
+            name='arrow-right'
+            size={18}
+            color='white'
             style={styles.buttonIcon}
           />
         </TouchableOpacity>

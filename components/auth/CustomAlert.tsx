@@ -1,5 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, Animated, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  Animated,
+  Dimensions,
+} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -107,7 +114,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="none"
+      animationType='none'
       onRequestClose={onClose}
     >
       <Animated.View
@@ -125,7 +132,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           activeOpacity={1}
           onPress={onClose}
         />
-        
+
         <View
           style={{
             backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#FFFFFF',
@@ -141,19 +148,23 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           }}
         >
           {/* Icono */}
-          <View style={{
-            alignItems: 'center',
-            marginBottom: 16,
-          }}>
-            <View style={{
-              width: 64,
-              height: 64,
-              borderRadius: 32,
-              backgroundColor: `${iconConfig.color}15`,
-              justifyContent: 'center',
+          <View
+            style={{
               alignItems: 'center',
-              marginBottom: 12,
-            }}>
+              marginBottom: 16,
+            }}
+          >
+            <View
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                backgroundColor: `${iconConfig.color}15`,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 12,
+              }}
+            >
               <FontAwesome
                 name={iconConfig.name as any}
                 size={32}
@@ -164,35 +175,41 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
 
           {/* Título */}
           {!(type === 'error' && title === 'Error') && (
-            <Text style={{
-              fontSize: 20,
-              fontWeight: '700',
-              color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-              textAlign: 'center',
-              marginBottom: 8,
-            }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '700',
+                color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+                textAlign: 'center',
+                marginBottom: 8,
+              }}
+            >
               {title}
             </Text>
           )}
 
           {/* Mensaje */}
-          <Text style={{
-            fontSize: 16,
-            color: colorScheme === 'dark' ? '#E0E0E0' : '#424242',
-            textAlign: 'center',
-            lineHeight: 24,
-            marginBottom: 28,
-            marginTop: (type === 'error' && title === 'Error') ? 8 : 0,
-            fontWeight: '400',
-          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: colorScheme === 'dark' ? '#E0E0E0' : '#424242',
+              textAlign: 'center',
+              lineHeight: 24,
+              marginBottom: 28,
+              marginTop: type === 'error' && title === 'Error' ? 8 : 0,
+              fontWeight: '400',
+            }}
+          >
             {message}
           </Text>
 
           {/* Botones */}
-          <View style={{
-            flexDirection: showCancel ? 'row' : 'column',
-            gap: 12,
-          }}>
+          <View
+            style={{
+              flexDirection: showCancel ? 'row' : 'column',
+              gap: 12,
+            }}
+          >
             {showCancel && (
               <TouchableOpacity
                 style={{
@@ -200,37 +217,49 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   paddingVertical: 14,
                   paddingHorizontal: 20,
                   borderRadius: 12,
-                  backgroundColor: colorScheme === 'dark' ? '#404040' : '#F5F5F5',
+                  backgroundColor:
+                    colorScheme === 'dark' ? '#404040' : '#F5F5F5',
                   alignItems: 'center',
                 }}
                 onPress={handleCancel}
               >
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: colorScheme === 'dark' ? '#FFFFFF' : '#424242',
-                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: colorScheme === 'dark' ? '#FFFFFF' : '#424242',
+                  }}
+                >
                   {cancelText}
                 </Text>
               </TouchableOpacity>
             )}
-            
+
             <TouchableOpacity
               style={{
                 flex: showCancel ? 1 : undefined,
                 paddingVertical: 14,
                 paddingHorizontal: 20,
                 borderRadius: 12,
-                backgroundColor: type === 'success' ? Colors[colorScheme].tint : type === 'error' ? Colors[colorScheme].tint : type === 'warning' ? Colors[colorScheme].tint : Colors[colorScheme].tint,
+                backgroundColor:
+                  type === 'success'
+                    ? Colors[colorScheme].tint
+                    : type === 'error'
+                      ? Colors[colorScheme].tint
+                      : type === 'warning'
+                        ? Colors[colorScheme].tint
+                        : Colors[colorScheme].tint,
                 alignItems: 'center',
               }}
               onPress={handleConfirm}
             >
-              <Text style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: '#FFFFFF',
-              }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: '#FFFFFF',
+                }}
+              >
                 {confirmText}
               </Text>
             </TouchableOpacity>
@@ -260,71 +289,83 @@ export const useCustomAlert = () => {
     message: '',
   });
 
-  const showAlert = React.useCallback((
-    type: 'success' | 'error' | 'warning' | 'info',
-    title: string,
-    message: string,
-    options?: {
-      confirmText?: string;
-      showCancel?: boolean;
-      cancelText?: string;
-      onConfirm?: () => void;
-      onCancel?: () => void;
-    }
-  ) => {
-    setAlert({
-      visible: true,
-      type,
-      title,
-      message,
-      ...options,
-    });
-  }, []);
+  const showAlert = React.useCallback(
+    (
+      type: 'success' | 'error' | 'warning' | 'info',
+      title: string,
+      message: string,
+      options?: {
+        confirmText?: string;
+        showCancel?: boolean;
+        cancelText?: string;
+        onConfirm?: () => void;
+        onCancel?: () => void;
+      }
+    ) => {
+      setAlert({
+        visible: true,
+        type,
+        title,
+        message,
+        ...options,
+      });
+    },
+    []
+  );
 
-  const showError = React.useCallback((
-    message: string,
-    options?: {
-      confirmText?: string;
-      showCancel?: boolean;
-      cancelText?: string;
-      onConfirm?: () => void;
-      onCancel?: () => void;
-    }
-  ) => {
-    showAlert('error', 'Error', message, options);
-  }, [showAlert]);
+  const showError = React.useCallback(
+    (
+      message: string,
+      options?: {
+        confirmText?: string;
+        showCancel?: boolean;
+        cancelText?: string;
+        onConfirm?: () => void;
+        onCancel?: () => void;
+      }
+    ) => {
+      showAlert('error', 'Error', message, options);
+    },
+    [showAlert]
+  );
 
-  const showSuccess = React.useCallback((
-    message: string,
-    options?: {
-      confirmText?: string;
-      showCancel?: boolean;
-      cancelText?: string;
-      onConfirm?: () => void;
-      onCancel?: () => void;
-    }
-  ) => {
-    showAlert('success', 'Éxito', message, options);
-  }, [showAlert]);
+  const showSuccess = React.useCallback(
+    (
+      message: string,
+      options?: {
+        confirmText?: string;
+        showCancel?: boolean;
+        cancelText?: string;
+        onConfirm?: () => void;
+        onCancel?: () => void;
+      }
+    ) => {
+      showAlert('success', 'Éxito', message, options);
+    },
+    [showAlert]
+  );
 
   const hideAlert = React.useCallback(() => {
     setAlert(prev => ({ ...prev, visible: false }));
   }, []);
 
-  const AlertComponent = React.useCallback(() => (
-    <CustomAlert
-      visible={alert.visible}
-      type={alert.type}
-      title={alert.title}
-      message={alert.message}
-      confirmText={alert.confirmText}
-      showCancel={alert.showCancel}
-      cancelText={alert.cancelText}
-      onConfirm={alert.onConfirm}
-      onCancel={alert.onCancel}
-      onClose={hideAlert}
-    />
-  ), [alert, hideAlert]);
+  const AlertComponent = React.useCallback(
+    () => (
+      <CustomAlert
+        visible={alert.visible}
+        type={alert.type}
+        title={alert.title}
+        message={alert.message}
+        confirmText={alert.confirmText}
+        showCancel={alert.showCancel}
+        cancelText={alert.cancelText}
+        onConfirm={alert.onConfirm}
+        onCancel={alert.onCancel}
+        onClose={hideAlert}
+      />
+    ),
+    [alert, hideAlert]
+  );
 
   return {
     showAlert,

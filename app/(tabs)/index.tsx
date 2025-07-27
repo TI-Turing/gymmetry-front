@@ -1,5 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  Animated,
+} from 'react-native';
 import { router } from 'expo-router';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
@@ -8,7 +13,7 @@ import Svg, { Polygon } from 'react-native-svg';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
-  
+
   /* CÓDIGO ORIGINAL COMENTADO - Con triángulos animados y fondo diagonal
   // Obtener dimensiones de la pantalla
   const { width, height } = Dimensions.get('window');
@@ -129,20 +134,25 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors[colorScheme].tint }]}>
+    <View
+      style={[styles.container, { backgroundColor: Colors[colorScheme].tint }]}
+    >
       {/* VERSIÓN SIMPLIFICADA - Solo fondo naranja, texto y botón */}
-      
+
       {/* Texto GYMMETRY */}
-      <Text style={[styles.gymmetryText]}>
-        GYMMETRY
-      </Text>
+      <Text style={[styles.gymmetryText]}>GYMMETRY</Text>
 
       {/* Botón Ingresar */}
       <TouchableOpacity
-        style={[styles.loginButton, { backgroundColor: Colors[colorScheme].background }]}
+        style={[
+          styles.loginButton,
+          { backgroundColor: Colors[colorScheme].background },
+        ]}
         onPress={handleLogin}
       >
-        <Text style={[styles.loginButtonText, { color: Colors[colorScheme].text }]}>
+        <Text
+          style={[styles.loginButtonText, { color: Colors[colorScheme].text }]}
+        >
           Ingresar
         </Text>
       </TouchableOpacity>

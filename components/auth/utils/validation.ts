@@ -1,7 +1,8 @@
 import { PasswordValidation } from '../types';
 
 const NUMERIC_SEQUENCES = /12345|23451|34512|45123|51234/;
-const LETTER_SEQUENCES = /abcdef|bcdefg|cdefgh|defghi|efghij|fghijk|ABCDEF|BCDEFG|CDEFGH|DEFGHI|EFGHIJ|FGHIJK/;
+const LETTER_SEQUENCES =
+  /abcdef|bcdefg|cdefgh|defghi|efghij|fghijk|ABCDEF|BCDEFG|CDEFGH|DEFGHI|EFGHIJ|FGHIJK/;
 const VALID_CHARS = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 const HAS_LETTER = /[a-zA-Z]/;
 const HAS_NUMBER = /[0-9]/;
@@ -30,7 +31,9 @@ export const validatePassword = (password: string, email: string): string[] => {
   }
 
   if (!VALID_CHARS.test(password)) {
-    errors.push('Solo se permiten caracteres del alfabeto inglés, números y símbolos básicos (sin espacios)');
+    errors.push(
+      'Solo se permiten caracteres del alfabeto inglés, números y símbolos básicos (sin espacios)'
+    );
   }
 
   if (NUMERIC_SEQUENCES.test(password)) {
@@ -44,7 +47,10 @@ export const validatePassword = (password: string, email: string): string[] => {
   return errors;
 };
 
-export const getPasswordValidation = (password: string, email: string): PasswordValidation => {
+export const getPasswordValidation = (
+  password: string,
+  email: string
+): PasswordValidation => {
   const trimmedPassword = password.trim();
   const hasContent = trimmedPassword.length > 0;
 
@@ -52,7 +58,8 @@ export const getPasswordValidation = (password: string, email: string): Password
     length: trimmedPassword.length >= 8 && trimmedPassword.length <= 50,
     hasLetter: hasContent && HAS_LETTER.test(trimmedPassword),
     hasNumber: hasContent && HAS_NUMBER.test(trimmedPassword),
-    notEqualToEmail: hasContent && trimmedPassword.toLowerCase() !== email.toLowerCase(),
+    notEqualToEmail:
+      hasContent && trimmedPassword.toLowerCase() !== email.toLowerCase(),
     validChars: hasContent && VALID_CHARS.test(trimmedPassword),
     noNumericSequence: hasContent && !NUMERIC_SEQUENCES.test(trimmedPassword),
     noLetterSequence: hasContent && !LETTER_SEQUENCES.test(trimmedPassword),

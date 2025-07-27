@@ -36,7 +36,7 @@ export function FilterableModal<T>({
     <Modal
       visible={visible}
       transparent={true}
-      animationType="slide"
+      animationType='slide'
       onRequestClose={onClose}
     >
       <TouchableOpacity
@@ -124,13 +124,13 @@ export function FilterableModal<T>({
               }}
               value={filter}
               onChangeText={onFilterChange}
-              placeholder="Buscar"
+              placeholder='Buscar'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
             <FontAwesome
-              name="search"
+              name='search'
               size={16}
-              color="white"
+              color='white'
               style={{ marginLeft: 8 }}
             />
           </View>
@@ -140,7 +140,7 @@ export function FilterableModal<T>({
               const itemId = getItemId(item);
               const itemName = getItemName(item);
               const isSelected = selectedId === itemId;
-              
+
               return (
                 <TouchableOpacity
                   key={itemId}

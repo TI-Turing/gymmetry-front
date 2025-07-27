@@ -20,24 +20,20 @@ export default function TabTwoScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Cerrar sesión',
-      '¿Estás seguro que quieres cerrar sesión?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Cerrar sesión',
-          style: 'destructive',
-          onPress: () => setUser(null),
-        },
-      ]
-    );
+    Alert.alert('Cerrar sesión', '¿Estás seguro que quieres cerrar sesión?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Cerrar sesión',
+        style: 'destructive',
+        onPress: () => setUser(null),
+      },
+    ]);
   };
 
   if (showAuth) {
     return (
-      <AuthContainer 
-        onAuthSuccess={handleAuthSuccess} 
+      <AuthContainer
+        onAuthSuccess={handleAuthSuccess}
         onBack={handleBackFromAuth}
       />
     );
@@ -48,12 +44,18 @@ export default function TabTwoScreen() {
       <Text style={[styles.title, { color: Colors[colorScheme].tint }]}>
         🏋️ Auth Demo
       </Text>
-      
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      
+
+      <View
+        style={styles.separator}
+        lightColor='#eee'
+        darkColor='rgba(255,255,255,0.1)'
+      />
+
       {user ? (
         <View style={styles.userContainer}>
-          <Text style={[styles.welcomeText, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[styles.welcomeText, { color: Colors[colorScheme].text }]}
+          >
             ¡Bienvenido!
           </Text>
           <Text style={[styles.userName, { color: Colors[colorScheme].tint }]}>
@@ -62,32 +64,45 @@ export default function TabTwoScreen() {
           <Text style={[styles.userEmail, { color: Colors[colorScheme].text }]}>
             {user.email}
           </Text>
-          
+
           <TouchableOpacity
-            style={[styles.logoutButton, { borderColor: Colors[colorScheme].tint }]}
+            style={[
+              styles.logoutButton,
+              { borderColor: Colors[colorScheme].tint },
+            ]}
             onPress={handleLogout}
           >
-            <Text style={[styles.logoutButtonText, { color: Colors[colorScheme].tint }]}>
+            <Text
+              style={[
+                styles.logoutButtonText,
+                { color: Colors[colorScheme].tint },
+              ]}
+            >
               Cerrar Sesión
             </Text>
           </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.authPrompt}>
-          <Text style={[styles.promptText, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[styles.promptText, { color: Colors[colorScheme].text }]}
+          >
             Demuestra los componentes de autenticación
           </Text>
-          <Text style={[styles.promptSubtext, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[styles.promptSubtext, { color: Colors[colorScheme].text }]}
+          >
             Login y registro con validaciones completas
           </Text>
-          
+
           <TouchableOpacity
-            style={[styles.authButton, { backgroundColor: Colors[colorScheme].tint }]}
+            style={[
+              styles.authButton,
+              { backgroundColor: Colors[colorScheme].tint },
+            ]}
             onPress={() => setShowAuth(true)}
           >
-            <Text style={styles.authButtonText}>
-              Probar Autenticación
-            </Text>
+            <Text style={styles.authButtonText}>Probar Autenticación</Text>
           </TouchableOpacity>
         </View>
       )}

@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Alert, ActionSheetIOS, Platform } from 'react-native';
+import {
+  TouchableOpacity,
+  Alert,
+  ActionSheetIOS,
+  Platform,
+} from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -14,18 +19,16 @@ interface SimpleDropdownProps {
   onSelect: (value: string) => void;
 }
 
-export default function SimpleDropdown({ 
-  label, 
-  placeholder, 
-  options, 
-  value, 
-  onSelect
+export default function SimpleDropdown({
+  label,
+  placeholder,
+  options,
+  value,
+  onSelect,
 }: SimpleDropdownProps) {
   const colorScheme = useColorScheme();
 
   const handlePress = () => {
-    
-    
     if (options.length === 0) {
       Alert.alert('Sin opciones', 'No hay opciones disponibles');
       return;
@@ -39,24 +42,26 @@ export default function SimpleDropdown({
           cancelButtonIndex: 0,
           title: `Seleccionar ${label}`,
         },
-        (buttonIndex) => {
+        buttonIndex => {
           if (buttonIndex > 0) {
-            onSelect(options[buttonIndex - 1]);
+            const selectedOption = options[buttonIndex - 1];
+            if (selectedOption) {
+              onSelect(selectedOption);
+            }
           }
         }
       );
     } else {
       // En Android usar Alert con botones
-      const buttons = options.map((option) => ({
+      const buttons = options.map(option => ({
         text: option,
         onPress: () => {
           onSelect(option);
         },
       }));
-      buttons.push({ 
-        text: 'Cancelar', 
-        onPress: () => {
-        }
+      buttons.push({
+        text: 'Cancelar',
+        onPress: () => {},
       });
 
       Alert.alert(`Seleccionar ${label}`, '', buttons);
@@ -83,14 +88,16 @@ export default function SimpleDropdown({
       >
         <Text
           style={{
-            color: value ? Colors[colorScheme].text : `${Colors[colorScheme].text}60`,
+            color: value
+              ? Colors[colorScheme].text
+              : `${Colors[colorScheme].text}60`,
             flex: 1,
           }}
         >
           {value || placeholder}
         </Text>
         <FontAwesome
-          name="chevron-down"
+          name='chevron-down'
           size={16}
           color={Colors[colorScheme].text}
         />

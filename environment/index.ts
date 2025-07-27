@@ -13,13 +13,26 @@ const getEnvironmentFromProcess = (): EnvironmentType => {
 };
 
 const createConfig = () => {
-  const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:7160/api';
-  const catalogsApiBaseUrl = process.env.EXPO_PUBLIC_CATALOGS_API_BASE_URL || process.env.CATALOGS_API_BASE_URL || 'https://your-catalogs-api-url.com/api';
-  const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || process.env.ENVIRONMENT || 'local';
+  const apiBaseUrl =
+    process.env.EXPO_PUBLIC_API_BASE_URL ||
+    process.env.API_BASE_URL ||
+    'http://localhost:7160/api';
+  const catalogsApiBaseUrl =
+    process.env.EXPO_PUBLIC_CATALOGS_API_BASE_URL ||
+    process.env.CATALOGS_API_BASE_URL ||
+    'https://your-catalogs-api-url.com/api';
+  const environment =
+    process.env.EXPO_PUBLIC_ENVIRONMENT || process.env.ENVIRONMENT || 'local';
   const debug = (process.env.EXPO_PUBLIC_DEBUG || process.env.DEBUG) === 'true';
-  const apiFunctionsKey = process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY || process.env.API_FUNCTIONS_KEY || '';
-  const apiMainFunctionsKey = process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY || process.env.API_MAIN_FUNCTIONS_KEY || '';
-  
+  const apiFunctionsKey =
+    process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY ||
+    process.env.API_FUNCTIONS_KEY ||
+    '';
+  const apiMainFunctionsKey =
+    process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY ||
+    process.env.API_MAIN_FUNCTIONS_KEY ||
+    '';
+
   return {
     API_BASE_URL: apiBaseUrl,
     CATALOGS_API_BASE_URL: catalogsApiBaseUrl,

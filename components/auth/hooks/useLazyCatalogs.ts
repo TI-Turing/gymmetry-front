@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import { catalogService } from '@/services/catalogService';
 import { userSessionService } from '@/services/userSessionService';
-import { 
-  Gender, 
-  Country, 
-  Region, 
-  City, 
-  EPS, 
-  DocumentType 
-} from '@/dto/common';
+import { Gender, Country, Region, City, EPS, DocumentType } from '@/dto/common';
 
 // Hook para géneros (solo cuando se necesite)
 export function useGenders(autoLoad: boolean = false) {
@@ -18,10 +11,10 @@ export function useGenders(autoLoad: boolean = false) {
 
   const loadGenders = async () => {
     if (loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await catalogService.getGenders();
       setGenders(data);
@@ -43,7 +36,7 @@ export function useGenders(autoLoad: boolean = false) {
     loading,
     error,
     loadGenders,
-    refetch: loadGenders
+    refetch: loadGenders,
   };
 }
 
@@ -55,10 +48,10 @@ export function useCountries(autoLoad: boolean = false) {
 
   const loadCountries = async () => {
     if (loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await catalogService.getCountries();
       setCountries(data);
@@ -80,7 +73,7 @@ export function useCountries(autoLoad: boolean = false) {
     loading,
     error,
     loadCountries,
-    refetch: loadCountries
+    refetch: loadCountries,
   };
 }
 
@@ -93,10 +86,10 @@ export function useRegionsByCountry(countryId?: string) {
   const loadRegions = async (targetCountryId?: string) => {
     const finalCountryId = targetCountryId || countryId;
     if (!finalCountryId || loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await catalogService.getRegionsByCountry(finalCountryId);
       setRegions(data);
@@ -120,7 +113,7 @@ export function useRegionsByCountry(countryId?: string) {
     loading,
     error,
     loadRegions,
-    clearRegions: () => setRegions([])
+    clearRegions: () => setRegions([]),
   };
 }
 
@@ -133,10 +126,10 @@ export function useCitiesByRegion(regionId?: string) {
   const loadCities = async (targetRegionId?: string) => {
     const finalRegionId = targetRegionId || regionId;
     if (!finalRegionId || loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await catalogService.getCitiesByRegion(finalRegionId);
       setCities(data);
@@ -160,7 +153,7 @@ export function useCitiesByRegion(regionId?: string) {
     loading,
     error,
     loadCities,
-    clearCities: () => setCities([])
+    clearCities: () => setCities([]),
   };
 }
 
@@ -172,10 +165,10 @@ export function useEPS(autoLoad: boolean = false) {
 
   const loadEPS = async () => {
     if (loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await catalogService.getEPS();
       setEps(data);
@@ -197,28 +190,35 @@ export function useEPS(autoLoad: boolean = false) {
     loading,
     error,
     loadEPS,
-    refetch: loadEPS
+    refetch: loadEPS,
   };
 }
 
 // Hook para tipos de documento (usa país de sesión automáticamente)
-export function useDocumentTypes(countryId?: string, autoLoad: boolean = false) {
+export function useDocumentTypes(
+  countryId?: string,
+  autoLoad: boolean = false
+) {
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadDocumentTypes = async (targetCountryId?: string) => {
     if (loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Si no se proporciona countryId, el servicio usará automáticamente el país de sesión
-      const data = await catalogService.getDocumentTypes(targetCountryId || countryId);
+      const data = await catalogService.getDocumentTypes(
+        targetCountryId || countryId
+      );
       setDocumentTypes(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error cargando tipos de documento');
+      setError(
+        err instanceof Error ? err.message : 'Error cargando tipos de documento'
+      );
     } finally {
       setLoading(false);
     }
@@ -241,21 +241,25 @@ export function useDocumentTypes(countryId?: string, autoLoad: boolean = false) 
     loading,
     error,
     loadDocumentTypes,
-    refetch: () => loadDocumentTypes()
+    refetch: () => loadDocumentTypes(),
   };
 }
 
 // Hook para datos del país del usuario desde sesión
 export function useUserCountrySession() {
-  const [userCountryData, setUserCountryData] = useState(userSessionService.getUserCountryData());
-  const [userCountryId, setUserCountryId] = useState(userSessionService.getUserCountryId());
+  const [userCountryData, setUserCountryData] = useState(
+    userSessionService.getUserCountryData()
+  );
+  const [userCountryId, setUserCountryId] = useState(
+    userSessionService.getUserCountryId()
+  );
 
   useEffect(() => {
     // Verificar periódicamente si hay nuevos datos de país
     const interval = setInterval(() => {
       const currentData = userSessionService.getUserCountryData();
       const currentId = userSessionService.getUserCountryId();
-      
+
       if (currentData !== userCountryData) {
         setUserCountryData(currentData);
       }
@@ -277,6 +281,6 @@ export function useUserCountrySession() {
     userCountryData,
     userCountryId,
     refreshUserCountry,
-    hasUserCountry: !!userCountryId
+    hasUserCountry: !!userCountryId,
   };
 }

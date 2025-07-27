@@ -4,7 +4,7 @@ import {
   Region,
   City,
   EPS,
-  DocumentType
+  DocumentType,
 } from '@/dto/common';
 
 interface UseStep3FormResult {
@@ -23,19 +23,19 @@ interface UseStep3FormResult {
   emergencyContact: string;
   emergencyPhone: string;
   address: string;
-  
+
   // Modal states
   showRegionModal: boolean;
   showCityModal: boolean;
   showDocumentTypeModal: boolean;
   showEpsModal: boolean;
-  
+
   // Filter states
   regionFilter: string;
   cityFilter: string;
   documentTypeFilter: string;
   epsFilter: string;
-  
+
   // Actions
   setCountry: (value: string) => void;
   setSelectedCountryId: (value: string) => void;
@@ -51,29 +51,29 @@ interface UseStep3FormResult {
   setEmergencyContact: (value: string) => void;
   setEmergencyPhone: (value: string) => void;
   setAddress: (value: string) => void;
-  
+
   // Modal actions
   setShowRegionModal: (value: boolean) => void;
   setShowCityModal: (value: boolean) => void;
   setShowDocumentTypeModal: (value: boolean) => void;
   setShowEpsModal: (value: boolean) => void;
-  
+
   // Filter actions
   setRegionFilter: (value: string) => void;
   setCityFilter: (value: string) => void;
   setDocumentTypeFilter: (value: string) => void;
   setEpsFilter: (value: string) => void;
-  
+
   // Handlers
   handleDocumentNumberChange: (text: string) => void;
   handleEmergencyPhoneChange: (text: string) => void;
-  
+
   // Filter functions
   getFilteredRegions: (regions: Region[]) => Region[];
   getFilteredCities: (cities: City[]) => City[];
   getFilteredEps: (epsOptions: EPS[]) => EPS[];
   getFilteredDocumentTypes: (documentTypes: DocumentType[]) => DocumentType[];
-  
+
   // Clear functions
   clearRegionData: () => void;
   clearCityData: () => void;
@@ -82,26 +82,42 @@ interface UseStep3FormResult {
 export const useStep3Form = (initialData?: any): UseStep3FormResult => {
   // Form states
   const [country, setCountry] = useState(initialData?.country || '');
-  const [selectedCountryId, setSelectedCountryId] = useState(initialData?.countryId || '');
+  const [selectedCountryId, setSelectedCountryId] = useState(
+    initialData?.countryId || ''
+  );
   const [region, setRegion] = useState(initialData?.region || '');
-  const [selectedRegionId, setSelectedRegionId] = useState(initialData?.regionId || '');
+  const [selectedRegionId, setSelectedRegionId] = useState(
+    initialData?.regionId || ''
+  );
   const [city, setCity] = useState(initialData?.city || '');
-  const [selectedCityId, setSelectedCityId] = useState(initialData?.cityId || '');
-  const [documentType, setDocumentType] = useState(initialData?.documentType || '');
-  const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState(initialData?.documentTypeId || '');
-  const [documentNumber, setDocumentNumber] = useState(initialData?.documentNumber || '');
+  const [selectedCityId, setSelectedCityId] = useState(
+    initialData?.cityId || ''
+  );
+  const [documentType, setDocumentType] = useState(
+    initialData?.documentType || ''
+  );
+  const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState(
+    initialData?.documentTypeId || ''
+  );
+  const [documentNumber, setDocumentNumber] = useState(
+    initialData?.documentNumber || ''
+  );
   const [eps, setEps] = useState(initialData?.eps || '');
   const [selectedEpsId, setSelectedEpsId] = useState(initialData?.epsId || '');
-  const [emergencyContact, setEmergencyContact] = useState(initialData?.emergencyContact || '');
-  const [emergencyPhone, setEmergencyPhone] = useState(initialData?.emergencyPhone || '');
+  const [emergencyContact, setEmergencyContact] = useState(
+    initialData?.emergencyContact || ''
+  );
+  const [emergencyPhone, setEmergencyPhone] = useState(
+    initialData?.emergencyPhone || ''
+  );
   const [address, setAddress] = useState(initialData?.address || '');
-  
+
   // Modal states
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showDocumentTypeModal, setShowDocumentTypeModal] = useState(false);
   const [showEpsModal, setShowEpsModal] = useState(false);
-  
+
   // Filter states
   const [regionFilter, setRegionFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
@@ -118,31 +134,42 @@ export const useStep3Form = (initialData?: any): UseStep3FormResult => {
     setEmergencyPhone(numericOnly);
   }, []);
 
-  const getFilteredRegions = useCallback((regions: Region[]) => 
-    regions.filter((region: Region) => 
-      region.Nombre.toLowerCase().includes(regionFilter.toLowerCase())
-    ), [regionFilter]);
+  const getFilteredRegions = useCallback(
+    (regions: Region[]) =>
+      regions.filter((region: Region) =>
+        region.Nombre.toLowerCase().includes(regionFilter.toLowerCase())
+      ),
+    [regionFilter]
+  );
 
-  const getFilteredCities = useCallback((cities: City[]) => 
-    cities.filter((city: City) => 
-      city.Nombre.toLowerCase().includes(cityFilter.toLowerCase())
-    ), [cityFilter]);
+  const getFilteredCities = useCallback(
+    (cities: City[]) =>
+      cities.filter((city: City) =>
+        city.Nombre.toLowerCase().includes(cityFilter.toLowerCase())
+      ),
+    [cityFilter]
+  );
 
-  const getFilteredEps = useCallback((epsOptions: EPS[]) => 
-    epsOptions.filter((eps: EPS) => 
-      eps.Nombre.toLowerCase().includes(epsFilter.toLowerCase())
-    ), [epsFilter]);
+  const getFilteredEps = useCallback(
+    (epsOptions: EPS[]) =>
+      epsOptions.filter((eps: EPS) =>
+        eps.Nombre.toLowerCase().includes(epsFilter.toLowerCase())
+      ),
+    [epsFilter]
+  );
 
-  const getFilteredDocumentTypes = useCallback((documentTypes: DocumentType[]) => 
-    documentTypes.filter((docType: DocumentType) => 
-      docType.Nombre.toLowerCase().includes(documentTypeFilter.toLowerCase())
-    ), [documentTypeFilter]);
+  const getFilteredDocumentTypes = useCallback(
+    (documentTypes: DocumentType[]) =>
+      documentTypes.filter((docType: DocumentType) =>
+        docType.Nombre.toLowerCase().includes(documentTypeFilter.toLowerCase())
+      ),
+    [documentTypeFilter]
+  );
 
   const clearRegionData = useCallback(() => {
     setRegion('');
     setSelectedRegionId('');
     clearCityData();
-    
   }, []);
 
   const clearCityData = useCallback(() => {
@@ -166,19 +193,19 @@ export const useStep3Form = (initialData?: any): UseStep3FormResult => {
     emergencyContact,
     emergencyPhone,
     address,
-    
+
     // Modal states
     showRegionModal,
     showCityModal,
     showDocumentTypeModal,
     showEpsModal,
-    
+
     // Filter states
     regionFilter,
     cityFilter,
     documentTypeFilter,
     epsFilter,
-    
+
     // Actions
     setCountry,
     setSelectedCountryId,
@@ -194,29 +221,29 @@ export const useStep3Form = (initialData?: any): UseStep3FormResult => {
     setEmergencyContact,
     setEmergencyPhone,
     setAddress,
-    
+
     // Modal actions
     setShowRegionModal,
     setShowCityModal,
     setShowDocumentTypeModal,
     setShowEpsModal,
-    
+
     // Filter actions
     setRegionFilter,
     setCityFilter,
     setDocumentTypeFilter,
     setEpsFilter,
-    
+
     // Handlers
     handleDocumentNumberChange,
     handleEmergencyPhoneChange,
-    
+
     // Filter functions
     getFilteredRegions,
     getFilteredCities,
     getFilteredEps,
     getFilteredDocumentTypes,
-    
+
     // Clear functions
     clearRegionData,
     clearCityData,
