@@ -203,7 +203,7 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         address: stepData.address,
         ...(stepData.documentNumber && { documentNumber: stepData.documentNumber }),
         ...(stepData.eps && { eps: stepData.eps }),
-        ...(stepData.epsId && { epsId: stepData.epsId }),
+        ...(stepData.epsId && { EpsId: stepData.epsId }),
         ...(stepData.country && { country: stepData.country }),
         ...(stepData.countryId && { CountryId: stepData.countryId }),
         ...(stepData.region && { region: stepData.region }),

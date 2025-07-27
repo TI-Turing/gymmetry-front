@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TextInput, TouchableOpacity, ScrollView, Alert, Image, Keyboard } from 'react-native';
+import { TextInput, TouchableOpacity, ScrollView, Image, Keyboard, Modal } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -15,6 +15,7 @@ import { Step5Data, UsernameCheckRequest, UsernameCheckResponse, UploadProfileIm
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 import { useCustomAlert } from './CustomAlert';
+import { LoadingAnimation } from './LoadingAnimation';
 
 interface Step5Props {
   userId: string;
@@ -34,6 +35,8 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'available' | 'taken' | 'invalid'>('idle');
   const [usernameError, setUsernameError] = useState<string>('');
   const [imageError, setImageError] = useState<boolean>(false);
+  const [imageLoading, setImageLoading] = useState<boolean>(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   
   // Ref para el debounce
   const debounceRef = useRef<number>(0);
@@ -326,16 +329,16 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
 
       if (response.data.Success) {
         console.log('✅ [IMAGE UPLOAD] Éxito. URL recibida:', response.data.Data);
-        Alert.alert('¡Éxito!', 'La imagen de perfil se subió correctamente');
+        showSuccess('La imagen de perfil se subió correctamente');
         return response.data.Data; // Retornar la URL de la imagen
       } else {
         console.log('❌ [IMAGE UPLOAD] Error en respuesta:', response.data.Message);
-        Alert.alert('Error', response.data.Message || 'Error al subir la imagen');
+        showError(response.data.Message || 'Error al subir la imagen');
         return null;
       }
     } catch (error: any) {
       console.error('❌ [IMAGE UPLOAD] Error:', error);
-      Alert.alert('Error', 'No se pudo subir la imagen. Intenta de nuevo.');
+      showError('No se pudo subir la imagen. Intenta de nuevo.');
       return null;
     } finally {
       setIsUploadingImage(false);
@@ -347,7 +350,7 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       // Solicitar permisos
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permisos necesarios', 'Necesitamos permisos para acceder a tus fotos');
+        showError('Necesitamos permisos para acceder a tus fotos');
         return;
       }
 
@@ -374,17 +377,19 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         
         if (uploadedImageUrl) {
           console.log('✅ [IMAGE SET] Usando URL del servidor:', uploadedImageUrl);
-          setProfileImage(uploadedImageUrl); // Usar la URL del servidor
           setImageError(false);
+          setImageLoading(false);
+          setProfileImage(uploadedImageUrl); // Usar la URL del servidor
         } else {
           console.log('⚠️ [IMAGE SET] Usando imagen local como fallback:', resizedUri);
-          setProfileImage(resizedUri); // Usar imagen local si falla el upload
           setImageError(false);
+          setImageLoading(false);
+          setProfileImage(resizedUri); // Usar imagen local si falla el upload
         }
       }
     } catch (error) {
       console.error('❌ [STEP 5] Error al seleccionar imagen:', error);
-      Alert.alert('Error', 'No se pudo seleccionar la imagen');
+      showError('No se pudo seleccionar la imagen');
     } finally {
       setIsUploadingImage(false);
     }
@@ -395,17 +400,18 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       // Solicitar permisos
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permisos necesarios', 'Necesitamos permisos para usar la cámara');
+        showError('Necesitamos permisos de cámara para tomar fotos');
         return;
       }
 
-      setIsUploadingImage(true);
+      setImageLoading(true);
+      setImageError(false);
 
       // Abrir cámara
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [1, 1], // Imagen cuadrada
-        quality: 1,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -421,35 +427,33 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         
         if (uploadedImageUrl) {
           console.log('✅ [IMAGE SET] Usando URL del servidor:', uploadedImageUrl);
-          setProfileImage(uploadedImageUrl); // Usar la URL del servidor
           setImageError(false);
+          setImageLoading(false);
+          setProfileImage(uploadedImageUrl); // Usar la URL del servidor
         } else {
           console.log('⚠️ [IMAGE SET] Usando imagen local como fallback:', resizedUri);
-          setProfileImage(resizedUri); // Usar imagen local si falla el upload
           setImageError(false);
+          setImageLoading(false);
+          setProfileImage(resizedUri); // Usar imagen local si falla el upload
         }
+      } else {
+        setImageLoading(false);
       }
+
+      setShowImageModal(false);
     } catch (error) {
       console.error('❌ [STEP 5] Error al tomar foto:', error);
-      Alert.alert('Error', 'No se pudo tomar la foto');
-    } finally {
-      setIsUploadingImage(false);
+      setImageLoading(false);
+      setImageError(true);
+      showError('No se pudo tomar la foto. Intenta nuevamente.');
+      setShowImageModal(false);
     }
   };
 
   const showImageOptions = () => {
     // Reset error state when user tries again
     setImageError(false);
-    
-    Alert.alert(
-      'Seleccionar foto de perfil',
-      'Elige una opción',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Tomar foto', onPress: takePhoto },
-        { text: 'Elegir de galería', onPress: pickImage },
-      ]
-    );
+    setShowImageModal(true);
   };
 
   const handleNext = async () => {
@@ -565,7 +569,7 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
               transform: [{ translateY: -10 }],
             }}>
               {isCheckingUsername ? (
-                <FontAwesome name="spinner" size={20} color={Colors[colorScheme].text + '60'} />
+                <LoadingAnimation size={20} />
               ) : usernameStatus === 'available' ? (
                 <FontAwesome name="check-circle" size={20} color="#00C851" />
               ) : usernameStatus === 'taken' || usernameStatus === 'invalid' ? (
@@ -615,27 +619,47 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
           >
             {isUploadingImage ? (
               <View style={commonStyles.imagePlaceholder}>
-                <FontAwesome
-                  name="spinner"
-                  size={40}
-                  color={Colors[colorScheme].tint}
-                />
+                <LoadingAnimation size={50} />
                 <Text style={[commonStyles.imageText, { color: Colors[colorScheme].text, marginTop: 12 }]}>
                   Procesando imagen...
                 </Text>
               </View>
             ) : profileImage && !imageError ? (
               <View style={commonStyles.imagePreviewContainer}>
+                {imageLoading && (
+                  <View style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.3)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1,
+                    borderRadius: 8,
+                  }}>
+                    <LoadingAnimation size={30} />
+                  </View>
+                )}
                 <Image 
                   source={{ uri: profileImage }} 
-                  style={commonStyles.imagePreview}
+                  style={[commonStyles.imagePreview, imageLoading && { opacity: 0.7 }]}
                   onError={(error) => {
                     console.error('❌ [IMAGE DISPLAY] Error al cargar imagen:', error.nativeEvent.error);
                     console.log('❌ [IMAGE DISPLAY] URI problemática:', profileImage);
+                    console.log('❌ [IMAGE DISPLAY] Tipo de URI:', typeof profileImage);
                     setImageError(true);
+                    setImageLoading(false);
                   }}
                   onLoad={() => {
                     console.log('✅ [IMAGE DISPLAY] Imagen cargada exitosamente:', profileImage);
+                    setImageError(false);
+                    setImageLoading(false);
+                  }}
+                  onLoadStart={() => {
+                    console.log('🔄 [IMAGE DISPLAY] Iniciando carga de imagen:', profileImage);
+                    setImageLoading(true);
                     setImageError(false);
                   }}
                 />
@@ -695,6 +719,123 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
           </Text>
         </TouchableOpacity>
       </View>
+      
+      {/* Modal para selección de imagen */}
+      <Modal
+        visible={showImageModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowImageModal(false)}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+          }}
+          activeOpacity={1}
+          onPress={() => setShowImageModal(false)}
+        >
+          <View
+            style={{
+              backgroundColor: Colors[colorScheme].background,
+              borderRadius: 12,
+              padding: 20,
+              width: '90%',
+              maxWidth: 400,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+            }}
+            onStartShouldSetResponder={() => true}
+          >
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 20,
+            }}>
+              <Text style={{
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: Colors[colorScheme].text,
+              }}>
+                Seleccionar foto de perfil
+              </Text>
+              <TouchableOpacity 
+                onPress={() => setShowImageModal(false)}
+                style={{
+                  padding: 8,
+                  borderRadius: 20,
+                  backgroundColor: `${Colors[colorScheme].text}10`,
+                }}
+              >
+                <Text style={{
+                  fontSize: 16,
+                  color: Colors[colorScheme].text,
+                  fontWeight: 'bold',
+                }}>
+                  ✕
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{
+              fontSize: 16,
+              color: Colors[colorScheme].text,
+              marginBottom: 20,
+              textAlign: 'center',
+            }}>
+              Elige una opción
+            </Text>
+            
+            <TouchableOpacity
+              style={{
+                padding: 16,
+                borderRadius: 8,
+                backgroundColor: Colors[colorScheme].tint,
+                marginBottom: 12,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => {
+                setShowImageModal(false);
+                takePhoto();
+              }}
+            >
+              <FontAwesome name="camera" size={20} color="white" style={{ marginRight: 10 }} />
+              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
+                Tomar foto
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                padding: 16,
+                borderRadius: 8,
+                backgroundColor: Colors[colorScheme].tint,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => {
+                setShowImageModal(false);
+                pickImage();
+              }}
+            >
+              <FontAwesome name="image" size={20} color="white" style={{ marginRight: 10 }} />
+              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
+                Elegir de galería
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
       
       {/* Componente de alertas personalizado */}
       <AlertComponent />

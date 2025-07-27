@@ -54,7 +54,7 @@ export const useStep4Form = ({
       const updateData = {
         ...(stepData.fitnessGoal && { fitnessGoal: stepData.fitnessGoal }),
         ...(stepData.healthRestrictions && { physicalExceptions: stepData.healthRestrictions }),
-        ...(stepData.additionalInfo && { additionalInfo: stepData.additionalInfo }),
+        ...(stepData.additionalInfo && { physicalExceptionsNotes: stepData.additionalInfo }),
         ...(stepData.rh && { RH: stepData.rh }),
       };
       
@@ -69,8 +69,7 @@ export const useStep4Form = ({
       onNext(stepData);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
-      console.error('❌ [STEP 4] Error:', errorMessage);
-      showError('No se pudieron guardar los datos. Intenta de nuevo.');
+      showError(errorMessage);
       // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
