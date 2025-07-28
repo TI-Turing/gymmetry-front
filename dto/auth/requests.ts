@@ -9,3 +9,8 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
 }
+
+export interface RefreshTokenRequest {
+  Token: string;
+  RefreshToken: string;
+}

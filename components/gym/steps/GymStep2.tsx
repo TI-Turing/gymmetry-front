@@ -11,8 +11,10 @@ import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
+import GymTypeDropdown from '../GymTypeDropdown';
 import { GymStep2Data, GymStepProps, GymType } from '../types';
 import { GymService } from '../GymService';
+import Colors from '@/constants/Colors';
 
 interface GymStep2Props extends GymStepProps<GymStep2Data> {
   gymId: string;
@@ -42,13 +44,24 @@ export default function GymStep2({
 
   const loadGymTypes = async () => {
     try {
+      // eslint-disable-next-line no-console
+      console.log('🏷️ Loading gym types...');
       const response = await GymService.getGymTypes();
+      // eslint-disable-next-line no-console
+      console.log('📦 Gym types response:', response);
+      // eslint-disable-next-line no-console
+      console.log('📊 Response.Data type:', typeof response.Data);
+      // eslint-disable-next-line no-console
+      console.log('📊 Response.Data is array:', Array.isArray(response.Data));
+
       if (response.Success) {
         setGymTypes(response.Data || []);
       } else {
         Alert.alert('Error', 'No se pudieron cargar los tipos de gimnasio');
       }
-    } catch {
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('💥 Error loading gym types:', error);
       Alert.alert('Error', 'Error de conexión al cargar tipos de gimnasio');
     } finally {
       setLoadingTypes(false);
@@ -102,7 +115,9 @@ export default function GymStep2({
     }
   };
 
-  const selectedGymType = gymTypes.find(type => type.Id === formData.gymTypeId);
+  const selectedGymType = Array.isArray(gymTypes)
+    ? gymTypes.find(type => type.Id === formData.gymTypeId)
+    : null;
 
   return (
     <KeyboardAvoidingView
@@ -124,58 +139,15 @@ export default function GymStep2({
 
         {/* Tipo de Gimnasio */}
         <View style={styles.section}>
-          <Text style={styles.label}>Tipo de Gimnasio *</Text>
-          {loadingTypes ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Cargando tipos...</Text>
-            </View>
-          ) : (
-            <ScrollView
-              style={styles.gymTypesContainer}
-              showsVerticalScrollIndicator={false}
-            >
-              {gymTypes.map(type => (
-                <TouchableOpacity
-                  key={type.Id}
-                  style={[
-                    styles.gymTypeCard,
-                    formData.gymTypeId === type.Id && styles.selectedGymType,
-                  ]}
-                  onPress={() => handleInputChange('gymTypeId', type.Id)}
-                >
-                  <View style={styles.gymTypeHeader}>
-                    <Text
-                      style={[
-                        styles.gymTypeName,
-                        formData.gymTypeId === type.Id && styles.selectedText,
-                      ]}
-                    >
-                      {type.Name}
-                    </Text>
-                    {formData.gymTypeId === type.Id && (
-                      <FontAwesome
-                        name='check-circle'
-                        size={20}
-                        color='#9C27B0'
-                      />
-                    )}
-                  </View>
-                  <Text
-                    style={[
-                      styles.gymTypeDescription,
-                      formData.gymTypeId === type.Id &&
-                        styles.selectedDescription,
-                    ]}
-                  >
-                    {type.Description}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
-          {errors.gymTypeId && (
-            <Text style={styles.errorText}>{errors.gymTypeId}</Text>
-          )}
+          <GymTypeDropdown
+            label='Tipo de Gimnasio *'
+            placeholder='Selecciona el tipo de gimnasio'
+            options={gymTypes}
+            value={formData.gymTypeId}
+            onSelect={typeId => handleInputChange('gymTypeId', typeId)}
+            error={errors.gymTypeId}
+            loading={loadingTypes}
+          />
         </View>
 
         {/* Formulario */}
@@ -203,7 +175,11 @@ export default function GymStep2({
         {/* Información del tipo seleccionado */}
         {selectedGymType && (
           <View style={styles.infoCard}>
-            <FontAwesome name='info-circle' size={20} color='#9C27B0' />
+            <FontAwesome
+              name='info-circle'
+              size={20}
+              color={Colors.dark.tint}
+            />
             <View style={styles.infoContent}>
               <Text style={styles.infoTitle}>Tipo seleccionado:</Text>
               <Text style={styles.infoText}>{selectedGymType.Name}</Text>
@@ -263,66 +239,9 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 30,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 15,
-  },
-  gymTypesContainer: {
-    maxHeight: 300,
-  },
-  loadingContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#B0B0B0',
-    fontSize: 16,
-  },
-  gymTypeCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  selectedGymType: {
-    borderColor: '#9C27B0',
-    backgroundColor: '#2A1B2E',
-  },
-  gymTypeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  gymTypeName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    flex: 1,
-  },
-  selectedText: {
-    color: '#9C27B0',
-  },
-  gymTypeDescription: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    lineHeight: 20,
-  },
-  selectedDescription: {
-    color: '#D0B0D0',
-  },
   form: {
     gap: 20,
     marginBottom: 20,
-  },
-  errorText: {
-    color: '#F44336',
-    fontSize: 14,
-    marginTop: 5,
   },
   infoCard: {
     backgroundColor: '#1E1E1E',
@@ -331,7 +250,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderLeftWidth: 3,
-    borderLeftColor: '#9C27B0',
+    borderLeftColor: Colors.dark.tint,
   },
   infoContent: {
     flex: 1,
@@ -340,7 +259,7 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#9C27B0',
+    color: Colors.dark.tint,
     marginBottom: 4,
   },
   infoText: {
@@ -355,7 +274,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#333333',
   },
   nextButton: {
-    backgroundColor: '#9C27B0',
+    backgroundColor: Colors.dark.tint,
   },
   backButton: {
     backgroundColor: 'transparent',

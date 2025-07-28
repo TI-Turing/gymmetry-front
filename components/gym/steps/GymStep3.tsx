@@ -7,6 +7,7 @@ import Button from '@/components/common/Button';
 import Dropdown from '@/components/auth/Dropdown';
 import { GymStepProps, GymStep3Data } from '../types';
 import { GymService } from '../GymService';
+import Colors from '@/constants/Colors';
 
 interface Country {
   Id: string;

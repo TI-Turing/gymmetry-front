@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, ScrollView, SafeAreaView, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { useCustomAlert } from '@/components/auth/CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import DisciplineConsistency from '@/components/home/DisciplineConsistency';
 import PlanInfo from '@/components/home/PlanInfo';
 import TodayRoutine from '@/components/home/TodayRoutine';

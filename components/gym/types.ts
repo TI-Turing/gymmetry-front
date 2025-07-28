@@ -19,14 +19,9 @@ export interface GymType {
   Gyms: any[];
 }
 
-// Información del gimnasio creado (lo que viene en Data del registro)
+// Información del gimnasio creado (solo el ID que retorna gym/add)
 export interface GymRegistrationData {
   Id: string;
-  Name: string;
-  Email: string;
-  Phone: string;
-  Nit: string;
-  // ... otros campos que el backend retorne
 }
 
 // Información del país (lo que viene en Data de países)

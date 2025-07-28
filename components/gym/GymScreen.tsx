@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { View } from '@/components/Themed';
-import { useCustomAlert } from '@/components/auth/CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { NoGymView, GymConnectedView } from './index';

@@ -17,6 +17,11 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 class ApiService {
   private axiosInstance: AxiosInstance;
+  private isRefreshing = false;
+  private failedQueue: {
+    resolve: (value?: any) => void;
+    reject: (error?: any) => void;
+  }[] = [];
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -84,15 +89,79 @@ class ApiService {
       return curlCommand;
     }
 
-    // Interceptor de response para logging y manejo de errores
+    // Interceptor de response para manejo automático de refresh token
     this.axiosInstance.interceptors.response.use(
       (response: AxiosResponse) => {
         return response;
       },
-      (error: AxiosError) => {
+      async (error: AxiosError) => {
+        const originalRequest = error.config as any;
+
+        // Si es un error 401 y no es el endpoint de refresh token
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          !originalRequest.url?.includes('/auth/refresh-token')
+        ) {
+          if (this.isRefreshing) {
+            // Si ya estamos refrescando, agregar a la cola
+            return new Promise((resolve, reject) => {
+              this.failedQueue.push({ resolve, reject });
+            })
+              .then(() => {
+                return this.axiosInstance(originalRequest);
+              })
+              .catch(err => {
+                return Promise.reject(err);
+              });
+          }
+
+          originalRequest._retry = true;
+          this.isRefreshing = true;
+
+          try {
+            // Intentar refrescar el token
+            const { authService } = await import('./authService');
+            const refreshed = await authService.refreshAuthToken();
+
+            if (refreshed) {
+              // Procesar cola de requests fallidos
+              this.processQueue(null);
+              // Reintentar el request original
+              return this.axiosInstance(originalRequest);
+            } else {
+              // Refresh falló, limpiar sesión y rechazar
+              this.processQueue(new Error('Session expired'));
+              await authService.logout();
+              return Promise.reject(new Error('Session expired'));
+            }
+          } catch (refreshError) {
+            // Error en el refresh, limpiar sesión
+            this.processQueue(refreshError);
+            const { authService } = await import('./authService');
+            await authService.logout();
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+          }
+        }
+
         return this.handleError(error);
       }
     );
+  }
+
+  // Método para procesar la cola de requests fallidos
+  private processQueue(error: any) {
+    this.failedQueue.forEach(({ resolve, reject }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
+
+    this.failedQueue = [];
   }
 
   // Método privado para manejar errores

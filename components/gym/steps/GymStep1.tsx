@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -11,6 +9,7 @@ import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStep1Data, GymStepProps } from '../types';
 import { GymService } from '../GymService';
 import Colors from '@/constants/Colors';
@@ -21,6 +20,8 @@ export default function GymStep1({
   initialData,
   isLoading = false,
 }: GymStepProps<GymStep1Data>) {
+  const { showError, AlertComponent } = useCustomAlert();
+
   const [formData, setFormData] = useState<GymStep1Data>({
     name: initialData?.name || '',
     email: initialData?.email || '',
@@ -68,18 +69,26 @@ export default function GymStep1({
   };
 
   const handleNext = async () => {
+    // eslint-disable-next-line no-console
+    console.log('🚀 handleNext called');
+    // eslint-disable-next-line no-console
+    console.log('📝 formData:', formData);
+
     if (!validateForm()) {
-      Alert.alert(
-        'Formulario incompleto',
-        'Por favor completa todos los campos requeridos'
-      );
+      // eslint-disable-next-line no-console
+      console.log('❌ Form validation failed');
+      showError('Por favor completa todos los campos requeridos');
       return;
     }
 
+    // eslint-disable-next-line no-console
+    console.log('✅ Form validation passed, calling registerGym');
     setLoading(true);
     try {
       // Registrar gimnasio inicial y obtener ID
       const response = await GymService.registerGym(formData);
+      // eslint-disable-next-line no-console
+      console.log('📡 registerGym response:', response);
 
       if (response.Success && response.Data) {
         // Pasar los datos junto con el gymId al siguiente paso
@@ -88,94 +97,100 @@ export default function GymStep1({
           gymId: response.Data.Id,
         } as any);
       } else {
-        Alert.alert(
-          'Error',
-          response.Message || 'Error al registrar el gimnasio'
-        );
+        showError(response.Message || 'Error al registrar el gimnasio');
       }
-    } catch (_error) {
-      Alert.alert('Error', 'Error de conexión. Intenta nuevamente.');
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('💥 Error in registerGym:', error);
+      showError('Error de conexión. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+    <>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Información Básica</Text>
-          <Text style={styles.headerSubtitle}>
-            Comencemos con los datos principales de tu gimnasio
-          </Text>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Información Básica</Text>
+            <Text style={styles.headerSubtitle}>
+              Comencemos con los datos principales de tu gimnasio
+            </Text>
+          </View>
+
+          {/* Formulario */}
+          <View style={styles.form}>
+            <FormInput
+              label='Nombre del Gimnasio *'
+              value={formData.name}
+              onChangeText={value => handleInputChange('name', value)}
+              error={errors.name}
+              inputStyle={styles.input}
+            />
+
+            <FormInput
+              label='Email Corporativo *'
+              value={formData.email}
+              onChangeText={value => handleInputChange('email', value)}
+              keyboardType='email-address'
+              autoCapitalize='none'
+              error={errors.email}
+              inputStyle={styles.input}
+            />
+
+            <FormInput
+              label='Teléfono Principal *'
+              value={formData.phone}
+              onChangeText={value => handleInputChange('phone', value)}
+              keyboardType='phone-pad'
+              error={errors.phone}
+              inputStyle={styles.input}
+            />
+
+            <FormInput
+              label='NIT o Identificación Tributaria *'
+              value={formData.nit}
+              onChangeText={value => handleInputChange('nit', value)}
+              error={errors.nit}
+              inputStyle={styles.input}
+            />
+          </View>
+
+          {/* Info Card */}
+          <View style={styles.infoCard}>
+            <FontAwesome
+              name='info-circle'
+              size={20}
+              color={Colors.dark.tint}
+            />
+            <Text style={styles.infoText}>
+              Esta información será verificada por nuestro equipo. Asegúrate de
+              que sea correcta y esté actualizada.
+            </Text>
+          </View>
+        </ScrollView>
+
+        {/* Botones */}
+        <View style={styles.buttonContainer}>
+          <Button
+            title={loading ? 'Registrando...' : 'Continuar'}
+            onPress={handleNext}
+            disabled={loading || isLoading}
+            style={styles.nextButton}
+          />
         </View>
-
-        {/* Formulario */}
-        <View style={styles.form}>
-          <FormInput
-            label='Nombre del Gimnasio *'
-            value={formData.name}
-            onChangeText={value => handleInputChange('name', value)}
-            error={errors.name}
-            inputStyle={styles.input}
-          />
-
-          <FormInput
-            label='Email Corporativo *'
-            value={formData.email}
-            onChangeText={value => handleInputChange('email', value)}
-            keyboardType='email-address'
-            autoCapitalize='none'
-            error={errors.email}
-            inputStyle={styles.input}
-          />
-
-          <FormInput
-            label='Teléfono Principal *'
-            value={formData.phone}
-            onChangeText={value => handleInputChange('phone', value)}
-            keyboardType='phone-pad'
-            error={errors.phone}
-            inputStyle={styles.input}
-          />
-
-          <FormInput
-            label='NIT o Identificación Tributaria *'
-            value={formData.nit}
-            onChangeText={value => handleInputChange('nit', value)}
-            error={errors.nit}
-            inputStyle={styles.input}
-          />
-        </View>
-
-        {/* Info Card */}
-        <View style={styles.infoCard}>
-          <FontAwesome name='info-circle' size={20} color={Colors.dark.tint} />
-          <Text style={styles.infoText}>
-            Esta información será verificada por nuestro equipo. Asegúrate de
-            que sea correcta y esté actualizada.
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Botones */}
-      <View style={styles.buttonContainer}>
-        <Button
-          title={loading ? 'Registrando...' : 'Continuar'}
-          onPress={handleNext}
-          disabled={loading || isLoading}
-          style={styles.nextButton}
-        />
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+      <AlertComponent />
+    </>
   );
 }
 

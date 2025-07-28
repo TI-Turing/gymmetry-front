@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import { useCustomAlert } from '@/components/auth/CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import QRScannerOption from './QRScannerOption';
 import SearchGymsOption from './SearchGymsOption';
 import RegisterGymOption from './RegisterGymOption';
