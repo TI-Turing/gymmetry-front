@@ -22,9 +22,22 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return '#4CAF50'; // Verde
+        return '#ff6300'; // Color principal
       case 'failed':
-        return '#F44336'; // Rojo
+        return 'rgba(255, 99, 0, 0.1)'; // Color principal con opacidad muy baja
+      case 'rest':
+        return '#9E9E9E'; // Gris
+      default:
+        return '#E0E0E0'; // Blanco/Sin datos
+    }
+  };
+
+  const getStatusBorderColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return '#ff6300'; // Color principal
+      case 'failed':
+        return '#ff6300'; // Borde en color principal
       case 'rest':
         return '#9E9E9E'; // Gris
       default:
@@ -61,7 +74,11 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
                   key={dayIndex}
                   style={[
                     styles.dayCircle,
-                    { backgroundColor: getStatusColor(dayData.status) },
+                    {
+                      backgroundColor: getStatusColor(dayData.status),
+                      borderColor: getStatusBorderColor(dayData.status),
+                      borderWidth: dayData.status === 'failed' ? 2 : 0,
+                    },
                   ]}
                 />
               ))}
@@ -77,11 +94,20 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
           <Text style={styles.legendText}>Descanso</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendCircle, { backgroundColor: '#4CAF50' }]} />
+          <View style={[styles.legendCircle, { backgroundColor: '#ff6300' }]} />
           <Text style={styles.legendText}>Cumplido</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendCircle, { backgroundColor: '#F44336' }]} />
+          <View
+            style={[
+              styles.legendCircle,
+              {
+                backgroundColor: 'rgba(255, 99, 0, 0.1)',
+                borderColor: '#ff6300',
+                borderWidth: 2,
+              },
+            ]}
+          />
           <Text style={styles.legendText}>Falla</Text>
         </View>
       </View>

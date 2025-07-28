@@ -3,8 +3,9 @@ import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCustomAlert } from '@/components/auth/CustomAlert';
+import { withWebLayout } from '@/components/layout/withWebLayout';
 
-export default function GymScreen() {
+function GymScreen() {
   const { showSuccess, AlertComponent } = useCustomAlert();
   const [isConnectedToGym, setIsConnectedToGym] = useState(false);
 
@@ -184,6 +185,8 @@ export default function GymScreen() {
 
   return isConnectedToGym ? renderGymView() : renderNoGymView();
 }
+
+export default withWebLayout(GymScreen, { defaultTab: 'gym' });
 
 const styles = StyleSheet.create({
   container: {

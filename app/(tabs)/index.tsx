@@ -6,10 +6,11 @@ import DisciplineConsistency from '@/components/home/DisciplineConsistency';
 import PlanInfo from '@/components/home/PlanInfo';
 import TodayRoutine from '@/components/home/TodayRoutine';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
+import { withWebLayout } from '@/components/layout/withWebLayout';
 
 type DayStatus = 'completed' | 'failed' | 'rest';
 
-export default function HomeScreen() {
+function HomeScreen() {
   const { showSuccess, AlertComponent } = useCustomAlert();
 
   // Datos de prueba para disciplina y consistencia
@@ -159,6 +160,8 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
+
+export default withWebLayout(HomeScreen, { defaultTab: 'index' });
 
 const styles = StyleSheet.create({
   container: {

@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
+import { withWebLayout } from '@/components/layout/withWebLayout';
 
-export default function FeedScreen() {
+function FeedScreen() {
   const [showComposer, setShowComposer] = useState(false);
   const [postText, setPostText] = useState('');
 
@@ -201,6 +202,8 @@ export default function FeedScreen() {
     </View>
   );
 }
+
+export default withWebLayout(FeedScreen, { defaultTab: 'feed' });
 
 const styles = StyleSheet.create({
   container: {

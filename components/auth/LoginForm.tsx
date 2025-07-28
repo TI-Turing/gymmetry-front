@@ -5,8 +5,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
@@ -54,172 +56,463 @@ export default function LoginForm({
     setShowPassword(prev => !prev);
   }, []);
 
-  const isFormValid = userNameOrEmail && password;
+  const isFormValid = !!userNameOrEmail && !!password;
+
+  // Determinar si estamos en web y obtener dimensiones
+  const isWeb = Platform.OS === 'web';
+  const { height: screenHeight } = Dimensions.get('window');
 
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={[{ flex: 1 }, isWeb && { backgroundColor: '#1A1A1A' }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
           contentContainerStyle={[
             commonStyles.container,
             { justifyContent: 'center' },
+            isWeb && {
+              alignItems: 'center',
+              minHeight: screenHeight,
+              backgroundColor: '#1A1A1A',
+            },
           ]}
           keyboardShouldPersistTaps='handled'
         >
-          <View style={[commonStyles.header, { marginBottom: 40 }]}>
-            <Text
-              style={[
-                commonStyles.title,
-                {
-                  color: Colors[colorScheme].tint,
-                  fontSize: 34,
-                  fontWeight: 'bold',
-                },
-              ]}
-            >
-              GYMMETRY
-            </Text>
-            <Text
-              style={[
-                commonStyles.subtitle,
-                { color: Colors[colorScheme].text },
-              ]}
-            >
-              Inicia sesión para continuar
-            </Text>
-          </View>
-
-          <View style={commonStyles.form}>
-            <View style={commonStyles.inputContainer}>
-              <Text
-                style={[
-                  commonStyles.label,
-                  { color: Colors[colorScheme].text },
-                ]}
+          <View
+            style={[
+              isWeb && {
+                maxWidth: 400,
+                width: '100%',
+              },
+            ]}
+          >
+            {isWeb ? (
+              <LinearGradient
+                colors={['#000000', '#121212', '#000000']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  borderRadius: 0,
+                  padding: 40,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 12,
+                  elevation: 12,
+                  borderWidth: 0,
+                }}
               >
-                Usuario o Email
-              </Text>
-              <TextInput
-                style={[
-                  commonStyles.input,
-                  {
-                    backgroundColor: Colors[colorScheme].background,
-                    color: Colors[colorScheme].text,
-                    borderColor: Colors[colorScheme].tint,
-                  },
-                ]}
-                value={userNameOrEmail}
-                onChangeText={setUserNameOrEmail}
-                placeholder='usuario o tu@email.com'
-                placeholderTextColor={`${Colors[colorScheme].text}60`}
-                keyboardType='email-address'
-                autoCapitalize='none'
-                autoCorrect={false}
-                autoComplete='email'
-                textContentType='emailAddress'
-                accessibilityLabel='Campo de usuario o email'
-                accessibilityHint='Ingresa tu nombre de usuario o dirección de correo electrónico'
-              />
-            </View>
-
-            <View style={commonStyles.inputContainer}>
-              <Text
-                style={[
-                  commonStyles.label,
-                  { color: Colors[colorScheme].text },
-                ]}
-              >
-                Contraseña
-              </Text>
-              <View style={{ position: 'relative' }}>
-                <TextInput
-                  style={[
-                    commonStyles.input,
-                    {
-                      backgroundColor: Colors[colorScheme].background,
-                      color: Colors[colorScheme].text,
-                      borderColor: '#666',
-                      paddingRight: 50,
-                    },
-                  ]}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder='Tu contraseña'
-                  placeholderTextColor={`${Colors[colorScheme].text}60`}
-                  secureTextEntry={!showPassword}
-                  autoComplete='password'
-                  textContentType='password'
-                  accessibilityLabel='Campo de contraseña'
-                  accessibilityHint='Ingresa tu contraseña'
+                <WebFormContent
+                  colorScheme={colorScheme}
+                  userNameOrEmail={userNameOrEmail}
+                  setUserNameOrEmail={setUserNameOrEmail}
+                  password={password}
+                  setPassword={setPassword}
+                  showPassword={showPassword}
+                  togglePasswordVisibility={togglePasswordVisibility}
+                  isFormValid={isFormValid}
+                  isLoading={isLoading}
+                  handleLogin={handleLogin}
+                  onSwitchToRegister={onSwitchToRegister}
                 />
-                <TouchableOpacity
-                  style={{
-                    position: 'absolute',
-                    right: 16,
-                    top: 12,
-                    padding: 4,
-                  }}
-                  onPress={togglePasswordVisibility}
-                  accessibilityLabel={
-                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-                  }
-                  accessibilityRole='button'
-                >
-                  <FontAwesome
-                    name={showPassword ? 'eye-slash' : 'eye'}
-                    size={20}
-                    color={Colors[colorScheme].text}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                commonStyles.button,
-                { backgroundColor: Colors[colorScheme].tint },
-                (!isFormValid || isLoading) && commonStyles.buttonDisabled,
-              ]}
-              onPress={handleLogin}
-              disabled={!isFormValid || isLoading}
-              accessibilityLabel={
-                isLoading ? 'Iniciando sesión' : 'Iniciar sesión'
-              }
-              accessibilityRole='button'
-              accessibilityState={{ disabled: !isFormValid || isLoading }}
-            >
-              <Text style={commonStyles.buttonText}>
-                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={{ alignItems: 'center', marginTop: 24 }}>
-              <Text
-                style={[{ color: Colors[colorScheme].text, marginBottom: 8 }]}
-              >
-                ¿No tienes cuenta?
-              </Text>
-              <TouchableOpacity
-                onPress={onSwitchToRegister}
-                accessibilityLabel='Ir a registro'
-                accessibilityRole='button'
-              >
-                <Text
-                  style={[
-                    { color: Colors[colorScheme].tint, fontWeight: '600' },
-                  ]}
-                >
-                  Regístrate
-                </Text>
-              </TouchableOpacity>
-            </View>
+              </LinearGradient>
+            ) : (
+              <MobileFormContent
+                colorScheme={colorScheme}
+                userNameOrEmail={userNameOrEmail}
+                setUserNameOrEmail={setUserNameOrEmail}
+                password={password}
+                setPassword={setPassword}
+                showPassword={showPassword}
+                togglePasswordVisibility={togglePasswordVisibility}
+                isFormValid={isFormValid}
+                isLoading={isLoading}
+                handleLogin={handleLogin}
+                onSwitchToRegister={onSwitchToRegister}
+              />
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
       <AlertComponent />
+    </>
+  );
+}
+
+// Componente para el formulario en web con estilos mejorados
+interface FormContentProps {
+  colorScheme: 'light' | 'dark';
+  userNameOrEmail: string;
+  setUserNameOrEmail: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  showPassword: boolean;
+  togglePasswordVisibility: () => void;
+  isFormValid: boolean;
+  isLoading: boolean;
+  handleLogin: () => void;
+  onSwitchToRegister: () => void;
+}
+
+function WebFormContent({
+  colorScheme,
+  userNameOrEmail,
+  setUserNameOrEmail,
+  password,
+  setPassword,
+  showPassword,
+  togglePasswordVisibility,
+  isFormValid,
+  isLoading,
+  handleLogin,
+  onSwitchToRegister,
+}: FormContentProps) {
+  return (
+    <>
+      <View
+        style={[
+          commonStyles.header,
+          { marginBottom: 40, backgroundColor: 'transparent' },
+        ]}
+      >
+        <Text
+          style={[
+            commonStyles.title,
+            {
+              color: '#ff6300',
+              fontSize: 34,
+              fontWeight: 'bold',
+            },
+          ]}
+        >
+          GYMMETRY
+        </Text>
+        <Text
+          style={[
+            commonStyles.subtitle,
+            {
+              color: '#FFFFFF',
+              backgroundColor: 'transparent',
+            },
+          ]}
+        >
+          Inicia sesión para continuar
+        </Text>
+      </View>
+
+      <View style={[commonStyles.form, { backgroundColor: 'transparent' }]}>
+        <View
+          style={[
+            commonStyles.inputContainer,
+            { backgroundColor: 'transparent' },
+          ]}
+        >
+          <Text
+            style={[
+              commonStyles.label,
+              {
+                color: '#FFFFFF',
+                backgroundColor: 'transparent',
+              },
+            ]}
+          >
+            Usuario o Email
+          </Text>
+          <TextInput
+            style={[
+              commonStyles.input,
+              {
+                backgroundColor: '#1E1E1E',
+                color: '#FFFFFF',
+                borderColor: '#ff6300',
+                borderWidth: 2,
+              },
+            ]}
+            value={userNameOrEmail}
+            onChangeText={setUserNameOrEmail}
+            placeholder='usuario o tu@email.com'
+            placeholderTextColor='#B0B0B0'
+            keyboardType='email-address'
+            autoCapitalize='none'
+            autoCorrect={false}
+            autoComplete='email'
+            textContentType='emailAddress'
+            accessibilityLabel='Campo de usuario o email'
+            accessibilityHint='Ingresa tu nombre de usuario o dirección de correo electrónico'
+          />
+        </View>
+
+        <View
+          style={[
+            commonStyles.inputContainer,
+            { backgroundColor: 'transparent' },
+          ]}
+        >
+          <Text
+            style={[
+              commonStyles.label,
+              {
+                color: '#FFFFFF',
+                backgroundColor: 'transparent',
+              },
+            ]}
+          >
+            Contraseña
+          </Text>
+          <View
+            style={{ position: 'relative', backgroundColor: 'transparent' }}
+          >
+            <TextInput
+              style={[
+                commonStyles.input,
+                {
+                  backgroundColor: '#1E1E1E',
+                  color: '#FFFFFF',
+                  borderColor: '#666',
+                  borderWidth: 2,
+                  paddingRight: 50,
+                },
+              ]}
+              value={password}
+              onChangeText={setPassword}
+              placeholder='Tu contraseña'
+              placeholderTextColor='#B0B0B0'
+              secureTextEntry={!showPassword}
+              autoComplete='password'
+              textContentType='password'
+              accessibilityLabel='Campo de contraseña'
+              accessibilityHint='Ingresa tu contraseña'
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                right: 16,
+                top: 12,
+                padding: 4,
+                backgroundColor: 'transparent',
+              }}
+              onPress={togglePasswordVisibility}
+              accessibilityLabel={
+                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              }
+              accessibilityRole='button'
+            >
+              <FontAwesome
+                name={showPassword ? 'eye-slash' : 'eye'}
+                size={20}
+                color='#FFFFFF'
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            commonStyles.button,
+            {
+              backgroundColor: '#ff6300',
+              marginTop: 24,
+            },
+            (!isFormValid || isLoading) && { opacity: 0.6 },
+          ]}
+          onPress={handleLogin}
+          disabled={!isFormValid || isLoading}
+          accessibilityLabel={isLoading ? 'Iniciando sesión' : 'Iniciar sesión'}
+          accessibilityRole='button'
+          accessibilityState={{ disabled: !isFormValid || isLoading }}
+        >
+          <Text style={[commonStyles.buttonText, { color: '#FFFFFF' }]}>
+            {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+          </Text>
+        </TouchableOpacity>
+
+        <View
+          style={{
+            alignItems: 'center',
+            marginTop: 24,
+            backgroundColor: 'transparent',
+          }}
+        >
+          <Text
+            style={{
+              color: '#FFFFFF',
+              marginBottom: 8,
+              backgroundColor: 'transparent',
+            }}
+          >
+            ¿No tienes cuenta?
+          </Text>
+          <TouchableOpacity
+            onPress={onSwitchToRegister}
+            accessibilityLabel='Ir a registro'
+            accessibilityRole='button'
+          >
+            <Text
+              style={{
+                color: '#ff6300',
+                fontWeight: '600',
+                backgroundColor: 'transparent',
+              }}
+            >
+              Regístrate
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
+}
+
+function MobileFormContent({
+  colorScheme,
+  userNameOrEmail,
+  setUserNameOrEmail,
+  password,
+  setPassword,
+  showPassword,
+  togglePasswordVisibility,
+  isFormValid,
+  isLoading,
+  handleLogin,
+  onSwitchToRegister,
+}: FormContentProps) {
+  return (
+    <>
+      <View style={[commonStyles.header, { marginBottom: 40 }]}>
+        <Text
+          style={[
+            commonStyles.title,
+            {
+              color: Colors[colorScheme].tint,
+              fontSize: 34,
+              fontWeight: 'bold',
+            },
+          ]}
+        >
+          GYMMETRY
+        </Text>
+        <Text
+          style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}
+        >
+          Inicia sesión para continuar
+        </Text>
+      </View>
+
+      <View style={commonStyles.form}>
+        <View style={commonStyles.inputContainer}>
+          <Text
+            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+          >
+            Usuario o Email
+          </Text>
+          <TextInput
+            style={[
+              commonStyles.input,
+              {
+                backgroundColor: Colors[colorScheme].background,
+                color: Colors[colorScheme].text,
+                borderColor: Colors[colorScheme].tint,
+              },
+            ]}
+            value={userNameOrEmail}
+            onChangeText={setUserNameOrEmail}
+            placeholder='usuario o tu@email.com'
+            placeholderTextColor={`${Colors[colorScheme].text}60`}
+            keyboardType='email-address'
+            autoCapitalize='none'
+            autoCorrect={false}
+            autoComplete='email'
+            textContentType='emailAddress'
+            accessibilityLabel='Campo de usuario o email'
+            accessibilityHint='Ingresa tu nombre de usuario o dirección de correo electrónico'
+          />
+        </View>
+
+        <View style={commonStyles.inputContainer}>
+          <Text
+            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
+          >
+            Contraseña
+          </Text>
+          <View style={{ position: 'relative' }}>
+            <TextInput
+              style={[
+                commonStyles.input,
+                {
+                  backgroundColor: Colors[colorScheme].background,
+                  color: Colors[colorScheme].text,
+                  borderColor: '#666',
+                  paddingRight: 50,
+                },
+              ]}
+              value={password}
+              onChangeText={setPassword}
+              placeholder='Tu contraseña'
+              placeholderTextColor={`${Colors[colorScheme].text}60`}
+              secureTextEntry={!showPassword}
+              autoComplete='password'
+              textContentType='password'
+              accessibilityLabel='Campo de contraseña'
+              accessibilityHint='Ingresa tu contraseña'
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                right: 16,
+                top: 12,
+                padding: 4,
+              }}
+              onPress={togglePasswordVisibility}
+              accessibilityLabel={
+                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              }
+              accessibilityRole='button'
+            >
+              <FontAwesome
+                name={showPassword ? 'eye-slash' : 'eye'}
+                size={20}
+                color={Colors[colorScheme].text}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            commonStyles.button,
+            { backgroundColor: Colors[colorScheme].tint },
+            (!isFormValid || isLoading) && commonStyles.buttonDisabled,
+          ]}
+          onPress={handleLogin}
+          disabled={!isFormValid || isLoading}
+          accessibilityLabel={isLoading ? 'Iniciando sesión' : 'Iniciar sesión'}
+          accessibilityRole='button'
+          accessibilityState={{ disabled: !isFormValid || isLoading }}
+        >
+          <Text style={commonStyles.buttonText}>
+            {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+          </Text>
+        </TouchableOpacity>
+
+        <View style={{ alignItems: 'center', marginTop: 24 }}>
+          <Text style={[{ color: Colors[colorScheme].text, marginBottom: 8 }]}>
+            ¿No tienes cuenta?
+          </Text>
+          <TouchableOpacity
+            onPress={onSwitchToRegister}
+            accessibilityLabel='Ir a registro'
+            accessibilityRole='button'
+          >
+            <Text
+              style={[{ color: Colors[colorScheme].tint, fontWeight: '600' }]}
+            >
+              Regístrate
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </>
   );
 }

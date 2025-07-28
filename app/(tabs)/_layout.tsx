@@ -1,6 +1,7 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -20,14 +21,17 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#1E1E1E',
-          borderTopColor: '#333333',
-          borderTopWidth: 1,
-          height: 80,
-          paddingBottom: 20,
-          paddingTop: 10,
-        },
+        tabBarStyle:
+          Platform.OS === 'web'
+            ? { display: 'none' }
+            : {
+                backgroundColor: '#1E1E1E',
+                borderTopColor: '#333333',
+                borderTopWidth: 1,
+                height: 80,
+                paddingBottom: 20,
+                paddingTop: 10,
+              },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',

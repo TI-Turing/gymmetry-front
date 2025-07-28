@@ -9,8 +9,9 @@ import {
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
+import { withWebLayout } from '@/components/layout/withWebLayout';
 
-export default function ProfileScreen() {
+function ProfileScreen() {
   const { user, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -149,6 +150,8 @@ export default function ProfileScreen() {
     </View>
   );
 }
+
+export default withWebLayout(ProfileScreen, { defaultTab: 'profile' });
 
 const styles = StyleSheet.create({
   container: {

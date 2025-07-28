@@ -7,10 +7,11 @@ import {
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
+import { withWebLayout } from '@/components/layout/withWebLayout';
 
 const { width } = Dimensions.get('window');
 
-export default function ProgressScreen() {
+function ProgressScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState('semana');
 
   const periods = [
@@ -217,6 +218,8 @@ export default function ProgressScreen() {
     </View>
   );
 }
+
+export default withWebLayout(ProgressScreen, { defaultTab: 'progress' });
 
 const styles = StyleSheet.create({
   container: {
