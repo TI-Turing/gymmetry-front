@@ -189,7 +189,7 @@ export default function MobileHeader({
 
 const styles = StyleSheet.create({
   header: {
-    height: 80,
+    height: 90,
     backgroundColor: '#1A1A1A',
     borderBottomWidth: 1,
     borderBottomColor: '#333333',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 54 : 40, // Más espacio desde la StatusBar
+    paddingTop: Platform.OS === 'ios' ? 54 : 45, // Más espacio desde la StatusBar
   },
   logoContainer: {
     flex: 1,
