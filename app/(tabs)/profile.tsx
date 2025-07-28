@@ -5,10 +5,13 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
+import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 
 function ProfileScreen() {
@@ -115,7 +118,8 @@ function ProfileScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {Platform.OS !== 'web' && <MobileHeader />}
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -147,7 +151,7 @@ function ProfileScreen() {
 
         <View style={styles.footer} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -43,6 +43,7 @@ export default function TabLayout() {
         options={{
           title: 'Inicio',
           tabBarIcon: ({ color }) => <TabBarIcon name='home' color={color} />,
+          tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
@@ -52,6 +53,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIcon name='building' color={color} />
           ),
+          tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
@@ -61,6 +63,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIcon name='bar-chart' color={color} />
           ),
+          tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
@@ -68,6 +71,7 @@ export default function TabLayout() {
         options={{
           title: 'Feed',
           tabBarIcon: ({ color }) => <TabBarIcon name='users' color={color} />,
+          tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
@@ -75,6 +79,7 @@ export default function TabLayout() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => <TabBarIcon name='user' color={color} />,
+          tabBarShowLabel: false,
         }}
       />
     </Tabs>

@@ -5,9 +5,12 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
+import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 
 function FeedScreen() {
@@ -180,7 +183,8 @@ function FeedScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {Platform.OS !== 'web' && <MobileHeader />}
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -199,7 +203,7 @@ function FeedScreen() {
 
         <View style={styles.footer} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

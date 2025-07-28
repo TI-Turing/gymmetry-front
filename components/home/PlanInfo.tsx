@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     gap: 16,
+    backgroundColor: '#1E1E1E',
   },
   dateContainer: {
     flexDirection: 'row',
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
   dateItem: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: '#1E1E1E',
   },
   dateLabel: {
     fontSize: 14,
@@ -92,6 +94,7 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     alignItems: 'center',
+    backgroundColor: '#1E1E1E',
   },
   progressLabel: {
     fontSize: 14,
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: '#333333',
+    backgroundColor: '#1E1E1E',
   },
   gymLabel: {
     fontSize: 14,

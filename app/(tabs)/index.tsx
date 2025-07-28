@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, ScrollView, SafeAreaView, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/auth/CustomAlert';
 import DisciplineConsistency from '@/components/home/DisciplineConsistency';
 import PlanInfo from '@/components/home/PlanInfo';
 import TodayRoutine from '@/components/home/TodayRoutine';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
+import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 
 type DayStatus = 'completed' | 'failed' | 'rest';
@@ -112,6 +113,7 @@ function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {Platform.OS !== 'web' && <MobileHeader />}
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}

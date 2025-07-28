@@ -22,6 +22,7 @@ export default function WebHeader({
 }: WebHeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const screenWidth = useScreenWidth();
 
   if (Platform.OS !== 'web') {
@@ -94,21 +95,31 @@ export default function WebHeader({
           {isCompact ? 'G' : 'GYMMETRY'}
         </Text>
       </View>
-      {/* Barra de búsqueda central */}
-      <View style={styles.searchContainer}>
-        <FontAwesome
-          name='search'
-          size={16}
-          color='#B0B0B0'
-          style={styles.searchIcon}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder='Buscar ejercicios, rutinas, usuarios...'
-          placeholderTextColor='#B0B0B0'
-          value={searchText}
-          onChangeText={setSearchText}
-        />
+
+      {/* Contenedor central para centrar la barra de búsqueda */}
+      <View style={styles.centerContainer}>
+        <View
+          style={[
+            styles.searchContainer,
+            isSearchFocused && styles.searchContainerFocused,
+          ]}
+        >
+          <FontAwesome
+            name='search'
+            size={16}
+            color='#B0B0B0'
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder='Buscar ejercicios, rutinas, usuarios...'
+            placeholderTextColor='#B0B0B0'
+            value={searchText}
+            onChangeText={setSearchText}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+          />
+        </View>
       </View>
 
       {/* Usuario y menú derecho */}
@@ -204,14 +215,18 @@ const styles = StyleSheet.create({
   logoCompact: {
     fontSize: 24,
   },
-  searchContainer: {
+  centerContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    width: 400, // Ancho fijo más compacto
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#121212', // Mismo color del fondo principal
     borderRadius: 25,
     paddingHorizontal: 15,
-    marginHorizontal: 20,
     height: 40,
   },
   searchIcon: {
@@ -221,6 +236,18 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#FFFFFF',
     fontSize: 14,
+    borderWidth: 0,
+    outlineWidth: 0,
+    backgroundColor: 'transparent',
+  },
+  searchContainerFocused: {
+    borderWidth: 2,
+    borderColor: '#ff6300',
+    shadowColor: '#ff6300',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   userContainer: {
     position: 'relative',

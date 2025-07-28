@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+    backgroundColor: '#1E1E1E',
   },
   title: {
     fontSize: 18,
@@ -145,16 +146,18 @@ const styles = StyleSheet.create({
   percentage: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#ff6300',
   },
   calendarContainer: {
     marginBottom: 16,
+    backgroundColor: '#1E1E1E',
   },
   daysHeader: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 12,
     paddingLeft: 32,
+    backgroundColor: '#1E1E1E',
   },
   dayLabel: {
     fontSize: 14,
@@ -167,6 +170,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    backgroundColor: '#1E1E1E',
   },
   weekNumber: {
     fontSize: 14,
@@ -180,6 +184,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     flex: 1,
     marginLeft: 8,
+    backgroundColor: '#1E1E1E',
   },
   dayCircle: {
     width: 24,
@@ -193,10 +198,12 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#333333',
+    backgroundColor: '#1E1E1E',
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#1E1E1E',
   },
   legendCircle: {
     width: 12,

@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCustomAlert } from '@/components/auth/CustomAlert';
+import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 
 function GymScreen() {
@@ -183,7 +189,12 @@ function GymScreen() {
     </View>
   );
 
-  return isConnectedToGym ? renderGymView() : renderNoGymView();
+  return (
+    <>
+      {Platform.OS !== 'web' && <MobileHeader />}
+      {isConnectedToGym ? renderGymView() : renderNoGymView()}
+    </>
+  );
 }
 
 export default withWebLayout(GymScreen, { defaultTab: 'gym' });
