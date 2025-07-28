@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -15,6 +14,7 @@ import GymTypeDropdown from '../GymTypeDropdown';
 import { GymStep2Data, GymStepProps, GymType } from '../types';
 import { GymService } from '../GymService';
 import Colors from '@/constants/Colors';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface GymStep2Props extends GymStepProps<GymStep2Data> {
   gymId: string;
@@ -27,6 +27,7 @@ export default function GymStep2({
   gymId,
   isLoading = false,
 }: GymStep2Props) {
+  const { showAlert, AlertComponent } = useCustomAlert();
   const [formData, setFormData] = useState<GymStep2Data>({
     gymTypeId: initialData?.gymTypeId || '',
     slogan: initialData?.slogan || '',
@@ -38,35 +39,32 @@ export default function GymStep2({
   const [gymTypes, setGymTypes] = useState<GymType[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(true);
 
-  useEffect(() => {
-    loadGymTypes();
-  }, []);
-
-  const loadGymTypes = async () => {
+  const loadGymTypes = useCallback(async () => {
     try {
-      // eslint-disable-next-line no-console
-      console.log('🏷️ Loading gym types...');
       const response = await GymService.getGymTypes();
-      // eslint-disable-next-line no-console
-      console.log('📦 Gym types response:', response);
-      // eslint-disable-next-line no-console
-      console.log('📊 Response.Data type:', typeof response.Data);
-      // eslint-disable-next-line no-console
-      console.log('📊 Response.Data is array:', Array.isArray(response.Data));
-
       if (response.Success) {
         setGymTypes(response.Data || []);
       } else {
-        Alert.alert('Error', 'No se pudieron cargar los tipos de gimnasio');
+        showAlert(
+          'error',
+          'Error',
+          'No se pudieron cargar los tipos de gimnasio'
+        );
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('💥 Error loading gym types:', error);
-      Alert.alert('Error', 'Error de conexión al cargar tipos de gimnasio');
+    } catch {
+      showAlert(
+        'error',
+        'Error',
+        'Error de conexión al cargar tipos de gimnasio'
+      );
     } finally {
       setLoadingTypes(false);
     }
-  };
+  }, [showAlert]);
+
+  useEffect(() => {
+    loadGymTypes();
+  }, [loadGymTypes]);
 
   const handleInputChange = (field: keyof GymStep2Data, value: string) => {
     setFormData(prev => ({
@@ -97,7 +95,8 @@ export default function GymStep2({
 
   const handleNext = async () => {
     if (!validateForm()) {
-      Alert.alert(
+      showAlert(
+        'warning',
         'Formulario incompleto',
         'Por favor completa todos los campos requeridos'
       );
@@ -109,7 +108,7 @@ export default function GymStep2({
       await GymService.updateGymStep(gymId, formData);
       onNext(formData);
     } catch {
-      Alert.alert('Error', 'Error al actualizar la información');
+      showAlert('error', 'Error', 'Error al actualizar la información');
     } finally {
       setLoading(false);
     }
@@ -207,6 +206,7 @@ export default function GymStep2({
           </TouchableOpacity>
         )}
       </View>
+      <AlertComponent />
     </KeyboardAvoidingView>
   );
 }

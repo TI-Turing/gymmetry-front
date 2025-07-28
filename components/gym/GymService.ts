@@ -70,30 +70,44 @@ export class GymService {
     console.log('🏷️ Cargando tipos de gimnasio...');
     const response = await apiService.get<any>('/gymtypes');
     // eslint-disable-next-line no-console
-    console.log('📡 Raw gymTypes response:', response);
+    console.log('📡 Raw gymTypes response from apiService:', response);
 
-    // El backend retorna un objeto con propiedades numeradas, convertir a array
+    // El apiService retorna { data: respuestaDelBackend, success: true }
+    // donde respuestaDelBackend = { Success: true, Data: [...], Message: "", StatusCode: 200 }
+    const backendResponse = response.data;
+
+    // eslint-disable-next-line no-console
+    console.log('� Backend response structure:', backendResponse);
+
+    // Extraer el array de tipos de gimnasio
     let gymTypesArray = [];
-    if (response.data && typeof response.data === 'object') {
-      // Si es un objeto con propiedades numeradas, convertir a array
-      gymTypesArray = Object.values(response.data);
-    } else if (Array.isArray(response.data)) {
-      // Si ya es un array, usarlo directamente
-      gymTypesArray = response.data;
+    if (
+      backendResponse &&
+      backendResponse.Data &&
+      Array.isArray(backendResponse.Data)
+    ) {
+      gymTypesArray = backendResponse.Data;
     }
 
     // eslint-disable-next-line no-console
-    console.log('🔄 Converted to array:', gymTypesArray);
+    console.log('🔄 Final gymTypesArray:', gymTypesArray);
+    // eslint-disable-next-line no-console
+    console.log('📊 Array length:', gymTypesArray.length);
+
+    if (gymTypesArray.length > 0) {
+      // eslint-disable-next-line no-console
+      console.log('� First gym type:', gymTypesArray[0]);
+    }
 
     const transformedResponse: GymTypesResponse = {
-      Success: response.success,
-      Message: response.message || '',
+      Success: backendResponse?.Success || false,
+      Message: backendResponse?.Message || '',
       Data: gymTypesArray,
-      StatusCode: 200,
+      StatusCode: backendResponse?.StatusCode || 200,
     };
 
     // eslint-disable-next-line no-console
-    console.log('🔄 Transformed gymTypes response:', transformedResponse);
+    console.log('🔄 Final transformed response:', transformedResponse);
 
     return transformedResponse;
   }
