@@ -446,7 +446,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               }
               onChange={handleDateChange}
               themeVariant={colorScheme === 'dark' ? 'dark' : 'light'}
-              accentColor='#ff6300'
+              accentColor={Colors.dark.tint}
             />
           )}
         </View>

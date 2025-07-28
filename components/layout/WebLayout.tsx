@@ -10,6 +10,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import ChatComponent from './ChatComponent';
 import WebHeader from './WebHeader';
 import { useScreenWidth } from './useScreenWidth';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Colors from '@/constants/Colors';
 
 interface WebLayoutProps {
   children: React.ReactNode;
@@ -18,11 +20,36 @@ interface WebLayoutProps {
 }
 
 const menuItems = [
-  { key: 'index', icon: 'home' as const, label: 'Inicio' },
-  { key: 'gym', icon: 'building' as const, label: 'Gym' },
-  { key: 'progress', icon: 'bar-chart' as const, label: 'Progreso' },
-  { key: 'feed', icon: 'users' as const, label: 'Feed' },
-  { key: 'profile', icon: 'user' as const, label: 'Perfil' },
+  {
+    key: 'index',
+    icon: 'home' as const,
+    label: 'Inicio',
+    iconType: 'FontAwesome' as const,
+  },
+  {
+    key: 'gym',
+    icon: 'dumbbell' as const,
+    label: 'Gym',
+    iconType: 'MaterialCommunityIcons' as const,
+  },
+  {
+    key: 'progress',
+    icon: 'bar-chart' as const,
+    label: 'Progreso',
+    iconType: 'FontAwesome' as const,
+  },
+  {
+    key: 'feed',
+    icon: 'users' as const,
+    label: 'Feed',
+    iconType: 'FontAwesome' as const,
+  },
+  {
+    key: 'profile',
+    icon: 'user' as const,
+    label: 'Perfil',
+    iconType: 'FontAwesome' as const,
+  },
 ];
 
 export default function WebLayout({
@@ -59,12 +86,31 @@ export default function WebLayout({
                 ]}
                 onPress={() => onTabChange(item.key)}
               >
-                <FontAwesome
-                  name={item.icon}
-                  size={20}
-                  color={activeTab === item.key ? '#ff6300' : '#B0B0B0'}
-                  style={[styles.menuIcon, isCompact && styles.menuIconCompact]}
-                />
+                {item.iconType === 'MaterialCommunityIcons' ? (
+                  <MaterialCommunityIcons
+                    name={item.icon}
+                    size={20}
+                    color={
+                      activeTab === item.key ? Colors.dark.tint : '#B0B0B0'
+                    }
+                    style={[
+                      styles.menuIcon,
+                      isCompact && styles.menuIconCompact,
+                    ]}
+                  />
+                ) : (
+                  <FontAwesome
+                    name={item.icon}
+                    size={20}
+                    color={
+                      activeTab === item.key ? Colors.dark.tint : '#B0B0B0'
+                    }
+                    style={[
+                      styles.menuIcon,
+                      isCompact && styles.menuIconCompact,
+                    ]}
+                  />
+                )}
                 {!isCompact && (
                   <Text
                     style={[
@@ -139,7 +185,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeMenuText: {
-    color: '#ff6300',
+    color: Colors.dark.tint,
     fontWeight: '600',
   },
   centerColumn: {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
+import Colors from '@/constants/Colors';
 
 export default function ChatComponent() {
   if (Platform.OS !== 'web') {
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   placeholderText: {
-    color: '#ff6300',
+    color: Colors.dark.tint,
     fontSize: 24,
     marginBottom: 8,
   },

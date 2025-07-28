@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import Colors from '@/constants/Colors';
 
 interface PlanInfoProps {
   startDate: string;
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#ff6300',
+    backgroundColor: Colors.dark.tint,
     borderRadius: 4,
   },
   progressText: {

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useScreenWidth } from './useScreenWidth';
+import Colors from '@/constants/Colors';
 
 interface WebHeaderProps {
   userName?: string;
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#ff6300',
+    color: Colors.dark.tint,
     textAlign: 'center',
   },
   logoCompact: {
@@ -242,8 +243,8 @@ const styles = StyleSheet.create({
   },
   searchContainerFocused: {
     borderWidth: 2,
-    borderColor: '#ff6300',
-    shadowColor: '#ff6300',
+    borderColor: Colors.dark.tint,
+    shadowColor: Colors.dark.tint,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#ff6300',
+    backgroundColor: Colors.dark.tint,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,

@@ -181,7 +181,7 @@ function WebFormContent({
           style={[
             commonStyles.title,
             {
-              color: '#ff6300',
+              color: Colors.dark.tint,
               fontSize: 34,
               fontWeight: 'bold',
             },
@@ -226,7 +226,7 @@ function WebFormContent({
               {
                 backgroundColor: '#1E1E1E',
                 color: '#FFFFFF',
-                borderColor: '#ff6300',
+                borderColor: Colors.dark.tint,
                 borderWidth: 2,
               },
             ]}
@@ -312,7 +312,7 @@ function WebFormContent({
           style={[
             commonStyles.button,
             {
-              backgroundColor: '#ff6300',
+              backgroundColor: Colors.dark.tint,
               marginTop: 24,
             },
             (!isFormValid || isLoading) && { opacity: 0.6 },
@@ -351,7 +351,7 @@ function WebFormContent({
           >
             <Text
               style={{
-                color: '#ff6300',
+                color: Colors.dark.tint,
                 fontWeight: '600',
                 backgroundColor: 'transparent',
               }}

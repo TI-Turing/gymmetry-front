@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -51,7 +52,12 @@ export default function TabLayout() {
         options={{
           title: 'Gym',
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name='building' color={color} />
+            <MaterialCommunityIcons
+              name='dumbbell'
+              size={28}
+              color={color}
+              style={{ marginBottom: -3 }}
+            />
           ),
           tabBarShowLabel: false,
         }}

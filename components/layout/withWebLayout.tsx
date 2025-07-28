@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Platform } from 'react-native';
+import { router, usePathname } from 'expo-router';
 import WebLayout from './WebLayout';
 
 interface WithWebLayoutOptions {
@@ -13,11 +14,24 @@ export function withWebLayout<P extends object>(
   const { defaultTab = 'index' } = options;
 
   return function WrappedComponent(props: P) {
+    const pathname = usePathname();
     const [activeTab, setActiveTab] = useState(defaultTab);
+
+    // Detectar la tab activa basada en la URL
+    useEffect(() => {
+      if (Platform.OS === 'web' && pathname) {
+        const pathSegments = pathname.split('/');
+        const currentTab = pathSegments[pathSegments.length - 1] || 'index';
+        setActiveTab(currentTab);
+      }
+    }, [pathname]);
 
     const handleTabChange = (tab: string) => {
       setActiveTab(tab);
-      // Aquí puedes agregar lógica de navegación global si es necesaria
+      // Navegación usando expo-router
+      if (Platform.OS === 'web') {
+        router.push(`/(tabs)/${tab}` as any);
+      }
     };
 
     if (Platform.OS === 'web') {

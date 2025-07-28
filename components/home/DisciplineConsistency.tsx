@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import Colors from '@/constants/Colors';
 
 interface DisciplineConsistencyData {
   week: number;
@@ -22,7 +23,7 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return '#ff6300'; // Color principal
+        return Colors.dark.tint; // Color principal
       case 'failed':
         return 'rgba(255, 99, 0, 0.1)'; // Color principal con opacidad muy baja
       case 'rest':
@@ -35,9 +36,9 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   const getStatusBorderColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return '#ff6300'; // Color principal
+        return Colors.dark.tint; // Color principal
       case 'failed':
-        return '#ff6300'; // Borde en color principal
+        return Colors.dark.tint; // Borde en color principal
       case 'rest':
         return '#9E9E9E'; // Gris
       default:
@@ -94,7 +95,9 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
           <Text style={styles.legendText}>Descanso</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendCircle, { backgroundColor: '#ff6300' }]} />
+          <View
+            style={[styles.legendCircle, { backgroundColor: Colors.dark.tint }]}
+          />
           <Text style={styles.legendText}>Cumplido</Text>
         </View>
         <View style={styles.legendItem}>
@@ -103,7 +106,7 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
               styles.legendCircle,
               {
                 backgroundColor: 'rgba(255, 99, 0, 0.1)',
-                borderColor: '#ff6300',
+                borderColor: Colors.dark.tint,
                 borderWidth: 2,
               },
             ]}
@@ -146,7 +149,7 @@ const styles = StyleSheet.create({
   percentage: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ff6300',
+    color: Colors.dark.tint,
   },
   calendarContainer: {
     marginBottom: 16,

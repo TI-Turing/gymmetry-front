@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import LottieView from 'lottie-react-native';
+import Colors from '@/constants/Colors';
 
 interface LoadingAnimationProps {
   size?: number;
@@ -36,7 +37,7 @@ export const FallbackLoadingAnimation: React.FC<LoadingAnimationProps> = ({
           height: size,
           borderRadius: size / 2,
           borderWidth: 3,
-          borderColor: '#ff6300',
+          borderColor: Colors.dark.tint,
           borderTopColor: 'transparent',
           backgroundColor: 'transparent',
         },

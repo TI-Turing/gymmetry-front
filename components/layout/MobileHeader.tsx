@@ -10,6 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Colors from '@/constants/Colors';
 
 interface MobileHeaderProps {
   title?: string;
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ff6300',
+    color: Colors.dark.tint,
   },
   menuButton: {
     padding: 8,
