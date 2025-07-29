@@ -1,0 +1,103 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '@/services/authService';
+import { Gym } from '@/components/gym/types';
+
+interface PreloadContextType {
+  gymData: Gym | null;
+  inicioData: any | null;
+  isPreloading: boolean;
+  preloadError: string | null;
+  refreshGymData: () => Promise<void>;
+  precargarDatos: () => Promise<void>;
+}
+
+const PreloadContext = createContext<PreloadContextType | undefined>(undefined);
+
+export const usePreload = () => {
+  const context = useContext(PreloadContext);
+  if (context === undefined) {
+    throw new Error('usePreload must be used within a PreloadProvider');
+  }
+  return context;
+};
+
+interface PreloadProviderProps {
+  children: React.ReactNode;
+}
+
+export const PreloadProvider: React.FC<PreloadProviderProps> = ({
+  children,
+}) => {
+  const [gymData, setGymData] = useState<Gym | null>(null);
+  const [inicioData, setInicioData] = useState<any | null>(null);
+  const [isPreloading, setIsPreloading] = useState(false);
+  const [preloadError, setPreloadError] = useState<string | null>(null);
+
+  const refreshGymData = async () => {
+    try {
+      const cachedGym = authService.getCachedGym();
+      if (cachedGym) {
+        setGymData(cachedGym);
+      } else {
+        // Si no hay datos en caché, intentar recargar
+        const gymId = authService.getGymId();
+        if (gymId) {
+          const gym = await authService.fetchAndCacheGymData(gymId);
+          setGymData(gym);
+        }
+      }
+    } catch {
+      setPreloadError('Error al cargar datos del gimnasio');
+    }
+  };
+
+  const precargarDatosInicio = async () => {
+    try {
+      // Aquí puedes agregar consultas para datos de inicio
+      // Por ahora retornamos datos simulados
+      const mockInicioData = {
+        welcomeMessage: 'Bienvenido a Gymmetry',
+        stats: {
+          workouts: 0,
+          progress: 0,
+        },
+      };
+      setInicioData(mockInicioData);
+    } catch {
+      setPreloadError('Error al cargar datos de inicio');
+    }
+  };
+
+  const precargarDatos = async () => {
+    setIsPreloading(true);
+    setPreloadError(null);
+
+    try {
+      await Promise.all([refreshGymData(), precargarDatosInicio()]);
+    } catch {
+      setPreloadError('Error al precargar datos');
+    } finally {
+      setIsPreloading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Precargar datos cuando el proveedor se monta
+    if (authService.isAuthenticated()) {
+      precargarDatos();
+    }
+  }, []);
+
+  const value: PreloadContextType = {
+    gymData,
+    inicioData,
+    isPreloading,
+    preloadError,
+    refreshGymData,
+    precargarDatos,
+  };
+
+  return (
+    <PreloadContext.Provider value={value}>{children}</PreloadContext.Provider>
+  );
+};

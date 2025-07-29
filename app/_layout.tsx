@@ -14,6 +14,7 @@ import { LogBox } from 'react-native';
 import { useColorScheme } from '@/components/useColorScheme';
 import { userSessionService } from '@/services/userSessionService';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { PreloadProvider } from '@/contexts/PreloadContext';
 
 // Suprimir warnings específicos que no son críticos
 LogBox.ignoreLogs([
@@ -59,7 +60,9 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <PreloadProvider>
+        <RootLayoutNav />
+      </PreloadProvider>
     </AuthProvider>
   );
 }

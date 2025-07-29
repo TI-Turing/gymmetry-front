@@ -20,6 +20,7 @@ interface FormInputProps extends Omit<TextInputProps, 'style'> {
   inputStyle?: any;
   labelStyle?: any;
   errorStyle?: any;
+  maxLines?: number;
 }
 
 export const FormInput: React.FC<FormInputProps> = ({
@@ -31,10 +32,42 @@ export const FormInput: React.FC<FormInputProps> = ({
   inputStyle,
   labelStyle,
   errorStyle,
+  maxLines,
   ...textInputProps
 }) => {
   const colorScheme = useColorScheme();
   const hasError = Boolean(error);
+  const [height, setHeight] = React.useState<number | undefined>(undefined);
+
+  const { multiline } = textInputProps;
+
+  const handleContentSizeChange = (event: any) => {
+    if (multiline && maxLines) {
+      const newHeight = event.nativeEvent.contentSize.height;
+      setHeight(newHeight);
+    }
+  };
+
+  const inputStyles = [
+    styles.input,
+    {
+      backgroundColor: Colors[colorScheme].background,
+      color: Colors[colorScheme].text,
+      borderColor: hasError ? Colors[colorScheme].tint + '80' : '#666',
+    },
+    hasError && styles.inputError,
+  ];
+
+  if (multiline) {
+    inputStyles.push(styles.multilineInput);
+    if (height !== undefined) {
+      const maxHeight =
+        (styles.multilineInput.lineHeight || 20) * (maxLines || 1);
+      inputStyles.push({ height: Math.min(height, maxHeight) });
+    }
+  }
+
+  inputStyles.push(inputStyle);
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -54,17 +87,9 @@ export const FormInput: React.FC<FormInputProps> = ({
       <View style={styles.inputRow}>
         {icon && <View style={styles.iconContainer}>{icon}</View>}
         <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: Colors[colorScheme].background,
-              color: Colors[colorScheme].text,
-              borderColor: hasError ? Colors[colorScheme].tint + '80' : '#666',
-            },
-            hasError && styles.inputError,
-            inputStyle,
-          ]}
+          style={inputStyles}
           placeholderTextColor={`${Colors[colorScheme].text}60`}
+          onContentSizeChange={handleContentSizeChange}
           {...textInputProps}
         />
       </View>
@@ -104,12 +129,19 @@ const styles = StyleSheet.create({
     marginRight: UI_CONSTANTS.SPACING.SM,
   },
   input: {
-    height: 48,
+    minHeight: 48,
     borderWidth: 1,
     borderRadius: UI_CONSTANTS.BORDER_RADIUS.MEDIUM,
     paddingHorizontal: UI_CONSTANTS.SPACING.MD,
     fontSize: UI_CONSTANTS.FONT_SIZE.MD,
     flex: 1,
+    textAlignVertical: 'center',
+  },
+  multilineInput: {
+    textAlignVertical: 'top',
+    paddingTop: UI_CONSTANTS.SPACING.MD,
+    paddingBottom: UI_CONSTANTS.SPACING.MD,
+    lineHeight: 20,
   },
   inputError: {
     borderColor: '#FF6B6B',

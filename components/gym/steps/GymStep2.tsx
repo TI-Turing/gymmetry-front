@@ -159,7 +159,7 @@ export default function GymStep2({
             value={formData.description}
             onChangeText={value => handleInputChange('description', value)}
             multiline
-            numberOfLines={4}
+            maxLines={6}
             error={errors.description}
           />
         </View>

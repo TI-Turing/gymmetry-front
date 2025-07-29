@@ -168,9 +168,10 @@ export default function GymStep3({
       >
         <View style={GymStyles.step3Header}>
           <FontAwesome name='map-marker' size={40} color={Colors.dark.tint} />
-          <Text style={GymStyles.step3Title}>Ubicación y Dirección</Text>
+          <Text style={GymStyles.step3Title}>Ubicación de la empresa</Text>
           <Text style={GymStyles.step3Subtitle}>
-            Selecciona el país, región, ciudad y dirección del gimnasio
+            Selecciona el país, región, ciudad en el que se encuentra registrado
+            el gimnasio
           </Text>
         </View>
 
@@ -199,10 +200,9 @@ export default function GymStep3({
             required
           />
           <FormInput
-            label='Dirección'
+            label='Dirección de la oficina principal*'
             value={formData.address}
             onChangeText={handleAddressChange}
-            placeholder='Ej: Calle 123 #45-67'
             multiline
             numberOfLines={2}
           />

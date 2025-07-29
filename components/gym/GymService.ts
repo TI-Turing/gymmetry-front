@@ -6,6 +6,8 @@ import {
   GymUpdateResponse,
   GymCompleteData,
   BackendApiResponse,
+  GymGetResponse,
+  Gym,
 } from './types';
 
 export class GymService {
@@ -78,6 +80,21 @@ export class GymService {
 
     return transformedResponse;
   }
+  // Obtener información de un gimnasio por ID
+  static async getGymById(gymId: string): Promise<GymGetResponse> {
+    const response = await apiService.get<any>(`/gym/${gymId}`);
+    const backendResponse = response.data;
+
+    const transformedResponse: GymGetResponse = {
+      Success: backendResponse?.Success || false,
+      Message: backendResponse?.Message || '',
+      Data: backendResponse?.Data || null,
+      StatusCode: backendResponse?.StatusCode || 200,
+    };
+
+    return transformedResponse;
+  }
+
   // Método helper para actualizar paso específico
   static async updateGymStep(
     stepData: Partial<GymCompleteData>

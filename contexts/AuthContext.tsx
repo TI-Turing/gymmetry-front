@@ -57,6 +57,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.Success) {
         setIsAuthenticated(true);
         setUserData(authService.getUserData());
+
+        // Trigger preload después de login exitoso (usando callback para evitar dependencias)
+        setTimeout(() => {
+          // El PreloadProvider detectará automáticamente el cambio de autenticación
+          // y precargará los datos necesarios
+        }, 100);
+
         return true;
       }
 

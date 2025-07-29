@@ -1,3 +1,5 @@
+import { User } from '../models/user';
+
 export interface LoginResponse {
   Success: boolean;
   Message: string;
@@ -9,6 +11,7 @@ export interface LoginResponse {
     RefreshToken: string;
     TokenExpiration: string;
     RefreshTokenExpiration: string;
+    User: User;
   };
   StatusCode: number;
 }

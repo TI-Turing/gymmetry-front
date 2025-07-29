@@ -90,7 +90,6 @@ export default function GymStep4({
           label='Sitio Web'
           value={formData.website}
           onChangeText={value => handleInputChange('website', value)}
-          placeholder='https://www.tugym.com'
           keyboardType='url'
           autoCapitalize='none'
           icon={<FontAwesome name='globe' size={20} color={Colors.dark.tint} />}
@@ -100,7 +99,6 @@ export default function GymStep4({
           label='Instagram'
           value={formData.instagram}
           onChangeText={value => handleInputChange('instagram', value)}
-          placeholder='https://www.instagram.com/tugym'
           keyboardType='url'
           autoCapitalize='none'
           icon={
@@ -112,7 +110,6 @@ export default function GymStep4({
           label='Facebook'
           value={formData.facebook}
           onChangeText={value => handleInputChange('facebook', value)}
-          placeholder='https://www.facebook.com/tugym'
           keyboardType='url'
           autoCapitalize='none'
           icon={

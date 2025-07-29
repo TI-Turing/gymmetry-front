@@ -27,6 +27,49 @@ export interface Country {
   // ... otros campos que el backend retorne
 }
 
+// Interfaz completa del Gym (según la respuesta del endpoint)
+export interface Gym {
+  Id: string;
+  Name: string;
+  Nit: string;
+  Email: string;
+  LogoUrl: string | null;
+  Description: string;
+  PhoneNumber: string | null;
+  WebsiteUrl: string | null;
+  SocialMediaLinks: string | null;
+  LegalRepresentative: string | null;
+  BillingEmail: string | null;
+  SubscriptionPlanId: string | null;
+  IsVerified: boolean;
+  Tags: string | null;
+  Owner_UserId: string;
+  BrandColor: string | null;
+  MaxBranchesAllowed: number | null;
+  QrImageUrl: string | null;
+  TrialEndsAt: string | null;
+  CountryId: string;
+  CreatedAt: string;
+  UpdatedAt: string;
+  DeletedAt: string | null;
+  Ip: string | null;
+  IsActive: boolean;
+  GymTypeId: string;
+  GymType: any;
+  Bills: any[];
+  Branches: any[];
+  GymPlanSelecteds: any[];
+  Plans: any[];
+  RoutineTemplates: any[];
+  UserGyms: any[];
+  UserUserGymAssigneds: any[];
+  PaymentAttempts: any[];
+  FacbookUrl: string | null;
+  InstagramUrl: string | null;
+  Slogan: string | null;
+  PaisId: string | null;
+}
+
 // Paso 1: Información básica y registro inicial
 export interface GymStep1Data {
   name: string;
@@ -93,6 +136,7 @@ export type GymRegistrationResponse = BackendApiResponse<string>;
 export type GymTypesResponse = BackendApiResponse<GymType[]>;
 export type CountriesResponse = BackendApiResponse<Country[]>;
 export type GymUpdateResponse = BackendApiResponse<any>; // El backend puede definir qué retorna en las actualizaciones
+export type GymGetResponse = BackendApiResponse<Gym>;
 
 // Props del formulario principal
 export interface GymRegistrationStepsProps {

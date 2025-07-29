@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileHeaderProps {
   title?: string;
@@ -19,6 +20,7 @@ interface MobileHeaderProps {
 export default function MobileHeader({
   title = 'GYMMETRY',
 }: MobileHeaderProps) {
+  const { logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [slideAnim] = useState(
     new Animated.Value(Dimensions.get('window').width)
@@ -30,6 +32,34 @@ export default function MobileHeader({
 
   const handleMenuOption = (option: string) => {
     closeMenu();
+    switch (option) {
+      case 'theme':
+        // Handle theme change
+        break;
+      case 'settings':
+        // Navigate to settings
+        break;
+      case 'support':
+        // Open support contact
+        break;
+      case 'bug':
+        // Report a bug
+        break;
+      case 'help':
+        // Open help section
+        break;
+      case 'privacy':
+        // Show privacy policy
+        break;
+      case 'logout':
+        // Ejecutar logout de manera asíncrona para evitar problemas con useInsertionEffect
+        setTimeout(async () => {
+          await logout();
+        }, 0);
+        break;
+      default:
+        break;
+    }
     // Aquí puedes manejar cada opción del menú
   };
 

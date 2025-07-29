@@ -232,7 +232,6 @@ function WebFormContent({
             ]}
             value={userNameOrEmail}
             onChangeText={setUserNameOrEmail}
-            placeholder='usuario o tu@email.com'
             placeholderTextColor='#B0B0B0'
             keyboardType='email-address'
             autoCapitalize='none'
@@ -277,7 +276,6 @@ function WebFormContent({
               ]}
               value={password}
               onChangeText={setPassword}
-              placeholder='Tu contraseña'
               placeholderTextColor='#B0B0B0'
               secureTextEntry={!showPassword}
               autoComplete='password'
@@ -418,7 +416,6 @@ function MobileFormContent({
             ]}
             value={userNameOrEmail}
             onChangeText={setUserNameOrEmail}
-            placeholder='usuario o tu@email.com'
             placeholderTextColor={`${Colors[colorScheme].text}60`}
             keyboardType='email-address'
             autoCapitalize='none'
@@ -449,7 +446,6 @@ function MobileFormContent({
               ]}
               value={password}
               onChangeText={setPassword}
-              placeholder='Tu contraseña'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
               secureTextEntry={!showPassword}
               autoComplete='password'
