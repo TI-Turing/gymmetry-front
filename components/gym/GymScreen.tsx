@@ -7,6 +7,7 @@ import { authService } from '@/services/authService';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { NoGymView, GymConnectedView } from './index';
+import { AddBranchForm } from '@/components/branches';
 import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
 import { GymCompleteData } from './types';
@@ -16,6 +17,7 @@ function GymScreen() {
   const { gymData, refreshGymData } = usePreload();
   const [isConnectedToGym, setIsConnectedToGym] = useState(false);
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
+  const [showAddBranchForm, setShowAddBranchForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Verificar si el usuario tiene un gym asignado
@@ -73,6 +75,21 @@ function GymScreen() {
     refreshGymData();
   };
 
+  const handleAddBranch = () => {
+    setShowAddBranchForm(true);
+  };
+
+  const handleBranchFormComplete = (branchId: string) => {
+    setShowAddBranchForm(false);
+    refreshGymData(); // Actualizar datos para mostrar la nueva sede
+    // TODO: Mostrar mensaje de éxito o navegar a la vista de la sede
+    console.log('Sede creada con ID:', branchId);
+  };
+
+  const handleBranchFormCancel = () => {
+    setShowAddBranchForm(false);
+  };
+
   return (
     <>
       {Platform.OS !== 'web' && <MobileHeader />}
@@ -81,10 +98,16 @@ function GymScreen() {
           <View style={styles.loadingContainer}>
             <Text>Cargando...</Text>
           </View>
+        ) : showAddBranchForm ? (
+          <AddBranchForm
+            onComplete={handleBranchFormComplete}
+            onCancel={handleBranchFormCancel}
+          />
         ) : hasGym ? (
           <GymInfoView
             gym={gymData || cachedGym!}
             onRefresh={handleRefreshGym}
+            onAddBranch={handleAddBranch}
           />
         ) : showRegistrationForm ? (
           <GymRegistrationSteps

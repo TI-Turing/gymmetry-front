@@ -16,9 +16,14 @@ import { UI_CONSTANTS } from '@/constants/AppConstants';
 interface GymInfoViewProps {
   gym: Gym;
   onRefresh?: () => void;
+  onAddBranch?: () => void;
 }
 
-export default function GymInfoView({ gym, onRefresh }: GymInfoViewProps) {
+export default function GymInfoView({
+  gym,
+  onRefresh,
+  onAddBranch,
+}: GymInfoViewProps) {
   const { width } = Dimensions.get('window');
 
   const formatDate = (dateString: string) => {
@@ -156,6 +161,17 @@ export default function GymInfoView({ gym, onRefresh }: GymInfoViewProps) {
             <Text style={styles.statLabel}>Rutinas</Text>
           </View>
         </View>
+
+        {/* Botón Agregar Sede */}
+        {onAddBranch && (
+          <TouchableOpacity
+            style={styles.addBranchButton}
+            onPress={onAddBranch}
+          >
+            <FontAwesome name='plus' size={18} color='#FFFFFF' />
+            <Text style={styles.addBranchText}>Agregar sede</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Información Adicional */}
@@ -287,5 +303,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#B0B0B0',
     marginTop: 4,
+  },
+  addBranchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.dark.tint,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: UI_CONSTANTS.SPACING.MD,
+  },
+  addBranchText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });

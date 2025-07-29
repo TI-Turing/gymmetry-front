@@ -1,4 +1,5 @@
 // Ejemplo de uso del servicio de API
+// NOTA: Para nuevas funcionalidades, usar userService y gymServiceExtensions en lugar de llamadas directas a apiService
 
 import { apiService } from '../services';
 import {
@@ -22,9 +23,10 @@ import {
   PhoneExistsResponse,
 } from '@/components/auth/types';
 
-// API específica para usuarios
+// API específica para usuarios (DEPRECATED - usar userService en su lugar)
 export const userAPI = {
   // Crear usuario inicial (Step 1 del registro)
+  // NUEVO: usar userService.addUser() en su lugar
   createUser: async (
     userData: CreateUserRequest
   ): Promise<CreateUserResponse> => {
@@ -45,6 +47,7 @@ export const userAPI = {
   },
 
   // Obtener usuario por ID
+  // NUEVO: usar userService.getUserById() en su lugar
   getUserById: async (id: number) => {
     return await apiService.get<User>(`/users/${id}`);
   },

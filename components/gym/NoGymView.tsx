@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import { useCustomAlert } from '@/components/common/CustomAlert';
 import QRScannerOption from './QRScannerOption';
 import SearchGymsOption from './SearchGymsOption';
 import RegisterGymOption from './RegisterGymOption';
+import GymSearchModal from './GymSearchModal';
 
 interface NoGymViewProps {
   onConnect: (connected: boolean) => void;
@@ -17,6 +18,7 @@ export default function NoGymView({
   onRegisterGym,
 }: NoGymViewProps) {
   const { showSuccess } = useCustomAlert();
+  const [showGymSearchModal, setShowGymSearchModal] = useState(false);
 
   const handleScanQR = () => {
     showSuccess('Escáner QR', {
@@ -29,19 +31,19 @@ export default function NoGymView({
   };
 
   const handleSearchGyms = () => {
-    showSuccess('Buscar Gimnasios', {
-      confirmText: 'Ver Lista',
-      onConfirm: () => {
-        // Aquí mostrar lista de gimnasios
-        // Implementar navegación a lista de gimnasios
-      },
-    });
+    setShowGymSearchModal(true);
   };
 
   const handleRegisterGym = () => {
     if (onRegisterGym) {
       onRegisterGym();
     }
+  };
+
+  const handleGymSelected = (gym: any) => {
+    // Aquí se podría manejar la selección del gym
+    // Por ejemplo, actualizar el estado del usuario
+    onConnect(true);
   };
 
   return (
@@ -75,6 +77,13 @@ export default function NoGymView({
           horarios, ocupación y mucho más.
         </Text>
       </View>
+
+      {/* Gym Search Modal */}
+      <GymSearchModal
+        visible={showGymSearchModal}
+        onClose={() => setShowGymSearchModal(false)}
+        onGymSelected={handleGymSelected}
+      />
     </ScrollView>
   );
 }

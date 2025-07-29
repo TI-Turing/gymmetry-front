@@ -39,3 +39,8 @@ environment/.env.local
 
 # typescript
 *.tsbuildinfo
+
+# back
+FitGymApp/
+Gymmetry.Domain/
+Gymmetry.Application/
