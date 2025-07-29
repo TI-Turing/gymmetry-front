@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Colors from '@/constants/Colors';
 
 interface RegisterGymOptionProps {
   onPress: () => void;
@@ -12,7 +13,11 @@ export default function RegisterGymOption({ onPress }: RegisterGymOptionProps) {
   return (
     <TouchableOpacity style={styles.optionCard} onPress={onPress}>
       <View style={styles.optionIcon}>
-        <MaterialCommunityIcons name='dumbbell' size={32} color='#9C27B0' />
+        <MaterialCommunityIcons
+          name='dumbbell'
+          size={32}
+          color={Colors.dark.tint}
+        />
       </View>
       <View style={styles.optionContent}>
         <Text style={styles.optionTitle}>¿Eres el dueño de un Gym?</Text>

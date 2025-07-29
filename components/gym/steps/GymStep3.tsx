@@ -1,234 +1,217 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, Alert } from 'react-native';
-import { View, Text } from '@/components/Themed';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ScrollView, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
-import Dropdown from '@/components/auth/Dropdown';
+import { useCustomAlert } from '@/components/common/CustomAlert';
+import { catalogService } from '@/services/catalogService';
+import {
+  CountrySelector,
+  RegionSelector,
+  CitySelector,
+} from '@/components/catalogs';
 import { GymStepProps, GymStep3Data } from '../types';
 import { GymService } from '../GymService';
-
-interface Country {
-  Id: string;
-  Name: string;
-  Code: string;
-}
+import { GymStyles } from '../styles/GymStyles';
+import { Country, Region, City } from '@/dto/common';
+import Colors from '@/constants/Colors';
 
 export default function GymStep3({
   gymId,
   onNext,
-  onBack,
-  initialData,
 }: GymStepProps<GymStep3Data> & { gymId: string }) {
+  const { showAlert, AlertComponent } = useCustomAlert();
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState<GymStep3Data>({
-    address: initialData?.address || '',
-    city: initialData?.city || '',
-    country: initialData?.country || '',
-    countryId: initialData?.countryId || '',
-    postalCode: initialData?.postalCode || '',
-    emergencyPhone: initialData?.emergencyPhone || '',
+    Id: gymId,
+    countryId: '', // Se asignará Colombia al cargar países
+    regionId: '',
+    cityId: '',
+    address: '',
   });
 
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingCountries, setIsLoadingCountries] = useState(true);
-
-  useEffect(() => {
-    loadCountries();
-  }, []);
-
-  const loadCountries = async () => {
+  const loadCountries = useCallback(async () => {
     try {
-      setIsLoadingCountries(true);
-      const response = await GymService.getCountries();
-      setCountries(response.Data || []);
-    } catch (error) {
-      console.error('Error loading countries:', error);
-      Alert.alert('Error', 'No se pudieron cargar los países');
-    } finally {
-      setIsLoadingCountries(false);
+      const countries = await catalogService.getCountries();
+      setCountries(countries);
+    } catch {
+      showAlert('error', 'Error', 'No se pudieron cargar los países');
     }
-  };
+  }, [showAlert]);
 
-  const handleInputChange = (field: keyof GymStep3Data, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleCountrySelect = (countryId: string) => {
-    const selectedCountry = countries.find(c => c.Id === countryId);
+  // El campo país estará deshabilitado, no se permite selección manual
+  const handleCountrySelect = async (countryId: string) => {
     setFormData(prev => ({
       ...prev,
       countryId,
-      country: selectedCountry?.Name || '',
+      regionId: '',
+      cityId: '',
     }));
+    await loadRegions(countryId);
   };
 
-  const validateForm = (): boolean => {
-    if (!formData.address.trim()) {
-      Alert.alert('Error', 'La dirección es obligatoria');
-      return false;
+  const loadRegions = useCallback(
+    async (countryId: string) => {
+      try {
+        const regions = await catalogService.getRegionsByCountry(countryId);
+        setRegions(regions);
+        setCities([]);
+      } catch {
+        showAlert('error', 'Error', 'No se pudieron cargar las regiones');
+      }
+    },
+    [showAlert]
+  );
+
+  const loadCities = useCallback(
+    async (regionId: string) => {
+      try {
+        const cities = await catalogService.getCitiesByRegion(regionId);
+        setCities(cities);
+      } catch {
+        showAlert('error', 'Error', 'No se pudieron cargar las ciudades');
+      }
+    },
+    [showAlert]
+  );
+
+  useEffect(() => {
+    // Cargar países al montar el componente
+    loadCountries();
+  }, [loadCountries]);
+
+  useEffect(() => {
+    // Seleccionar Colombia por defecto cuando los países estén disponibles
+    if (countries.length > 0 && !formData.countryId) {
+      const colombia = countries.find(
+        c => c.Nombre.toLowerCase() === 'colombia'
+      );
+      if (colombia) {
+        setFormData(prev => ({
+          ...prev,
+          countryId: colombia.Id,
+          regionId: '',
+          cityId: '',
+        }));
+        loadRegions(colombia.Id);
+      }
     }
-    if (!formData.city.trim()) {
-      Alert.alert('Error', 'La ciudad es obligatoria');
-      return false;
-    }
+  }, [countries, formData.countryId, loadRegions]);
+
+  const handleRegionSelect = async (regionId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      regionId,
+      cityId: '',
+    }));
+    await loadCities(regionId);
+  };
+
+  const handleCitySelect = (cityId: string) => {
+    setFormData(prev => ({ ...prev, cityId }));
+  };
+
+  const handleAddressChange = (text: string) => {
+    setFormData(prev => ({ ...prev, address: text }));
+  };
+
+  const validate = () => {
     if (!formData.countryId) {
-      Alert.alert('Error', 'El país es obligatorio');
+      showAlert('warning', 'Campo requerido', 'Selecciona un país');
       return false;
     }
-    if (!formData.postalCode.trim()) {
-      Alert.alert('Error', 'El código postal es obligatorio');
+    if (!formData.regionId) {
+      showAlert('warning', 'Campo requerido', 'Selecciona una región');
       return false;
     }
-    if (!formData.emergencyPhone.trim()) {
-      Alert.alert('Error', 'El teléfono de emergencia es obligatorio');
+    if (!formData.cityId) {
+      showAlert('warning', 'Campo requerido', 'Selecciona una ciudad');
+      return false;
+    }
+    if (!formData.address.trim()) {
+      showAlert('warning', 'Campo requerido', 'Ingresa la dirección');
       return false;
     }
     return true;
   };
 
-  const handleNext = async () => {
-    if (!validateForm()) return;
-
-    setIsLoading(true);
+  const onSubmit = async () => {
+    if (!validate()) return;
+    setLoading(true);
     try {
-      await GymService.updateGymStep(gymId, {
-        address: formData.address,
-        city: formData.city,
-        countryId: formData.countryId,
-        postalCode: formData.postalCode,
-        emergencyPhone: formData.emergencyPhone,
-      });
-
+      await GymService.updateGymStep(formData);
       onNext(formData);
-    } catch (error) {
-      console.error('Error updating gym step 3:', error);
-      Alert.alert('Error', 'No se pudo guardar la información de ubicación');
+    } catch {
+      showAlert(
+        'error',
+        'Error',
+        'No se pudo guardar la información de ubicación'
+      );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const countryOptions = countries.map(country => ({
-    label: country.Name,
-    value: country.Id,
-  }));
-
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <FontAwesome name='map-marker' size={40} color='#9C27B0' />
-        <Text style={styles.title}>Ubicación y Contacto</Text>
-        <Text style={styles.subtitle}>
-          Proporciona la dirección y contacto de emergencia del gimnasio
-        </Text>
+    <KeyboardAvoidingView
+      style={GymStyles.step3Container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        style={GymStyles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={GymStyles.step3Header}>
+          <FontAwesome name='map-marker' size={40} color={Colors.dark.tint} />
+          <Text style={GymStyles.step3Title}>Ubicación y Dirección</Text>
+          <Text style={GymStyles.step3Subtitle}>
+            Selecciona el país, región, ciudad y dirección del gimnasio
+          </Text>
+        </View>
+
+        <View style={GymStyles.step3Form}>
+          <View style={{ opacity: 0.6 }} pointerEvents='none'>
+            <CountrySelector
+              countries={countries}
+              value={formData.countryId}
+              onSelect={handleCountrySelect}
+              required
+              disabled
+            />
+          </View>
+          <RegionSelector
+            regions={regions}
+            countryId={formData.countryId}
+            value={formData.regionId}
+            onSelect={handleRegionSelect}
+            required
+          />
+          <CitySelector
+            cities={cities}
+            regionId={formData.regionId}
+            value={formData.cityId}
+            onSelect={handleCitySelect}
+            required
+          />
+          <FormInput
+            label='Dirección'
+            value={formData.address}
+            onChangeText={handleAddressChange}
+            placeholder='Ej: Calle 123 #45-67'
+            multiline
+            numberOfLines={2}
+          />
+        </View>
+      </ScrollView>
+      <View style={GymStyles.step3ButtonContainer}>
+        <Button title='Continuar' onPress={onSubmit} loading={loading} />
       </View>
-
-      <View style={styles.form}>
-        <FormInput
-          label='Dirección'
-          value={formData.address}
-          onChangeText={value => handleInputChange('address', value)}
-          placeholder='Ej: Calle 123 #45-67'
-          multiline
-          numberOfLines={2}
-          required
-        />
-
-        <FormInput
-          label='Ciudad'
-          value={formData.city}
-          onChangeText={value => handleInputChange('city', value)}
-          placeholder='Ej: Medellín'
-          required
-        />
-
-        <Dropdown
-          label='País'
-          options={countryOptions}
-          selectedValue={formData.countryId}
-          onSelect={handleCountrySelect}
-          placeholder='Selecciona un país'
-          isLoading={isLoadingCountries}
-          required
-        />
-
-        <FormInput
-          label='Código Postal'
-          value={formData.postalCode}
-          onChangeText={value => handleInputChange('postalCode', value)}
-          placeholder='Ej: 050001'
-          keyboardType='numeric'
-          required
-        />
-
-        <FormInput
-          label='Teléfono de Emergencia'
-          value={formData.emergencyPhone}
-          onChangeText={value => handleInputChange('emergencyPhone', value)}
-          placeholder='Ej: +57 300 123 4567'
-          keyboardType='phone-pad'
-          required
-        />
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <Button
-          title='Anterior'
-          onPress={onBack}
-          variant='outline'
-          style={styles.backButton}
-        />
-        <Button
-          title='Continuar'
-          onPress={handleNext}
-          loading={isLoading}
-          style={styles.nextButton}
-        />
-      </View>
-    </ScrollView>
+      <AlertComponent />
+    </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  header: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginTop: 15,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    marginTop: 10,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  form: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 30,
-    gap: 15,
-  },
-  backButton: {
-    flex: 1,
-  },
-  nextButton: {
-    flex: 2,
-  },
-});

@@ -7,6 +7,7 @@ const REFRESH_TOKEN_KEY = '@refresh_token';
 const TOKEN_EXPIRATION_KEY = '@token_expiration';
 const REFRESH_TOKEN_EXPIRATION_KEY = '@refresh_token_expiration';
 const USER_DATA_KEY = '@user_data';
+const USER_ID_KEY = '@user_id';
 
 interface UserData {
   userId: string;
@@ -65,6 +66,8 @@ class AuthService {
           USER_DATA_KEY,
           JSON.stringify(this.userData)
         );
+        // Persistir userId separado
+        await AsyncStorage.setItem(USER_ID_KEY, this.userData.userId);
 
         // Configurar token en el servicio API
         apiService.setAuthToken(this.token);
@@ -91,6 +94,7 @@ class AuthService {
       await AsyncStorage.removeItem(TOKEN_EXPIRATION_KEY);
       await AsyncStorage.removeItem(REFRESH_TOKEN_EXPIRATION_KEY);
       await AsyncStorage.removeItem(USER_DATA_KEY);
+      await AsyncStorage.removeItem(USER_ID_KEY);
 
       // Limpiar token del servicio API
       apiService.removeAuthToken();
@@ -114,6 +118,7 @@ class AuthService {
         REFRESH_TOKEN_EXPIRATION_KEY
       );
       const userDataString = await AsyncStorage.getItem(USER_DATA_KEY);
+      const storedUserId = await AsyncStorage.getItem(USER_ID_KEY);
 
       if (
         token &&
@@ -127,6 +132,9 @@ class AuthService {
         this.tokenExpiration = new Date(tokenExpirationString);
         this.refreshTokenExpiration = new Date(refreshTokenExpirationString);
         this.userData = JSON.parse(userDataString);
+        if (this.userData && storedUserId) {
+          this.userData.userId = storedUserId;
+        }
 
         // Verificar si el refresh token está expirado
         if (this.refreshTokenExpiration <= new Date()) {

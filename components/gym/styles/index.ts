@@ -1,0 +1,1 @@
+export { GymStyles } from './GymStyles';

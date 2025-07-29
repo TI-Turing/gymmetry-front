@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
@@ -13,6 +9,7 @@ import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStep1Data, GymStepProps } from '../types';
 import { GymService } from '../GymService';
 import Colors from '@/constants/Colors';
+import { GymStyles } from '../styles';
 
 export default function GymStep1({
   onNext,
@@ -27,6 +24,7 @@ export default function GymStep1({
     email: initialData?.email || '',
     phone: initialData?.phone || '',
     nit: initialData?.nit || '',
+    owner_UserId: initialData?.owner_UserId || '',
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -69,39 +67,28 @@ export default function GymStep1({
   };
 
   const handleNext = async () => {
-    // eslint-disable-next-line no-console
-    console.log('🚀 handleNext called');
-    // eslint-disable-next-line no-console
-    console.log('📝 formData:', formData);
-
     if (!validateForm()) {
-      // eslint-disable-next-line no-console
-      console.log('❌ Form validation failed');
       showError('Por favor completa todos los campos requeridos');
       return;
     }
-
-    // eslint-disable-next-line no-console
-    console.log('✅ Form validation passed, calling registerGym');
     setLoading(true);
     try {
+      // Obtener userId del almacenamiento local
+      const userId = (await AsyncStorage.getItem('@user_id')) || '';
       // Registrar gimnasio inicial y obtener ID
-      const response = await GymService.registerGym(formData);
-      // eslint-disable-next-line no-console
-      console.log('📡 registerGym response:', response);
-
+      const payload = { ...formData, owner_UserId: userId };
+      const response = await GymService.registerGym(payload);
       if (response.Success && response.Data) {
-        // Pasar los datos junto con el gymId al siguiente paso
+        // Pasar los datos junto con gymId y owner_UserId al siguiente paso
         onNext({
           ...formData,
-          gymId: response.Data.Id,
+          gymId: response.Data,
+          owner_UserId: userId,
         } as any);
       } else {
         showError(response.Message || 'Error al registrar el gimnasio');
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('💥 Error in registerGym:', error);
+    } catch {
       showError('Error de conexión. Intenta nuevamente.');
     } finally {
       setLoading(false);
@@ -111,30 +98,29 @@ export default function GymStep1({
   return (
     <>
       <KeyboardAvoidingView
-        style={styles.container}
+        style={GymStyles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          style={styles.scrollView}
+          style={GymStyles.scrollView}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={GymStyles.scrollContent}
         >
           {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Información Básica</Text>
-            <Text style={styles.headerSubtitle}>
+          <View style={GymStyles.header}>
+            <Text style={GymStyles.headerTitle}>Información Básica</Text>
+            <Text style={GymStyles.headerSubtitle}>
               Comencemos con los datos principales de tu gimnasio
             </Text>
           </View>
 
           {/* Formulario */}
-          <View style={styles.form}>
+          <View style={GymStyles.form}>
             <FormInput
               label='Nombre del Gimnasio *'
               value={formData.name}
               onChangeText={value => handleInputChange('name', value)}
               error={errors.name}
-              inputStyle={styles.input}
             />
 
             <FormInput
@@ -144,7 +130,6 @@ export default function GymStep1({
               keyboardType='email-address'
               autoCapitalize='none'
               error={errors.email}
-              inputStyle={styles.input}
             />
 
             <FormInput
@@ -153,7 +138,6 @@ export default function GymStep1({
               onChangeText={value => handleInputChange('phone', value)}
               keyboardType='phone-pad'
               error={errors.phone}
-              inputStyle={styles.input}
             />
 
             <FormInput
@@ -161,18 +145,17 @@ export default function GymStep1({
               value={formData.nit}
               onChangeText={value => handleInputChange('nit', value)}
               error={errors.nit}
-              inputStyle={styles.input}
             />
           </View>
 
           {/* Info Card */}
-          <View style={styles.infoCard}>
+          <View style={GymStyles.infoCard}>
             <FontAwesome
               name='info-circle'
               size={20}
               color={Colors.dark.tint}
             />
-            <Text style={styles.infoText}>
+            <Text style={GymStyles.infoText}>
               Esta información será verificada por nuestro equipo. Asegúrate de
               que sea correcta y esté actualizada.
             </Text>
@@ -180,12 +163,12 @@ export default function GymStep1({
         </ScrollView>
 
         {/* Botones */}
-        <View style={styles.buttonContainer}>
+        <View style={GymStyles.buttonContainer}>
           <Button
             title={loading ? 'Registrando...' : 'Continuar'}
             onPress={handleNext}
             disabled={loading || isLoading}
-            style={styles.nextButton}
+            style={GymStyles.nextButton}
           />
         </View>
       </KeyboardAvoidingView>
@@ -193,75 +176,3 @@ export default function GymStep1({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  header: {
-    marginBottom: 30,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    lineHeight: 22,
-  },
-  form: {
-    gap: 20,
-  },
-  input: {
-    borderColor: '#666',
-  },
-  infoCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 20,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.dark.tint,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#B0B0B0',
-    lineHeight: 20,
-    marginLeft: 12,
-  },
-  buttonContainer: {
-    padding: 20,
-    gap: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#333333',
-  },
-  nextButton: {
-    backgroundColor: Colors.dark.tint,
-  },
-  backButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#666666',
-    borderRadius: 8,
-    paddingVertical: 15,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

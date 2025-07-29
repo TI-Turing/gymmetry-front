@@ -12,6 +12,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
 import { GymRegistrationFormData, GymRegistrationFormProps } from './types';
+import Colors from '@/constants/Colors';
 
 export default function GymRegistrationForm({
   onSubmit,
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   submitButton: {
-    backgroundColor: '#9C27B0',
+    backgroundColor: Colors.dark.tint,
   },
   cancelButton: {
     backgroundColor: 'transparent',

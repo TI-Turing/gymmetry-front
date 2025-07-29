@@ -31,7 +31,7 @@ function ProfileScreen() {
     { icon: 'trophy', title: '100 Entrenamientos', color: '#FFD700' },
     { icon: 'fire', title: '30 Días Consecutivos', color: '#FF6B35' },
     { icon: 'star', title: 'Meta Mensual', color: '#4CAF50' },
-    { icon: 'medal', title: 'Primer PR', color: '#9C27B0' },
+    { icon: 'medal', title: 'Primer PR', color: Colors.dark.tint },
   ];
 
   const menuItems = [

@@ -13,6 +13,7 @@ import { UI_CONSTANTS } from '@/constants/AppConstants';
 
 interface FormInputProps extends Omit<TextInputProps, 'style'> {
   label?: string;
+  icon?: React.ReactNode;
   error?: string;
   required?: boolean;
   containerStyle?: any;
@@ -23,6 +24,7 @@ interface FormInputProps extends Omit<TextInputProps, 'style'> {
 
 export const FormInput: React.FC<FormInputProps> = ({
   label,
+  icon,
   error,
   required = false,
   containerStyle,
@@ -49,22 +51,23 @@ export const FormInput: React.FC<FormInputProps> = ({
         </Text>
       )}
 
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: Colors[colorScheme].background,
-            color: Colors[colorScheme].text,
-            borderColor: hasError
-              ? Colors[colorScheme].tint + '80'
-              : Colors[colorScheme].text + '40',
-          },
-          hasError && styles.inputError,
-          inputStyle,
-        ]}
-        placeholderTextColor={`${Colors[colorScheme].text}60`}
-        {...textInputProps}
-      />
+      <View style={styles.inputRow}>
+        {icon && <View style={styles.iconContainer}>{icon}</View>}
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: Colors[colorScheme].background,
+              color: Colors[colorScheme].text,
+              borderColor: hasError ? Colors[colorScheme].tint + '80' : '#666',
+            },
+            hasError && styles.inputError,
+            inputStyle,
+          ]}
+          placeholderTextColor={`${Colors[colorScheme].text}60`}
+          {...textInputProps}
+        />
+      </View>
 
       {error && (
         <Text
@@ -93,12 +96,20 @@ const styles = StyleSheet.create({
   required: {
     color: '#FF6B6B',
   },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    marginRight: UI_CONSTANTS.SPACING.SM,
+  },
   input: {
     height: 48,
     borderWidth: 1,
     borderRadius: UI_CONSTANTS.BORDER_RADIUS.MEDIUM,
     paddingHorizontal: UI_CONSTANTS.SPACING.MD,
     fontSize: UI_CONSTANTS.FONT_SIZE.MD,
+    flex: 1,
   },
   inputError: {
     borderColor: '#FF6B6B',

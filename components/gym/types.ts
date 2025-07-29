@@ -19,11 +19,6 @@ export interface GymType {
   Gyms: any[];
 }
 
-// Información del gimnasio creado (solo el ID que retorna gym/add)
-export interface GymRegistrationData {
-  Id: string;
-}
-
 // Información del país (lo que viene en Data de países)
 export interface Country {
   Id: string;
@@ -38,7 +33,7 @@ export interface GymStep1Data {
   email: string;
   phone: string;
   nit: string;
-  gymId?: string; // Se agrega después del registro
+  owner_UserId: string;
 }
 
 // Paso 2: Tipo de gimnasio y detalles
@@ -46,16 +41,16 @@ export interface GymStep2Data {
   gymTypeId: string;
   slogan: string;
   description: string;
+  Id: string;
 }
 
 // Paso 3: Ubicación y contacto
 export interface GymStep3Data {
   address: string;
-  city: string;
-  country: string;
   countryId: string;
-  postalCode: string;
-  emergencyPhone: string;
+  regionId: string;
+  cityId: string;
+  Id: string;
 }
 
 // Paso 4: Presencia digital
@@ -63,8 +58,7 @@ export interface GymStep4Data {
   website: string;
   instagram: string;
   facebook: string;
-  twitter: string;
-  linkedin: string;
+  Id: string;
 }
 
 // Paso 5: Multimedia (imágenes y videos)
@@ -73,6 +67,7 @@ export interface GymStep5Data {
   coverImage: string | null;
   galleryImages: string[];
   videos: string[];
+  Id: string;
 }
 
 // Datos completos del registro
@@ -82,7 +77,7 @@ export interface GymCompleteData
     GymStep3Data,
     GymStep4Data,
     GymStep5Data {
-  gymId?: string; // Se obtiene después del primer paso
+  Id: string; // Se obtiene después del primer paso
 }
 
 // Props para los componentes de pasos
@@ -94,7 +89,7 @@ export interface GymStepProps<T> {
 }
 
 // Respuestas tipadas de la API usando la estructura estándar del backend C#
-export type GymRegistrationResponse = BackendApiResponse<GymRegistrationData>;
+export type GymRegistrationResponse = BackendApiResponse<string>;
 export type GymTypesResponse = BackendApiResponse<GymType[]>;
 export type CountriesResponse = BackendApiResponse<Country[]>;
 export type GymUpdateResponse = BackendApiResponse<any>; // El backend puede definir qué retorna en las actualizaciones
