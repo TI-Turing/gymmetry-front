@@ -12,6 +12,7 @@ import {
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { router } from 'expo-router';
 
 interface MobileHeaderProps {
   title?: string;
@@ -33,6 +34,9 @@ export default function MobileHeader({
   const handleMenuOption = (option: string) => {
     closeMenu();
     switch (option) {
+      case 'plans':
+        router.push('/plans-modal');
+        break;
       case 'theme':
         // Handle theme change
         break;
@@ -83,6 +87,12 @@ export default function MobileHeader({
   };
 
   const menuOptions = [
+    {
+      key: 'plans',
+      icon: 'star',
+      label: 'Planes',
+      action: () => handleMenuOption('plans'),
+    },
     {
       key: 'theme',
       icon: 'moon-o',

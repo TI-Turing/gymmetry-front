@@ -13,6 +13,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
+import Colors from '@/constants/Colors';
 
 function ProfileScreen() {
   const { user, logout } = useAuth();

@@ -11,6 +11,7 @@ import {
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useScreenWidth } from './useScreenWidth';
 import Colors from '@/constants/Colors';
+import { router } from 'expo-router';
 
 interface WebHeaderProps {
   userName?: string;
@@ -40,10 +41,45 @@ export default function WebHeader({
 
   const handleMenuOption = (option: string) => {
     setShowUserMenu(false);
-    // Aquí puedes manejar cada opción del menú
+
+    // Manejar navegación según la opción
+    switch (option) {
+      case 'plans':
+        router.push('/plans-modal');
+        break;
+      case 'theme':
+        // TODO: Implementar cambio de tema
+        break;
+      case 'settings':
+        // TODO: Implementar navegación a configuración
+        break;
+      case 'support':
+        // TODO: Implementar contacto con soporte
+        break;
+      case 'bug':
+        // TODO: Implementar reporte de bugs
+        break;
+      case 'help':
+        // TODO: Implementar ayuda
+        break;
+      case 'privacy':
+        // TODO: Implementar privacidad
+        break;
+      case 'logout':
+        // TODO: Implementar logout
+        break;
+      default:
+        break;
+    }
   };
 
   const userMenuOptions = [
+    {
+      key: 'plans',
+      icon: 'star',
+      label: 'Planes',
+      action: () => handleMenuOption('plans'),
+    },
     {
       key: 'theme',
       icon: 'moon-o',
