@@ -50,8 +50,8 @@ export interface PasswordUserRequest {
 }
 
 export interface UpdateUserGymRequest {
-  userId: string;
-  gymId: string;
+  UserId: string;
+  GymId: string;
 }
 
 export interface AddUserResponse {
@@ -157,9 +157,9 @@ export const userService = {
   async updateUserGym(
     request: UpdateUserGymRequest
   ): Promise<ApiResponse<boolean>> {
-    // PUT /user/gym/update (según la ruta de la Azure Function)
+    // PUT /user/update-gym (según el endpoint proporcionado)
     const response = await apiService.put<ApiResponse<boolean>>(
-      '/user/gym/update',
+      '/user/update-gym',
       request
     );
     return response.data;

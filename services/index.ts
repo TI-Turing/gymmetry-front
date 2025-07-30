@@ -13,3 +13,4 @@ export { branchService } from './branchService';
 export { branchMediaService } from './branchMediaService';
 export { planService } from './planService';
 export { planTypeService } from './planTypeService';
+export { gymPlanService } from './gymPlanService';

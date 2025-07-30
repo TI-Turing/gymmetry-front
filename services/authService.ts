@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService } from './apiService';
-import { LoginRequest, LoginResponse, RefreshTokenResponse } from '@/dto/auth';
+import {
+  LoginRequest,
+  LoginResponse,
+  LoginResponseData,
+  RefreshTokenResponseData,
+} from '@/dto/auth';
 import { GymService } from '@/components/gym/GymService';
 import { Gym } from '@/components/gym/types';
 
@@ -46,54 +51,56 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await apiService.post<LoginResponse>(
+      const response = await apiService.post<LoginResponseData>(
         '/auth/login',
         credentials
       );
 
-      if (response.data.Success && response.data.Data) {
+      if (response.success && response.data) {
         // Guardar token y datos del usuario
-        this.token = response.data.Data.Token;
-        this.refreshToken = response.data.Data.RefreshToken;
-        this.tokenExpiration = new Date(response.data.Data.TokenExpiration);
+        this.token = response.data.Token;
+        this.refreshToken = response.data.RefreshToken;
+        this.tokenExpiration = new Date(response.data.TokenExpiration);
         this.refreshTokenExpiration = new Date(
-          response.data.Data.RefreshTokenExpiration
+          response.data.RefreshTokenExpiration
         );
-        const user = response.data.Data.User;
+        const user = response.data.User;
         this.userData = {
-          userId: response.data.Data.UserId,
-          userName: response.data.Data.UserName || user.UserName || '',
-          email: response.data.Data.Email,
+          userId: response.data.UserId,
+          userName: response.data.UserName || user.UserName || '',
+          email: response.data.Email,
           planId: user.PlanId,
           gymId: user.GymId,
         };
 
         // Persistir en AsyncStorage
-        await AsyncStorage.setItem(TOKEN_KEY, this.token);
-        await AsyncStorage.setItem(REFRESH_TOKEN_KEY, this.refreshToken);
-        await AsyncStorage.setItem(
-          TOKEN_EXPIRATION_KEY,
-          this.tokenExpiration.toISOString()
-        );
-        await AsyncStorage.setItem(
-          REFRESH_TOKEN_EXPIRATION_KEY,
-          this.refreshTokenExpiration.toISOString()
-        );
-        await AsyncStorage.setItem(
-          USER_DATA_KEY,
-          JSON.stringify(this.userData)
-        );
+        if (this.token && this.refreshToken) {
+          await AsyncStorage.setItem(TOKEN_KEY, this.token);
+          await AsyncStorage.setItem(REFRESH_TOKEN_KEY, this.refreshToken);
+          await AsyncStorage.setItem(
+            TOKEN_EXPIRATION_KEY,
+            this.tokenExpiration.toISOString()
+          );
+          await AsyncStorage.setItem(
+            REFRESH_TOKEN_EXPIRATION_KEY,
+            this.refreshTokenExpiration.toISOString()
+          );
+          await AsyncStorage.setItem(
+            USER_DATA_KEY,
+            JSON.stringify(this.userData)
+          );
 
-        // Persistir datos adicionales por separado
-        await AsyncStorage.setItem(USER_ID_KEY, this.userData.userId);
-        if (this.userData.planId) {
-          await AsyncStorage.setItem(PLAN_ID_KEY, this.userData.planId);
-        }
-        if (this.userData.gymId) {
-          await AsyncStorage.setItem(GYM_ID_KEY, this.userData.gymId);
-        }
-        if (this.userData.userName) {
-          await AsyncStorage.setItem(USERNAME_KEY, this.userData.userName);
+          // Persistir datos adicionales por separado
+          await AsyncStorage.setItem(USER_ID_KEY, this.userData.userId);
+          if (this.userData.planId) {
+            await AsyncStorage.setItem(PLAN_ID_KEY, this.userData.planId);
+          }
+          if (this.userData.gymId) {
+            await AsyncStorage.setItem(GYM_ID_KEY, this.userData.gymId);
+          }
+          if (this.userData.userName) {
+            await AsyncStorage.setItem(USERNAME_KEY, this.userData.userName);
+          }
         }
 
         // Configurar token en el servicio API
@@ -110,9 +117,12 @@ class AuthService {
 
         // Precargar datos adicionales en segundo plano
         this.precargarDatosInicio();
-      }
 
-      return response.data;
+        return response as LoginResponse;
+      } else {
+        // Si no hay datos válidos en la respuesta
+        throw new Error('Respuesta de login inválida');
+      }
     } catch (error) {
       throw error;
     }
@@ -214,18 +224,21 @@ class AuthService {
           return false;
         }
 
+        // Configurar token en el servicio API primero (incluso si está expirado)
+        apiService.setAuthToken(this.token);
+
         // Verificar si el token necesita ser refrescado
         if (this.tokenExpiration <= new Date()) {
           // Token expirado, intentar refrescar
+          console.log('🔄 Token expirado, intentando refresh...');
           const refreshed = await this.refreshAuthToken();
           if (!refreshed) {
+            console.log('❌ Refresh falló, cerrando sesión');
             await this.logout();
             return false;
           }
+          console.log('✅ Token refrescado exitosamente');
         }
-
-        // Configurar token en el servicio API
-        apiService.setAuthToken(this.token);
 
         return true;
       }
@@ -301,6 +314,11 @@ class AuthService {
     return null;
   }
 
+  // Método público para que los componentes puedan verificar el token antes de operaciones importantes
+  async checkAndRefreshToken(): Promise<boolean> {
+    return await this.ensureValidToken();
+  }
+
   isTokenExpired(): boolean {
     if (!this.tokenExpiration) return true;
     return this.tokenExpiration <= new Date();
@@ -316,7 +334,15 @@ class AuthService {
       return false;
     }
 
-    if (this.isTokenExpired()) {
+    // Verificar si el refresh token está expirado
+    if (this.isRefreshTokenExpired()) {
+      await this.logout();
+      return false;
+    }
+
+    // Si el token expira en menos de 5 minutos, refrescarlo proactivamente
+    const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
+    if (this.tokenExpiration && this.tokenExpiration <= fiveMinutesFromNow) {
       return await this.refreshAuthToken();
     }
 
@@ -326,10 +352,13 @@ class AuthService {
   async refreshAuthToken(): Promise<boolean> {
     try {
       if (!this.token || !this.refreshToken) {
+        console.log('❌ Refresh falló: No hay token o refresh token');
         return false;
       }
 
-      const response = await apiService.post<RefreshTokenResponse>(
+      console.log('🔄 Intentando refresh token...');
+
+      const response = await apiService.post<RefreshTokenResponseData>(
         '/auth/refresh-token',
         {
           Token: this.token,
@@ -337,26 +366,35 @@ class AuthService {
         }
       );
 
-      if (response.data.Success && response.data.Data?.NewToken) {
+      if (response.success && response.data?.NewToken) {
+        console.log('✅ Refresh exitoso, actualizando token');
+
         // Actualizar el token y su expiración
-        this.token = response.data.Data.NewToken;
-        this.tokenExpiration = new Date(response.data.Data.TokenExpiration);
+        this.token = response.data.NewToken;
+        this.tokenExpiration = new Date(response.data.TokenExpiration);
 
         // Persistir el nuevo token y su expiración
-        await AsyncStorage.setItem(TOKEN_KEY, this.token);
-        await AsyncStorage.setItem(
-          TOKEN_EXPIRATION_KEY,
-          this.tokenExpiration.toISOString()
-        );
+        if (this.token) {
+          await AsyncStorage.setItem(TOKEN_KEY, this.token);
+          await AsyncStorage.setItem(
+            TOKEN_EXPIRATION_KEY,
+            this.tokenExpiration.toISOString()
+          );
 
-        // Configurar el nuevo token en el servicio API
-        apiService.setAuthToken(this.token);
+          // Configurar el nuevo token en el servicio API
+          apiService.setAuthToken(this.token);
+        }
 
         return true;
       }
 
+      console.log(
+        '❌ Refresh falló: Respuesta inválida del servidor',
+        response.data
+      );
       return false;
-    } catch {
+    } catch (error) {
+      console.log('❌ Error en refresh token:', error);
       // Si falla el refresh, limpiar sesión
       await this.logout();
       return false;

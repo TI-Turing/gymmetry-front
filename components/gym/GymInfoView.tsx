@@ -9,9 +9,11 @@ import {
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { Gym } from './types';
 import { UI_CONSTANTS } from '@/constants/AppConstants';
+import { authService } from '@/services/authService';
 
 interface GymInfoViewProps {
   gym: Gym;
@@ -25,6 +27,13 @@ export default function GymInfoView({
   onAddBranch,
 }: GymInfoViewProps) {
   const { width } = Dimensions.get('window');
+  const router = useRouter();
+
+  // Verificar si el usuario actual es el propietario del gimnasio
+  const currentUserId = authService.getUserId();
+  const isOwner = currentUserId === gym.Owner_UserId;
+  // Verificar si el gimnasio tiene un plan activo
+  const hasActivePlan = gym.SubscriptionPlanId != null;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
@@ -32,6 +41,10 @@ export default function GymInfoView({
       month: 'long',
       day: 'numeric',
     });
+  };
+
+  const handleSelectPlan = () => {
+    router.push('/plans');
   };
 
   return (
@@ -163,13 +176,24 @@ export default function GymInfoView({
         </View>
 
         {/* Botón Agregar Sede */}
-        {onAddBranch && (
+        {onAddBranch && isOwner && (
           <TouchableOpacity
             style={styles.addBranchButton}
             onPress={onAddBranch}
           >
             <FontAwesome name='plus' size={18} color='#FFFFFF' />
             <Text style={styles.addBranchText}>Agregar sede</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Botón Seleccionar Plan */}
+        {isOwner && !hasActivePlan && (
+          <TouchableOpacity
+            style={styles.selectPlanButton}
+            onPress={handleSelectPlan}
+          >
+            <FontAwesome name='credit-card' size={18} color='#FFFFFF' />
+            <Text style={styles.selectPlanText}>Seleccionar plan</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -315,6 +339,22 @@ const styles = StyleSheet.create({
     marginTop: UI_CONSTANTS.SPACING.MD,
   },
   addBranchText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  selectPlanButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF6B35',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: UI_CONSTANTS.SPACING.SM,
+  },
+  selectPlanText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',

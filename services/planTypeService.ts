@@ -1,5 +1,5 @@
 // Servicio para PlanType
-import { apiService } from './apiService';
+import { apiService, ApiResponse } from './apiService';
 
 // Interfaces DTO (replicadas desde C#)
 export interface PlanType {
@@ -33,14 +33,6 @@ export interface UpdatePlanTypeRequest {
 
 export interface FindPlanTypesByFieldsRequest {
   fields: { [key: string]: any };
-}
-
-// Interfaces de respuesta del backend (formato estándar de Azure Functions)
-export interface ApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
 }
 
 // Servicio principal
@@ -104,7 +96,7 @@ export const planTypeService = {
   // Obtener todos los tipos de plan
   async getAllPlanTypes(): Promise<ApiResponse<PlanType[]>> {
     const response =
-      await apiService.get<ApiResponse<PlanType[]>>('/plantype/all');
+      await apiService.get<ApiResponse<PlanType[]>>('/plantypes');
     return response.data;
   },
 };

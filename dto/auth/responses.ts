@@ -1,34 +1,43 @@
 import { User } from '../models/user';
 
+export interface LoginResponseData {
+  UserId: string;
+  UserName: string;
+  Email: string;
+  Token: string;
+  RefreshToken: string;
+  TokenExpiration: string;
+  RefreshTokenExpiration: string;
+  User: User;
+}
+
 export interface LoginResponse {
-  Success: boolean;
-  Message: string;
-  Data: {
-    UserId: string;
-    UserName: string;
-    Email: string;
-    Token: string;
-    RefreshToken: string;
-    TokenExpiration: string;
-    RefreshTokenExpiration: string;
-    User: User;
-  };
-  StatusCode: number;
+  success: boolean;
+  message: string;
+  data: LoginResponseData;
+  statusCode: number;
+}
+
+export interface RegisterResponseData {
+  // Define the actual registration response data structure here
+  [key: string]: any;
 }
 
 export interface RegisterResponse {
-  Success: boolean;
-  Message: string;
-  Data: any;
-  StatusCode: number;
+  success: boolean;
+  message: string;
+  data: RegisterResponseData;
+  statusCode: number;
+}
+
+export interface RefreshTokenResponseData {
+  NewToken: string;
+  TokenExpiration: string;
 }
 
 export interface RefreshTokenResponse {
-  Success: boolean;
-  Message: string;
-  Data: {
-    NewToken: string;
-    TokenExpiration: string;
-  };
-  StatusCode: number;
+  success: boolean;
+  message: string;
+  data: RefreshTokenResponseData;
+  statusCode: number;
 }

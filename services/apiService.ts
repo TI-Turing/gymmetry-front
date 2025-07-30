@@ -2,10 +2,10 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { Environment } from '../environment';
 
 export interface ApiResponse<T = any> {
-  data: T;
   success: boolean;
-  message?: string;
-  errors?: string[];
+  message: string;
+  data: T;
+  statusCode: number;
 }
 
 export interface RequestOptions {
@@ -225,15 +225,13 @@ class ApiService {
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.get<T>(endpoint, {
+      const response = await this.axiosInstance.get<ApiResponse<T>>(endpoint, {
         headers: options?.headers,
         timeout: options?.timeout,
       });
 
-      return {
-        data: response.data,
-        success: true,
-      };
+      // El backend ya devuelve la estructura ApiResponse correcta
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -245,15 +243,17 @@ class ApiService {
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.post<T>(endpoint, body, {
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
+      const response = await this.axiosInstance.post<ApiResponse<T>>(
+        endpoint,
+        body,
+        {
+          headers: options?.headers,
+          timeout: options?.timeout,
+        }
+      );
 
-      return {
-        data: response.data,
-        success: true,
-      };
+      // El backend ya devuelve la estructura ApiResponse correcta
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -265,15 +265,17 @@ class ApiService {
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.put<T>(endpoint, body, {
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
+      const response = await this.axiosInstance.put<ApiResponse<T>>(
+        endpoint,
+        body,
+        {
+          headers: options?.headers,
+          timeout: options?.timeout,
+        }
+      );
 
-      return {
-        data: response.data,
-        success: true,
-      };
+      // El backend ya devuelve la estructura ApiResponse correcta
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -285,15 +287,17 @@ class ApiService {
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.patch<T>(endpoint, body, {
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
+      const response = await this.axiosInstance.patch<ApiResponse<T>>(
+        endpoint,
+        body,
+        {
+          headers: options?.headers,
+          timeout: options?.timeout,
+        }
+      );
 
-      return {
-        data: response.data,
-        success: true,
-      };
+      // El backend ya devuelve la estructura ApiResponse correcta
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -304,15 +308,16 @@ class ApiService {
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.delete<T>(endpoint, {
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
+      const response = await this.axiosInstance.delete<ApiResponse<T>>(
+        endpoint,
+        {
+          headers: options?.headers,
+          timeout: options?.timeout,
+        }
+      );
 
-      return {
-        data: response.data,
-        success: true,
-      };
+      // El backend ya devuelve la estructura ApiResponse correcta
+      return response.data;
     } catch (error) {
       throw error;
     }
