@@ -1,0 +1,44 @@
+name: SonarCloud Frontend
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # necesario para análisis de historial/PR decoration
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test --if-present
+
+      # (Opcional) Generar reporte ESLint si quieres importarlo
+      # - name: Lint
+      #   run: npx eslint "src/**/*.{js,jsx,ts,tsx}" -f json -o eslint-report.json || true
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.Gymmetry_Front }}
