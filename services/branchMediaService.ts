@@ -54,21 +54,21 @@ export const branchMediaService = {
     request: UploadBranchImageRequest
   ): Promise<ApiResponse<string>> {
     // POST /branch/media/upload (ruta inferida para subir imágenes de sede)
-    const response = await apiService.post<ApiResponse<string>>(
+    const response = await apiService.post<string>(
       '/branch/media/upload',
       request
     );
-    return response.data;
+    return response;
   },
 
   async getBranchImages(
     branchId: string
   ): Promise<ApiResponse<BranchMediaResponse[]>> {
     // GET /branch/{branchId}/media (ruta inferida para obtener imágenes de una sede)
-    const response = await apiService.get<ApiResponse<BranchMediaResponse[]>>(
+    const response = await apiService.get<BranchMediaResponse[]>(
       `/branch/${branchId}/media`
     );
-    return response.data;
+    return response;
   },
 
   async getBranchImageById(
@@ -76,21 +76,21 @@ export const branchMediaService = {
     imageId: string
   ): Promise<ApiResponse<BranchMediaResponse>> {
     // GET /branch/{branchId}/media/{imageId} (ruta inferida para obtener imagen específica)
-    const response = await apiService.get<ApiResponse<BranchMediaResponse>>(
+    const response = await apiService.get<BranchMediaResponse>(
       `/branch/${branchId}/media/${imageId}`
     );
-    return response.data;
+    return response;
   },
 
   async updateBranchImage(
     request: UpdateBranchImageRequest
   ): Promise<ApiResponse<string>> {
     // PUT /branch/media/update (ruta inferida para actualizar imagen de sede)
-    const response = await apiService.put<ApiResponse<string>>(
+    const response = await apiService.put<string>(
       '/branch/media/update',
       request
     );
-    return response.data;
+    return response;
   },
 
   async deleteBranchImage(
@@ -98,10 +98,10 @@ export const branchMediaService = {
     imageId: string
   ): Promise<ApiResponse<boolean>> {
     // DELETE /branch/{branchId}/media/{imageId} (ruta inferida para eliminar imagen)
-    const response = await apiService.delete<ApiResponse<boolean>>(
+    const response = await apiService.delete<boolean>(
       `/branch/${branchId}/media/${imageId}`
     );
-    return response.data;
+    return response;
   },
 
   async setBranchMainImage(
@@ -109,21 +109,21 @@ export const branchMediaService = {
     imageId: string
   ): Promise<ApiResponse<boolean>> {
     // PUT /branch/{branchId}/media/{imageId}/main (ruta inferida para establecer imagen principal)
-    const response = await apiService.put<ApiResponse<boolean>>(
+    const response = await apiService.put<boolean>(
       `/branch/${branchId}/media/${imageId}/main`,
       {}
     );
-    return response.data;
+    return response;
   },
 
   async findBranchMediaByFields(
     request: FindBranchMediaByFieldsRequest
   ): Promise<ApiResponse<BranchMediaBasicInfo[]>> {
     // POST /branch/media/find (genérica para buscar por cualquier campo)
-    const response = await apiService.post<ApiResponse<BranchMediaBasicInfo[]>>(
+    const response = await apiService.post<BranchMediaBasicInfo[]>(
       '/branch/media/find',
       request
     );
-    return response.data;
+    return response;
   },
 };

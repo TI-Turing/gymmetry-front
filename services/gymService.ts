@@ -89,50 +89,45 @@ export const gymServiceExtensions = {
     request: GenerateGymQrRequest
   ): Promise<ApiResponse<GenerateGymQrResponse>> {
     // POST /gym/generate-qr (según la ruta de la Azure Function)
-    const response = await apiService.post<ApiResponse<GenerateGymQrResponse>>(
+    const response = await apiService.post<GenerateGymQrResponse>(
       '/gym/generate-qr',
       request
     );
-    return response.data;
+    return response;
   },
 
   async uploadGymLogo(
     request: UploadGymLogoRequest
   ): Promise<ApiResponse<string>> {
     // POST /gym/upload-logo (según la ruta de la Azure Function)
-    const response = await apiService.post<ApiResponse<string>>(
-      '/gym/upload-logo',
-      request
-    );
-    return response.data;
+    const response = await apiService.post<string>('/gym/upload-logo', request);
+    return response;
   },
 
   async deleteGym(gymId: string): Promise<ApiResponse<boolean>> {
     // DELETE /gym/{id} (según la ruta de la Azure Function)
-    const response = await apiService.delete<ApiResponse<boolean>>(
-      `/gym/${gymId}`
-    );
-    return response.data;
+    const response = await apiService.delete<boolean>(`/gym/${gymId}`);
+    return response;
   },
 
   async findGymsByFields(
     request: FindGymsByFieldsRequest
   ): Promise<ApiResponse<GymBasicInfo[]>> {
     // POST /gym/find (genérica para buscar gyms por cualquier campo)
-    const response = await apiService.post<ApiResponse<GymBasicInfo[]>>(
+    const response = await apiService.post<GymBasicInfo[]>(
       '/gym/find',
       request
     );
-    return response.data;
+    return response;
   },
 
   async findGymsByName(
     name: string
   ): Promise<ApiResponse<FindGymsByNameResponse[]>> {
     // GET /gyms/findbyname/{name} (según la Azure Function especificada)
-    const response = await apiService.get<
-      ApiResponse<FindGymsByNameResponse[]>
-    >(`/gyms/findbyname/${encodeURIComponent(name)}`);
-    return response.data;
+    const response = await apiService.get<FindGymsByNameResponse[]>(
+      `/gyms/findbyname/${encodeURIComponent(name)}`
+    );
+    return response;
   },
 };

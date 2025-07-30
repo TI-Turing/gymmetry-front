@@ -18,12 +18,7 @@ import { apiService } from '@/services/apiService';
 import { Environment } from '@/environment';
 
 // Imports locales
-import {
-  Step5Data,
-  UsernameCheckRequest,
-  UsernameCheckResponse,
-  UploadProfileImageResponse,
-} from './types';
+import { Step5Data, UsernameCheckRequest } from './types';
 import { handleApiError } from './utils/api';
 import { commonStyles } from './styles/common';
 import { useCustomAlert } from './CustomAlert';
@@ -131,10 +126,7 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       };
 
       // Usar apiService para incluir el token automáticamente
-      const response = await apiService.post<UsernameCheckResponse>(
-        '/users/find',
-        requestData
-      );
+      const response = await apiService.post<any[]>('/users/find', requestData);
 
       // Restaurar el foco inmediatamente después del request
       if (wasInputFocused && usernameInputRef.current) {
@@ -148,9 +140,9 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         });
       }
 
-      if (response.data?.Success) {
+      if (response.Success) {
         // Si Data está vacío, el nombre de usuario está disponible
-        if (!response.data.Data || response.data.Data.length === 0) {
+        if (!response.Data || response.Data.length === 0) {
           setUsernameStatus('available');
           setUsernameError('');
           // Guardar en cache
@@ -171,10 +163,10 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       } else {
         setUsernameStatus('invalid');
         setUsernameError(
-          response.data?.Message || 'Error al verificar el nombre de usuario'
+          response.Message || 'Error al verificar el nombre de usuario'
         );
       }
-    } catch (error: any) {
+    } catch {
       setUsernameStatus('invalid');
       setUsernameError(
         'Error al verificar la disponibilidad del nombre de usuario'
@@ -365,7 +357,7 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       } as any);
 
       // Hacer el request usando apiService para incluir el token automáticamente
-      const response = await apiService.post<UploadProfileImageResponse>(
+      const response = await apiService.post<string>(
         '/user/upload-profile-image',
         formData,
         {
@@ -375,14 +367,14 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
         }
       );
 
-      if (response.data.Success) {
+      if (response.Success) {
         showSuccess('La imagen de perfil se subió correctamente');
-        return response.data.Data; // Retornar la URL de la imagen
+        return response.Data; // Retornar la URL de la imagen
       } else {
-        showError(response.data.Message || 'Error al subir la imagen');
+        showError(response.Message || 'Error al subir la imagen');
         return null;
       }
-    } catch (error: any) {
+    } catch {
       showError('No se pudo subir la imagen. Intenta de nuevo.');
       return null;
     } finally {

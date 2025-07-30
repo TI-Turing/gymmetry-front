@@ -48,78 +48,66 @@ export interface ApiResponse<T> {
 export const planService = {
   // Crear un nuevo plan para un usuario
   async addPlan(request: CreatePlanRequest): Promise<ApiResponse<string>> {
-    const response = await apiService.post<ApiResponse<string>>(
-      '/plan/add',
-      request
-    );
-    return response.data;
+    const response = await apiService.post<string>('/plan/add', request);
+    return response;
   },
 
   // Obtener un plan por ID
   async getPlanById(id: string): Promise<ApiResponse<Plan>> {
-    const response = await apiService.get<ApiResponse<Plan>>(`/plan/${id}`);
-    return response.data;
+    const response = await apiService.get<Plan>(`/plan/${id}`);
+    return response;
   },
 
   // Actualizar un plan
   async updatePlan(request: UpdatePlanRequest): Promise<ApiResponse<boolean>> {
-    const response = await apiService.put<ApiResponse<boolean>>(
-      '/plan/update',
-      request
-    );
-    return response.data;
+    const response = await apiService.put<boolean>('/plan/update', request);
+    return response;
   },
 
   // Eliminar un plan
   async deletePlan(id: string): Promise<ApiResponse<boolean>> {
-    const response = await apiService.delete<ApiResponse<boolean>>(
-      `/plan/${id}`
-    );
-    return response.data;
+    const response = await apiService.delete<boolean>(`/plan/${id}`);
+    return response;
   },
 
   // Buscar planes por campos específicos
   async findPlansByFields(
     request: FindPlansByFieldsRequest
   ): Promise<ApiResponse<Plan[]>> {
-    const response = await apiService.post<ApiResponse<Plan[]>>(
+    const response = await apiService.post<Plan[]>(
       '/plan/findbyfields',
       request
     );
-    return response.data;
+    return response;
   },
 
   // Obtener planes activos de un usuario
   async getUserActivePlans(userId: string): Promise<ApiResponse<Plan[]>> {
-    const response = await apiService.get<ApiResponse<Plan[]>>(
+    const response = await apiService.get<Plan[]>(
       `/plan/user/${userId}/active`
     );
-    return response.data;
+    return response;
   },
 
   // Obtener todos los planes de un usuario
   async getUserPlans(userId: string): Promise<ApiResponse<Plan[]>> {
-    const response = await apiService.get<ApiResponse<Plan[]>>(
-      `/plan/user/${userId}`
-    );
-    return response.data;
+    const response = await apiService.get<Plan[]>(`/plan/user/${userId}`);
+    return response;
   },
 
   // Obtener el plan actual del usuario (el más reciente activo)
   async getCurrentUserPlan(userId: string): Promise<ApiResponse<Plan>> {
-    const response = await apiService.get<ApiResponse<Plan>>(
-      `/plan/user/${userId}/current`
-    );
-    return response.data;
+    const response = await apiService.get<Plan>(`/plan/user/${userId}/current`);
+    return response;
   },
 
   // Cancelar un plan (marcar como inactivo)
   async cancelPlan(planId: string): Promise<ApiResponse<boolean>> {
-    const response = await apiService.put<ApiResponse<boolean>>(
+    const response = await apiService.put<boolean>(
       `/plan/${planId}/cancel`,
       {}
     );
-    return response.data;
+    return response;
   },
 
   // Renovar un plan (extender fecha de finalización)
@@ -127,11 +115,10 @@ export const planService = {
     planId: string,
     newEndDate: string
   ): Promise<ApiResponse<boolean>> {
-    const response = await apiService.put<ApiResponse<boolean>>(
-      `/plan/${planId}/renew`,
-      { endDate: newEndDate }
-    );
-    return response.data;
+    const response = await apiService.put<boolean>(`/plan/${planId}/renew`, {
+      endDate: newEndDate,
+    });
+    return response;
   },
 };
 

@@ -24,12 +24,7 @@ import { Button } from '../common/Button';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { useCustomAlert } from './CustomAlert';
 import { commonStyles } from './styles/common';
-import {
-  Step5Data,
-  UsernameCheckRequest,
-  UsernameCheckResponse,
-  UploadProfileImageResponse,
-} from './types';
+import { Step5Data, UsernameCheckRequest } from './types';
 import { handleApiError } from './utils/api';
 import { apiService } from '@/services/apiService';
 import { userAPI } from '@/services/apiExamples';
@@ -152,7 +147,7 @@ const Step5 = memo<Step5Props>(
             UserName: usernameToCheck,
           };
 
-          const response = await apiService.post<UsernameCheckResponse>(
+          const response = await apiService.post<any[]>(
             '/users/find',
             requestData
           );
@@ -169,8 +164,8 @@ const Step5 = memo<Step5Props>(
             });
           }
 
-          if (response.data?.Success) {
-            if (!response.data.Data || response.data.Data.length === 0) {
+          if (response.Success) {
+            if (!response.Data || response.Data.length === 0) {
               setUsernameStatus('available');
               setUsernameError('');
               usernameCache.current.set(usernameToCheck, {
@@ -188,11 +183,10 @@ const Step5 = memo<Step5Props>(
           } else {
             setUsernameStatus('invalid');
             setUsernameError(
-              response.data?.Message ||
-                'Error al verificar el nombre de usuario'
+              response.Message || 'Error al verificar el nombre de usuario'
             );
           }
-        } catch (error: any) {
+        } catch {
           setUsernameStatus('invalid');
           setUsernameError(
             'Error al verificar la disponibilidad del nombre de usuario'
@@ -373,7 +367,7 @@ const Step5 = memo<Step5Props>(
             name: filename,
           } as any);
 
-          const response = await apiService.post<UploadProfileImageResponse>(
+          const response = await apiService.post<string>(
             '/user/upload-profile-image',
             formData,
             {
@@ -383,14 +377,14 @@ const Step5 = memo<Step5Props>(
             }
           );
 
-          if (response.data.Success) {
+          if (response.Success) {
             showSuccess('La imagen de perfil se subió correctamente');
-            return response.data.Data;
+            return response.Data;
           } else {
-            showError(response.data.Message || 'Error al subir la imagen');
+            showError(response.Message || 'Error al subir la imagen');
             return null;
           }
-        } catch (error: any) {
+        } catch {
           showError('No se pudo subir la imagen. Intenta de nuevo.');
           return null;
         } finally {
@@ -433,7 +427,7 @@ const Step5 = memo<Step5Props>(
             setProfileImage(resizedUri);
           }
         }
-      } catch (error) {
+      } catch {
         showError('No se pudo seleccionar la imagen');
       } finally {
         setIsUploadingImage(false);
@@ -476,7 +470,7 @@ const Step5 = memo<Step5Props>(
         }
 
         setShowImageModal(false);
-      } catch (error) {
+      } catch {
         setImageLoading(false);
         setImageError(true);
         showError('No se pudo tomar la foto. Intenta nuevamente.');

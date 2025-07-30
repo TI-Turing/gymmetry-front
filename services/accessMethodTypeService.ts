@@ -35,54 +35,52 @@ export const accessMethodTypeService = {
     request: AddAccessMethodTypeRequest
   ): Promise<ApiResponse<string>> {
     // POST /accessmethodtype/add (según la ruta de la Azure Function)
-    const response = await apiService.post<ApiResponse<string>>(
+    const response = await apiService.post<string>(
       '/accessmethodtype/add',
       request
     );
-    return response.data;
+    return response;
   },
 
   async getAccessMethodTypeById(id: string): Promise<ApiResponse<any>> {
     // GET /accessmethodtype/{id} (según la ruta de la Azure Function)
-    const response = await apiService.get<ApiResponse<any>>(
-      `/accessmethodtype/${id}`
-    );
-    return response.data;
+    const response = await apiService.get<any>(`/accessmethodtype/${id}`);
+    return response;
   },
 
   async updateAccessMethodType(
     request: UpdateAccessMethodTypeRequest
   ): Promise<ApiResponse<boolean>> {
     // PUT /accessmethodtype/update (según la ruta de la Azure Function)
-    const response = await apiService.put<ApiResponse<boolean>>(
+    const response = await apiService.put<boolean>(
       '/accessmethodtype/update',
       request
     );
-    return response.data;
+    return response;
   },
 
   async deleteAccessMethodType(id: string): Promise<ApiResponse<boolean>> {
     // DELETE /accessmethodtype/{id} (según la ruta de la Azure Function)
-    const response = await apiService.delete<ApiResponse<boolean>>(
+    const response = await apiService.delete<boolean>(
       `/accessmethodtype/${id}`
     );
-    return response.data;
+    return response;
   },
 
   async getAllAccessMethodTypes(): Promise<ApiResponse<any[]>> {
     // GET /accessmethodtype (según la ruta de la Azure Function)
-    const response =
-      await apiService.get<ApiResponse<any[]>>('/accessmethodtype');
-    return response.data;
+    const response = await apiService.get<any[]>('/accessmethodtype');
+    return response;
   },
 
   async findAccessMethodTypesByFields(
     request: FindAccessMethodTypesByFieldsRequest
   ): Promise<ApiResponse<AccessMethodTypeBasicInfo[]>> {
     // POST /accessmethodtype/find (genérica para buscar por cualquier campo)
-    const response = await apiService.post<
-      ApiResponse<AccessMethodTypeBasicInfo[]>
-    >('/accessmethodtype/find', request);
-    return response.data;
+    const response = await apiService.post<AccessMethodTypeBasicInfo[]>(
+      '/accessmethodtype/find',
+      request
+    );
+    return response;
   },
 };

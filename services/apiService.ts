@@ -2,10 +2,10 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { Environment } from '../environment';
 
 export interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
-  data: T;
-  statusCode: number;
+  Success: boolean;
+  Message: string;
+  Data: T;
+  StatusCode: number;
 }
 
 export interface RequestOptions {

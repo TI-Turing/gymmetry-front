@@ -16,9 +16,9 @@ export class GymService {
     apiResponse: ApiResponse<T>
   ): BackendApiResponse<T> {
     return {
-      Success: apiResponse.success,
-      Message: apiResponse.message || '',
-      Data: apiResponse.data,
+      Success: apiResponse.Success,
+      Message: apiResponse.Message || '',
+      Data: apiResponse.Data,
       StatusCode: 200, // El apiService no retorna StatusCode, asumimos 200 si es exitoso
     };
   }
@@ -34,7 +34,7 @@ export class GymService {
       owner_userId: data.owner_UserId, // Enviar Owner_UserId al backend
       countryId: 'b1a7c2e2-1234-4cde-8f2a-123456789abc',
     });
-    const backend = apiResp.data as BackendApiResponse<string>;
+    const backend = apiResp.Data as BackendApiResponse<string>;
     // Extraer el ID real desde backend.Data
     const gymId = backend.Data || '';
     const transformedResponse: GymRegistrationResponse = {
@@ -59,7 +59,7 @@ export class GymService {
   // Obtener tipos de gimnasio
   static async getGymTypes(): Promise<GymTypesResponse> {
     const response = await apiService.get<any>('/gymtypes');
-    const backendResponse = response.data;
+    const backendResponse = response.Data;
 
     // Extraer el array de tipos de gimnasio
     let gymTypesArray = [];
@@ -83,7 +83,7 @@ export class GymService {
   // Obtener información de un gimnasio por ID
   static async getGymById(gymId: string): Promise<GymGetResponse> {
     const response = await apiService.get<any>(`/gym/${gymId}`);
-    const backendResponse = response.data;
+    const backendResponse = response.Data;
 
     const transformedResponse: GymGetResponse = {
       Success: backendResponse?.Success || false,

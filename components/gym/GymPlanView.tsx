@@ -51,9 +51,9 @@ export default function GymPlanView({
         gymPlanService.getCurrentGymPlan(gymId),
       ]);
       console.log('Plan Types Response:', planTypesResponse);
-      if (planTypesResponse.success) {
+      if (planTypesResponse.Success) {
         // Asegurar que siempre tenemos un array
-        setGymPlanTypes(planTypesResponse.data || []);
+        setGymPlanTypes(planTypesResponse.Data || []);
       } else {
         // Solo mostrar error si el servicio falló, no si no hay datos
         setGymPlanTypes([]);
@@ -61,8 +61,8 @@ export default function GymPlanView({
         return;
       }
 
-      if (currentPlanResponse.success) {
-        setCurrentGymPlan(currentPlanResponse.data);
+      if (currentPlanResponse.Success) {
+        setCurrentGymPlan(currentPlanResponse.Data);
       }
     } catch {
       setError('Error al cargar los planes del gimnasio');
@@ -107,7 +107,7 @@ export default function GymPlanView({
                 const response =
                   await gymPlanService.createGymPlan(createPlanRequest);
 
-                if (response.success) {
+                if (response.Success) {
                   Alert.alert(
                     'Plan Creado',
                     `El plan "${planType.name}" ha sido asignado exitosamente al gimnasio.`,
@@ -125,7 +125,7 @@ export default function GymPlanView({
                 } else {
                   Alert.alert(
                     'Error',
-                    response.message || 'No se pudo crear el plan'
+                    response.Message || 'No se pudo crear el plan'
                   );
                 }
               } catch {

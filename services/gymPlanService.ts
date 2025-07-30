@@ -51,10 +51,10 @@ class GymPlanService {
     } catch {
       // En caso de error, devolver array vacío para evitar crashes
       return {
-        success: false,
-        message: 'Error al cargar tipos de planes',
-        data: [],
-        statusCode: 500,
+        Success: false,
+        Message: 'Error al cargar tipos de planes',
+        Data: [],
+        StatusCode: 500,
       };
     }
   }
@@ -71,10 +71,10 @@ class GymPlanService {
 
       // Mock temporal
       const mockResponse: ApiResponse<GymPlanSelected | null> = {
-        success: true,
-        message: '',
-        data: null, // No hay plan activo actualmente
-        statusCode: 200,
+        Success: true,
+        Message: '',
+        Data: null, // No hay plan activo actualmente
+        StatusCode: 200,
       };
 
       return mockResponse;

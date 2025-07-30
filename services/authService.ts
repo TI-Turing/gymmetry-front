@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiService } from './apiService';
+import { apiService, ApiResponse } from './apiService';
 import {
   LoginRequest,
-  LoginResponse,
   LoginResponseData,
   RefreshTokenResponseData,
 } from '@/dto/auth';
@@ -49,26 +48,28 @@ class AuthService {
     return AuthService.instance;
   }
 
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
+  async login(
+    credentials: LoginRequest
+  ): Promise<ApiResponse<LoginResponseData>> {
     try {
       const response = await apiService.post<LoginResponseData>(
         '/auth/login',
         credentials
       );
-
-      if (response.success && response.data) {
+      console.log('🔐 Respuesta de login:', response.Success);
+      if (response.Success) {
         // Guardar token y datos del usuario
-        this.token = response.data.Token;
-        this.refreshToken = response.data.RefreshToken;
-        this.tokenExpiration = new Date(response.data.TokenExpiration);
+        this.token = response.Data.Token;
+        this.refreshToken = response.Data.RefreshToken;
+        this.tokenExpiration = new Date(response.Data.TokenExpiration);
         this.refreshTokenExpiration = new Date(
-          response.data.RefreshTokenExpiration
+          response.Data.RefreshTokenExpiration
         );
-        const user = response.data.User;
+        const user = response.Data.User;
         this.userData = {
-          userId: response.data.UserId,
-          userName: response.data.UserName || user.UserName || '',
-          email: response.data.Email,
+          userId: response.Data.UserId,
+          userName: response.Data.UserName || user.UserName || '',
+          email: response.Data.Email,
           planId: user.PlanId,
           gymId: user.GymId,
         };
@@ -118,12 +119,14 @@ class AuthService {
         // Precargar datos adicionales en segundo plano
         this.precargarDatosInicio();
 
-        return response as LoginResponse;
+        // Retornar la respuesta del API directamente con formato ApiResponse
+        return response;
       } else {
         // Si no hay datos válidos en la respuesta
         throw new Error('Respuesta de login inválida');
       }
     } catch (error) {
+      console.log('❌ Error en login:', error);
       throw error;
     }
   }
@@ -366,12 +369,12 @@ class AuthService {
         }
       );
 
-      if (response.success && response.data?.NewToken) {
+      if (response.Success && response.Data?.NewToken) {
         console.log('✅ Refresh exitoso, actualizando token');
 
         // Actualizar el token y su expiración
-        this.token = response.data.NewToken;
-        this.tokenExpiration = new Date(response.data.TokenExpiration);
+        this.token = response.Data.NewToken;
+        this.tokenExpiration = new Date(response.Data.TokenExpiration);
 
         // Persistir el nuevo token y su expiración
         if (this.token) {
@@ -390,7 +393,7 @@ class AuthService {
 
       console.log(
         '❌ Refresh falló: Respuesta inválida del servidor',
-        response.data
+        response.Data
       );
       return false;
     } catch (error) {
