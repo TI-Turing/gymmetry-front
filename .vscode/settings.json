@@ -1,0 +1,6 @@
+{
+  "sonarlint.connectedMode.project": {
+    "connectionId": "ti-turing",
+    "projectKey": "TI-Turing_gymmetry-front"
+  }
+}
