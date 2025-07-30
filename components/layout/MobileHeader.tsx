@@ -35,7 +35,7 @@ export default function MobileHeader({
     closeMenu();
     switch (option) {
       case 'plans':
-        router.push('/plans-modal');
+        router.push('/plans');
         break;
       case 'theme':
         // Handle theme change

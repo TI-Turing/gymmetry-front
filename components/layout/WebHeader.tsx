@@ -45,7 +45,7 @@ export default function WebHeader({
     // Manejar navegación según la opción
     switch (option) {
       case 'plans':
-        router.push('/plans-modal');
+        router.push('/plans');
         break;
       case 'theme':
         // TODO: Implementar cambio de tema
