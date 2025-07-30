@@ -74,25 +74,47 @@ function RootLayoutNav() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return; // No hacer nada mientras se carga
+    if (isLoading) return; // Esperar a que Auth cargue
 
-    const inAuthGroup = segments[0] === '(tabs)';
+    const first = segments[0] as string | undefined; // p.ej. '(tabs)', 'login', 'register', 'plans', 'modal', etc.
 
-    if (!isAuthenticated && inAuthGroup) {
-      // Usuario no autenticado intentando acceder a la app, redirigir a login
+    // Rutas de la app a las que un usuario autenticado SÍ puede entrar aunque no sean parte de (tabs)
+    const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal']);
+
+    // Usuario NO autenticado intentando entrar a la app (tabs, plans, modal) -> mandar a login
+    if (
+      !isAuthenticated &&
+      (first === '(tabs)' || first === 'plans' || first === 'modal')
+    ) {
       router.replace('/login');
-    } else if (isAuthenticated && !inAuthGroup) {
-      // Usuario autenticado en pantallas de auth, redirigir a la app
+      return;
+    }
+
+    // Usuario autenticado en pantallas de auth -> mandarlo a la app (tabs)
+    const inAuthScreens = first === 'login' || first === 'register';
+    if (isAuthenticated && inAuthScreens) {
       router.replace('/(tabs)');
+      return;
+    }
+
+    // (Opcional) Si está autenticado pero está en una ruta no permitida, redirigir a tabs
+    if (isAuthenticated && !allowedWhenAuth.has(first ?? '(tabs)')) {
+      router.replace('/(tabs)');
+      return;
     }
   }, [isAuthenticated, segments, isLoading, router]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        {/* Grupo principal con tabs */}
         <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+
+        {/* Auth */}
         <Stack.Screen name='login' options={{ headerShown: false }} />
         <Stack.Screen name='register' options={{ headerShown: false }} />
+
+        {/* Modales / pantallas fuera de tabs */}
         <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
         <Stack.Screen
           name='plans'
