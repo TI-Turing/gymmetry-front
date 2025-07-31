@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
 import { Gym } from '@/components/gym/types';
+import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
 
 interface PreloadContextType {
   gymData: Gym | null;
@@ -35,14 +36,15 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
 
   const refreshGymData = async () => {
     try {
-      const cachedGym = authService.getCachedGym();
+      const { GymService } = await import('@/services/gymService');
+      const cachedGym = GymService.getCachedGym();
       if (cachedGym) {
         setGymData(cachedGym);
       } else {
         // Si no hay datos en caché, intentar recargar
         const gymId = authService.getGymId();
         if (gymId) {
-          const gym = await authService.fetchAndCacheGymData(gymId);
+          const gym = await GymService.fetchAndCacheGymData(gymId);
           setGymData(gym);
         }
       }

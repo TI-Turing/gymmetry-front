@@ -7,7 +7,7 @@ import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStep1Data, GymStepProps } from '../types';
-import { GymService } from '../GymService';
+import { GymService } from '@/services/gymService';
 import Colors from '@/constants/Colors';
 import { GymStyles } from '../styles';
 
@@ -78,7 +78,13 @@ export default function GymStep1({
       // Registrar gimnasio inicial y obtener ID
       const payload = { ...formData, owner_UserId: userId };
       const response = await GymService.registerGym(payload);
+      console.log('GymService.registerGym response:', response);
       if (response.Success && response.Data) {
+        AsyncStorage.setItem('GYM_DATA_KEY', response.Data);
+        console.log(
+          'Data en GYM_DATA_KEY:',
+          await AsyncStorage.getItem('GYM_DATA_KEY')
+        );
         // Pasar los datos junto con gymId y owner_UserId al siguiente paso
         onNext({
           ...formData,

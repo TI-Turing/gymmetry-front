@@ -6,7 +6,7 @@ import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
 import GymTypeDropdown from '../GymTypeDropdown';
 import { GymStep2Data, GymStepProps, GymType } from '../types';
-import { GymService } from '../GymService';
+import { GymService } from '@/services/gymService';
 import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStyles } from '../styles';

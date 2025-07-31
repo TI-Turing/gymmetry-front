@@ -5,8 +5,6 @@ import {
   LoginResponseData,
   RefreshTokenResponseData,
 } from '@/dto/auth';
-import { GymService } from '@/components/gym/GymService';
-import { Gym } from '@/components/gym/types';
 
 const TOKEN_KEY = '@auth_token';
 const REFRESH_TOKEN_KEY = '@refresh_token';
@@ -27,11 +25,6 @@ interface UserData {
   gymId: string | null;
 }
 
-interface CachedGymData {
-  gym: Gym | null;
-  lastFetched: string;
-}
-
 class AuthService {
   private static instance: AuthService;
   private token: string | null = null;
@@ -39,7 +32,6 @@ class AuthService {
   private tokenExpiration: Date | null = null;
   private refreshTokenExpiration: Date | null = null;
   private userData: UserData | null = null;
-  private cachedGym: CachedGymData | null = null;
 
   static getInstance(): AuthService {
     if (!AuthService.instance) {
@@ -107,10 +99,11 @@ class AuthService {
         // Configurar token en el servicio API
         apiService.setAuthToken(this.token);
 
-        // Consultar información del gym si existe
+        // Consultar información del gym si existe (ahora delegado al GymService)
         if (this.userData.gymId) {
           try {
-            await this.fetchAndCacheGymData(this.userData.gymId);
+            const { GymService } = await import('./gymService');
+            await GymService.fetchAndCacheGymData(this.userData.gymId);
           } catch {
             // No hacer nada si falla la obtención de datos del gym
           }
@@ -154,7 +147,6 @@ class AuthService {
       this.tokenExpiration = null;
       this.refreshTokenExpiration = null;
       this.userData = null;
-      this.cachedGym = null;
 
       // Limpiar AsyncStorage
       await AsyncStorage.removeItem(TOKEN_KEY);
@@ -177,7 +169,6 @@ class AuthService {
       this.tokenExpiration = null;
       this.refreshTokenExpiration = null;
       this.userData = null;
-      this.cachedGym = null;
     }
   }
 
@@ -192,7 +183,6 @@ class AuthService {
       );
       const userDataString = await AsyncStorage.getItem(USER_DATA_KEY);
       const storedUserId = await AsyncStorage.getItem(USER_ID_KEY);
-      const gymDataString = await AsyncStorage.getItem(GYM_DATA_KEY);
 
       if (
         token &&
@@ -210,13 +200,13 @@ class AuthService {
           this.userData.userId = storedUserId;
         }
 
-        // Cargar datos del gym si existen
-        if (gymDataString) {
+        // Cargar datos del gym si existe gymId (ahora usando GymService)
+        if (this.userData?.gymId) {
           try {
-            this.cachedGym = JSON.parse(gymDataString);
+            const { GymService } = await import('./gymService');
+            await GymService.loadGymDataFromStorage();
           } catch {
-            // Error al parsear datos del gym, limpiar
-            await AsyncStorage.removeItem(GYM_DATA_KEY);
+            // Silenciosamente fallar si no se pueden cargar datos del gym
           }
         }
 
@@ -284,37 +274,6 @@ class AuthService {
 
   getUserName(): string | null {
     return this.userData?.userName || null;
-  }
-
-  getCachedGym(): Gym | null {
-    return this.cachedGym?.gym || null;
-  }
-
-  async fetchAndCacheGymData(gymId: string): Promise<Gym | null> {
-    try {
-      const response = await GymService.getGymById(gymId);
-      if (response.Success && response.Data) {
-        const gymData: CachedGymData = {
-          gym: response.Data,
-          lastFetched: new Date().toISOString(),
-        };
-        this.cachedGym = gymData;
-        await AsyncStorage.setItem(GYM_DATA_KEY, JSON.stringify(gymData));
-
-        return response.Data;
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }
-
-  async refreshGymData(): Promise<Gym | null> {
-    const gymId = this.getGymId();
-    if (gymId) {
-      return await this.fetchAndCacheGymData(gymId);
-    }
-    return null;
   }
 
   // Método público para que los componentes puedan verificar el token antes de operaciones importantes
@@ -403,7 +362,61 @@ class AuthService {
       return false;
     }
   }
+
+  // Método para refrescar la información del usuario después de crear un gym
+  async refreshUserData(): Promise<boolean> {
+    try {
+      if (!this.userData?.userId) {
+        return false;
+      }
+
+      const { userService } = await import('./userService');
+      const response = await userService.getUserById(this.userData.userId);
+
+      if (response.Success && response.Data) {
+        const user = response.Data;
+
+        // Actualizar userData con la nueva información
+        this.userData = {
+          ...this.userData,
+          gymId: user.GymId,
+          planId: user.PlanId,
+        };
+
+        // Persistir los datos actualizados
+        await AsyncStorage.setItem(
+          USER_DATA_KEY,
+          JSON.stringify(this.userData)
+        );
+
+        // Actualizar gymId en AsyncStorage
+        if (this.userData.gymId) {
+          await AsyncStorage.setItem(GYM_ID_KEY, this.userData.gymId);
+
+          // Consultar y cachear información del nuevo gym
+          try {
+            const { GymService } = await import('./gymService');
+            await GymService.fetchAndCacheGymData(this.userData.gymId);
+          } catch {
+            // No hacer nada si falla la obtención de datos del gym
+          }
+        }
+
+        // Actualizar planId si existe
+        if (this.userData.planId) {
+          await AsyncStorage.setItem(PLAN_ID_KEY, this.userData.planId);
+        }
+
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.log('❌ Error refrescando datos del usuario:', error);
+      return false;
+    }
+  }
 }
 
 export const authService = AuthService.getInstance();
-export type { UserData, CachedGymData };
+export type { UserData };

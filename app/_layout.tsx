@@ -16,6 +16,9 @@ import { userSessionService } from '@/services/userSessionService';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { PreloadProvider } from '@/contexts/PreloadContext';
 
+// Importar el watcher para activarlo globalmente
+import '@/services/gymDataWatcher';
+
 // Suprimir warnings específicos que no son críticos
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',

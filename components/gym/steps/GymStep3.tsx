@@ -12,7 +12,7 @@ import {
   CitySelector,
 } from '@/components/catalogs';
 import { GymStepProps, GymStep3Data } from '../types';
-import { GymService } from '../GymService';
+import { GymService } from '@/services/gymService';
 import { GymStyles } from '../styles/GymStyles';
 import { Country, Region, City } from '@/dto/common';
 import Colors from '@/constants/Colors';

@@ -4,7 +4,7 @@ import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Button from '@/components/common/Button';
 import { GymStepProps, GymStep5Data } from '../types';
-import { GymService } from '../GymService';
+import { GymService } from '@/services/gymService';
 import { GymStyles } from '../styles/GymStyles';
 import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';

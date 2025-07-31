@@ -41,11 +41,12 @@ export default function PlansModal() {
       }
 
       // Obtener datos del gimnasio para verificar si el usuario es el owner
-      let gymData = authService.getCachedGym();
+      const { GymService } = await import('@/services/gymService');
+      let gymData = GymService.getCachedGym();
 
-      if (!gymData) {
+      if (!gymData && userGymId) {
         // Si no hay datos en caché, intentar refrescarlos
-        gymData = await authService.refreshGymData();
+        gymData = await GymService.refreshGymData(userGymId);
       }
 
       if (gymData && gymData.Owner_UserId === userId) {

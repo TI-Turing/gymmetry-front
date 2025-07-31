@@ -133,8 +133,8 @@ export interface GymStepProps<T> {
 
 // Respuestas tipadas de la API usando la estructura estándar del backend C#
 export type GymRegistrationResponse = BackendApiResponse<string>;
-export type GymTypesResponse = BackendApiResponse<GymType[]>;
-export type CountriesResponse = BackendApiResponse<Country[]>;
+export type GymTypesResponse = GymType[];
+export type CountriesResponse = Country[];
 export type GymUpdateResponse = BackendApiResponse<any>; // El backend puede definir qué retorna en las actualizaciones
 export type GymGetResponse = BackendApiResponse<Gym>;
 

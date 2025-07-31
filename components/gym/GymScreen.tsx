@@ -19,13 +19,27 @@ function GymScreen() {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [showAddBranchForm, setShowAddBranchForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [userGymId, setUserGymId] = useState<string | null>(null);
+  const [cachedGym, setCachedGym] = useState<any>(null);
 
-  // Verificar si el usuario tiene un gym asignado
-  const userGymId = authService.getGymId();
-  const cachedGym = authService.getCachedGym();
+  // Función para actualizar datos del usuario
+  const updateUserData = () => {
+    const currentUserGymId = authService.getGymId();
+    const { GymService } = require('@/services/gymService');
+    const currentCachedGym = GymService.getCachedGym();
+    console.log('GymScreen:', currentUserGymId);
+    console.log('Cached Gym:', currentCachedGym);
+    setUserGymId(currentUserGymId);
+    setCachedGym(currentCachedGym);
+  };
 
   // Usuario tiene gym si tiene gymId Y (tiene datos en caché O datos en preload)
   const hasGym = userGymId && (cachedGym || gymData);
+
+  useEffect(() => {
+    // Actualizar datos del usuario inicialmente
+    updateUserData();
+  }, []);
 
   useEffect(() => {
     const checkGymStatus = async () => {
@@ -56,23 +70,44 @@ function GymScreen() {
     setShowRegistrationForm(true);
   };
 
-  const handleRegistrationSubmit = (data: GymCompleteData) => {
-    // Aquí se implementará la lógica para enviar los datos a la API
-    // Por ahora, mostrar una alerta de éxito y volver a la vista anterior
-    setShowRegistrationForm(false);
-    // Actualizar datos del gym después del registro
-    refreshGymData();
-    // TODO: Implementar llamada a la API
-    // eslint-disable-next-line no-console
-    console.log('Datos de registro del gimnasio:', data);
+  const handleRegistrationSubmit = async (data: GymCompleteData) => {
+    try {
+      setIsLoading(true);
+
+      // Cerrar el formulario de registro
+      setShowRegistrationForm(false);
+
+      // Refrescar la información del usuario para obtener el gymId actualizado
+      const userRefreshed = await authService.refreshUserData();
+
+      if (userRefreshed) {
+        // Actualizar el estado local con los nuevos datos del usuario
+        updateUserData();
+
+        // Actualizar datos del gym después del registro
+        await refreshGymData();
+      }
+
+      // TODO: Implementar llamada a la API si es necesario
+      // eslint-disable-next-line no-console
+      console.log('Datos de registro del gimnasio:', data);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error al procesar el registro del gimnasio:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRegistrationCancel = () => {
     setShowRegistrationForm(false);
   };
 
-  const handleRefreshGym = () => {
-    refreshGymData();
+  const handleRefreshGym = async () => {
+    // Actualizar datos del usuario por si hay cambios
+    updateUserData();
+    // Refrescar datos del gym
+    await refreshGymData();
   };
 
   const handleAddBranch = () => {

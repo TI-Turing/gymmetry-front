@@ -5,7 +5,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
 import { GymStepProps, GymStep4Data } from '../types';
-import { GymService } from '../GymService';
+import { GymService } from '@/services/gymService';
 import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 

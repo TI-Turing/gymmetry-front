@@ -1,6 +1,6 @@
 // Ejemplo de uso de las respuestas estandarizadas de la API
 
-import { GymService } from './GymService';
+import { GymService } from '@/services/gymService';
 import {
   GymRegistrationResponse,
   GymTypesResponse,
