@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { Environment } from '../environment';
+import { logger } from '@/utils';
 import type { ApiResponse as BackendApiResponse } from '@/dto/common/ApiResponse';
 
 export interface RequestOptions {
@@ -54,8 +55,7 @@ class ApiService {
             config.headers,
             config.data
           );
-          // eslint-disable-next-line no-console
-          console.log('📋 CURL del request:', curlCommand);
+          logger.debug('📋 CURL del request:', curlCommand);
         }
         return config;
       },

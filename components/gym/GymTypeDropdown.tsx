@@ -34,7 +34,7 @@ export default function GymTypeDropdown({
 
   const handleSelect = (typeId: string) => {
     // eslint-disable-next-line no-console
-    console.log('📝 Selected gym type:', typeId);
+    // TODO: manejar selección de tipo de gimnasio (actualiza estado o llama servicio)
     onSelect(typeId);
     setIsModalVisible(false);
   };

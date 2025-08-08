@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 import { asyncStorageObserver } from './asyncStorageObserver';
 import { GymService } from './gymService';
+import { logger } from '@/utils';
 
 const GYM_DATA_KEY = '@gym_data';
 
@@ -48,47 +48,47 @@ class GymDataWatcher {
   ): Promise<void> {
     // Si no hay valor nuevo, no hacer nada
     if (!newValue) {
-      console.log('[GymDataWatcher] No hay valor nuevo, no se hace nada.');
+      logger.debug('[GymDataWatcher] No hay valor nuevo, no se hace nada.');
       return;
     }
 
     try {
       // Parsear los nuevos datos del gym
-      console.log('[GymDataWatcher] Nuevo valor detectado:', newValue);
+      logger.debug('[GymDataWatcher] Nuevo valor detectado:', newValue);
       const gymDataCache = JSON.parse(newValue);
-      console.log('[GymDataWatcher] gymDataCache:', gymDataCache);
+      logger.debug('[GymDataWatcher] gymDataCache:', gymDataCache);
 
       // Verificar si es una estructura válida de CachedGymData
       if (gymDataCache && gymDataCache.gym && gymDataCache.gym.Id) {
         const gymId = gymDataCache.gym.Id;
-        console.log('[GymDataWatcher] gymId detectado:', gymId);
+        logger.debug('[GymDataWatcher] gymId detectado:', gymId);
 
         // Verificar si el gymId cambió comparando con el valor anterior
         let shouldRefetch = false;
 
         if (!oldValue) {
           // Si no había valor anterior, definitivamente debemos consultar
-          console.log(
+          logger.info(
             '[GymDataWatcher] No hay valor anterior, se consultará el gym.'
           );
           shouldRefetch = true;
         } else {
           try {
-            console.log('[GymDataWatcher] Valor anterior:', oldValue);
+            logger.debug('[GymDataWatcher] Valor anterior:', oldValue);
             const oldGymDataCache = JSON.parse(oldValue);
-            console.log('[GymDataWatcher] oldGymDataCache:', oldGymDataCache);
+            logger.debug('[GymDataWatcher] oldGymDataCache:', oldGymDataCache);
             const oldGymId = oldGymDataCache?.gym?.Id;
-            console.log('[GymDataWatcher] oldGymId:', oldGymId);
+            logger.debug('[GymDataWatcher] oldGymId:', oldGymId);
 
             // Si el ID del gym cambió, debemos consultar
             if (oldGymId !== gymId) {
-              console.log(
+              logger.info(
                 '[GymDataWatcher] El gymId ha cambiado, se consultará el gym.'
               );
               shouldRefetch = true;
             }
           } catch (err) {
-            console.log(
+            logger.warn(
               '[GymDataWatcher] Error parseando valor anterior, se consultará por seguridad.',
               err
             );
@@ -99,29 +99,29 @@ class GymDataWatcher {
 
         // Solo consultar si realmente cambió el gym
         if (shouldRefetch) {
-          console.log(
+          logger.info(
             '[GymDataWatcher] Ejecutando refetchGymData para gymId:',
             gymId
           );
           await this.refetchGymData(gymId);
         } else {
-          console.log(
+          logger.debug(
             '[GymDataWatcher] No es necesario consultar el gym, el ID no cambió.'
           );
         }
       } else {
-        console.log(
+        logger.warn(
           '[GymDataWatcher] gymDataCache no es válido o no tiene gym.Id'
         );
       }
     } catch (_error) {
-      console.log(
+      logger.warn(
         '[GymDataWatcher] Error parseando newValue, intentando con el gymId actual del cache.',
         _error
       );
       // Si hay error parseando, intentar con el gymId del cache actual
       const currentGymId = GymService.getCachedGymData()?.gym?.Id;
-      console.log('[GymDataWatcher] currentGymId del cache:', currentGymId);
+      logger.debug('[GymDataWatcher] currentGymId del cache:', currentGymId);
       if (currentGymId) {
         await this.refetchGymData(currentGymId);
       }
@@ -132,19 +132,19 @@ class GymDataWatcher {
   private async refetchGymData(gymId: string): Promise<void> {
     try {
       // Usar el método del GymService que maneja el caching
-      console.log('[GymDataWatcher] Refetching gym data for gymId:', gymId);
+      logger.info('[GymDataWatcher] Refetching gym data for gymId:', gymId);
       await GymService.updateCacheFromObserver(gymId);
 
       // Opcional: Notificar a otros componentes que los datos se actualizaron
       // Esto se puede usar para mostrar notificaciones o actualizar UI específica
-      console.log(
+      logger.info(
         '[GymDataWatcher] Notificando actualización de datos del gym:',
         gymId
       );
       this.notifyGymDataUpdated(gymId);
     } catch (_error) {
       // Manejo silencioso de errores para no interrumpir la aplicación
-      console.log('[GymDataWatcher] Error en refetchGymData:', _error);
+      logger.error('[GymDataWatcher] Error en refetchGymData:', _error);
     }
   }
 
@@ -155,7 +155,7 @@ class GymDataWatcher {
 
     // Ejemplo: Crear un evento personalizado (opcional)
     if (typeof window !== 'undefined') {
-      console.log(
+      logger.debug(
         '[GymDataWatcher] Dispatching gymDataUpdated event para gymId:',
         gymId
       );

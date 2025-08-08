@@ -7,6 +7,7 @@ import { authService } from '@/services/authService';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { NoGymView, GymConnectedView } from './index';
+import { logger } from '@/utils';
 import { AddBranchForm } from '@/components/branches';
 import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
@@ -87,11 +88,9 @@ function GymScreen() {
       }
 
       // TODO: Implementar llamada a la API si es necesario
-      // eslint-disable-next-line no-console
-      console.log('Datos de registro del gimnasio:', data);
+      logger.debug('Datos de registro del gimnasio:', data);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error al procesar el registro del gimnasio:', error);
+      logger.error('Error al procesar el registro del gimnasio:', error);
     } finally {
       setIsLoading(false);
     }

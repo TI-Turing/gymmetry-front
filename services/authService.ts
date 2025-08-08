@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService, ApiResponse } from './apiService';
+import { logger } from '@/utils';
 import { Environment } from '@/environment';
 import {
   LoginRequest,
@@ -50,8 +51,7 @@ class AuthService {
         credentials
       );
       if (Environment.DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log('🔐 Respuesta de login:', response.Success);
+        logger.info('🔐 Respuesta de login:', response.Success);
       }
       if (response.Success) {
         // Guardar token y datos del usuario (solo si hay Data)
@@ -131,8 +131,7 @@ class AuthService {
       }
     } catch (error) {
       if (Environment.DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log('❌ Error en login:', error);
+        logger.error('❌ Error en login:', error);
       }
       throw error;
     }
@@ -238,21 +237,18 @@ class AuthService {
         if (this.tokenExpiration <= new Date()) {
           // Token expirado, intentar refrescar
           if (Environment.DEBUG) {
-            // eslint-disable-next-line no-console
-            console.log('🔄 Token expirado, intentando refresh...');
+            logger.info('🔄 Token expirado, intentando refresh...');
           }
           const refreshed = await this.refreshAuthToken();
           if (!refreshed) {
             if (Environment.DEBUG) {
-              // eslint-disable-next-line no-console
-              console.log('❌ Refresh falló, cerrando sesión');
+              logger.warn('❌ Refresh falló, cerrando sesión');
             }
             await this.logout();
             return false;
           }
           if (Environment.DEBUG) {
-            // eslint-disable-next-line no-console
-            console.log('✅ Token refrescado exitosamente');
+            logger.info('✅ Token refrescado exitosamente');
           }
         }
 
@@ -338,15 +334,13 @@ class AuthService {
     try {
       if (!this.token || !this.refreshToken) {
         if (Environment.DEBUG) {
-          // eslint-disable-next-line no-console
-          console.log('❌ Refresh falló: No hay token o refresh token');
+          logger.warn('❌ Refresh falló: No hay token o refresh token');
         }
         return false;
       }
 
       if (Environment.DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log('🔄 Intentando refresh token...');
+        logger.info('🔄 Intentando refresh token...');
       }
 
       const response = await apiService.post<RefreshTokenResponseData>(
@@ -359,8 +353,7 @@ class AuthService {
 
       if (response.Success && response.Data?.NewToken) {
         if (Environment.DEBUG) {
-          // eslint-disable-next-line no-console
-          console.log('✅ Refresh exitoso, actualizando token');
+          logger.info('✅ Refresh exitoso, actualizando token');
         }
 
         // Actualizar el token y su expiración
@@ -383,8 +376,7 @@ class AuthService {
       }
 
       if (Environment.DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log(
+        logger.warn(
           '❌ Refresh falló: Respuesta inválida del servidor',
           response.Data
         );
@@ -392,8 +384,7 @@ class AuthService {
       return false;
     } catch (error) {
       if (Environment.DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log('❌ Error en refresh token:', error);
+        logger.error('❌ Error en refresh token:', error);
       }
       // Si falla el refresh, limpiar sesión
       await this.logout();
@@ -451,8 +442,7 @@ class AuthService {
       return false;
     } catch (error) {
       if (Environment.DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log('❌ Error refrescando datos del usuario:', error);
+        logger.error('❌ Error refrescando datos del usuario:', error);
       }
       return false;
     }

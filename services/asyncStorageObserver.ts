@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@/utils';
 
 // Tipos para los listeners
 type StorageListener = (
@@ -71,7 +71,7 @@ class AsyncStorageObserver {
         observer.currentValue = value;
       }
     } catch (error) {
-      console.error(`Error inicializando valor para key ${key}:`, error);
+      logger.error(`Error inicializando valor para key ${key}:`, error);
     }
   }
 
@@ -109,12 +109,12 @@ class AsyncStorageObserver {
               try {
                 listener(newValue, oldValue, key);
               } catch (error) {
-                console.error(`Error en listener para key ${key}:`, error);
+                logger.error(`Error en listener para key ${key}:`, error);
               }
             });
           }
         } catch (error) {
-          console.error(`Error verificando cambios para key ${key}:`, error);
+          logger.error(`Error verificando cambios para key ${key}:`, error);
         }
       }
     );
@@ -137,12 +137,12 @@ class AsyncStorageObserver {
             try {
               listener(newValue, oldValue, key);
             } catch (error) {
-              console.error(`Error en listener para key ${key}:`, error);
+              logger.error(`Error en listener para key ${key}:`, error);
             }
           });
         }
       } catch (error) {
-        console.error(`Error en verificación forzada para key ${key}:`, error);
+        logger.error(`Error en verificación forzada para key ${key}:`, error);
       }
     } else {
       await this.checkForChanges();

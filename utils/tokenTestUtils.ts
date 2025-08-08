@@ -1,6 +1,6 @@
 // Utilidades para probar el refresh token en desarrollo
 import { authService } from '@/services/authService';
-/* eslint-disable no-console */
+import { logger } from '@/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const tokenTestUtils = {
@@ -11,9 +11,9 @@ export const tokenTestUtils = {
       const expiredDate = new Date(Date.now() - 60000).toISOString(); // 1 minuto atrás
       await AsyncStorage.setItem('@token_expiration', expiredDate);
 
-      console.log('🧪 Token marcado como expirado para testing');
+      logger.info('🧪 Token marcado como expirado para testing');
     } catch (error) {
-      console.error('Error simulando token expirado:', error);
+      logger.error('Error simulando token expirado:', error);
     }
   },
 
@@ -27,41 +27,41 @@ export const tokenTestUtils = {
         '@refresh_token_expiration'
       );
 
-      console.log('🔍 Estado del token:');
-      console.log('Token existe:', !!token);
-      console.log('Refresh token existe:', !!refreshToken);
-      console.log('Token expira:', tokenExpiration);
-      console.log('Refresh token expira:', refreshTokenExpiration);
+      logger.info('🔍 Estado del token:');
+      logger.info('Token existe:', !!token);
+      logger.info('Refresh token existe:', !!refreshToken);
+      logger.info('Token expira:', tokenExpiration);
+      logger.info('Refresh token expira:', refreshTokenExpiration);
 
       if (tokenExpiration) {
         const expDate = new Date(tokenExpiration);
         const now = new Date();
-        console.log('Token expirado:', expDate <= now);
-        console.log(
+        logger.info('Token expirado:', expDate <= now);
+        logger.info(
           'Tiempo hasta expiración:',
           Math.round((expDate.getTime() - now.getTime()) / 1000 / 60),
           'minutos'
         );
       }
 
-      console.log(
+      logger.info(
         'AuthService isAuthenticated:',
         authService.isAuthenticated()
       );
     } catch (error) {
-      console.error('Error verificando estado del token:', error);
+      logger.error('Error verificando estado del token:', error);
     }
   },
 
   // Función para probar el refresh manualmente
   async testRefreshToken(): Promise<boolean> {
     try {
-      console.log('🧪 Probando refresh token...');
+      logger.info('🧪 Probando refresh token...');
       const result = await authService.checkAndRefreshToken();
-      console.log('Resultado del refresh:', result);
+      logger.info('Resultado del refresh:', result);
       return result;
     } catch (error) {
-      console.error('Error en test de refresh:', error);
+      logger.error('Error en test de refresh:', error);
       return false;
     }
   },
@@ -81,9 +81,9 @@ export const tokenTestUtils = {
         '@username',
         '@gym_data',
       ]);
-      console.log('🧹 Datos de autenticación limpiados');
+      logger.info('🧹 Datos de autenticación limpiados');
     } catch (error) {
-      console.error('Error limpiando datos:', error);
+      logger.error('Error limpiando datos:', error);
     }
   },
 };
