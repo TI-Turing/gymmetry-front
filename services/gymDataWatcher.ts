@@ -18,7 +18,9 @@ class GymDataWatcher {
 
   // Iniciar el observador global
   startWatching(): void {
-    if (this.isWatching) return;
+    if (this.isWatching) {
+      return;
+    }
 
     this.removeListener = asyncStorageObserver.addListener(
       GYM_DATA_KEY,
@@ -30,7 +32,9 @@ class GymDataWatcher {
 
   // Parar el observador global
   stopWatching(): void {
-    if (!this.isWatching) return;
+    if (!this.isWatching) {
+      return;
+    }
 
     if (this.removeListener) {
       this.removeListener();

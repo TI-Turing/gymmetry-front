@@ -94,7 +94,9 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
   };
 
   const formatPrice = (price: number) => {
-    if (price === 0) return 'Gratis';
+    if (price === 0) {
+      return 'Gratis';
+    }
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',

@@ -99,8 +99,12 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
 
         // Ordenar planes por precio (gratuito primero, luego por precio ascendente)
         const sortedPlans = mappedPlanTypes.sort((a, b) => {
-          if (a.price === 0 && b.price > 0) return -1;
-          if (b.price === 0 && a.price > 0) return 1;
+          if (a.price === 0 && b.price > 0) {
+            return -1;
+          }
+          if (b.price === 0 && a.price > 0) {
+            return 1;
+          }
           return a.price - b.price;
         });
 
@@ -195,7 +199,9 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
   };
 
   const formatPrice = (price: number) => {
-    if (price === 0) return 'Gratis';
+    if (price === 0) {
+      return 'Gratis';
+    }
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',

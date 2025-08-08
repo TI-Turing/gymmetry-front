@@ -5,12 +5,14 @@ Este directorio contiene la configuración de ambiente para la aplicación gymme
 ## Archivos de Configuración
 
 ### Archivos .env
+
 - **`.env.example`** - Template con variables de ejemplo (incluido en git)
 - **`.env.local`** - Configuración para desarrollo local (ignorado por git)
 - **`.env.development`** - Configuración para ambiente de desarrollo (ignorado por git)
 - **`.env.production`** - Configuración para ambiente de producción (ignorado por git)
 
 ### Archivo de Configuración TypeScript
+
 - **`index.ts`** - Lee las variables de entorno y las expone como configuración tipada
 
 ## Cómo Funciona
@@ -51,12 +53,14 @@ npm run web:prod         # Web con .env.production
 ## Variables de Entorno
 
 ### API Configuration
+
 - `API_BASE_URL` - URL base de la API principal
 - `CATALOGS_API_BASE_URL` - URL base de la API de catálogos
 - `API_FUNCTIONS_KEY` - Clave para Azure Functions de catálogos
 - `API_MAIN_FUNCTIONS_KEY` - Clave para Azure Functions principales
 
 ### Environment
+
 - `ENVIRONMENT` - Nombre del ambiente (local, development, production)
 - `DEBUG` - Habilita logs de debug (true/false)
 

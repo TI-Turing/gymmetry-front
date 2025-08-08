@@ -77,7 +77,9 @@ class AsyncStorageObserver {
 
   // Iniciar el polling para verificar cambios
   private startPolling(): void {
-    if (this.pollingInterval) return;
+    if (this.pollingInterval) {
+      return;
+    }
 
     this.pollingInterval = setInterval(async () => {
       await this.checkForChanges();

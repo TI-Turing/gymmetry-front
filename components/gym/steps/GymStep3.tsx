@@ -141,7 +141,9 @@ export default function GymStep3({
   };
 
   const onSubmit = async () => {
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
     setLoading(true);
     try {
       await GymService.updateGymStep(formData);

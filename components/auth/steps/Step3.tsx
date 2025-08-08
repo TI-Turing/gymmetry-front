@@ -70,7 +70,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   const [documentTypesLoading, setDocumentTypesLoading] = useState(false);
 
   const loadCountries = useCallback(async () => {
-    if (countriesLoading || catalogData.countries.length > 0) return;
+    if (countriesLoading || catalogData.countries.length > 0) {
+      return;
+    }
 
     setCountriesLoading(true);
     try {
@@ -84,7 +86,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
 
   const loadRegions = useCallback(
     async (countryId: string) => {
-      if (regionsLoading) return;
+      if (regionsLoading) {
+        return;
+      }
 
       setRegionsLoading(true);
       try {
@@ -100,7 +104,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
 
   const loadCities = useCallback(
     async (regionId: string) => {
-      if (citiesLoading) return;
+      if (citiesLoading) {
+        return;
+      }
 
       setCitiesLoading(true);
       try {
@@ -115,7 +121,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
   );
 
   const loadEPS = useCallback(async () => {
-    if (epsLoading || catalogData.epsOptions.length > 0) return;
+    if (epsLoading || catalogData.epsOptions.length > 0) {
+      return;
+    }
 
     setEpsLoading(true);
     try {
@@ -129,7 +137,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
 
   const loadDocumentTypes = useCallback(
     async (countryId?: string) => {
-      if (documentTypesLoading) return;
+      if (documentTypesLoading) {
+        return;
+      }
 
       setDocumentTypesLoading(true);
       try {
@@ -375,7 +385,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
               },
             ]}
             onPress={() => {
-              if (!formData.selectedCountryId) return;
+              if (!formData.selectedCountryId) {
+                return;
+              }
               formData.setShowRegionModal(true);
               if (catalogData.regions.length === 0) {
                 loadRegions(formData.selectedCountryId);
@@ -423,7 +435,9 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
               },
             ]}
             onPress={() => {
-              if (!formData.selectedRegionId) return;
+              if (!formData.selectedRegionId) {
+                return;
+              }
               formData.setShowCityModal(true);
               if (catalogData.cities.length === 0) {
                 loadCities(formData.selectedRegionId);

@@ -20,7 +20,9 @@ export const RegionSelector = memo<RegionSelectorProps>(
     const [showModal, setShowModal] = useState(false);
 
     const filteredRegions = useMemo(() => {
-      if (!countryId) return [];
+      if (!countryId) {
+        return [];
+      }
       return regions.filter(region => region.PaisId === countryId);
     }, [regions, countryId]);
 

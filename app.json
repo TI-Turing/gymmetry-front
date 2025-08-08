@@ -37,9 +37,7 @@
       "orientation": "portrait-primary",
       "preferRelatedApplications": false
     },
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
     }

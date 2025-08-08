@@ -31,8 +31,14 @@ export const filterEmptyFields = (
  * @returns true si el valor tiene contenido válido
  */
 export const hasValidValue = (value: any): boolean => {
-  if (value === null || value === undefined) return false;
-  if (typeof value === 'string') return value.trim() !== '';
-  if (typeof value === 'number') return !isNaN(value);
+  if (value === null || value === undefined) {
+    return false;
+  }
+  if (typeof value === 'string') {
+    return value.trim() !== '';
+  }
+  if (typeof value === 'number') {
+    return !isNaN(value);
+  }
   return true;
 };

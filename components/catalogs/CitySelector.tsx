@@ -20,7 +20,9 @@ export const CitySelector = memo<CitySelectorProps>(
     const [showModal, setShowModal] = useState(false);
 
     const filteredCities = useMemo(() => {
-      if (!regionId) return [];
+      if (!regionId) {
+        return [];
+      }
       return cities.filter(city => city.RegionId === regionId);
     }, [cities, regionId]);
 

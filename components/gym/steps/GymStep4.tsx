@@ -30,7 +30,9 @@ export default function GymStep4({
   };
 
   const validateUrl = (url: string): boolean => {
-    if (!url.trim()) return true; // URLs son opcionales
+    if (!url.trim()) {
+      return true;
+    } // URLs son opcionales
 
     try {
       new URL(url);
@@ -57,7 +59,9 @@ export default function GymStep4({
   };
 
   const handleNext = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setIsLoading(true);
     try {

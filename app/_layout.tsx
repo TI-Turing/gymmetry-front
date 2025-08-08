@@ -46,7 +46,9 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
   }, [error]);
 
   useEffect(() => {
@@ -77,7 +79,9 @@ function RootLayoutNav() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return; // Esperar a que Auth cargue
+    if (isLoading) {
+      return;
+    } // Esperar a que Auth cargue
 
     const first = segments[0] as string | undefined; // p.ej. '(tabs)', 'login', 'register', 'plans', 'modal', etc.
 

@@ -21,4 +21,5 @@ export default {
   // Valores planos por defecto (modo claro) para usos no tematizados
   text: '#fff',
   tint: tintColorLight,
+  background: '#121212',
 };

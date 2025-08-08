@@ -301,12 +301,16 @@ class AuthService {
   }
 
   isTokenExpired(): boolean {
-    if (!this.tokenExpiration) return true;
+    if (!this.tokenExpiration) {
+      return true;
+    }
     return this.tokenExpiration <= new Date();
   }
 
   isRefreshTokenExpired(): boolean {
-    if (!this.refreshTokenExpiration) return true;
+    if (!this.refreshTokenExpiration) {
+      return true;
+    }
     return this.refreshTokenExpiration <= new Date();
   }
 

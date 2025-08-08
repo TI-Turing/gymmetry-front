@@ -141,7 +141,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // Error messages
-export const ERROR_MESSAGES = {
+export const ERROR_MESSAGES_LEGACY = {
   NETWORK: 'Error de conexión. Verifica tu internet e intenta nuevamente.',
   TIMEOUT: 'La operación tardó demasiado. Intenta nuevamente.',
   GENERIC: 'Ha ocurrido un error inesperado. Intenta nuevamente.',
@@ -164,7 +164,7 @@ export const ERROR_MESSAGES = {
 } as const;
 
 // Success messages
-export const SUCCESS_MESSAGES = {
+export const SUCCESS_MESSAGES_LEGACY = {
   PROFILE_UPDATED: 'Perfil actualizado correctamente',
   IMAGE_UPLOADED: 'Imagen subida correctamente',
   PHONE_VERIFIED: 'Teléfono verificado correctamente',
@@ -180,6 +180,6 @@ export default {
   IMAGE_CONSTANTS,
   ANIMATION_CONSTANTS,
   STORAGE_KEYS,
-  ERROR_MESSAGES,
-  SUCCESS_MESSAGES,
+  ERROR_MESSAGES_LEGACY,
+  SUCCESS_MESSAGES_LEGACY,
 };

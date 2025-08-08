@@ -21,22 +21,27 @@
     "web:prod": "npx cross-env NODE_ENV=production EXPO_PUBLIC_ENV=production node env-loader.js && expo start --web",
     "web:build": "expo export --platform web",
     "web:serve": "expo export --platform web && npx serve dist",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
-    "test:coverage": "jest --coverage",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watchAll --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "test:ci": "jest --ci --passWithNoTests --coverage",
     "env:setup": "node env-loader.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint:check": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "type-check": "tsc --noEmit",
+    "validate": "npm run lint:check && npm run format:check && npm run type-check && npm run test:ci",
     "pre-commit": "npm run lint:fix && npm run format && npm run type-check",
     "clean": "expo r -c",
-    "reset": "rm -rf node_modules && npm install && expo r -c",
+    "clean:deps": "rm -rf node_modules package-lock.json && npm install",
+    "reset": "npm run clean:deps && expo r -c",
     "deps:check": "npx npm-check-updates",
-  "deps:update": "npx npm-check-updates -u && npm install",
-  "models:generate": "node scripts/generate-models-from-cs.js",
-  "dtos:generate": "node scripts/generate-dtos-from-cs.js"
+    "deps:update": "npx npm-check-updates -u && npm install",
+    "models:generate": "node scripts/generate-models-from-cs.js",
+    "dtos:generate": "node scripts/generate-dtos-from-cs.js",
+    "codegen": "npm run models:generate && npm run dtos:generate"
   },
   "jest": {
     "preset": "jest-expo",
@@ -55,13 +60,8 @@
     "coverageReporters": ["text", "lcov", "html"]
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
+    "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md}": ["prettier --write"]
   },
   "husky": {
     "hooks": {
@@ -128,7 +128,7 @@
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-native": "^4.1.0",
-  "eslint-plugin-unused-imports": "^3.2.0",
+    "eslint-plugin-unused-imports": "^3.2.0",
     "husky": "^8.0.3",
     "jest": "^29.2.1",
     "jest-expo": "~53.0.9",

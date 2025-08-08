@@ -30,7 +30,9 @@ export function AccessMethodTypeList() {
     load();
   }, []);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return <LoadingSpinner />;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AccessMethodType - Lista</Text>

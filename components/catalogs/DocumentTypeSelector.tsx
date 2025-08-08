@@ -20,7 +20,9 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
     const [showModal, setShowModal] = useState(false);
 
     const filteredDocumentTypes = useMemo(() => {
-      if (!countryId) return [];
+      if (!countryId) {
+        return [];
+      }
       return documentTypes.filter(docType => docType.PaisId === countryId);
     }, [documentTypes, countryId]);
 

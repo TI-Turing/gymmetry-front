@@ -29,7 +29,9 @@ export function SubModuleList() {
     load();
   }, []);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return <LoadingSpinner />;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SubModule - Lista</Text>

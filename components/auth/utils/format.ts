@@ -1,5 +1,7 @@
 export const formatDateToDisplay = (date: Date): string => {
-  if (!date || isNaN(date.getTime())) return '';
+  if (!date || isNaN(date.getTime())) {
+    return '';
+  }
 
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -9,7 +11,9 @@ export const formatDateToDisplay = (date: Date): string => {
 };
 
 export const formatDateForBackend = (dateString: string): string => {
-  if (!dateString) return '';
+  if (!dateString) {
+    return '';
+  }
 
   const parts = dateString.split('/');
   if (parts.length === 3) {
@@ -23,7 +27,9 @@ export const formatDateForBackend = (dateString: string): string => {
 };
 
 export const parseDisplayDate = (dateString: string): Date => {
-  if (!dateString) return new Date();
+  if (!dateString) {
+    return new Date();
+  }
 
   const parts = dateString.split('/');
   if (parts.length === 3) {

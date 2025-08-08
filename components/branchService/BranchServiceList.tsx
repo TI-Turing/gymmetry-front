@@ -29,7 +29,9 @@ export function BranchServiceList() {
     load();
   }, []);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return <LoadingSpinner />;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>BranchService - Lista</Text>

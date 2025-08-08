@@ -10,7 +10,9 @@ export function useGenders(autoLoad: boolean = false) {
   const [error, setError] = useState<string | null>(null);
 
   const loadGenders = async () => {
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -47,7 +49,9 @@ export function useCountries(autoLoad: boolean = false) {
   const [error, setError] = useState<string | null>(null);
 
   const loadCountries = async () => {
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -85,7 +89,9 @@ export function useRegionsByCountry(countryId?: string) {
 
   const loadRegions = async (targetCountryId?: string) => {
     const finalCountryId = targetCountryId || countryId;
-    if (!finalCountryId || loading) return;
+    if (!finalCountryId || loading) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -125,7 +131,9 @@ export function useCitiesByRegion(regionId?: string) {
 
   const loadCities = async (targetRegionId?: string) => {
     const finalRegionId = targetRegionId || regionId;
-    if (!finalRegionId || loading) return;
+    if (!finalRegionId || loading) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -164,7 +172,9 @@ export function useEPS(autoLoad: boolean = false) {
   const [error, setError] = useState<string | null>(null);
 
   const loadEPS = async () => {
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -204,7 +214,9 @@ export function useDocumentTypes(
   const [error, setError] = useState<string | null>(null);
 
   const loadDocumentTypes = async (targetCountryId?: string) => {
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
