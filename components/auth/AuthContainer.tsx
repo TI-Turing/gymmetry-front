@@ -16,7 +16,6 @@ export default function AuthContainer({
   onAuthSuccess,
   onBack,
 }: AuthContainerProps) {
-  console.log('🔧 AuthContainer render - Estado inicial:');
   const [isLogin, setIsLogin] = useState(true);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -24,26 +23,9 @@ export default function AuthContainer({
   const [isLoading, setIsLoading] = useState(false);
 
   const showAlert = (message: string, type: 'success' | 'error' = 'error') => {
-    console.log('🚨 showAlert llamado:', {
-      message,
-      type,
-      visible: alertVisible,
-    });
     setAlertMessage(message);
     setAlertType(type);
     setAlertVisible(true);
-    console.log('🚨 Estado después de showAlert:', {
-      alertVisible: true,
-      alertMessage: message,
-    });
-
-    console.log('🔧 AuthContainer render - Estado inicial:', {
-    isLogin,
-    alertVisible,
-    alertMessage,
-    alertType,
-    isLoading,
-  });
     // Auto-ocultar después de 5 segundos para errores, 3 para éxito
     const timeout = type === 'error' ? 5000 : 3000;
     setTimeout(() => {
@@ -55,8 +37,6 @@ export default function AuthContainer({
   const switchToLogin = () => setIsLogin(true);
 
   const handleLogin = async (email: string, password: string) => {
-    console.log('🚨 AuthContainer handleLogin llamado:', { email, password });
-
     // Prevenir múltiples llamadas simultáneas
     if (isLoading) {
       return { Success: false, error: 'Operación en progreso' };
@@ -74,8 +54,6 @@ export default function AuthContainer({
         userNameOrEmail: email.trim(),
         password: password,
       });
-
-      console.log('🚨 Respuesta del authService:', response);
 
       // Verificar que la respuesta tenga la estructura esperada
       if (!response || typeof response.Success !== 'boolean') {
@@ -121,8 +99,6 @@ export default function AuthContainer({
         return { Success: false, error: errorMessage };
       }
     } catch (error: any) {
-      console.log('🚨 Error en AuthContainer:', error);
-
       // Determinar el tipo de error
       let errorMessage =
         'Error de conexión. Verifica tu conexión a internet e intenta nuevamente.';
@@ -200,7 +176,6 @@ export default function AuthContainer({
         message={alertMessage}
         type={alertType}
         onClose={() => {
-          console.log('🚨 CustomAlert onClose llamado');
           setAlertVisible(false);
         }}
       />

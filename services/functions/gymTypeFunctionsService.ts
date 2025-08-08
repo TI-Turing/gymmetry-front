@@ -21,11 +21,18 @@ export const gymTypeFunctionsService = {
     const response = await apiService.get<GymType[]>(`/gymtypes`);
     return response;
   },
-  async findGymTypesByFields(request: Record<string, any>): Promise<ApiResponse<GymType[]>> {
-    const response = await apiService.post<GymType[]>(`/gymtypes/find`, request);
+  async findGymTypesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<GymType[]>> {
+    const response = await apiService.post<GymType[]>(
+      `/gymtypes/find`,
+      request
+    );
     return response;
   },
-  async updateGymType(request: UpdateGymTypeRequest): Promise<ApiResponse<any>> {
+  async updateGymType(
+    request: UpdateGymTypeRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/gymtype/update`, request);
     return response;
   },

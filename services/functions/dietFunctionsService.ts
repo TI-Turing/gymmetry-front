@@ -21,7 +21,9 @@ export const dietFunctionsService = {
     const response = await apiService.get<Diet[]>(`/diets`);
     return response;
   },
-  async findDietsByFields(request: Record<string, any>): Promise<ApiResponse<Diet[]>> {
+  async findDietsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Diet[]>> {
     const response = await apiService.post<Diet[]>(`/diets/find`, request);
     return response;
   },

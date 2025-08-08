@@ -7,7 +7,9 @@ export const commentFunctionsService = {
     const response = await apiService.delete<any>(`/comment/${id}`);
     return response;
   },
-  async createComment(request: CommentCreateRequestDto): Promise<ApiResponse<any>> {
+  async createComment(
+    request: CommentCreateRequestDto
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/comment`, request);
     return response;
   },

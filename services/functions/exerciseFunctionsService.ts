@@ -21,11 +21,18 @@ export const exerciseFunctionsService = {
     const response = await apiService.get<Exercise[]>(`/exercises`);
     return response;
   },
-  async findExercisesByFields(request: Record<string, any>): Promise<ApiResponse<Exercise[]>> {
-    const response = await apiService.post<Exercise[]>(`/exercises/find`, request);
+  async findExercisesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Exercise[]>> {
+    const response = await apiService.post<Exercise[]>(
+      `/exercises/find`,
+      request
+    );
     return response;
   },
-  async updateExercise(request: UpdateExerciseRequest): Promise<ApiResponse<any>> {
+  async updateExercise(
+    request: UpdateExerciseRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/exercise/update`, request);
     return response;
   },

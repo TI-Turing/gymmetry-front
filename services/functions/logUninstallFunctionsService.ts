@@ -5,7 +5,9 @@ import type { UpdateLogUninstallRequest } from '@/dto/LogUninstall/Request/Updat
 
 // Auto-generated service for LogUninstall Azure Functions
 export const logUninstallFunctionsService = {
-  async addLogUninstall(request: AddLogUninstallRequest): Promise<ApiResponse<any>> {
+  async addLogUninstall(
+    request: AddLogUninstallRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/loguninstall/add`, request);
     return response;
   },
@@ -21,11 +23,18 @@ export const logUninstallFunctionsService = {
     const response = await apiService.get<LogUninstall[]>(`/loguninstalls`);
     return response;
   },
-  async findLogUninstallsByFields(request: Record<string, any>): Promise<ApiResponse<LogUninstall[]>> {
-    const response = await apiService.post<LogUninstall[]>(`/loguninstalls/find`, request);
+  async findLogUninstallsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<LogUninstall[]>> {
+    const response = await apiService.post<LogUninstall[]>(
+      `/loguninstalls/find`,
+      request
+    );
     return response;
   },
-  async updateLogUninstall(request: UpdateLogUninstallRequest): Promise<ApiResponse<any>> {
+  async updateLogUninstall(
+    request: UpdateLogUninstallRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/loguninstall/update`, request);
     return response;
   },

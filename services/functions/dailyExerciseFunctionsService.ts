@@ -5,7 +5,9 @@ import type { UpdateDailyExerciseRequest } from '@/dto/DailyExercise/Request/Upd
 
 // Auto-generated service for DailyExercise Azure Functions
 export const dailyExerciseFunctionsService = {
-  async addDailyExercise(request: AddDailyExerciseRequest): Promise<ApiResponse<any>> {
+  async addDailyExercise(
+    request: AddDailyExerciseRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/dailyexercise/add`, request);
     return response;
   },
@@ -14,19 +16,31 @@ export const dailyExerciseFunctionsService = {
     return response;
   },
   async getDailyExerciseById(id: string): Promise<ApiResponse<DailyExercise>> {
-    const response = await apiService.get<DailyExercise>(`/dailyexercise/${id}`);
+    const response = await apiService.get<DailyExercise>(
+      `/dailyexercise/${id}`
+    );
     return response;
   },
   async getAllDailyExercises(): Promise<ApiResponse<DailyExercise[]>> {
     const response = await apiService.get<DailyExercise[]>(`/dailyexercises`);
     return response;
   },
-  async findDailyExercisesByFields(request: Record<string, any>): Promise<ApiResponse<DailyExercise[]>> {
-    const response = await apiService.post<DailyExercise[]>(`/dailyexercises/find`, request);
+  async findDailyExercisesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<DailyExercise[]>> {
+    const response = await apiService.post<DailyExercise[]>(
+      `/dailyexercises/find`,
+      request
+    );
     return response;
   },
-  async updateDailyExercise(request: UpdateDailyExerciseRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/dailyexercise/update`, request);
+  async updateDailyExercise(
+    request: UpdateDailyExerciseRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/dailyexercise/update`,
+      request
+    );
     return response;
   },
 };

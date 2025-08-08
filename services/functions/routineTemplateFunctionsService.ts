@@ -6,12 +6,22 @@ import type { UpdateRoutineTemplateRequest } from '@/dto/RoutineTemplate/Request
 
 // Auto-generated service for RoutineTemplate Azure Functions
 export const routineTemplateFunctionsService = {
-  async addRoutineTemplate(request: AddRoutineTemplateRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/routinetemplate/add`, request);
+  async addRoutineTemplate(
+    request: AddRoutineTemplateRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/routinetemplate/add`,
+      request
+    );
     return response;
   },
-  async duplicateRoutineTemplate(request: DuplicateRoutineTemplateRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/routinetemplate/duplicate`, request);
+  async duplicateRoutineTemplate(
+    request: DuplicateRoutineTemplateRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/routinetemplate/duplicate`,
+      request
+    );
     return response;
   },
   async deleteRoutineTemplate(id: string): Promise<ApiResponse<any>> {
@@ -19,19 +29,32 @@ export const routineTemplateFunctionsService = {
     return response;
   },
   async getRoutineTemplate(id: string): Promise<ApiResponse<RoutineTemplate>> {
-    const response = await apiService.get<RoutineTemplate>(`/routinetemplate/${id}`);
+    const response = await apiService.get<RoutineTemplate>(
+      `/routinetemplate/${id}`
+    );
     return response;
   },
   async getAllRoutineTemplates(): Promise<ApiResponse<RoutineTemplate[]>> {
-    const response = await apiService.get<RoutineTemplate[]>(`/routinetemplates`);
+    const response =
+      await apiService.get<RoutineTemplate[]>(`/routinetemplates`);
     return response;
   },
-  async findRoutineTemplatesByFields(request: Record<string, any>): Promise<ApiResponse<RoutineTemplate[]>> {
-    const response = await apiService.post<RoutineTemplate[]>(`/routinetemplates/find`, request);
+  async findRoutineTemplatesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<RoutineTemplate[]>> {
+    const response = await apiService.post<RoutineTemplate[]>(
+      `/routinetemplates/find`,
+      request
+    );
     return response;
   },
-  async updateRoutineTemplate(request: UpdateRoutineTemplateRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/routinetemplate/update`, request);
+  async updateRoutineTemplate(
+    request: UpdateRoutineTemplateRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/routinetemplate/update`,
+      request
+    );
     return response;
   },
 };

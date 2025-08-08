@@ -53,7 +53,7 @@ export default function AccessMethodDropdown({
       } else {
         setError(response.Message || 'Error al cargar métodos de acceso');
       }
-  } catch {
+    } catch {
       setError('Error al cargar métodos de acceso');
     } finally {
       setIsLoading(false);

@@ -234,16 +234,16 @@ function buildService(entityFolder) {
     }
 
     // URL params (id)
-  const fnParams = [];
+    const fnParams = [];
     if (/\{id:guid\}/i.test(route) || /\{id\}/i.test(route)) {
       fnParams.push('id: string');
     }
     if (reqParam) fnParams.push(reqParam);
 
     // Compose TS call
-  const typeArg = respTsType ? `<${respTsType}>` : '';
+    const typeArg = respTsType ? `<${respTsType}>` : '';
     const methodCall = method.toLowerCase();
-  const urlExpr = '`' + route.replace(/\{id(?::guid)?\}/gi, '${id}') + '`';
+    const urlExpr = '`' + route.replace(/\{id(?::guid)?\}/gi, '${id}') + '`';
 
     if (methodCall === 'get' || methodCall === 'delete') {
       lines.push(

@@ -28,7 +28,9 @@ export const likeFunctionsService = {
     return response;
   },
   async getLikeByPostAndUser(): Promise<ApiResponse<any>> {
-    const response = await apiService.get<any>(`/like/post/{postId:guid}/user/{userId:guid}`);
+    const response = await apiService.get<any>(
+      `/like/post/{postId:guid}/user/{userId:guid}`
+    );
     return response;
   },
 };

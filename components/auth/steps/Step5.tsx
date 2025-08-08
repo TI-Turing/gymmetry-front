@@ -520,7 +520,10 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
 
         // Solo llamar al API si hay datos que actualizar (username por ahora)
         if (stepData.username) {
-          const response = await userService.updateUser({ id: userId, ...updateData });
+          const response = await userService.updateUser({
+            id: userId,
+            ...updateData,
+          });
 
           if (!response.Success) {
             showError(

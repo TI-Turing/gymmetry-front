@@ -22,11 +22,18 @@ export const planTypeFunctionsService = {
     const response = await apiService.get<PlanType[]>(`/plantypes`);
     return response;
   },
-  async findPlanTypesByFields(request: FindPlanTypesByFieldsRequest): Promise<ApiResponse<PlanType[]>> {
-    const response = await apiService.post<PlanType[]>(`/plantypes/find`, request);
+  async findPlanTypesByFields(
+    request: FindPlanTypesByFieldsRequest
+  ): Promise<ApiResponse<PlanType[]>> {
+    const response = await apiService.post<PlanType[]>(
+      `/plantypes/find`,
+      request
+    );
     return response;
   },
-  async updatePlanType(request: UpdatePlanTypeRequest): Promise<ApiResponse<any>> {
+  async updatePlanType(
+    request: UpdatePlanTypeRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/plantype/update`, request);
     return response;
   },

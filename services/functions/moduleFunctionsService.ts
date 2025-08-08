@@ -21,7 +21,9 @@ export const moduleFunctionsService = {
     const response = await apiService.get<Module[]>(`/modules`);
     return response;
   },
-  async findModulesByFields(request: Record<string, any>): Promise<ApiResponse<Module[]>> {
+  async findModulesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Module[]>> {
     const response = await apiService.post<Module[]>(`/modules/find`, request);
     return response;
   },

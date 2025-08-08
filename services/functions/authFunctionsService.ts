@@ -7,11 +7,19 @@ import type { RefreshTokenRequest } from '@/dto/auth/Request/RefreshTokenRequest
 // Auto-generated service for Auth Azure Functions
 export const authFunctionsService = {
   async login(request: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    const response = await apiService.post<LoginResponse>(`/auth/login`, request);
+    const response = await apiService.post<LoginResponse>(
+      `/auth/login`,
+      request
+    );
     return response;
   },
-  async refreshToken(request: RefreshTokenRequest): Promise<ApiResponse<RefreshTokenResponse>> {
-    const response = await apiService.post<RefreshTokenResponse>(`/auth/refresh-token`, request);
+  async refreshToken(
+    request: RefreshTokenRequest
+  ): Promise<ApiResponse<RefreshTokenResponse>> {
+    const response = await apiService.post<RefreshTokenResponse>(
+      `/auth/refresh-token`,
+      request
+    );
     return response;
   },
 };

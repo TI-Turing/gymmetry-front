@@ -21,11 +21,18 @@ export const subModuleFunctionsService = {
     const response = await apiService.get<SubModule[]>(`/submodules`);
     return response;
   },
-  async findSubModulesByFields(request: Record<string, any>): Promise<ApiResponse<SubModule[]>> {
-    const response = await apiService.post<SubModule[]>(`/submodules/find`, request);
+  async findSubModulesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<SubModule[]>> {
+    const response = await apiService.post<SubModule[]>(
+      `/submodules/find`,
+      request
+    );
     return response;
   },
-  async updateSubModule(request: UpdateSubModuleRequest): Promise<ApiResponse<any>> {
+  async updateSubModule(
+    request: UpdateSubModuleRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/submodule/update`, request);
     return response;
   },

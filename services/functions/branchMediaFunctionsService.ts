@@ -19,8 +19,13 @@ export const branchMediaFunctionsService = {
     const response = await apiService.get<BranchMedia[]>(`/branchmedias`);
     return response;
   },
-  async findBranchMediasByFields(request: Record<string, any>): Promise<ApiResponse<BranchMedia[]>> {
-    const response = await apiService.post<BranchMedia[]>(`/branchmedias/find`, request);
+  async findBranchMediasByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<BranchMedia[]>> {
+    const response = await apiService.post<BranchMedia[]>(
+      `/branchmedias/find`,
+      request
+    );
     return response;
   },
   async updateBranchMedia(request: BranchMedia): Promise<ApiResponse<any>> {

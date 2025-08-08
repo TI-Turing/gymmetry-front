@@ -5,28 +5,48 @@ import type { UpdateCategoryExerciseRequest } from '@/dto/CategoryExercise/Reque
 
 // Auto-generated service for CategoryExercise Azure Functions
 export const categoryExerciseFunctionsService = {
-  async addCategoryExercise(request: AddCategoryExerciseRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/categoryexercise/add`, request);
+  async addCategoryExercise(
+    request: AddCategoryExerciseRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/categoryexercise/add`,
+      request
+    );
     return response;
   },
   async deleteCategoryExercise(id: string): Promise<ApiResponse<any>> {
     const response = await apiService.delete<any>(`/categoryexercise/${id}`);
     return response;
   },
-  async getCategoryExerciseById(id: string): Promise<ApiResponse<CategoryExercise>> {
-    const response = await apiService.get<CategoryExercise>(`/categoryexercise/${id}`);
+  async getCategoryExerciseById(
+    id: string
+  ): Promise<ApiResponse<CategoryExercise>> {
+    const response = await apiService.get<CategoryExercise>(
+      `/categoryexercise/${id}`
+    );
     return response;
   },
   async getAllCategoryExercises(): Promise<ApiResponse<CategoryExercise[]>> {
-    const response = await apiService.get<CategoryExercise[]>(`/categoryexercises`);
+    const response =
+      await apiService.get<CategoryExercise[]>(`/categoryexercises`);
     return response;
   },
-  async findCategoryExercisesByFields(request: Record<string, any>): Promise<ApiResponse<CategoryExercise[]>> {
-    const response = await apiService.post<CategoryExercise[]>(`/categoryexercises/find`, request);
+  async findCategoryExercisesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<CategoryExercise[]>> {
+    const response = await apiService.post<CategoryExercise[]>(
+      `/categoryexercises/find`,
+      request
+    );
     return response;
   },
-  async updateCategoryExercise(request: UpdateCategoryExerciseRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/categoryexercise/update`, request);
+  async updateCategoryExercise(
+    request: UpdateCategoryExerciseRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/categoryexercise/update`,
+      request
+    );
     return response;
   },
 };

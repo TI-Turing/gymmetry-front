@@ -21,7 +21,9 @@ export const brandFunctionsService = {
     const response = await apiService.get<Brand[]>(`/brands`);
     return response;
   },
-  async findBrandsByFields(request: Record<string, any>): Promise<ApiResponse<Brand[]>> {
+  async findBrandsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Brand[]>> {
     const response = await apiService.post<Brand[]>(`/brands/find`, request);
     return response;
   },

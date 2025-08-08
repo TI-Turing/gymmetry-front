@@ -1,5 +1,6 @@
 // Utilidades para probar el refresh token en desarrollo
 import { authService } from '@/services/authService';
+/* eslint-disable no-console */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const tokenTestUtils = {

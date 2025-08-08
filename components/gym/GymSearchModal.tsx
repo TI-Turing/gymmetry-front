@@ -87,10 +87,10 @@ export default function GymSearchModal({
         setError(response.Message || 'Error al buscar gimnasios');
         setGyms([]);
       }
-  } catch {
+    } catch {
       setError('Error al buscar gimnasios');
       setGyms([]);
-  } finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -111,7 +111,7 @@ export default function GymSearchModal({
 
       // Cerrar modal
       handleCloseModal();
-  } catch {
+    } catch {
       setError('Error al conectar con el gimnasio');
     }
   };

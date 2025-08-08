@@ -27,8 +27,6 @@ function GymScreen() {
     const currentUserGymId = authService.getGymId();
     const { GymService } = require('@/services/gymService');
     const currentCachedGym = GymService.getCachedGym();
-    console.log('GymScreen:', currentUserGymId);
-    console.log('Cached Gym:', currentCachedGym);
     setUserGymId(currentUserGymId);
     setCachedGym(currentCachedGym);
   };
@@ -118,7 +116,6 @@ function GymScreen() {
     setShowAddBranchForm(false);
     refreshGymData(); // Actualizar datos para mostrar la nueva sede
     // TODO: Mostrar mensaje de éxito o navegar a la vista de la sede
-    console.log('Sede creada con ID:', branchId);
   };
 
   const handleBranchFormCancel = () => {

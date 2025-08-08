@@ -22,7 +22,9 @@ export const planFunctionsService = {
     const response = await apiService.get<Plan[]>(`/plans`);
     return response;
   },
-  async findPlansByFields(request: FindPlansByFieldsRequest): Promise<ApiResponse<Plan[]>> {
+  async findPlansByFields(
+    request: FindPlansByFieldsRequest
+  ): Promise<ApiResponse<Plan[]>> {
     const response = await apiService.post<Plan[]>(`/plans/find`, request);
     return response;
   },

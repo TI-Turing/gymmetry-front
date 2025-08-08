@@ -21,7 +21,9 @@ export const branchFunctionsService = {
     const response = await apiService.get<Branch[]>(`/branches`);
     return response;
   },
-  async findBranchesByFields(request: Record<string, any>): Promise<ApiResponse<Branch[]>> {
+  async findBranchesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Branch[]>> {
     const response = await apiService.post<Branch[]>(`/branches/find`, request);
     return response;
   },

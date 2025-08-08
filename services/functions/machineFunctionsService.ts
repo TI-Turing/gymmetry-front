@@ -25,11 +25,18 @@ export const machineFunctionsService = {
     const response = await apiService.get<Machine[]>(`/machines`);
     return response;
   },
-  async findMachinesByFields(request: Record<string, any>): Promise<ApiResponse<Machine[]>> {
-    const response = await apiService.post<Machine[]>(`/machines/find`, request);
+  async findMachinesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Machine[]>> {
+    const response = await apiService.post<Machine[]>(
+      `/machines/find`,
+      request
+    );
     return response;
   },
-  async updateMachine(request: UpdateMachineRequest): Promise<ApiResponse<any>> {
+  async updateMachine(
+    request: UpdateMachineRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/machine/update`, request);
     return response;
   },

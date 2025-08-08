@@ -5,28 +5,50 @@ import type { UpdatePhysicalAssessmentRequest } from '@/dto/PhysicalAssessment/R
 
 // Auto-generated service for PhysicalAssessment Azure Functions
 export const physicalAssessmentFunctionsService = {
-  async addPhysicalAssessment(request: AddPhysicalAssessmentRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/physicalassessment/add`, request);
+  async addPhysicalAssessment(
+    request: AddPhysicalAssessmentRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/physicalassessment/add`,
+      request
+    );
     return response;
   },
   async deletePhysicalAssessment(id: string): Promise<ApiResponse<any>> {
     const response = await apiService.delete<any>(`/physicalassessment/${id}`);
     return response;
   },
-  async getPhysicalAssessmentById(id: string): Promise<ApiResponse<PhysicalAssessment>> {
-    const response = await apiService.get<PhysicalAssessment>(`/physicalassessment/${id}`);
+  async getPhysicalAssessmentById(
+    id: string
+  ): Promise<ApiResponse<PhysicalAssessment>> {
+    const response = await apiService.get<PhysicalAssessment>(
+      `/physicalassessment/${id}`
+    );
     return response;
   },
-  async getAllPhysicalAssessments(): Promise<ApiResponse<PhysicalAssessment[]>> {
-    const response = await apiService.get<PhysicalAssessment[]>(`/physicalassessments`);
+  async getAllPhysicalAssessments(): Promise<
+    ApiResponse<PhysicalAssessment[]>
+  > {
+    const response =
+      await apiService.get<PhysicalAssessment[]>(`/physicalassessments`);
     return response;
   },
-  async findPhysicalAssessmentsByFields(request: Record<string, any>): Promise<ApiResponse<PhysicalAssessment[]>> {
-    const response = await apiService.post<PhysicalAssessment[]>(`/physicalassessments/find`, request);
+  async findPhysicalAssessmentsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<PhysicalAssessment[]>> {
+    const response = await apiService.post<PhysicalAssessment[]>(
+      `/physicalassessments/find`,
+      request
+    );
     return response;
   },
-  async updatePhysicalAssessment(request: UpdatePhysicalAssessmentRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/physicalassessment/update`, request);
+  async updatePhysicalAssessment(
+    request: UpdatePhysicalAssessmentRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/physicalassessment/update`,
+      request
+    );
     return response;
   },
 };

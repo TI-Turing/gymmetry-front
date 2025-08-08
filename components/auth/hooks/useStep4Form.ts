@@ -68,7 +68,10 @@ export const useStep4Form = ({
         ...(stepData.rh && { RH: stepData.rh }),
       };
 
-  const response = await userService.updateUser({ id: userId, ...updateData });
+      const response = await userService.updateUser({
+        id: userId,
+        ...updateData,
+      });
 
       if (!response.Success) {
         showError(

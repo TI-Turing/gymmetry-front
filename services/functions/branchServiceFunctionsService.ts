@@ -18,12 +18,20 @@ export const branchServiceFunctionsService = {
     const response = await apiService.get<any[]>(`/branchservices`);
     return response;
   },
-  async findBranchServicesByFields(request: Record<string, any>): Promise<ApiResponse<any[]>> {
-    const response = await apiService.post<any[]>(`/branchservices/find`, request);
+  async findBranchServicesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<any[]>> {
+    const response = await apiService.post<any[]>(
+      `/branchservices/find`,
+      request
+    );
     return response;
   },
   async updateBranchService(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/branchservice/update`, request);
+    const response = await apiService.put<any>(
+      `/branchservice/update`,
+      request
+    );
     return response;
   },
 };

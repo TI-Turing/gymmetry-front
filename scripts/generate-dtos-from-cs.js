@@ -1,31 +1,36 @@
 /* eslint-disable no-console */
 /*
-  Generator: converts C# DTO classes in "Dto - Base" to TypeScript interfaces in ./dto/_generated
-  - Preserves Request/Response subfolder structure per entity
-  - Maps common C# types to TS
-  - Unknown complex types -> any (to avoid missing import errors)
-  - Skips existing files is not needed because output goes to _generated
+  Generator: convierte clases DTO en C# (en carpetas "Dto - Base"/"DTO - Base")
+  a interfaces TypeScript en ./dto con estructura Request/Response por entidad.
+  - Mapea tipos C# comunes a TS
+  - Tipos complejos desconocidos -> any
+  - Nunca sobreescribe dto/common/ApiResponse
 */
 const fs = require('fs');
 const path = require('path');
 
-const SRC_DIR = path.resolve(__dirname, '..', 'Dto - Base');
+// Múltiples posibles ubicaciones de origen (case-insensitive en distintos repos)
+const SRC_DIRS = [
+  path.resolve(__dirname, '..', 'Dto - Base'),
+  path.resolve(__dirname, '..', 'DTO - Base'),
+].filter(p => fs.existsSync(p));
+
 // Output directamente en la carpeta dto (sin _generated), como se definió en la estandarización
 const OUT_DIR = path.resolve(__dirname, '..', 'dto');
 
-if (!fs.existsSync(SRC_DIR)) {
-  console.error(`Source folder not found: ${SRC_DIR}`);
+if (SRC_DIRS.length === 0) {
+  console.error(
+    `Source folders not found. Checked: ${[
+      path.resolve(__dirname, '..', 'Dto - Base'),
+      path.resolve(__dirname, '..', 'DTO - Base'),
+    ].join(', ')}`
+  );
   process.exit(1);
 }
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 /** @type {Record<string, string>} */
 const typeMap = {
-  const SRC_DIRS = [
-    path.resolve(__dirname, '..', 'Dto - Base'),
-    path.resolve(__dirname, '..', 'DTO - Base'),
-  ].filter((p) => fs.existsSync(p));
-  const entries = SRC_DIRS.flatMap(SRC_DIR => fs.readdirSync(SRC_DIR, { withFileTypes: true }));
   String: 'string',
   int: 'number',
   long: 'number',
@@ -170,40 +175,45 @@ function processCsFile(inFile, outDir) {
 
 function generate() {
   let count = 0;
-  const entries = fs.readdirSync(SRC_DIR, { withFileTypes: true });
+  for (const SRC_DIR of SRC_DIRS) {
+    const entries = fs.readdirSync(SRC_DIR, { withFileTypes: true });
 
-  // Handle root-level common DTOs
-  for (const ent of entries) {
-    if (ent.isFile() && ent.name.endsWith('.cs')) {
-      const inFile = path.join(SRC_DIR, ent.name);
-      const outDir = path.join(OUT_DIR, 'common');
-      if (processCsFile(inFile, outDir)) count++;
-    }
-  }
-
-  // Handle entities
-  for (const ent of entries) {
-    if (!ent.isDirectory()) continue;
-    const entityName = ent.name; // e.g., User, Gym
-    const entityDir = path.join(SRC_DIR, entityName);
-    const reqDir = path.join(entityDir, 'Request');
-    const resDir = path.join(entityDir, 'Response');
-    const outEntityDirName = resolveExistingEntityDirName(OUT_DIR, entityName);
-
-    if (fs.existsSync(reqDir)) {
-      const files = fs.readdirSync(reqDir).filter(n => n.endsWith('.cs'));
-      for (const f of files) {
-        const inFile = path.join(reqDir, f);
-        const outDir = path.join(OUT_DIR, outEntityDirName, 'Request');
+    // Archivos sueltos en la raíz (comunes)
+    for (const ent of entries) {
+      if (ent.isFile() && ent.name.endsWith('.cs')) {
+        const inFile = path.join(SRC_DIR, ent.name);
+        const outDir = path.join(OUT_DIR, 'common');
         if (processCsFile(inFile, outDir)) count++;
       }
     }
-    if (fs.existsSync(resDir)) {
-      const files = fs.readdirSync(resDir).filter(n => n.endsWith('.cs'));
-      for (const f of files) {
-        const inFile = path.join(resDir, f);
-        const outDir = path.join(OUT_DIR, outEntityDirName, 'Response');
-        if (processCsFile(inFile, outDir)) count++;
+
+    // Entidades con subcarpetas Request/Response
+    for (const ent of entries) {
+      if (!ent.isDirectory()) continue;
+      const entityName = ent.name; // e.g., User, Gym
+      const entityDir = path.join(SRC_DIR, entityName);
+      const reqDir = path.join(entityDir, 'Request');
+      const resDir = path.join(entityDir, 'Response');
+      const outEntityDirName = resolveExistingEntityDirName(
+        OUT_DIR,
+        entityName
+      );
+
+      if (fs.existsSync(reqDir)) {
+        const files = fs.readdirSync(reqDir).filter(n => n.endsWith('.cs'));
+        for (const f of files) {
+          const inFile = path.join(reqDir, f);
+          const outDir = path.join(OUT_DIR, outEntityDirName, 'Request');
+          if (processCsFile(inFile, outDir)) count++;
+        }
+      }
+      if (fs.existsSync(resDir)) {
+        const files = fs.readdirSync(resDir).filter(n => n.endsWith('.cs'));
+        for (const f of files) {
+          const inFile = path.join(resDir, f);
+          const outDir = path.join(OUT_DIR, outEntityDirName, 'Response');
+          if (processCsFile(inFile, outDir)) count++;
+        }
       }
     }
   }

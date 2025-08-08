@@ -5,28 +5,50 @@ import type { UpdateNotificationOptionRequest } from '@/dto/NotificationOption/R
 
 // Auto-generated service for NotificationOption Azure Functions
 export const notificationOptionFunctionsService = {
-  async addNotificationOption(request: AddNotificationOptionRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/notificationoption/add`, request);
+  async addNotificationOption(
+    request: AddNotificationOptionRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/notificationoption/add`,
+      request
+    );
     return response;
   },
   async deleteNotificationOption(id: string): Promise<ApiResponse<any>> {
     const response = await apiService.delete<any>(`/notificationoption/${id}`);
     return response;
   },
-  async getNotificationOptionById(id: string): Promise<ApiResponse<NotificationOption>> {
-    const response = await apiService.get<NotificationOption>(`/notificationoption/${id}`);
+  async getNotificationOptionById(
+    id: string
+  ): Promise<ApiResponse<NotificationOption>> {
+    const response = await apiService.get<NotificationOption>(
+      `/notificationoption/${id}`
+    );
     return response;
   },
-  async getAllNotificationOptions(): Promise<ApiResponse<NotificationOption[]>> {
-    const response = await apiService.get<NotificationOption[]>(`/notificationoptions`);
+  async getAllNotificationOptions(): Promise<
+    ApiResponse<NotificationOption[]>
+  > {
+    const response =
+      await apiService.get<NotificationOption[]>(`/notificationoptions`);
     return response;
   },
-  async findNotificationOptionsByFields(request: Record<string, any>): Promise<ApiResponse<NotificationOption[]>> {
-    const response = await apiService.post<NotificationOption[]>(`/notificationoptions/find`, request);
+  async findNotificationOptionsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<NotificationOption[]>> {
+    const response = await apiService.post<NotificationOption[]>(
+      `/notificationoptions/find`,
+      request
+    );
     return response;
   },
-  async updateNotificationOption(request: UpdateNotificationOptionRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/notificationoption/update`, request);
+  async updateNotificationOption(
+    request: UpdateNotificationOptionRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/notificationoption/update`,
+      request
+    );
     return response;
   },
 };

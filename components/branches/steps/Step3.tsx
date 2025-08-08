@@ -13,17 +13,14 @@ interface Step3Props {
 export default function Step3({ branchId, onMediaUpload }: Step3Props) {
   const handleSelectImages = () => {
     // TODO: Implementar selección de imágenes
-    console.log('Seleccionar imágenes para sede:', branchId);
   };
 
   const handleSelectVideos = () => {
     // TODO: Implementar selección de videos
-    console.log('Seleccionar videos para sede:', branchId);
   };
 
   const handleTakePhoto = () => {
     // TODO: Implementar captura de foto
-    console.log('Tomar foto para sede:', branchId);
   };
 
   return (

@@ -21,7 +21,9 @@ export const dailyFunctionsService = {
     const response = await apiService.get<Daily[]>(`/dailies`);
     return response;
   },
-  async findDailiesByFields(request: Record<string, any>): Promise<ApiResponse<Daily[]>> {
+  async findDailiesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Daily[]>> {
     const response = await apiService.post<Daily[]>(`/dailies/find`, request);
     return response;
   },

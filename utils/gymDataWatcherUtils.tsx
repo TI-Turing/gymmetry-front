@@ -54,7 +54,7 @@ export function useGymDataUpdates() {
         );
       };
     }
-  return () => {};
+    return () => {};
   }, []);
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const path = require('path');
 const fs = require('fs');
 
@@ -52,9 +53,10 @@ function setupEnvironmentFile() {
           }
         }
       });
-      
+
       if (additionalLines.length > 0) {
-        envContent += '\n# Node.js compatibility versions\n' + additionalLines.join('\n');
+        envContent +=
+          '\n# Node.js compatibility versions\n' + additionalLines.join('\n');
       }
 
       fs.writeFileSync(targetFile, envContent);

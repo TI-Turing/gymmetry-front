@@ -5,7 +5,9 @@ import type { UpdatePermissionRequest } from '@/dto/Permission/Request/UpdatePer
 
 // Auto-generated service for Permission Azure Functions
 export const permissionFunctionsService = {
-  async addPermission(request: AddPermissionRequest): Promise<ApiResponse<any>> {
+  async addPermission(
+    request: AddPermissionRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/permission/add`, request);
     return response;
   },
@@ -21,11 +23,18 @@ export const permissionFunctionsService = {
     const response = await apiService.get<Permission[]>(`/permissions`);
     return response;
   },
-  async findPermissionsByFields(request: Record<string, any>): Promise<ApiResponse<Permission[]>> {
-    const response = await apiService.post<Permission[]>(`/permissions/find`, request);
+  async findPermissionsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Permission[]>> {
+    const response = await apiService.post<Permission[]>(
+      `/permissions/find`,
+      request
+    );
     return response;
   },
-  async updatePermission(request: UpdatePermissionRequest): Promise<ApiResponse<any>> {
+  async updatePermission(
+    request: UpdatePermissionRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/permission/update`, request);
     return response;
   },

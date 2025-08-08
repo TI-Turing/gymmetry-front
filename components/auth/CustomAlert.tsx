@@ -38,8 +38,6 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  console.log('🚨 CustomAlert renderizado:', { visible, type, title, message });
-  
   const colorScheme = useColorScheme();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;

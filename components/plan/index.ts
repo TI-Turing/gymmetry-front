@@ -1,2 +1,3 @@
-export { default as PlanView } from './PlanView';
-export { default } from './PlanView';
+export { PlanList } from './PlanList';
+export { PlanDetail } from './PlanDetail';
+export { PlanForm } from './PlanForm';

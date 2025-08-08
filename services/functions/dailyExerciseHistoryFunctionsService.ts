@@ -5,28 +5,53 @@ import type { UpdateDailyExerciseHistoryRequest } from '@/dto/DailyExerciseHisto
 
 // Auto-generated service for DailyExerciseHistory Azure Functions
 export const dailyExerciseHistoryFunctionsService = {
-  async addDailyExerciseHistory(request: AddDailyExerciseHistoryRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/dailyexercisehistory/add`, request);
+  async addDailyExerciseHistory(
+    request: AddDailyExerciseHistoryRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/dailyexercisehistory/add`,
+      request
+    );
     return response;
   },
   async deleteDailyExerciseHistory(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/dailyexercisehistory/${id}`);
+    const response = await apiService.delete<any>(
+      `/dailyexercisehistory/${id}`
+    );
     return response;
   },
-  async getDailyExerciseHistoryById(id: string): Promise<ApiResponse<DailyExerciseHistory>> {
-    const response = await apiService.get<DailyExerciseHistory>(`/dailyexercisehistory/${id}`);
+  async getDailyExerciseHistoryById(
+    id: string
+  ): Promise<ApiResponse<DailyExerciseHistory>> {
+    const response = await apiService.get<DailyExerciseHistory>(
+      `/dailyexercisehistory/${id}`
+    );
     return response;
   },
-  async getAllDailyExerciseHistories(): Promise<ApiResponse<DailyExerciseHistory[]>> {
-    const response = await apiService.get<DailyExerciseHistory[]>(`/dailyexercisehistories`);
+  async getAllDailyExerciseHistories(): Promise<
+    ApiResponse<DailyExerciseHistory[]>
+  > {
+    const response = await apiService.get<DailyExerciseHistory[]>(
+      `/dailyexercisehistories`
+    );
     return response;
   },
-  async findDailyExerciseHistoriesByFields(request: Record<string, any>): Promise<ApiResponse<DailyExerciseHistory[]>> {
-    const response = await apiService.post<DailyExerciseHistory[]>(`/dailyexercisehistories/find`, request);
+  async findDailyExerciseHistoriesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<DailyExerciseHistory[]>> {
+    const response = await apiService.post<DailyExerciseHistory[]>(
+      `/dailyexercisehistories/find`,
+      request
+    );
     return response;
   },
-  async updateDailyExerciseHistory(request: UpdateDailyExerciseHistoryRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/dailyexercisehistory/update`, request);
+  async updateDailyExerciseHistory(
+    request: UpdateDailyExerciseHistoryRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/dailyexercisehistory/update`,
+      request
+    );
     return response;
   },
 };

@@ -30,8 +30,6 @@ export default function LoginForm({
   onSwitchToRegister,
   showAlert,
 }: LoginFormProps) {
-  console.log('🔥 LoginForm renderizado - onLogin:', typeof onLogin, !!onLogin);
-  
   const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -40,11 +38,6 @@ export default function LoginForm({
   const colorScheme = useColorScheme();
 
   const handleLogin = useCallback(async () => {
-    console.log('🔥 LoginForm handleLogin llamado con:', {
-      userNameOrEmail,
-      password,
-    });
-
     // Validation
     if (!userNameOrEmail || !password) {
       if (showAlert) {
@@ -55,15 +48,12 @@ export default function LoginForm({
 
     setIsLoading(true);
     try {
-      console.log('🔥 Llamando a onLogin desde LoginForm');
       const result = await onLogin(userNameOrEmail, password);
-      console.log('🔥 Resultado de onLogin:', result);
       if (!result.Success && showAlert) {
         showAlert(result.error || 'Error desconocido');
       }
       // Si es Success: true, AuthContainer manejará el éxito
     } catch (error: any) {
-      console.log('🔥 Error en LoginForm:', error);
       const errorMessage = handleApiError(error);
       if (showAlert) {
         showAlert(errorMessage);

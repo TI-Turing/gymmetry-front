@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { asyncStorageObserver } from './asyncStorageObserver';
 import { GymService } from './gymService';
 

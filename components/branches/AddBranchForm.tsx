@@ -175,7 +175,7 @@ export default function AddBranchForm({
           />
         );
       case 3:
-  return <Step3 branchId={branchId} onMediaUpload={() => {}} />;
+        return <Step3 branchId={branchId} onMediaUpload={() => {}} />;
       default:
         return null;
     }

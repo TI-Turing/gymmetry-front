@@ -105,7 +105,8 @@ function parseProperties(content) {
   const lines = content.split(/\r?\n/);
   const props = [];
   // Matches: public [virtual] Type Name { get; set; }
-  const propRegex = /public\s+(?:virtual\s+)?([\w<>?,\[\]]+)\s+(\w+)\s*\{\s*get;\s*set;\s*\}/;
+  const propRegex =
+    /public\s+(?:virtual\s+)?([\w<>?,\[\]]+)\s+(\w+)\s*\{\s*get;\s*set;\s*\}/;
   for (const raw of lines) {
     const line = raw.trim();
     const m = line.match(propRegex);

@@ -79,7 +79,7 @@ export default function GymAdminDropdown({
       } else {
         setError(response.Message || 'Error al cargar empleados del gym');
       }
-  } catch {
+    } catch {
       setError('Error al cargar empleados del gym');
     } finally {
       setIsLoading(false);

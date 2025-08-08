@@ -48,14 +48,18 @@ export default function Step1({
       <AccessMethodDropdown
         label='Método de acceso'
         value={formData.accessMethodId}
-        onValueChange={value => onFormDataChange('accessMethodId', value)}
+        onValueChange={(value: string) =>
+          onFormDataChange('accessMethodId', value)
+        }
         required
       />
 
       <GymAdminDropdown
         label='Administrador principal del gym'
         value={formData.adminUserId}
-        onValueChange={value => onFormDataChange('adminUserId', value)}
+        onValueChange={(value: string) =>
+          onFormDataChange('adminUserId', value)
+        }
         required
       />
     </View>

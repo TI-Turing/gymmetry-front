@@ -22,7 +22,9 @@ export const gymFunctionsService = {
     const response = await apiService.get<any>(`/gyms`);
     return response;
   },
-  async findGymsByFields(request: FindGymsByFieldsRequest): Promise<ApiResponse<any>> {
+  async findGymsByFields(
+    request: FindGymsByFieldsRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/gyms/find`, request);
     return response;
   },

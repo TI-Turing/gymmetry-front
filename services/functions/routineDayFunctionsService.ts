@@ -6,12 +6,19 @@ import type { UpdateRoutineDayRequest } from '@/dto/RoutineDay/Request/UpdateRou
 
 // Auto-generated service for RoutineDay Azure Functions
 export const routineDayFunctionsService = {
-  async addRoutineDay(request: AddRoutineDayRequest): Promise<ApiResponse<any>> {
+  async addRoutineDay(
+    request: AddRoutineDayRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/routineday/add`, request);
     return response;
   },
-  async addRoutineDays(request: AddRoutineDaysRequest): Promise<ApiResponse<any[]>> {
-    const response = await apiService.post<any[]>(`/routineday/addmany`, request);
+  async addRoutineDays(
+    request: AddRoutineDaysRequest
+  ): Promise<ApiResponse<any[]>> {
+    const response = await apiService.post<any[]>(
+      `/routineday/addmany`,
+      request
+    );
     return response;
   },
   async deleteRoutineDay(id: string): Promise<ApiResponse<any>> {
@@ -26,11 +33,18 @@ export const routineDayFunctionsService = {
     const response = await apiService.get<RoutineDay[]>(`/routinedays`);
     return response;
   },
-  async findRoutineDaysByFields(request: Record<string, any>): Promise<ApiResponse<RoutineDay[]>> {
-    const response = await apiService.post<RoutineDay[]>(`/routinedays/find`, request);
+  async findRoutineDaysByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<RoutineDay[]>> {
+    const response = await apiService.post<RoutineDay[]>(
+      `/routinedays/find`,
+      request
+    );
     return response;
   },
-  async updateRoutineDay(request: UpdateRoutineDayRequest): Promise<ApiResponse<any>> {
+  async updateRoutineDay(
+    request: UpdateRoutineDayRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/routineday/update`, request);
     return response;
   },

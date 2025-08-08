@@ -5,8 +5,13 @@ import type { UpdateRoutineAssignedRequest } from '@/dto/RoutineAssigned/Request
 
 // Auto-generated service for RoutineAssigned Azure Functions
 export const routineAssignedFunctionsService = {
-  async addRoutineAssigned(request: AddRoutineAssignedRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/routineassigned/add`, request);
+  async addRoutineAssigned(
+    request: AddRoutineAssignedRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/routineassigned/add`,
+      request
+    );
     return response;
   },
   async deleteRoutineAssigned(id: string): Promise<ApiResponse<any>> {
@@ -14,19 +19,32 @@ export const routineAssignedFunctionsService = {
     return response;
   },
   async getRoutineAssigned(id: string): Promise<ApiResponse<RoutineAssigned>> {
-    const response = await apiService.get<RoutineAssigned>(`/routineassigned/${id}`);
+    const response = await apiService.get<RoutineAssigned>(
+      `/routineassigned/${id}`
+    );
     return response;
   },
   async getAllRoutineAssigneds(): Promise<ApiResponse<RoutineAssigned[]>> {
-    const response = await apiService.get<RoutineAssigned[]>(`/routineassigneds`);
+    const response =
+      await apiService.get<RoutineAssigned[]>(`/routineassigneds`);
     return response;
   },
-  async findRoutineAssignedsByFields(request: Record<string, any>): Promise<ApiResponse<RoutineAssigned[]>> {
-    const response = await apiService.post<RoutineAssigned[]>(`/routineassigneds/find`, request);
+  async findRoutineAssignedsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<RoutineAssigned[]>> {
+    const response = await apiService.post<RoutineAssigned[]>(
+      `/routineassigneds/find`,
+      request
+    );
     return response;
   },
-  async updateRoutineAssigned(request: UpdateRoutineAssignedRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/routineassigned/update`, request);
+  async updateRoutineAssigned(
+    request: UpdateRoutineAssignedRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/routineassigned/update`,
+      request
+    );
     return response;
   },
 };

@@ -11,7 +11,9 @@ export const billFunctionsService = {
     const response = await apiService.get<Bill[]>(`/bills`);
     return response;
   },
-  async findBillsByFields(request: Record<string, any>): Promise<ApiResponse<Bill[]>> {
+  async findBillsByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Bill[]>> {
     const response = await apiService.post<Bill[]>(`/bills/find`, request);
     return response;
   },

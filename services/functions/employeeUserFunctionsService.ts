@@ -5,7 +5,9 @@ import type { UpdateEmployeeUserRequest } from '@/dto/EmployeeUser/Request/Updat
 
 // Auto-generated service for EmployeeUser Azure Functions
 export const employeeUserFunctionsService = {
-  async addEmployeeUser(request: AddEmployeeUserRequest): Promise<ApiResponse<any>> {
+  async addEmployeeUser(
+    request: AddEmployeeUserRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/employeeuser/add`, request);
     return response;
   },
@@ -21,11 +23,18 @@ export const employeeUserFunctionsService = {
     const response = await apiService.get<EmployeeUser[]>(`/employeeusers`);
     return response;
   },
-  async findEmployeeUsersByFields(request: Record<string, any>): Promise<ApiResponse<EmployeeUser[]>> {
-    const response = await apiService.post<EmployeeUser[]>(`/employeeusers/find`, request);
+  async findEmployeeUsersByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<EmployeeUser[]>> {
+    const response = await apiService.post<EmployeeUser[]>(
+      `/employeeusers/find`,
+      request
+    );
     return response;
   },
-  async updateEmployeeUser(request: UpdateEmployeeUserRequest): Promise<ApiResponse<any>> {
+  async updateEmployeeUser(
+    request: UpdateEmployeeUserRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/employeeuser/update`, request);
     return response;
   },

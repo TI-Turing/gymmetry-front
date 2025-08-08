@@ -108,7 +108,7 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
       } else {
         setError(response.Message || 'Error al cargar tipos de planes');
       }
-  } catch {
+    } catch {
       setError('Error al cargar tipos de planes');
     } finally {
       setIsLoading(false);
@@ -187,7 +187,7 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
       } else {
         Alert.alert('Error', response.Message || 'Error al asignar el plan');
       }
-  } catch {
+    } catch {
       Alert.alert('Error', 'Error al asignar el plan');
     } finally {
       setIsAssigningPlan(null);

@@ -21,11 +21,18 @@ export const userTypeFunctionsService = {
     const response = await apiService.get<UserType[]>(`/usertypes`);
     return response;
   },
-  async findUserTypesByFields(request: Record<string, any>): Promise<ApiResponse<UserType[]>> {
-    const response = await apiService.post<UserType[]>(`/usertypes/find`, request);
+  async findUserTypesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<UserType[]>> {
+    const response = await apiService.post<UserType[]>(
+      `/usertypes/find`,
+      request
+    );
     return response;
   },
-  async updateUserType(request: UpdateUserTypeRequest): Promise<ApiResponse<any>> {
+  async updateUserType(
+    request: UpdateUserTypeRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/usertype/update`, request);
     return response;
   },

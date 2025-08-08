@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Tipos para los listeners

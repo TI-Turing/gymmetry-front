@@ -21,11 +21,18 @@ export const scheduleFunctionsService = {
     const response = await apiService.get<Schedule[]>(`/schedules`);
     return response;
   },
-  async findSchedulesByFields(request: Record<string, any>): Promise<ApiResponse<Schedule[]>> {
-    const response = await apiService.post<Schedule[]>(`/schedules/find`, request);
+  async findSchedulesByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<Schedule[]>> {
+    const response = await apiService.post<Schedule[]>(
+      `/schedules/find`,
+      request
+    );
     return response;
   },
-  async updateSchedule(request: UpdateScheduleRequest): Promise<ApiResponse<any>> {
+  async updateSchedule(
+    request: UpdateScheduleRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/schedule/update`, request);
     return response;
   },

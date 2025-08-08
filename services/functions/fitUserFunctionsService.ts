@@ -21,11 +21,18 @@ export const fitUserFunctionsService = {
     const response = await apiService.get<FitUser[]>(`/fitusers`);
     return response;
   },
-  async findFitUsersByFields(request: Record<string, any>): Promise<ApiResponse<FitUser[]>> {
-    const response = await apiService.post<FitUser[]>(`/fitusers/find`, request);
+  async findFitUsersByFields(
+    request: Record<string, any>
+  ): Promise<ApiResponse<FitUser[]>> {
+    const response = await apiService.post<FitUser[]>(
+      `/fitusers/find`,
+      request
+    );
     return response;
   },
-  async updateFitUser(request: UpdateFitUserRequest): Promise<ApiResponse<any>> {
+  async updateFitUser(
+    request: UpdateFitUserRequest
+  ): Promise<ApiResponse<any>> {
     const response = await apiService.put<any>(`/fituser/update`, request);
     return response;
   },
