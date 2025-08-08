@@ -72,7 +72,9 @@ BranchMediaList.displayName = 'BranchMediaList';
       loadingMessage='Cargando archivos...'
     />
   );
-}
+});
+
+BranchMediaList.displayName = 'BranchMediaList';
 
 const styles = StyleSheet.create({
   card: {

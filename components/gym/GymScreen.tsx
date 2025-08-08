@@ -12,8 +12,9 @@ import { AddBranchForm } from '@/components/branches';
 import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
 import { GymCompleteData } from './types';
+import { GymService } from '@/services/gymService';
 
-function GymScreen() {
+function GymScreen(): React.JSX.Element {
   const { AlertComponent } = useCustomAlert();
   const { gymData, refreshGymData } = usePreload();
   const [isConnectedToGym, setIsConnectedToGym] = useState(false);
@@ -26,7 +27,6 @@ function GymScreen() {
   // Función para actualizar datos del usuario
   const updateUserData = () => {
     const currentUserGymId = authService.getGymId();
-    const { GymService } = require('@/services/gymService');
     const currentCachedGym = GymService.getCachedGym();
     setUserGymId(currentUserGymId);
     setCachedGym(currentCachedGym);
@@ -52,8 +52,8 @@ function GymScreen() {
     checkGymStatus();
   }, [userGymId, cachedGym, gymData, refreshGymData]);
 
-  // Debug: Descomenta para ver el estado
-  //const handleGymConnection = (connected: boolean) => {
+  // Handler para conexión a gimnasio
+  const handleGymConnection = (connected: boolean) => {
     setIsConnectedToGym(connected);
   };
 
@@ -151,8 +151,6 @@ function GymScreen() {
   );
 }
 
-export default withWebLayout(GymScreen, { defaultTab: 'gym' });
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -165,3 +163,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
 });
+
+export default withWebLayout(GymScreen, { defaultTab: 'gym' });

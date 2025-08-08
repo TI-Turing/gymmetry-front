@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
-import FormInput from '@/components/common/FormInput';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 import { signalRFunctionsService } from '@/services/functions';
