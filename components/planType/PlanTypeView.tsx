@@ -10,7 +10,8 @@ import {
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { planTypeService, PlanType } from '@/services/planTypeService';
+import { planTypeService } from '@/services/planTypeService';
+import type { PlanType } from '@/dto/planType/PlanType';
 import { userService } from '@/services/userService';
 import { authService } from '@/services/authService';
 
@@ -107,7 +108,7 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
       } else {
         setError(response.Message || 'Error al cargar tipos de planes');
       }
-    } catch (_err) {
+  } catch {
       setError('Error al cargar tipos de planes');
     } finally {
       setIsLoading(false);
@@ -186,7 +187,7 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
       } else {
         Alert.alert('Error', response.Message || 'Error al asignar el plan');
       }
-    } catch (_err) {
+  } catch {
       Alert.alert('Error', 'Error al asignar el plan');
     } finally {
       setIsAssigningPlan(null);

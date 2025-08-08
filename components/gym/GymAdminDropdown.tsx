@@ -11,7 +11,8 @@ import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { UI_CONSTANTS } from '@/constants/AppConstants';
-import { userService, UserBasicInfo } from '@/services/userService';
+import { userService } from '@/services/userService';
+import type { UserBasicInfo } from '@/dto/user/UserBasicInfo';
 import { authService } from '@/services/authService';
 
 interface GymAdminDropdownProps {
@@ -39,6 +40,7 @@ export default function GymAdminDropdown({
 
   useEffect(() => {
     loadGymEmployees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadGymEmployees = async () => {
@@ -76,7 +78,7 @@ export default function GymAdminDropdown({
       } else {
         setError(response.Message || 'Error al cargar empleados del gym');
       }
-    } catch (_err) {
+  } catch {
       setError('Error al cargar empleados del gym');
     } finally {
       setIsLoading(false);

@@ -34,7 +34,8 @@
     "clean": "expo r -c",
     "reset": "rm -rf node_modules && npm install && expo r -c",
     "deps:check": "npx npm-check-updates",
-    "deps:update": "npx npm-check-updates -u && npm install"
+  "deps:update": "npx npm-check-updates -u && npm install",
+  "models:generate": "node scripts/generate-models-from-cs.js"
   },
   "jest": {
     "preset": "jest-expo",

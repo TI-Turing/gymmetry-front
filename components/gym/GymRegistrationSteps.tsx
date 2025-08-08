@@ -34,7 +34,7 @@ export default function GymRegistrationSteps({
   const [gymData, setGymData] = useState<Partial<GymCompleteData>>({});
   const [gymId, setGymId] = useState<string>('');
 
-  const handleStep1Complete = (data: GymStep1Data) => {
+  const handleStep1Complete = (data: GymStep1Data & { gymId?: string }) => {
     if (data.gymId) {
       setGymId(data.gymId);
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,7 +10,8 @@ import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { UI_CONSTANTS } from '@/constants/AppConstants';
-import { userService, UserBasicInfo } from '@/services/userService';
+import { userService } from '@/services/userService';
+import type { UserBasicInfo } from '@/dto/user/UserBasicInfo';
 import { authService } from '@/services/authService';
 
 interface UserDropdownProps {
@@ -35,11 +36,7 @@ export default function UserDropdown({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadGymUsers();
-  }, []);
-
-  const loadGymUsers = async () => {
+  const loadGymUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -65,12 +62,16 @@ export default function UserDropdown({
       } else {
         setError(response.Message || 'Error al cargar usuarios del gym');
       }
-    } catch (err) {
+  } catch {
       setError('Error al cargar usuarios del gym');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [onValueChange, value]);
+
+  useEffect(() => {
+    loadGymUsers();
+  }, [loadGymUsers]);
 
   const selectedUser = users.find(user => user.id === value);
   const isDisabledState = disabled || users.length <= 1;

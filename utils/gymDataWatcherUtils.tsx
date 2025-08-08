@@ -10,9 +10,10 @@ export function GymAwareComponent() {
 
   useEffect(() => {
     // El componente puede reaccionar automáticamente a cambios en los datos del gym
-    if (gymData) {
-      console.log('Datos del gym actualizados:', gymData.gym?.Name);
-    }
+    // if (gymData) {
+    //   console.debug('Datos del gym actualizados:', gymData.gym?.Name);
+    // }
+    return () => {};
   }, [gymData]);
 
   if (error) {
@@ -36,8 +37,7 @@ export function GymAwareComponent() {
 // Hook personalizado para escuchar eventos de actualización de gym
 export function useGymDataUpdates() {
   useEffect(() => {
-    const handleGymUpdate = (event: CustomEvent) => {
-      console.log('Gym data updated:', event.detail);
+    const handleGymUpdate = (_event: CustomEvent) => {
       // Aquí puedes agregar lógica personalizada cuando se actualicen los datos
     };
 
@@ -54,6 +54,7 @@ export function useGymDataUpdates() {
         );
       };
     }
+  return () => {};
   }, []);
 }
 

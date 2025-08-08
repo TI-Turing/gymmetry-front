@@ -173,10 +173,10 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
           <View style={styles.planHeader}>
             <View style={styles.planInfo}>
               <Text style={styles.planName}>
-                {currentUserPlan.planTypeName || 'Plan Desconocido'}
+                {currentUserPlan?.planTypeName || 'Plan Desconocido'}
               </Text>
               <Text style={styles.planPrice}>
-                {formatPrice(currentUserPlan.price || 0)}
+                {formatPrice(currentUserPlan?.price || 0)}
               </Text>
             </View>
             <View
@@ -213,7 +213,9 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
               <FontAwesome name='calendar' size={16} color='#CCCCCC' />
               <Text style={styles.detailLabel}>Inicio:</Text>
               <Text style={styles.detailValue}>
-                {formatDate(currentUserPlan.startDate)}
+                {formatDate(
+                  currentUserPlan?.startDate || new Date().toISOString()
+                )}
               </Text>
             </View>
 
@@ -227,7 +229,9 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
                   isExpiringSoon && styles.expiringSoonText,
                 ]}
               >
-                {formatDate(currentUserPlan.endDate)}
+                {formatDate(
+                  currentUserPlan?.endDate || new Date().toISOString()
+                )}
               </Text>
             </View>
 

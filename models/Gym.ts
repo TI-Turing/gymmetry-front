@@ -1,0 +1,50 @@
+// Auto-generated from C# class Gym. Do not edit manually.
+import type { Bill } from './Bill';
+import type { Branch } from './Branch';
+import type { GymPlanSelected } from './GymPlanSelected';
+import type { GymType } from './GymType';
+import type { PaymentAttempt } from './PaymentAttempt';
+import type { Plan } from './Plan';
+import type { RoutineTemplate } from './RoutineTemplate';
+import type { User } from './User';
+
+export interface Gym {
+  Id: string;
+  Name: string;
+  Nit: string;
+  Email: string;
+  LogoUrl: string | null;
+  Description: string | null;
+  PhoneNumber: string | null;
+  WebsiteUrl: string | null;
+  SocialMediaLinks: string | null;
+  LegalRepresentative: string | null;
+  BillingEmail: string | null;
+  SubscriptionPlanId: string | null;
+  IsVerified: boolean;
+  Tags: string | null;
+  Owner_UserId: string | null;
+  BrandColor: string | null;
+  MaxBranchesAllowed: number | null;
+  QrImageUrl: string | null;
+  TrialEndsAt: string | null;
+  CountryId: string;
+  CreatedAt: string;
+  UpdatedAt: string | null;
+  DeletedAt: string | null;
+  Ip: string | null;
+  IsActive: boolean;
+  GymTypeId: string | null;
+  GymType: GymType;
+  Bills: Bill[];
+  Branches: Branch[];
+  GymPlanSelecteds: GymPlanSelected[];
+  Plans: Plan[];
+  RoutineTemplates: RoutineTemplate[];
+  UserGyms: User[];
+  PaymentAttempts: PaymentAttempt[];
+  FacbookUrl: string | null;
+  InstagramUrl: string | null;
+  Slogan: string | null;
+  PaisId: string | null;
+}

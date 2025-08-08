@@ -48,7 +48,7 @@ export const FormInput: React.FC<FormInputProps> = ({
     }
   };
 
-  const inputStyles = [
+  const inputStyles: any[] = [
     styles.input,
     {
       backgroundColor: Colors[colorScheme].background,
@@ -63,7 +63,7 @@ export const FormInput: React.FC<FormInputProps> = ({
     if (height !== undefined) {
       const maxHeight =
         (styles.multilineInput.lineHeight || 20) * (maxLines || 1);
-      inputStyles.push({ height: Math.min(height, maxHeight) });
+      inputStyles.push({ height: Math.min(height, maxHeight) } as any);
     }
   }
 

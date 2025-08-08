@@ -12,10 +12,8 @@ import {
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import {
-  gymServiceExtensions,
-  FindGymsByNameResponse,
-} from '@/services/gymService';
+import { gymServiceExtensions } from '@/services/gymService';
+import type { FindGymsByNameResponse } from '@/dto/gym/FindGymsByNameResponse';
 import { authService } from '@/services/authService';
 import GymInfoView from './GymInfoView';
 
@@ -89,10 +87,10 @@ export default function GymSearchModal({
         setError(response.Message || 'Error al buscar gimnasios');
         setGyms([]);
       }
-    } catch (_err) {
+  } catch {
       setError('Error al buscar gimnasios');
       setGyms([]);
-    } finally {
+  } finally {
       setIsLoading(false);
     }
   };
@@ -113,7 +111,7 @@ export default function GymSearchModal({
 
       // Cerrar modal
       handleCloseModal();
-    } catch (_err) {
+  } catch {
       setError('Error al conectar con el gimnasio');
     }
   };
