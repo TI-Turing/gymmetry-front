@@ -38,6 +38,8 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  console.log('🚨 CustomAlert renderizado:', { visible, type, title, message });
+  
   const colorScheme = useColorScheme();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -71,7 +73,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
         }),
       ]).start();
     }
-  }, [visible]);
+  }, [visible, scaleAnim, opacityAnim]);
 
   const getIconConfig = () => {
     switch (type) {
@@ -106,15 +108,11 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
 
   const iconConfig = getIconConfig();
 
-  if (!visible) {
-    return null;
-  }
-
   return (
     <Modal
       visible={visible}
       transparent
-      animationType='none'
+      animationType='fade'
       onRequestClose={onClose}
     >
       <Animated.View

@@ -124,7 +124,6 @@ export function FilterableModal<T>({
               }}
               value={filter}
               onChangeText={onFilterChange}
-              placeholder='Buscar'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
             <FontAwesome

@@ -1,30 +1,28 @@
 import React from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import LoginForm from '@/components/auth/LoginForm';
+import AuthContainer from '@/components/auth/AuthContainer';
+import { User } from '@/components/auth/types';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  console.log('🚀 LoginPage renderizada');
 
-  const handleLogin = async (userNameOrEmail: string, password: string) => {
-    const success = await login(userNameOrEmail, password);
-    if (success) {
-      // Después del login exitoso, navegar a la app principal
-      router.replace('/(tabs)');
-    }
-    // Si falla, LoginForm manejará el error
+  const handleAuthSuccess = (user: User) => {
+    console.log('🚀 handleAuthSuccess llamado con:', user);
+    // Después del login exitoso, navegar a la app principal
+    router.replace('/(tabs)');
   };
 
-  const handleSwitchToRegister = () => {
-    router.push('/register' as any);
+  const handleBack = () => {
+    console.log('🚀 handleBack llamado');
+    router.back();
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <LoginForm
-        onLogin={handleLogin}
-        onSwitchToRegister={handleSwitchToRegister}
+      <AuthContainer
+        onAuthSuccess={handleAuthSuccess}
+        onBack={handleBack}
       />
     </View>
   );

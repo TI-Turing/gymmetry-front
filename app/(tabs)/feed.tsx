@@ -170,7 +170,6 @@ function FeedScreen() {
         <View style={styles.composerBody}>
           <TextInput
             style={styles.composerTextInput}
-            placeholder='¿Cómo fue tu entrenamiento hoy?'
             placeholderTextColor='#B0B0B0'
             multiline
             value={postText}

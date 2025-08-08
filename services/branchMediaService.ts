@@ -1,52 +1,10 @@
 // Servicio para BranchMedia - Manejo de imágenes y medios de las sedes
-import { apiService } from './apiService';
-
-// Interfaces DTO (basadas en patrones comunes de manejo de medios)
-export interface UploadBranchImageRequest {
-  branchId: string;
-  image: ArrayBuffer;
-  fileName?: string;
-  contentType?: string;
-  imageType: 'main' | 'gallery' | 'thumbnail'; // Tipo de imagen
-}
-
-export interface BranchMediaResponse {
-  id: string;
-  branchId: string;
-  imageUrl: string;
-  imageType: string;
-  fileName: string;
-  uploadedAt: string;
-}
-
-export interface UpdateBranchImageRequest {
-  id: string;
-  branchId: string;
-  image: ArrayBuffer;
-  fileName?: string;
-  contentType?: string;
-}
-
-// Interface para búsqueda por campos (genérica)
-export interface FindBranchMediaByFieldsRequest {
-  fields: { [key: string]: any };
-}
-
-export interface BranchMediaBasicInfo {
-  id: string;
-  branchId: string;
-  imageUrl: string;
-  imageType: string;
-  fileName: string;
-}
-
-// Interfaces de respuesta del backend (formato estándar de Azure Functions)
-export interface ApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
-}
+import { apiService, ApiResponse } from './apiService';
+import { UploadBranchImageRequest } from '@/dto/branchMedia/UploadBranchImageRequest';
+import { BranchMediaResponse } from '@/dto/branchMedia/BranchMediaResponse';
+import { UpdateBranchImageRequest } from '@/dto/branchMedia/UpdateBranchImageRequest';
+import { FindBranchMediaByFieldsRequest } from '@/dto/branchMedia/FindBranchMediaByFieldsRequest';
+import { BranchMediaBasicInfo } from '@/dto/branchMedia/BranchMediaBasicInfo';
 
 // Funciones del servicio
 export const branchMediaService = {

@@ -135,7 +135,6 @@ export default function GymStep2({
         <View style={GymStyles.section}>
           <GymTypeDropdown
             label='Tipo de Gimnasio *'
-            placeholder='Selecciona el tipo de gimnasio'
             options={gymTypes}
             value={formData.gymTypeId}
             onSelect={typeId => handleInputChange('gymTypeId', typeId)}

@@ -115,8 +115,9 @@ class AuthService {
         // Retornar la respuesta del API directamente con formato ApiResponse
         return response;
       } else {
-        // Si no hay datos válidos en la respuesta
-        throw new Error('Respuesta de login inválida');
+        // Si la respuesta indica fallo (Success: false), retornar la respuesta tal como está
+        // para que el componente pueda mostrar el mensaje del servidor
+        return response;
       }
     } catch (error) {
       console.log('❌ Error en login:', error);

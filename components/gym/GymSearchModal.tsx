@@ -303,7 +303,6 @@ export default function GymSearchModal({
           />
           <TextInput
             style={styles.searchInput}
-            placeholder='Buscar gimnasios...'
             placeholderTextColor='#B0B0B0'
             value={searchText}
             onChangeText={setSearchText}

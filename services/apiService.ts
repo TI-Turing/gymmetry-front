@@ -39,7 +39,15 @@ class ApiService {
     this.axiosInstance.interceptors.request.use(
       config => {
         if (config.headers) {
-          config.headers['Host'] = '192.168.0.16:7160';
+          // Extraer host dinámicamente de la URL base
+          const baseUrl = config.baseURL || Environment.API_BASE_URL;
+          try {
+            const url = new URL(baseUrl);
+            config.headers['Host'] = url.host;
+          } catch {
+            // Fallback si la URL no es válida
+            config.headers['Host'] = 'localhost:7160';
+          }
           config.headers['Cache-Control'] = 'no-cache';
         }
 
@@ -51,7 +59,7 @@ class ApiService {
           config.headers,
           config.data
         );
-
+        console.log('📋 CURL del request:', curlCommand);
         return config;
       },
       error => {
@@ -97,11 +105,12 @@ class ApiService {
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
 
-        // Si es un error 401 y no es el endpoint de refresh token
+        // Si es un error 401 y no es el endpoint de refresh token ni login
         if (
           error.response?.status === 401 &&
           !originalRequest._retry &&
-          !originalRequest.url?.includes('/auth/refresh-token')
+          !originalRequest.url?.includes('/auth/refresh-token') &&
+          !originalRequest.url?.includes('/auth/login')
         ) {
           if (this.isRefreshing) {
             // Si ya estamos refrescando, agregar a la cola
@@ -180,6 +189,21 @@ class ApiService {
     const status = error.response.status;
     const data = error.response.data as any;
 
+    // Si el servidor devuelve una respuesta con formato ApiResponse, preservarla
+    if (
+      data &&
+      typeof data === 'object' &&
+      typeof data.Success === 'boolean' &&
+      typeof data.Message === 'string'
+    ) {
+      // Es una respuesta del servidor con formato ApiResponse, devolverla tal como está
+      // En lugar de lanzar un error, rechazar con la respuesta completa
+      return Promise.reject({
+        isApiResponse: true,
+        response: data,
+      });
+    }
+
     // Si el servidor devuelve un mensaje específico, usarlo (revisar diferentes formatos)
     if (data?.Message) {
       throw new Error(data.Message);
@@ -232,7 +256,11 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Si es una respuesta del servidor con formato ApiResponse, devolverla
+      if (error?.isApiResponse) {
+        return error.response;
+      }
       throw error;
     }
   }
@@ -254,7 +282,11 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Si es una respuesta del servidor con formato ApiResponse, devolverla
+      if (error?.isApiResponse) {
+        return error.response;
+      }
       throw error;
     }
   }
@@ -276,7 +308,11 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Si es una respuesta del servidor con formato ApiResponse, devolverla
+      if (error?.isApiResponse) {
+        return error.response;
+      }
       throw error;
     }
   }
@@ -298,7 +334,11 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Si es una respuesta del servidor con formato ApiResponse, devolverla
+      if (error?.isApiResponse) {
+        return error.response;
+      }
       throw error;
     }
   }
@@ -318,7 +358,11 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Si es una respuesta del servidor con formato ApiResponse, devolverla
+      if (error?.isApiResponse) {
+        return error.response;
+      }
       throw error;
     }
   }

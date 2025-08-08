@@ -10,7 +10,10 @@ import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { UI_CONSTANTS } from '@/constants/AppConstants';
-import { BranchService, AccessMethodType } from '@/services/branchServiceNew';
+import {
+  BranchApiService as BranchService,
+  AccessMethodType,
+} from '@/services/branchServiceNew';
 
 interface AccessMethodDropdownProps {
   value?: string;
@@ -50,7 +53,7 @@ export default function AccessMethodDropdown({
       } else {
         setError(response.Message || 'Error al cargar métodos de acceso');
       }
-    } catch (err) {
+  } catch {
       setError('Error al cargar métodos de acceso');
     } finally {
       setIsLoading(false);

@@ -149,7 +149,6 @@ export default function WebHeader({
           />
           <TextInput
             style={styles.searchInput}
-            placeholder='Buscar ejercicios, rutinas, usuarios...'
             placeholderTextColor='#B0B0B0'
             value={searchText}
             onChangeText={setSearchText}

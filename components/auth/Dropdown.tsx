@@ -14,7 +14,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 interface DropdownProps {
   label: string;
-  placeholder: string;
+  placeholder?: string;
   options: string[];
   value: string;
   onSelect: (value: string) => void;
@@ -86,7 +86,7 @@ export default function Dropdown({
             },
           ]}
         >
-          {value || placeholder}
+          {value || ''}
         </Text>
         <FontAwesome
           name='chevron-down'
@@ -146,7 +146,6 @@ export default function Dropdown({
                   ]}
                   value={searchText}
                   onChangeText={setSearchText}
-                  placeholder={`Buscar ${label?.toLowerCase() || 'opción'}...`}
                   placeholderTextColor={`${Colors[colorScheme].text}60`}
                 />
               )}

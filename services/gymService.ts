@@ -1,100 +1,28 @@
 // Servicio principal para Gym - Todas las funciones centralizadas aquí
 import { apiService, ApiResponse } from './apiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Importar tipos necesarios desde components/gym/types
+import { GymStep1Data } from '../dto/gym/GymStep1Data';
+import { GymCompleteData } from '../dto/gym/GymCompleteData';
+import { BackendApiResponse } from '../dto/gym/BackendApiResponse';
+import { GymType } from '../dto/gym/GymType';
+import { Gym } from '../dto/gym/Gym';
 import {
-  GymStep1Data,
   GymRegistrationResponse,
   GymUpdateResponse,
-  GymCompleteData,
-  BackendApiResponse,
   GymGetResponse,
-  GymType,
-  Gym,
-} from '@/components/gym/types';
+} from '../dto/gym/responses';
+import { GenerateGymQrRequest } from '../dto/gym/GenerateGymQrRequest';
+import { UploadGymLogoRequest } from '../dto/gym/UploadGymLogoRequest';
+import { GenerateGymQrResponse } from '../dto/gym/GenerateGymQrResponse';
+import { FindGymsByFieldsRequest } from '../dto/gym/FindGymsByFieldsRequest';
+import { GymBasicInfo } from '../dto/gym/GymBasicInfo';
+import { FindGymsByNameResponse } from '../dto/gym/FindGymsByNameResponse';
+import { CachedGymData } from '../dto/gym/CachedGymData';
 
 // Constante para la clave de AsyncStorage
 const GYM_DATA_KEY = '@gym_data';
 
-// Interface para datos del gym en cache
-export interface CachedGymData {
-  gym: Gym | null;
-  lastFetched: string;
-}
-
-// Interfaces DTO adicionales (replicadas desde C#)
-export interface GenerateGymQrRequest {
-  gymId: string;
-  url: string;
-}
-
-export interface UploadGymLogoRequest {
-  gymId: string;
-  image: ArrayBuffer;
-  fileName?: string;
-  contentType?: string;
-}
-
-export interface GenerateGymQrResponse {
-  qrCode: string;
-  gymPlanSelectedType: any; // Puedes definir la interfaz si tienes el modelo
-}
-
-// Interface para búsqueda por campos (genérica)
-export interface FindGymsByFieldsRequest {
-  fields: { [key: string]: any };
-}
-
-export interface GymBasicInfo {
-  id: string;
-  name: string;
-  email: string;
-  nit: string;
-  isVerified: boolean;
-}
-
-// Interface para respuesta de búsqueda por nombre
-export interface FindGymsByNameResponse {
-  Id: string;
-  Name: string;
-  Nit: string;
-  Email: string;
-  LogoUrl: string | null;
-  Description: string;
-  PhoneNumber: string | null;
-  WebsiteUrl: string | null;
-  SocialMediaLinks: string | null;
-  LegalRepresentative: string | null;
-  BillingEmail: string | null;
-  SubscriptionPlanId: string | null;
-  IsVerified: boolean;
-  Tags: string | null;
-  Owner_UserId: string;
-  BrandColor: string | null;
-  MaxBranchesAllowed: number | null;
-  QrImageUrl: string | null;
-  TrialEndsAt: string | null;
-  CountryId: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-  DeletedAt: string | null;
-  Ip: string | null;
-  IsActive: boolean;
-  GymTypeId: string;
-  GymType: any;
-  Bills: any[];
-  Branches: any[];
-  GymPlanSelecteds: any[];
-  Plans: any[];
-  RoutineTemplates: any[];
-  UserGyms: any[];
-  PaymentAttempts: any[];
-  FacbookUrl: string | null;
-  InstagramUrl: string | null;
-  Slogan: string | null;
-  PaisId: string | null;
-}
+// Interface para datos del gym en cache ahora en dto/gym/CachedGymData
 
 // Interfaces de respuesta del backend (formato estándar de Azure Functions)
 // Nota: ApiResponse ya está importado desde apiService

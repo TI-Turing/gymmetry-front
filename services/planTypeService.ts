@@ -1,39 +1,9 @@
 // Servicio para PlanType
 import { apiService, ApiResponse } from './apiService';
-
-// Interfaces DTO (replicadas desde C#)
-export interface PlanType {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  features: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
-
-export interface CreatePlanTypeRequest {
-  name: string;
-  description: string;
-  price: number;
-  features: string[];
-  isActive?: boolean;
-}
-
-export interface UpdatePlanTypeRequest {
-  id: string;
-  name?: string;
-  description?: string;
-  price?: number;
-  features?: string[];
-  isActive?: boolean;
-}
-
-export interface FindPlanTypesByFieldsRequest {
-  fields: { [key: string]: any };
-}
+import { PlanType } from '@/dto/planType/PlanType';
+import { CreatePlanTypeRequest } from '@/dto/planType/CreatePlanTypeRequest';
+import { UpdatePlanTypeRequest } from '@/dto/planType/UpdatePlanTypeRequest';
+import { FindPlanTypesByFieldsRequest } from '@/dto/planType/FindPlanTypesByFieldsRequest';
 
 // Servicio principal
 export const planTypeService = {

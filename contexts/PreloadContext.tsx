@@ -1,7 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { authService } from '@/services/authService';
-import { Gym } from '@/components/gym/types';
-import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
+import { Gym } from '../dto/gym/Gym';
+// import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
 
 interface PreloadContextType {
   gymData: Gym | null;
@@ -34,7 +40,7 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
   const [isPreloading, setIsPreloading] = useState(false);
   const [preloadError, setPreloadError] = useState<string | null>(null);
 
-  const refreshGymData = async () => {
+  const refreshGymData = useCallback(async () => {
     try {
       const { GymService } = await import('@/services/gymService');
       const cachedGym = GymService.getCachedGym();
@@ -51,7 +57,7 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
     } catch {
       setPreloadError('Error al cargar datos del gimnasio');
     }
-  };
+  }, []);
 
   const precargarDatosInicio = async () => {
     try {
@@ -70,7 +76,7 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
     }
   };
 
-  const precargarDatos = async () => {
+  const precargarDatos = useCallback(async () => {
     setIsPreloading(true);
     setPreloadError(null);
 
@@ -81,14 +87,14 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
     } finally {
       setIsPreloading(false);
     }
-  };
+  }, [refreshGymData]);
 
   useEffect(() => {
     // Precargar datos cuando el proveedor se monta
     if (authService.isAuthenticated()) {
       precargarDatos();
     }
-  }, []);
+  }, [precargarDatos]);
 
   const value: PreloadContextType = {
     gymData,

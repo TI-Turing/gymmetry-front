@@ -1,28 +1,29 @@
 import React from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import RegisterForm from '@/components/auth/RegisterForm';
-import { AuthProvider } from '@/components/auth/AuthContext';
+import AuthContainer from '@/components/auth/AuthContainer';
+import { User } from '@/components/auth/types';
 
 export default function RegisterPage() {
-  const handleRegister = (userData: any) => {
-    // Aquí iría tu lógica post-registro
-    // Navegar a la app principal o pantalla de bienvenida
+  console.log('🚀 RegisterPage renderizada');
+
+  const handleAuthSuccess = (user: User) => {
+    console.log('🚀 handleAuthSuccess llamado con:', user);
+    // Después del registro exitoso, navegar a la app principal
     router.replace('/(tabs)');
   };
 
-  const handleSwitchToLogin = () => {
-    router.push('/login' as any);
+  const handleBack = () => {
+    console.log('🚀 handleBack llamado');
+    router.back();
   };
 
   return (
-    <AuthProvider>
-      <View style={{ flex: 1 }}>
-        <RegisterForm
-          onRegister={handleRegister}
-          onSwitchToLogin={handleSwitchToLogin}
-        />
-      </View>
-    </AuthProvider>
+    <View style={{ flex: 1 }}>
+      <AuthContainer
+        onAuthSuccess={handleAuthSuccess}
+        onBack={handleBack}
+      />
+    </View>
   );
 }

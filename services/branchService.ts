@@ -1,46 +1,9 @@
 // Servicio para Branch basado en las Azure Functions y DTOs del backend
-import { apiService } from './apiService';
-
-// Interfaces DTO (replicadas desde C#)
-export interface AddBranchRequest {
-  name: string;
-  address: string;
-  cityId: string;
-  regionId: string;
-  gymId: string;
-  accessMethodId: string;
-}
-
-export interface UpdateBranchRequest {
-  id: string;
-  address: string;
-  cityId: string;
-  regionId: string;
-  gymId: string;
-  branchDailyBranchId: string;
-  accessMethodId: string;
-}
-
-// Interface para búsqueda por campos (genérica)
-export interface FindBranchesByFieldsRequest {
-  fields: { [key: string]: any };
-}
-
-export interface BranchBasicInfo {
-  id: string;
-  name: string;
-  address: string;
-  gymId: string;
-  accessMethodId: string;
-}
-
-// Interfaces de respuesta del backend (formato estándar de Azure Functions)
-export interface ApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
-}
+import { apiService, ApiResponse } from './apiService';
+import { AddBranchRequest } from '@/dto/branch/AddBranchRequest';
+import { UpdateBranchRequest } from '@/dto/branch/UpdateBranchRequest';
+import { FindBranchesByFieldsRequest } from '@/dto/branch/FindBranchesByFieldsRequest';
+import { BranchBasicInfo } from '@/dto/branch/BranchBasicInfo';
 
 // Funciones del servicio
 export const branchService = {

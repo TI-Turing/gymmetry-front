@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Step2Data,
   Country,
@@ -7,13 +7,9 @@ import {
 } from '../types';
 import { DEFAULT_COUNTRY } from '../CountryCodePicker';
 import { useGenders } from './useLazyCatalogs';
-import { userAPI } from '@/services/apiExamples';
+import { userService } from '@/services/userService';
 import { handleApiError } from '../utils/api';
-import {
-  formatDateToDisplay,
-  formatDateForBackend,
-  parseDisplayDate,
-} from '../utils/format';
+import { formatDateToDisplay, formatDateForBackend } from '../utils/format';
 import { useCustomAlert } from '../CustomAlert';
 
 interface UseStep2FormProps {
@@ -122,27 +118,7 @@ export const useStep2Form = ({
   >('method');
   const [phoneExists, setPhoneExists] = useState<boolean | null>(null);
 
-  // Verificar si el teléfono existe cuando cambia
-  const checkPhoneExists = useCallback(
-    async (phoneNumber: string, countryDialCode: string) => {
-      if (!phoneNumber.trim() || phoneNumber.length < 7) {
-        setPhoneExists(null);
-        return;
-      }
-
-      try {
-        const fullPhone = `${countryDialCode}${phoneNumber.trim()}`;
-        const response = await userAPI.checkPhoneExists(fullPhone);
-
-        if (response.Success) {
-          setPhoneExists(response.Data);
-        }
-      } catch (error) {
-        setPhoneExists(null);
-      }
-    },
-    []
-  );
+  // Verificar si el teléfono existe cuando cambia (eliminado por no uso)
 
   const handlePhoneChange = useCallback(
     (text: string) => {
@@ -208,7 +184,7 @@ export const useStep2Form = ({
     // Verificar si el teléfono existe usando la función checkPhoneExists
     try {
       const fullPhone = `${selectedCountry.dialCode}${phone.trim()}`;
-      const response = await userAPI.checkPhoneExists(fullPhone);
+      const response = await userService.checkPhoneExists(fullPhone);
 
       if (response.Success && response.Data === true) {
         // El teléfono ya existe, mostrar mensaje de error en el modal
@@ -219,13 +195,13 @@ export const useStep2Form = ({
         setPhoneExists(false);
         setVerificationStep('method');
       }
-    } catch (error) {
+    } catch {
       setVerificationStep('error');
       setPhoneExists(null);
     } finally {
       setIsVerificationLoading(false);
     }
-  }, [phone, selectedCountry.dialCode]);
+  }, [phone, selectedCountry.dialCode, showAlert]);
 
   const handleSendVerification = useCallback(
     async (method: 'whatsapp' | 'sms') => {
@@ -239,7 +215,12 @@ export const useStep2Form = ({
           Recipient: fullPhone,
           Method: method,
         };
-        const response = await userAPI.sendPhoneVerification(data);
+        const response = await userService.requestOtp({
+          userId: data.UserId,
+          verificationType: data.VerificationType,
+          recipient: data.Recipient,
+          method: data.Method,
+        });
         if (response.Success || response.Success) {
           setVerificationStep('code');
         } else {
@@ -258,7 +239,7 @@ export const useStep2Form = ({
         setIsVerificationLoading(false);
       }
     },
-    [selectedCountry.dialCode, phone]
+    [selectedCountry.dialCode, phone, userId, showAlert]
   );
 
   const handleValidateOTP = useCallback(async () => {
@@ -282,7 +263,12 @@ export const useStep2Form = ({
         Recipient: fullPhone,
       };
 
-      const response = await userAPI.validateOTP(data);
+      const response = await userService.validateOtp({
+        userId: data.UserId,
+        otp: data.Otp,
+        verificationType: data.VerificationType,
+        recipient: data.Recipient,
+      });
 
       if (response.Success && response.Data) {
         setPhoneVerified(true);
@@ -298,7 +284,7 @@ export const useStep2Form = ({
     } finally {
       setIsVerificationLoading(false);
     }
-  }, [selectedCountry.dialCode, phone, otpCode, verificationId]);
+  }, [selectedCountry.dialCode, phone, otpCode, userId, showAlert]);
 
   const closeVerificationModal = useCallback(() => {
     setShowVerificationModal(false);
@@ -348,14 +334,17 @@ export const useStep2Form = ({
         ...(stepData.genderId && { IdGender: stepData.genderId }),
       };
 
-      const response = await userAPI.updateUser(userId, updateData);
+      const response = await userService.updateUser({
+        id: userId,
+        ...updateData,
+      });
 
       if (!response.Success) {
         throw new Error(response.Message || 'Error al actualizar usuario');
       }
 
       onNext(stepData);
-    } catch (error: any) {
+    } catch {
       // Error handling - continuar con el flujo ya que los datos básicos están completos
       onNext(stepData);
     } finally {

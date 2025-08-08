@@ -215,7 +215,6 @@ export default function GymAdminDropdown({
             />
             <TextInput
               style={styles.searchInput}
-              placeholder='Buscar empleado...'
               placeholderTextColor='#B0B0B0'
               value={searchText}
               onChangeText={setSearchText}

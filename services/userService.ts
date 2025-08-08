@@ -1,91 +1,15 @@
 // Servicio para User basado en las Azure Functions y DTOs del backend
-import { apiService } from './apiService';
-
-// Interfaces DTO (replicadas desde C#)
-export interface AddUserRequest {
-  email: string;
-  password: string;
-}
-
-export interface UpdateUserRequest {
-  id: string;
-  idEps?: string;
-  name: string;
-  lastName: string;
-  userName: string;
-  idGender?: string;
-  birthDate?: string;
-  documentTypeId?: string;
-  phone?: string;
-  countryId?: string;
-  address?: string;
-  cityId?: string;
-  regionId?: string;
-  rh?: string;
-  emergencyName?: string;
-  emergencyPhone?: string;
-  physicalExceptions?: string;
-  userTypeId?: string;
-  physicalExceptionsNotes?: string;
-}
-
-export interface OtpRequest {
-  userId: string;
-  verificationType: string;
-  recipient: string;
-  method: string;
-}
-
-export interface ValidateOtpRequest {
-  userId: string;
-  otp: string;
-  verificationType: string;
-  recipient: string;
-}
-
-export interface PasswordUserRequest {
-  email: string;
-  newPassword: string;
-  token: string;
-}
-
-export interface UpdateUserGymRequest {
-  UserId: string;
-  GymId: string;
-}
-
-export interface AddUserResponse {
-  id: string;
-  token: string;
-}
-
-export interface ValidateUserFieldsResponse {
-  isComplete: boolean;
-  missingFields: string[];
-}
-
-// Interface para búsqueda por campos (User_FindUsersByFieldsFunction)
-export interface FindUsersByFieldsRequest {
-  fields: { [key: string]: any };
-}
-
-export interface UserBasicInfo {
-  id: string;
-  name: string;
-  lastName: string;
-  userName: string;
-  email: string;
-  gymId?: string;
-  userTypeId?: string;
-}
-
-// Interfaces de respuesta del backend (formato estándar de Azure Functions)
-export interface ApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
-}
+import { apiService, ApiResponse } from './apiService';
+import { AddUserRequest } from '@/dto/user/AddUserRequest';
+import { UpdateUserRequest } from '@/dto/user/UpdateUserRequest';
+import { OtpRequest } from '@/dto/user/OtpRequest';
+import { ValidateOtpRequest } from '@/dto/user/ValidateOtpRequest';
+import { PasswordUserRequest } from '@/dto/user/PasswordUserRequest';
+import { UpdateUserGymRequest } from '@/dto/user/UpdateUserGymRequest';
+import { AddUserResponse } from '@/dto/user/AddUserResponse';
+import { ValidateUserFieldsResponse } from '@/dto/user/ValidateUserFieldsResponse';
+import { FindUsersByFieldsRequest } from '@/dto/user/FindUsersByFieldsRequest';
+import { UserBasicInfo } from '@/dto/user/UserBasicInfo';
 
 // Funciones del servicio
 export const userService = {
@@ -189,6 +113,22 @@ export const userService = {
     const response = await apiService.post<UserBasicInfo[]>('/users/find', {
       fields: { gymId },
     });
+    return response;
+  },
+
+  async checkPhoneExists(phone: string): Promise<ApiResponse<boolean>> {
+    // GET /user/phone-exists/{phone}
+    const response = await apiService.get<boolean>(
+      `/user/phone-exists/${encodeURIComponent(phone)}`
+    );
+    return response;
+  },
+
+  async checkEmailExists(email: string): Promise<ApiResponse<boolean>> {
+    // GET /user/email-exists/{email}
+    const response = await apiService.get<boolean>(
+      `/user/email-exists/${encodeURIComponent(email)}`
+    );
     return response;
   },
 };

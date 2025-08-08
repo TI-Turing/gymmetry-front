@@ -1,39 +1,7 @@
 import { apiService, ApiResponse } from './apiService';
-
-// Interfaces para los planes de gym
-export interface GymPlanSelectedType {
-  id: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string | null;
-  deletedAt: string | null;
-  ip: string | null;
-  isActive: boolean;
-  countryId: string;
-  price: number | null;
-  usdPrice: number | null;
-  description: string;
-  gymPlanSelecteds: any[];
-}
-
-export interface CreateGymPlanRequest {
-  GymId: string;
-  StartDate: string;
-  EndDate: string;
-  GymPlanSelectedTypeId: string;
-}
-
-export interface GymPlanSelected {
-  id: string;
-  gymId: string;
-  gymPlanSelectedTypeId: string;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string | null;
-  gymPlanSelectedType?: GymPlanSelectedType;
-}
+import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
+import { CreateGymPlanRequest } from '@/dto/gymPlan/CreateGymPlanRequest';
+import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
 
 class GymPlanService {
   /**
@@ -44,8 +12,6 @@ class GymPlanService {
       const response = await apiService.get<GymPlanSelectedType[]>(
         '/gymplanselectedtypes'
       );
-      console.log('GymPlanTypes Response:', response);
-
       // Ahora el apiService devuelve directamente la estructura del backend
       return response;
     } catch {
@@ -79,7 +45,6 @@ class GymPlanService {
 
       return mockResponse;
     } catch (error) {
-      console.error('Error al obtener el plan actual del gym:', error);
       throw error;
     }
   }
@@ -97,7 +62,6 @@ class GymPlanService {
       );
       return response;
     } catch (error) {
-      console.error('Error al crear plan de gym:', error);
       throw error;
     }
   }

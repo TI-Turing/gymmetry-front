@@ -56,6 +56,13 @@ export interface PhoneExistsResponse {
   StatusCode: number;
 }
 
+export interface EmailExistsResponse {
+  Success: boolean;
+  Message: string;
+  Data: boolean;
+  StatusCode: number;
+}
+
 export interface Step3Data {
   eps?: string;
   country?: string;

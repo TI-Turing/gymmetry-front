@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Step4Data } from '../types';
-import { userAPI } from '@/services/apiExamples';
+import { userService } from '@/services/userService';
 import { handleApiError } from '../utils/api';
 
 interface UseStep4FormProps {
@@ -68,7 +68,7 @@ export const useStep4Form = ({
         ...(stepData.rh && { RH: stepData.rh }),
       };
 
-      const response = await userAPI.updateUser(userId, updateData);
+  const response = await userService.updateUser({ id: userId, ...updateData });
 
       if (!response.Success) {
         showError(

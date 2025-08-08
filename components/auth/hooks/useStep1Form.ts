@@ -3,7 +3,7 @@ import { Step1Data, ApiResponse } from '../types';
 import { usePasswordValidation, useFormValidation } from './useValidation';
 import { validatePassword } from '../utils/validation';
 import { handleApiError } from '../utils/api';
-import { userAPI } from '@/services/apiExamples';
+import { userService } from '@/services/userService';
 import { apiService } from '@/services/apiService';
 
 interface UseStep1FormProps {
@@ -101,19 +101,46 @@ export const useStep1Form = ({
     setIsLoading(true);
 
     try {
-      const response = (await userAPI.createUser({
+      // Primero verificar si el email ya existe
+      try {
+        const emailCheckResponse = await userService.checkEmailExists(email);
+        if (emailCheckResponse.Success && emailCheckResponse.Data === true) {
+          showError(
+            'Este email ya está registrado. Por favor usa otro email o inicia sesión.'
+          );
+          return;
+        }
+      } catch {
+        // Continuar con el registro aunque no se pueda verificar
+      }
+
+      // Crear usuario
+      const response = (await userService.addUser({
         email,
-        Password: password,
+        password,
       })) as ApiResponse;
 
       if (!response.Success) {
-        throw new Error(response.Message || 'Error al crear usuario');
+        // Manejar errores específicos del servidor
+        let errorMessage = response.Message || 'Error al crear usuario';
+
+        // Detectar error de email duplicado en el servidor
+        if (
+          (errorMessage.toLowerCase().includes('email') &&
+            errorMessage.toLowerCase().includes('already')) ||
+          errorMessage.toLowerCase().includes('existe') ||
+          errorMessage.toLowerCase().includes('duplicate')
+        ) {
+          errorMessage =
+            'Este email ya está registrado. Por favor usa otro email o inicia sesión.';
+        }
+
+        throw new Error(errorMessage);
       }
 
       if (response.Data?.Token) {
         apiService.setAuthToken(response.Data.Token);
       }
-
       const stepData = {
         email,
         password,
@@ -137,6 +164,7 @@ export const useStep1Form = ({
     email,
     password,
     onNext,
+    showError,
   ]);
 
   return {

@@ -1,33 +1,9 @@
 // Servicio para AccessMethodType basado en las Azure Functions y DTOs del backend
-import { apiService } from './apiService';
-
-// Interfaces DTO (replicadas desde C#)
-export interface AddAccessMethodTypeRequest {
-  name: string;
-}
-
-export interface UpdateAccessMethodTypeRequest {
-  id: string;
-  name: string;
-}
-
-// Interface para búsqueda por campos (genérica)
-export interface FindAccessMethodTypesByFieldsRequest {
-  fields: { [key: string]: any };
-}
-
-export interface AccessMethodTypeBasicInfo {
-  id: string;
-  name: string;
-}
-
-// Interfaces de respuesta del backend (formato estándar de Azure Functions)
-export interface ApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
-}
+import { apiService, ApiResponse } from './apiService';
+import { AddAccessMethodTypeRequest } from '@/dto/accessMethodType/AddAccessMethodTypeRequest';
+import { UpdateAccessMethodTypeRequest } from '@/dto/accessMethodType/UpdateAccessMethodTypeRequest';
+import { FindAccessMethodTypesByFieldsRequest } from '@/dto/accessMethodType/FindAccessMethodTypesByFieldsRequest';
+import { AccessMethodTypeBasicInfo } from '@/dto/accessMethodType/AccessMethodTypeBasicInfo';
 
 // Funciones del servicio
 export const accessMethodTypeService = {

@@ -1,48 +1,9 @@
 // Servicio para Plan (suscripciones de usuarios)
-import { apiService } from './apiService';
-
-// Interfaces DTO (replicadas desde C#)
-export interface Plan {
-  id: string;
-  startDate: string;
-  endDate: string;
-  planTypeId: string;
-  userId: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  planType?: any; // Se puede expandir con la interfaz PlanType
-  user?: any; // Se puede expandir con la interfaz User
-}
-
-export interface CreatePlanRequest {
-  startDate: string;
-  endDate: string;
-  planTypeId: string;
-  userId: string;
-}
-
-export interface UpdatePlanRequest {
-  id: string;
-  startDate?: string;
-  endDate?: string;
-  planTypeId?: string;
-  userId?: string;
-  isActive?: boolean;
-}
-
-export interface FindPlansByFieldsRequest {
-  fields: { [key: string]: any };
-}
-
-// Interfaces de respuesta del backend (formato estándar de Azure Functions)
-export interface ApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
-}
+import { apiService, ApiResponse } from './apiService';
+import { Plan } from '@/dto/plan/Plan';
+import { CreatePlanRequest } from '@/dto/plan/CreatePlanRequest';
+import { UpdatePlanRequest } from '@/dto/plan/UpdatePlanRequest';
+import { FindPlansByFieldsRequest } from '@/dto/plan/FindPlansByFieldsRequest';
 
 // Servicio principal
 export const planService = {

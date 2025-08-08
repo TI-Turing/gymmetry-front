@@ -11,7 +11,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { UI_CONSTANTS } from '@/constants/AppConstants';
 import {
-  BranchService,
+  BranchApiService as BranchService,
   CreateBranchRequest,
 } from '@/services/branchServiceNew';
 import { authService } from '@/services/authService';
@@ -111,7 +111,7 @@ export default function AddBranchForm({
       } else {
         Alert.alert('Error', response.Message || 'Error al crear la sede');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Error al crear la sede');
     } finally {
       setIsLoading(false);
@@ -175,14 +175,7 @@ export default function AddBranchForm({
           />
         );
       case 3:
-        return (
-          <Step3
-            branchId={branchId}
-            onMediaUpload={mediaFiles => {
-              console.log('Media files:', mediaFiles);
-            }}
-          />
-        );
+  return <Step3 branchId={branchId} onMediaUpload={() => {}} />;
       default:
         return null;
     }

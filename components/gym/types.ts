@@ -1,129 +1,22 @@
-// Respuesta estándar de la API del backend C# (para uso en el módulo gym)
-export interface BackendApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T | null;
-  StatusCode: number;
-}
+import type { GymCompleteData as TGymCompleteData } from '@/dto/gym/GymCompleteData';
 
-// Tipos para el registro de gimnasio por pasos
-export interface GymType {
-  Id: string;
-  Name: string;
-  Description: string;
-  CreatedAt: string;
-  UpdatedAt: string | null;
-  DeletedAt: string | null;
-  Ip: string | null;
-  IsActive: boolean;
-  Gyms: any[];
-}
+// Re-export de tipos de dominio (DTOs)
+export type { BackendApiResponse } from '@/dto/gym/BackendApiResponse';
+export type { Gym } from '@/dto/gym/Gym';
+export type { GymType } from '@/dto/gym/GymType';
+export type { GymStep1Data } from '@/dto/gym/GymStep1Data';
+export type { GymStep2Data } from '@/dto/gym/GymStep2Data';
+export type { GymStep3Data } from '@/dto/gym/GymStep3Data';
+export type { GymStep4Data } from '@/dto/gym/GymStep4Data';
+export type { GymStep5Data } from '@/dto/gym/GymStep5Data';
+export type { GymCompleteData } from '@/dto/gym/GymCompleteData';
+export type {
+  GymRegistrationResponse,
+  GymUpdateResponse,
+  GymGetResponse,
+} from '@/dto/gym/responses';
 
-// Información del país (lo que viene en Data de países)
-export interface Country {
-  Id: string;
-  Name: string;
-  Code: string;
-  // ... otros campos que el backend retorne
-}
-
-// Interfaz completa del Gym (según la respuesta del endpoint)
-export interface Gym {
-  Id: string;
-  Name: string;
-  Nit: string;
-  Email: string;
-  LogoUrl: string | null;
-  Description: string;
-  PhoneNumber: string | null;
-  WebsiteUrl: string | null;
-  SocialMediaLinks: string | null;
-  LegalRepresentative: string | null;
-  BillingEmail: string | null;
-  SubscriptionPlanId: string | null;
-  IsVerified: boolean;
-  Tags: string | null;
-  Owner_UserId: string;
-  BrandColor: string | null;
-  MaxBranchesAllowed: number | null;
-  QrImageUrl: string | null;
-  TrialEndsAt: string | null;
-  CountryId: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-  DeletedAt: string | null;
-  Ip: string | null;
-  IsActive: boolean;
-  GymTypeId: string;
-  GymType: any;
-  Bills: any[];
-  Branches: any[];
-  GymPlanSelecteds: any[];
-  Plans: any[];
-  RoutineTemplates: any[];
-  UserGyms: any[];
-  UserUserGymAssigneds: any[];
-  PaymentAttempts: any[];
-  FacbookUrl: string | null;
-  InstagramUrl: string | null;
-  Slogan: string | null;
-  PaisId: string | null;
-}
-
-// Paso 1: Información básica y registro inicial
-export interface GymStep1Data {
-  name: string;
-  email: string;
-  phone: string;
-  nit: string;
-  owner_UserId: string;
-}
-
-// Paso 2: Tipo de gimnasio y detalles
-export interface GymStep2Data {
-  gymTypeId: string;
-  slogan: string;
-  description: string;
-  Id: string;
-}
-
-// Paso 3: Ubicación y contacto
-export interface GymStep3Data {
-  address: string;
-  countryId: string;
-  regionId: string;
-  cityId: string;
-  Id: string;
-}
-
-// Paso 4: Presencia digital
-export interface GymStep4Data {
-  website: string;
-  instagram: string;
-  facebook: string;
-  Id: string;
-}
-
-// Paso 5: Multimedia (imágenes y videos)
-export interface GymStep5Data {
-  logo: string | null;
-  coverImage: string | null;
-  galleryImages: string[];
-  videos: string[];
-  Id: string;
-}
-
-// Datos completos del registro
-export interface GymCompleteData
-  extends GymStep1Data,
-    GymStep2Data,
-    GymStep3Data,
-    GymStep4Data,
-    GymStep5Data {
-  Id: string; // Se obtiene después del primer paso
-}
-
-// Props para los componentes de pasos
+// Tipos UI (props) que pertenecen a la capa de presentación
 export interface GymStepProps<T> {
   onNext: (data: T) => void;
   onBack?: () => void;
@@ -131,26 +24,16 @@ export interface GymStepProps<T> {
   isLoading?: boolean;
 }
 
-// Respuestas tipadas de la API usando la estructura estándar del backend C#
-export type GymRegistrationResponse = BackendApiResponse<string>;
-export type GymTypesResponse = GymType[];
-export type CountriesResponse = Country[];
-export type GymUpdateResponse = BackendApiResponse<any>; // El backend puede definir qué retorna en las actualizaciones
-export type GymGetResponse = BackendApiResponse<Gym>;
-
-// Props del formulario principal
 export interface GymRegistrationStepsProps {
-  onComplete: (data: GymCompleteData) => void;
+  onComplete: (data: TGymCompleteData) => void;
   onCancel: () => void;
 }
 
-// Props del formulario simple (legacy)
 export interface GymRegistrationFormProps {
   onSubmit: (data: GymRegistrationFormData) => void;
   onCancel: () => void;
 }
 
-// Datos del formulario simple (legacy) - para compatibilidad
 export interface GymRegistrationFormData {
   name: string;
   nit: string;

@@ -41,6 +41,22 @@ function setupEnvironmentFile() {
         envContent = `EXPO_PUBLIC_ENV=${nodeEnv}\n${envContent}`;
       }
 
+      // Add non-prefixed versions for Node.js compatibility
+      const lines = envContent.split('\n');
+      const additionalLines = [];
+      lines.forEach(line => {
+        if (line.startsWith('EXPO_PUBLIC_')) {
+          const unprefixed = line.replace('EXPO_PUBLIC_', '');
+          if (!lines.some(l => l.startsWith(unprefixed.split('=')[0] + '='))) {
+            additionalLines.push(unprefixed);
+          }
+        }
+      });
+      
+      if (additionalLines.length > 0) {
+        envContent += '\n# Node.js compatibility versions\n' + additionalLines.join('\n');
+      }
+
       fs.writeFileSync(targetFile, envContent);
     } catch (err) {
       console.error(`❌ Error copying environment file: ${err.message}`);

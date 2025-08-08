@@ -10,11 +10,9 @@ import {
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import {
-  gymPlanService,
-  GymPlanSelectedType,
-  GymPlanSelected,
-} from '@/services/gymPlanService';
+import { gymPlanService } from '@/services/gymPlanService';
+import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
+import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
 import { authService } from '@/services/authService';
 
 interface GymPlanViewProps {
@@ -50,7 +48,6 @@ export default function GymPlanView({
         gymPlanService.getGymPlanTypes(),
         gymPlanService.getCurrentGymPlan(gymId),
       ]);
-      console.log('Plan Types Response:', planTypesResponse);
       if (planTypesResponse.Success) {
         // Asegurar que siempre tenemos un array
         setGymPlanTypes(planTypesResponse.Data || []);

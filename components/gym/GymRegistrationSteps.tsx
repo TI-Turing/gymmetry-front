@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
-import StepsBar from '@/components/auth/StepsBar';
+import StepsBar from '@/components/auth/steps/StepsBar';
 import GymStep1 from './steps/GymStep1';
 import GymStep2 from './steps/GymStep2';
 import GymStep3 from './steps/GymStep3';

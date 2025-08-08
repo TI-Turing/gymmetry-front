@@ -12,45 +12,66 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
-import { useCustomAlert } from './CustomAlert';
 import { handleApiError } from '@/utils';
 import { commonStyles } from './styles/common';
 import Colors from '@/constants/Colors';
 
 interface LoginFormProps {
-  onLogin: (userNameOrEmail: string, password: string) => void;
+  onLogin: (
+    userNameOrEmail: string,
+    password: string
+  ) => Promise<{ Success: boolean; error?: string }>;
   onSwitchToRegister: () => void;
+  showAlert?: (message: string, type?: 'success' | 'error') => void;
 }
 
 export default function LoginForm({
   onLogin,
   onSwitchToRegister,
+  showAlert,
 }: LoginFormProps) {
+  console.log('🔥 LoginForm renderizado - onLogin:', typeof onLogin, !!onLogin);
+  
   const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const colorScheme = useColorScheme();
-  const { showError, AlertComponent } = useCustomAlert();
 
   const handleLogin = useCallback(async () => {
+    console.log('🔥 LoginForm handleLogin llamado con:', {
+      userNameOrEmail,
+      password,
+    });
+
     // Validation
     if (!userNameOrEmail || !password) {
-      showError('Por favor completa todos los campos');
+      if (showAlert) {
+        showAlert('Por favor completa todos los campos');
+      }
       return;
     }
 
     setIsLoading(true);
     try {
-      await onLogin(userNameOrEmail, password);
+      console.log('🔥 Llamando a onLogin desde LoginForm');
+      const result = await onLogin(userNameOrEmail, password);
+      console.log('🔥 Resultado de onLogin:', result);
+      if (!result.Success && showAlert) {
+        showAlert(result.error || 'Error desconocido');
+      }
+      // Si es Success: true, AuthContainer manejará el éxito
     } catch (error: any) {
+      console.log('🔥 Error en LoginForm:', error);
       const errorMessage = handleApiError(error);
-      showError(errorMessage);
+      if (showAlert) {
+        showAlert(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [userNameOrEmail, password, onLogin, showError]);
+  }, [userNameOrEmail, password, onLogin, showAlert]);
 
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword(prev => !prev);
@@ -136,7 +157,6 @@ export default function LoginForm({
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <AlertComponent />
     </>
   );
 }

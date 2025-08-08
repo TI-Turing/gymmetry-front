@@ -9,7 +9,7 @@ import { GymStyles } from './styles';
 
 interface GymTypeDropdownProps {
   label: string;
-  placeholder: string;
+  placeholder?: string;
   options: GymType[];
   value: string; // ID del tipo seleccionado
   onSelect: (typeId: string) => void;
@@ -30,7 +30,7 @@ export default function GymTypeDropdown({
   const colorScheme = useColorScheme();
 
   const selectedOption = options.find(option => option.Id === value);
-  const selectedName = selectedOption?.Name || placeholder;
+  const selectedName = selectedOption?.Name || '';
 
   const handleSelect = (typeId: string) => {
     // eslint-disable-next-line no-console

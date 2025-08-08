@@ -4,11 +4,11 @@ export { default as LoginForm } from './LoginForm';
 export { default as RegisterForm } from './RegisterForm';
 
 // Steps del registro
-export { default as Step1 } from './Step1';
-export { default as Step2 } from './Step2';
-export { default as Step3 } from './Step3';
-export { default as Step4 } from './Step4';
-export { default as StepsBar } from './StepsBar';
+export { default as Step1 } from './steps/Step1';
+export { default as Step2 } from './steps/Step2';
+export { default as Step3 } from './steps/Step3';
+export { default as Step4 } from './steps/Step4';
+export { default as StepsBar } from './steps/StepsBar';
 
 // Componentes auxiliares
 export { default as Dropdown } from './Dropdown';
