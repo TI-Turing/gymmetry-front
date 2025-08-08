@@ -1,77 +1,140 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import Button from '@/components/common/Button';
-import FormInput from '@/components/common/FormInput';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
-import { employeeTypeFunctionsService } from '@/services/functions';
+import { EntityList } from '@/components/common';
+import { Colors } from '@/constants';
+import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
+import { employeeTypeService } from '@/services';
 
 export function EmployeeTypeList() {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await employeeTypeFunctionsService.getAllEmployeeTypes();
-      setItems(res.Data || []);
-    } catch (e) {
-      setError('Error al cargar');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
+  const loadEmployeeTypes = useCallback(async () => {
+    const response = await employeeTypeService.getAllEmployeeTypes();
+    return response.Data || [];
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  const renderEmployeeTypeItem = useCallback(
+    ({ item }: { item: any }) => (
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            {item.name || item.typeName || 'Tipo sin nombre'}
+          </Text>
+          <Text style={styles.statusText}>
+            {item.isActive ? 'Activo' : 'Inactivo'}
+          </Text>
+        </View>
+        
+        <Text style={styles.description}>
+          {item.description || 'Sin descripción disponible'}
+        </Text>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Código:</Text>
+          <Text style={styles.value}>{item.code || item.typeCode || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Nivel acceso:</Text>
+          <Text style={styles.value}>{item.accessLevel || item.level || 'Básico'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Departamento:</Text>
+          <Text style={styles.value}>
+            {item.department || item.defaultDepartment || 'General'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Empleados:</Text>
+          <Text style={styles.value}>{item.employeeCount || 0} asignados</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Permisos:</Text>
+          <Text style={styles.value}>
+            {item.permissions?.length || item.permissionCount || 0} configurados
+          </Text>
+        </View>
+      </View>
+    ),
+    []
+  );
+
+  const keyExtractor = useCallback(
+    (item: any) => item.id || item.typeId || String(Math.random()),
+    []
+  );
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>EmployeeType - Lista</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <FlatList
-        data={items}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardText}>{JSON.stringify(item)}</Text>
-          </View>
-        )}
-      />
-      <Button title='Refrescar' onPress={load} />
-    </View>
+    <EntityList
+      title='Tipos de Empleado'
+      loadFunction={loadEmployeeTypes}
+      renderItem={renderEmployeeTypeItem}
+      keyExtractor={keyExtractor}
+      emptyTitle='No hay tipos de empleado'
+      emptyMessage='No se encontraron tipos de empleado configurados'
+      loadingMessage='Cargando tipos de empleado...'
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
   card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
+    backgroundColor: Colors.light.background,
+    padding: SPACING.md,
+    marginVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
+  title: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.light.text,
+    flex: 1,
+    marginRight: SPACING.sm,
+  },
+  statusText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+    backgroundColor: Colors.light.tabIconSelected,
+    color: Colors.light.background,
+  },
+  description: {
+    fontSize: FONT_SIZES.md,
+    color: Colors.light.tabIconDefault,
+    marginBottom: SPACING.sm,
+    lineHeight: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginVertical: SPACING.xs,
+  },
+  label: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    minWidth: 100,
+  },
+  value: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    flex: 1,
+  },
 });
-export default styles;
+
+export default EmployeeTypeList;

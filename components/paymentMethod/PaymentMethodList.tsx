@@ -4,71 +4,82 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { routineTemplateFunctionsService } from '@/services/functions';
+import { paymentMethodService } from '@/services';
 
-export function RoutineTemplateList() {
-  const loadRoutineTemplates = useCallback(async () => {
-    const response = await routineTemplateFunctionsService.getAllRoutineTemplates();
+export function PaymentMethodList() {
+  const loadPaymentMethods = useCallback(async () => {
+    const response = await paymentMethodService.getAllPaymentMethods();
     return response.Data || [];
   }, []);
 
-  const renderRoutineTemplateItem = useCallback(
+  const renderPaymentMethodItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.name || `Template ${item.id?.slice(0, 8)}`}
+            {item.name || item.methodName || 'Método sin nombre'}
           </Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activa' : 'Inactiva'}
+            {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
         
-        {item.description && (
-          <Text style={styles.description} numberOfLines={3}>
-            {item.description}
+        <Text style={styles.description}>
+          {item.description || 'Sin descripción disponible'}
+        </Text>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Tipo:</Text>
+          <Text style={styles.value}>{item.type || item.paymentType || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Proveedor:</Text>
+          <Text style={styles.value}>{item.provider || item.gateway || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Comisión:</Text>
+          <Text style={styles.value}>{item.fee || 0}% por transacción</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Monedas:</Text>
+          <Text style={styles.value}>
+            {item.supportedCurrencies?.join(', ') || item.currency || 'USD'}
           </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Transacciones:</Text>
+          <Text style={styles.value}>{item.transactionCount || 0} procesadas</Text>
+        </View>
+        
+        {item.minAmount && (
+          <View style={styles.row}>
+            <Text style={styles.label}>Monto mínimo:</Text>
+            <Text style={styles.value}>${item.minAmount}</Text>
+          </View>
         )}
-        
-        <View style={styles.row}>
-          <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>
-            {item.exerciseCount || '0'}
-          </Text>
-        </View>
-        
-        <View style={styles.row}>
-          <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration || 'N/A'} min
-          </Text>
-        </View>
-        
-        <View style={styles.row}>
-          <Text style={styles.label}>Creada:</Text>
-          <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
-          </Text>
-        </View>
       </View>
     ),
     []
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
+    (item: any) => item.id || item.methodId || String(Math.random()),
     []
   );
 
   return (
     <EntityList
-      title='Plantillas de Rutina'
-      loadFunction={loadRoutineTemplates}
-      renderItem={renderRoutineTemplateItem}
+      title='Métodos de Pago'
+      loadFunction={loadPaymentMethods}
+      renderItem={renderPaymentMethodItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay plantillas'
-      emptyMessage='No se encontraron plantillas de rutina'
-      loadingMessage='Cargando plantillas...'
+      emptyTitle='No hay métodos de pago'
+      emptyMessage='No se encontraron métodos de pago configurados'
+      loadingMessage='Cargando métodos de pago...'
     />
   );
 }
@@ -96,6 +107,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -107,10 +119,10 @@ const styles = StyleSheet.create({
     color: Colors.light.background,
   },
   description: {
-    fontSize: FONT_SIZES.sm,
-    color: Colors.light.text,
+    fontSize: FONT_SIZES.md,
+    color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
@@ -121,7 +133,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 80,
+    minWidth: 100,
   },
   value: {
     fontSize: FONT_SIZES.sm,
@@ -130,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RoutineTemplateList;
+export default PaymentMethodList;

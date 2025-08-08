@@ -4,51 +4,51 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { routineTemplateFunctionsService } from '@/services/functions';
+import { equipmentService } from '@/services';
 
-export function RoutineTemplateList() {
-  const loadRoutineTemplates = useCallback(async () => {
-    const response = await routineTemplateFunctionsService.getAllRoutineTemplates();
+export function EquipmentList() {
+  const loadEquipment = useCallback(async () => {
+    const response = await equipmentService.getAllEquipment();
     return response.Data || [];
   }, []);
 
-  const renderRoutineTemplateItem = useCallback(
+  const renderEquipmentItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || `Template ${item.id?.slice(0, 8)}`}
-          </Text>
+          <Text style={styles.title}>{item.name || 'Equipamiento sin nombre'}</Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activa' : 'Inactiva'}
+            {item.isAvailable ? 'Disponible' : 'No disponible'}
           </Text>
         </View>
         
-        {item.description && (
-          <Text style={styles.description} numberOfLines={3}>
-            {item.description}
-          </Text>
-        )}
+        <Text style={styles.description}>
+          {item.description || 'Sin descripción disponible'}
+        </Text>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Categoría:</Text>
+          <Text style={styles.value}>{item.category || 'General'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Marca:</Text>
+          <Text style={styles.value}>{item.brand || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Estado:</Text>
+          <Text style={styles.value}>{item.condition || 'Bueno'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Ubicación:</Text>
+          <Text style={styles.value}>{item.location || item.zone || 'N/A'}</Text>
+        </View>
         
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>
-            {item.exerciseCount || '0'}
-          </Text>
-        </View>
-        
-        <View style={styles.row}>
-          <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration || 'N/A'} min
-          </Text>
-        </View>
-        
-        <View style={styles.row}>
-          <Text style={styles.label}>Creada:</Text>
-          <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
-          </Text>
+          <Text style={styles.value}>{item.exerciseCount || 0} configurados</Text>
         </View>
       </View>
     ),
@@ -62,13 +62,13 @@ export function RoutineTemplateList() {
 
   return (
     <EntityList
-      title='Plantillas de Rutina'
-      loadFunction={loadRoutineTemplates}
-      renderItem={renderRoutineTemplateItem}
+      title='Equipamiento'
+      loadFunction={loadEquipment}
+      renderItem={renderEquipmentItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay plantillas'
-      emptyMessage='No se encontraron plantillas de rutina'
-      loadingMessage='Cargando plantillas...'
+      emptyTitle='No hay equipamiento'
+      emptyMessage='No se encontró equipamiento registrado'
+      loadingMessage='Cargando equipamiento...'
     />
   );
 }
@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -107,10 +108,10 @@ const styles = StyleSheet.create({
     color: Colors.light.background,
   },
   description: {
-    fontSize: FONT_SIZES.sm,
-    color: Colors.light.text,
+    fontSize: FONT_SIZES.md,
+    color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
@@ -130,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RoutineTemplateList;
+export default EquipmentList;
