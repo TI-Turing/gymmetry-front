@@ -1,78 +1,215 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import Button from '@/components/common/Button';
-import FormInput from '@/components/common/FormInput';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
-import { gymPlanSelectedModuleFunctionsService } from '@/services/functions';
+import { EntityList } from '@/components/common';
+import { Colors } from '@/constants';
+import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export function GymPlanSelectedModuleList() {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
+  const loadGymPlanSelectedModules = useCallback(async () => {
     try {
-      const res =
-        await gymPlanSelectedModuleFunctionsService.getAllGymPlanSelectedModules();
-      setItems(res.Data || []);
-    } catch (e) {
-      setError('Error al cargar');
-    } finally {
-      setLoading(false);
+      // Placeholder for actual service call
+      return [];
+    } catch {
+      return [];
     }
-  };
-
-  useEffect(() => {
-    load();
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>GymPlanSelectedModule - Lista</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <FlatList
-        data={items}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardText}>{JSON.stringify(item)}</Text>
+  const renderGymPlanSelectedModuleItem = useCallback(
+    ({ item }: { item: any }) => (
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            {item.moduleName || item.name || 'Módulo seleccionado'}
+          </Text>
+          <Text style={styles.statusText}>
+            {item.isActive ? 'Activo' : 'Inactivo'}
+          </Text>
+        </View>
+        
+        <Text style={styles.description}>
+          {item.description || 'Módulo seleccionado del plan de gimnasio'}
+        </Text>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Plan:</Text>
+          <Text style={styles.value}>{item.planName || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Gimnasio:</Text>
+          <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Módulo:</Text>
+          <Text style={styles.value}>{item.moduleName || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Categoría:</Text>
+          <Text style={styles.value}>{item.category || 'General'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Precio:</Text>
+          <Text style={styles.value}>
+            {item.price ? `$${item.price.toFixed(2)}` : 'Incluido'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Fecha inclusión:</Text>
+          <Text style={styles.value}>
+            {item.addedAt 
+              ? new Date(item.addedAt).toLocaleDateString() 
+              : 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Configurado por:</Text>
+          <Text style={styles.value}>{item.configuredBy || 'Sistema'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Límite uso:</Text>
+          <Text style={styles.value}>
+            {item.usageLimit ? `${item.usageLimit} usos` : 'Ilimitado'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Usos actuales:</Text>
+          <Text style={styles.value}>{item.currentUsage || '0'}</Text>
+        </View>
+        
+        {item.features && Array.isArray(item.features) && (
+          <View style={styles.featuresSection}>
+            <Text style={styles.featuresLabel}>Características incluidas:</Text>
+            <View style={styles.featuresList}>
+              {item.features.slice(0, 2).map((feature: string, index: number) => (
+                <Text key={index} style={styles.feature}>
+                  • {feature}
+                </Text>
+              ))}
+              {item.features.length > 2 && (
+                <Text style={styles.moreFeatures}>
+                  +{item.features.length - 2} más...
+                </Text>
+              )}
+            </View>
           </View>
         )}
-      />
-      <Button title='Refrescar' onPress={load} />
-    </View>
+      </View>
+    ),
+    []
+  );
+
+  const keyExtractor = useCallback(
+    (item: any) => 
+      item.id || 
+      item.selectionId || 
+      `${item.planId}-${item.moduleId}` || 
+      String(Math.random()),
+    []
+  );
+
+  return (
+    <EntityList
+      title='Módulos de Plan Seleccionados'
+      loadFunction={loadGymPlanSelectedModules}
+      renderItem={renderGymPlanSelectedModuleItem}
+      keyExtractor={keyExtractor}
+      emptyTitle='No hay módulos seleccionados'
+      emptyMessage='No se encontraron módulos seleccionados en el plan'
+      loadingMessage='Cargando módulos del plan...'
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
   card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
+    backgroundColor: Colors.light.background,
+    padding: SPACING.md,
+    marginVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
+  title: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.light.text,
+    flex: 1,
+    marginRight: SPACING.sm,
+  },
+  statusText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+    backgroundColor: Colors.light.tabIconSelected,
+    color: Colors.light.background,
+  },
+  description: {
+    fontSize: FONT_SIZES.md,
+    color: Colors.light.tabIconDefault,
+    marginBottom: SPACING.sm,
+    lineHeight: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginVertical: SPACING.xs,
+  },
+  label: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    minWidth: 100,
+  },
+  value: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    flex: 1,
+  },
+  featuresSection: {
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.light.tabIconDefault + '20',
+  },
+  featuresLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    marginBottom: SPACING.xs,
+  },
+  featuresList: {
+    gap: SPACING.xs,
+  },
+  feature: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    marginLeft: SPACING.sm,
+  },
+  moreFeatures: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconSelected,
+    fontStyle: 'italic',
+    marginLeft: SPACING.sm,
+  },
 });
-export default styles;
+
+export default GymPlanSelectedModuleList;

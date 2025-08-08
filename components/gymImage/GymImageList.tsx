@@ -1,77 +1,178 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import Button from '@/components/common/Button';
-import FormInput from '@/components/common/FormInput';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
-import { gymImageFunctionsService } from '@/services/functions';
+import { EntityList } from '@/components/common';
+import { Colors } from '@/constants';
+import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
+import { gymImageService } from '@/services';
 
 export function GymImageList() {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await gymImageFunctionsService.getAllGymImages();
-      setItems(res.Data || []);
-    } catch (e) {
-      setError('Error al cargar');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
+  const loadGymImages = useCallback(async () => {
+    const response = await gymImageService.getAllGymImages();
+    return response.Data || [];
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>GymImage - Lista</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <FlatList
-        data={items}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardText}>{JSON.stringify(item)}</Text>
+  const renderGymImageItem = useCallback(
+    ({ item }: { item: any }) => (
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            {item.title || item.imageName || 'Imagen sin título'}
+          </Text>
+          <Text style={styles.statusText}>
+            {item.isActive ? 'Activa' : 'Inactiva'}
+          </Text>
+        </View>
+        
+        <Text style={styles.description}>
+          {item.description || 'Sin descripción disponible'}
+        </Text>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Gimnasio:</Text>
+          <Text style={styles.value}>{item.gymName || item.gym || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Categoría:</Text>
+          <Text style={styles.value}>{item.category || 'General'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Formato:</Text>
+          <Text style={styles.value}>{item.format || item.fileType || 'JPG'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Tamaño:</Text>
+          <Text style={styles.value}>
+            {item.fileSize ? `${(item.fileSize / 1024).toFixed(1)} KB` : 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Resolución:</Text>
+          <Text style={styles.value}>
+            {item.width && item.height ? `${item.width}x${item.height}` : 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Subida:</Text>
+          <Text style={styles.value}>
+            {item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString() : 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Por:</Text>
+          <Text style={styles.value}>{item.uploadedBy || 'Sistema'}</Text>
+        </View>
+        
+        {item.url && (
+          <View style={styles.urlSection}>
+            <Text style={styles.urlLabel}>URL:</Text>
+            <Text style={styles.url} numberOfLines={2}>
+              {item.url}
+            </Text>
           </View>
         )}
-      />
-      <Button title='Refrescar' onPress={load} />
-    </View>
+      </View>
+    ),
+    []
+  );
+
+  const keyExtractor = useCallback(
+    (item: any) => item.id || item.imageId || String(Math.random()),
+    []
+  );
+
+  return (
+    <EntityList
+      title='Imágenes del Gimnasio'
+      loadFunction={loadGymImages}
+      renderItem={renderGymImageItem}
+      keyExtractor={keyExtractor}
+      emptyTitle='No hay imágenes'
+      emptyMessage='No se encontraron imágenes del gimnasio'
+      loadingMessage='Cargando imágenes...'
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
   card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
+    backgroundColor: Colors.light.background,
+    padding: SPACING.md,
+    marginVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
+  title: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.light.text,
+    flex: 1,
+    marginRight: SPACING.sm,
+  },
+  statusText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+    backgroundColor: Colors.light.tabIconSelected,
+    color: Colors.light.background,
+  },
+  description: {
+    fontSize: FONT_SIZES.md,
+    color: Colors.light.tabIconDefault,
+    marginBottom: SPACING.sm,
+    lineHeight: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginVertical: SPACING.xs,
+  },
+  label: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    minWidth: 100,
+  },
+  value: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    flex: 1,
+  },
+  urlSection: {
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.light.tabIconDefault + '20',
+  },
+  urlLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    marginBottom: SPACING.xs,
+  },
+  url: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconSelected,
+    fontFamily: 'monospace',
+  },
 });
-export default styles;
+
+export default GymImageList;

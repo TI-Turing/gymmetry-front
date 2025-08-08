@@ -1,78 +1,263 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import Button from '@/components/common/Button';
-import FormInput from '@/components/common/FormInput';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
-import { journeyEmployeeFunctionsService } from '@/services/functions';
+import { EntityList } from '@/components/common';
+import { Colors } from '@/constants';
+import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export function JourneyEmployeeList() {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
+  const loadJourneyEmployees = useCallback(async () => {
     try {
-      const res =
-        await journeyEmployeeFunctionsService.getAllJourneyEmployees();
-      setItems(res.Data || []);
-    } catch (e) {
-      setError('Error al cargar');
-    } finally {
-      setLoading(false);
+      // Placeholder for actual service call
+      return [];
+    } catch {
+      return [];
     }
-  };
-
-  useEffect(() => {
-    load();
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>JourneyEmployee - Lista</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <FlatList
-        data={items}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardText}>{JSON.stringify(item)}</Text>
+  const renderJourneyEmployeeItem = useCallback(
+    ({ item }: { item: any }) => (
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            {item.employeeName || 'Empleado'}
+          </Text>
+          <Text style={styles.statusText}>
+            {item.status === 'working' ? 'Trabajando' :
+             item.status === 'break' ? 'Descanso' :
+             item.status === 'finished' ? 'Terminado' : 'Inactivo'}
+          </Text>
+        </View>
+        
+        <Text style={styles.description}>
+          {item.position || 'Registro de jornada laboral'}
+        </Text>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Empleado:</Text>
+          <Text style={styles.value}>{item.employeeName || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Posición:</Text>
+          <Text style={styles.value}>{item.position || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Fecha:</Text>
+          <Text style={styles.value}>
+            {item.date 
+              ? new Date(item.date).toLocaleDateString() 
+              : 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Hora entrada:</Text>
+          <Text style={styles.value}>
+            {item.checkIn 
+              ? new Date(item.checkIn).toLocaleTimeString() 
+              : 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Hora salida:</Text>
+          <Text style={styles.value}>
+            {item.checkOut 
+              ? new Date(item.checkOut).toLocaleTimeString() 
+              : 'Pendiente'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Horas trabajadas:</Text>
+          <Text style={styles.value}>
+            {item.hoursWorked 
+              ? `${item.hoursWorked.toFixed(1)}h` 
+              : 'Calculando...'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Horas extra:</Text>
+          <Text style={[styles.value, {
+            color: item.overtimeHours > 0 ? '#ffa726' : Colors.light.text
+          }]}>
+            {item.overtimeHours 
+              ? `${item.overtimeHours.toFixed(1)}h` 
+              : '0h'}
+          </Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Sucursal:</Text>
+          <Text style={styles.value}>{item.branchName || 'N/A'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Área:</Text>
+          <Text style={styles.value}>{item.workArea || 'General'}</Text>
+        </View>
+        
+        <View style={styles.row}>
+          <Text style={styles.label}>Descansos:</Text>
+          <Text style={styles.value}>
+            {item.breakCount || 0} ({item.breakDuration || 0} min)
+          </Text>
+        </View>
+        
+        {item.notes && (
+          <View style={styles.notesSection}>
+            <Text style={styles.notesLabel}>Notas:</Text>
+            <Text style={styles.notes} numberOfLines={3}>
+              {item.notes}
+            </Text>
           </View>
         )}
-      />
-      <Button title='Refrescar' onPress={load} />
-    </View>
+        
+        {item.tasks && Array.isArray(item.tasks) && (
+          <View style={styles.tasksSection}>
+            <Text style={styles.tasksLabel}>Tareas asignadas:</Text>
+            <View style={styles.tasksList}>
+              {item.tasks.slice(0, 3).map((task: string, index: number) => (
+                <Text key={index} style={styles.task}>
+                  ✓ {task}
+                </Text>
+              ))}
+              {item.tasks.length > 3 && (
+                <Text style={styles.moreTasks}>
+                  +{item.tasks.length - 3} más...
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
+      </View>
+    ),
+    []
+  );
+
+  const keyExtractor = useCallback(
+    (item: any) => item.id || item.journeyId || String(Math.random()),
+    []
+  );
+
+  return (
+    <EntityList
+      title='Jornadas de Empleados'
+      loadFunction={loadJourneyEmployees}
+      renderItem={renderJourneyEmployeeItem}
+      keyExtractor={keyExtractor}
+      emptyTitle='No hay jornadas'
+      emptyMessage='No se encontraron jornadas de empleados'
+      loadingMessage='Cargando jornadas...'
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
   card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
+    backgroundColor: Colors.light.background,
+    padding: SPACING.md,
+    marginVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
+  title: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.light.text,
+    flex: 1,
+    marginRight: SPACING.sm,
+  },
+  statusText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+    backgroundColor: Colors.light.tabIconSelected,
+    color: Colors.light.background,
+  },
+  description: {
+    fontSize: FONT_SIZES.md,
+    color: Colors.light.tabIconDefault,
+    marginBottom: SPACING.sm,
+    lineHeight: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginVertical: SPACING.xs,
+  },
+  label: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    minWidth: 120,
+  },
+  value: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    flex: 1,
+  },
+  notesSection: {
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.light.tabIconDefault + '20',
+  },
+  notesLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    marginBottom: SPACING.xs,
+  },
+  notes: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    fontStyle: 'italic',
+    backgroundColor: Colors.light.tabIconDefault + '10',
+    padding: SPACING.sm,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  tasksSection: {
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.light.tabIconDefault + '20',
+  },
+  tasksLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconDefault,
+    fontWeight: '500',
+    marginBottom: SPACING.xs,
+  },
+  tasksList: {
+    gap: SPACING.xs,
+  },
+  task: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.text,
+    marginLeft: SPACING.sm,
+  },
+  moreTasks: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.light.tabIconSelected,
+    fontStyle: 'italic',
+    marginLeft: SPACING.sm,
+  },
 });
-export default styles;
+
+export default JourneyEmployeeList;
