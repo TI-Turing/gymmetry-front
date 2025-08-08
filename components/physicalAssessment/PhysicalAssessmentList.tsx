@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function PhysicalAssessmentList() {
+const PhysicalAssessmentList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadPhysicalAssessments = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+PhysicalAssessmentList.displayName = 'PhysicalAssessmentList';
+
+
 
   const renderPhysicalAssessmentItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,84 +33,93 @@ export function PhysicalAssessmentList() {
             {item.isCompleted ? 'Completada' : 'Pendiente'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.notes || 'Evaluación física del usuario'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
           <Text style={styles.value}>{item.userName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Evaluador:</Text>
           <Text style={styles.value}>{item.evaluatorName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.assessmentDate 
-              ? new Date(item.assessmentDate).toLocaleDateString() 
+            {item.assessmentDate
+              ? new Date(item.assessmentDate).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Peso:</Text>
           <Text style={styles.value}>
             {item.weight ? `${item.weight} kg` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Altura:</Text>
           <Text style={styles.value}>
             {item.height ? `${item.height} cm` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>IMC:</Text>
-          <Text style={[styles.value, {
-            color: item.bmi > 25 ? '#ff6b6b' : 
-                  item.bmi < 18.5 ? '#ffa726' : '#4caf50'
-          }]}>
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.bmi > 25
+                    ? '#ff6b6b'
+                    : item.bmi < 18.5
+                      ? '#ffa726'
+                      : '#4caf50',
+              },
+            ]}
+          >
             {item.bmi ? item.bmi.toFixed(1) : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>% Grasa corporal:</Text>
           <Text style={styles.value}>
             {item.bodyFat ? `${item.bodyFat}%` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Masa muscular:</Text>
           <Text style={styles.value}>
             {item.muscleMass ? `${item.muscleMass} kg` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Presión arterial:</Text>
           <Text style={styles.value}>
-            {item.systolic && item.diastolic 
-              ? `${item.systolic}/${item.diastolic} mmHg` 
+            {item.systolic && item.diastolic
+              ? `${item.systolic}/${item.diastolic} mmHg`
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Frecuencia cardíaca:</Text>
           <Text style={styles.value}>
             {item.heartRate ? `${item.heartRate} bpm` : 'N/A'}
           </Text>
         </View>
-        
+
         {item.goals && Array.isArray(item.goals) && (
           <View style={styles.goalsSection}>
             <Text style={styles.goalsLabel}>Objetivos:</Text>

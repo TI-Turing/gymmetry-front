@@ -6,11 +6,16 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { employeeRegisterDailyService } from '@/services';
 
-export function EmployeeRegisterDailyList() {
+const EmployeeRegisterDailyList = React.memo(() => {
   const loadEmployeeRegisters = useCallback(async () => {
-    const response = await employeeRegisterDailyService.getAllEmployeeRegisterDaily();
+    const response =
+      await employeeRegisterDailyService.getAllEmployeeRegisterDaily();
     return response.Data || [];
   }, []);
+
+EmployeeRegisterDailyList.displayName = 'EmployeeRegisterDailyList';
+
+
 
   const renderEmployeeRegisterItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,44 +28,41 @@ export function EmployeeRegisterDailyList() {
             {item.isPresent ? 'Presente' : 'Ausente'}
           </Text>
         </View>
-        
+
         <Text style={styles.date}>
-          Fecha: {item.date ? new Date(item.date).toLocaleDateString() : 'Sin fecha'}
+          Fecha:{' '}
+          {item.date ? new Date(item.date).toLocaleDateString() : 'Sin fecha'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Entrada:</Text>
           <Text style={styles.value}>
             {item.checkInTime || item.entryTime || 'Sin registrar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Salida:</Text>
           <Text style={styles.value}>
             {item.checkOutTime || item.exitTime || 'Sin registrar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Horas trabajadas:</Text>
           <Text style={styles.value}>
             {item.hoursWorked || item.totalHours || 0} horas
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Departamento:</Text>
           <Text style={styles.value}>
             {item.department || item.area || 'No especificado'}
           </Text>
         </View>
-        
-        {item.notes && (
-          <Text style={styles.notes}>
-            Notas: {item.notes}
-          </Text>
-        )}
+
+        {item.notes && <Text style={styles.notes}>Notas: {item.notes}</Text>}
       </View>
     ),
     []

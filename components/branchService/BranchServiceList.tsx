@@ -5,15 +5,19 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function BranchServiceList() {
+const BranchServiceList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
+
   const loadBranchServices = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
+      const result = await servicePlaceholder();
+      return result || [];
+    } catch (_error) {
+      // Handle error silently or use proper error handling
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderBranchServiceItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,79 +30,79 @@ export function BranchServiceList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Servicio de la sucursal'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Sucursal:</Text>
           <Text style={styles.value}>{item.branchName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
           <Text style={styles.value}>
             {item.price ? `$${item.price.toFixed(2)}` : 'Incluido'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
           <Text style={styles.value}>
             {item.duration ? `${item.duration} min` : 'Variable'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Disponibilidad:</Text>
-          <Text style={styles.value}>
-            {item.availability || 'Por horario'}
-          </Text>
+          <Text style={styles.value}>{item.availability || 'Por horario'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad:</Text>
           <Text style={styles.value}>
             {item.maxCapacity ? `${item.maxCapacity} personas` : 'Ilimitada'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Instructor:</Text>
           <Text style={styles.value}>
             {item.requiresInstructor ? 'Requerido' : 'No requerido'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Reserva:</Text>
           <Text style={styles.value}>
             {item.requiresReservation ? 'Con reserva' : 'Sin reserva'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Popularidad:</Text>
           <Text style={styles.value}>
             ⭐ {item.rating || '0.0'} ({item.reviewCount || 0} reseñas)
           </Text>
         </View>
-        
+
         {item.equipment && Array.isArray(item.equipment) && (
           <View style={styles.equipmentSection}>
             <Text style={styles.equipmentLabel}>Equipamiento:</Text>
             <View style={styles.equipmentList}>
-              {item.equipment.slice(0, 3).map((equip: string, index: number) => (
-                <Text key={index} style={styles.equipmentItem}>
-                  • {equip}
-                </Text>
-              ))}
+              {item.equipment
+                .slice(0, 3)
+                .map((equip: string, index: number) => (
+                  <Text key={index} style={styles.equipmentItem}>
+                    • {equip}
+                  </Text>
+                ))}
               {item.equipment.length > 3 && (
                 <Text style={styles.moreEquipment}>
                   +{item.equipment.length - 3} más...
@@ -113,10 +117,10 @@ export function BranchServiceList() {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => 
-      item.id || 
-      item.serviceId || 
-      `${item.branchId}-${item.serviceId}` || 
+    (item: any) =>
+      item.id ||
+      item.serviceId ||
+      `${item.branchId}-${item.serviceId}` ||
       String(Math.random()),
     []
   );
@@ -132,7 +136,9 @@ export function BranchServiceList() {
       loadingMessage='Cargando servicios...'
     />
   );
-}
+});
+
+BranchServiceList.displayName = 'BranchServiceList';
 
 const styles = StyleSheet.create({
   card: {

@@ -6,51 +6,59 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { exerciseService } from '@/services';
 
-export function ExerciseList() {
+const ExerciseList = React.memo(() => {
   const loadExercises = useCallback(async () => {
     const response = await exerciseService.getAllExercises();
     return response.Data || [];
   }, []);
 
+ExerciseList.displayName = 'ExerciseList';
+
+
+
   const renderExerciseItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>{item.name || 'Ejercicio sin nombre'}</Text>
+          <Text style={styles.title}>
+            {item.name || 'Ejercicio sin nombre'}
+          </Text>
           <Text style={styles.statusText}>
             {item.difficulty || 'Intermedio'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Músculos:</Text>
           <Text style={styles.value}>{item.targetMuscles || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Equipamiento:</Text>
-          <Text style={styles.value}>{item.equipment || 'Sin equipamiento'}</Text>
+          <Text style={styles.value}>
+            {item.equipment || 'Sin equipamiento'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
           <Text style={styles.value}>{item.duration || 'Variable'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Calorías:</Text>
           <Text style={styles.value}>{item.caloriesBurned || 0} kcal/min</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usado en:</Text>
           <Text style={styles.value}>{item.routineCount || 0} rutinas</Text>

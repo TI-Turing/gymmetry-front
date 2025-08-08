@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { employeeUserService } from '@/services';
 
-export function EmployeeUserList() {
+const EmployeeUserList = React.memo(() => {
   const loadEmployeeUsers = useCallback(async () => {
     const response = await employeeUserService.getAllEmployeeUsers();
     return response.Data || [];
   }, []);
+
+EmployeeUserList.displayName = 'EmployeeUserList';
+
+
 
   const renderEmployeeUserItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,38 +27,46 @@ export function EmployeeUserList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.email}>
           {item.email || 'Sin email configurado'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Código:</Text>
-          <Text style={styles.value}>{item.employeeCode || item.code || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.employeeCode || item.code || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Posición:</Text>
-          <Text style={styles.value}>{item.position || item.jobTitle || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.position || item.jobTitle || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Departamento:</Text>
           <Text style={styles.value}>{item.department || 'No asignado'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Teléfono:</Text>
-          <Text style={styles.value}>{item.phone || item.phoneNumber || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.phone || item.phoneNumber || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha ingreso:</Text>
           <Text style={styles.value}>
-            {item.hireDate ? new Date(item.hireDate).toLocaleDateString() : 'N/A'}
+            {item.hireDate
+              ? new Date(item.hireDate).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Salario:</Text>
           <Text style={styles.value}>

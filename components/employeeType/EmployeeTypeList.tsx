@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { employeeTypeService } from '@/services';
 
-export function EmployeeTypeList() {
+const EmployeeTypeList = React.memo(() => {
   const loadEmployeeTypes = useCallback(async () => {
     const response = await employeeTypeService.getAllEmployeeTypes();
     return response.Data || [];
   }, []);
+
+EmployeeTypeList.displayName = 'EmployeeTypeList';
+
+
 
   const renderEmployeeTypeItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,33 +27,37 @@ export function EmployeeTypeList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Código:</Text>
-          <Text style={styles.value}>{item.code || item.typeCode || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.code || item.typeCode || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Nivel acceso:</Text>
-          <Text style={styles.value}>{item.accessLevel || item.level || 'Básico'}</Text>
+          <Text style={styles.value}>
+            {item.accessLevel || item.level || 'Básico'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Departamento:</Text>
           <Text style={styles.value}>
             {item.department || item.defaultDepartment || 'General'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Empleados:</Text>
           <Text style={styles.value}>{item.employeeCount || 0} asignados</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Permisos:</Text>
           <Text style={styles.value}>

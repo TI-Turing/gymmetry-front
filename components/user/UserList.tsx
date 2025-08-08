@@ -6,12 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export function UserList() {
+  const servicePlaceholder = () => Promise.resolve([]);
   const loadUsers = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
 
@@ -26,76 +29,84 @@ export function UserList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.email || 'Sin email disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
           <Text style={styles.value}>{item.userType || 'Usuario'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Teléfono:</Text>
           <Text style={styles.value}>{item.phone || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Género:</Text>
           <Text style={styles.value}>{item.gender || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Edad:</Text>
           <Text style={styles.value}>
-            {item.age || (item.birthDate 
-              ? Math.floor((Date.now() - new Date(item.birthDate).getTime()) / 31557600000)
-              : 'N/A')}
+            {item.age ||
+              (item.birthDate
+                ? Math.floor(
+                    (Date.now() - new Date(item.birthDate).getTime()) /
+                      31557600000
+                  )
+                : 'N/A')}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha registro:</Text>
           <Text style={styles.value}>
-            {item.createdAt 
-              ? new Date(item.createdAt).toLocaleDateString() 
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Último acceso:</Text>
           <Text style={styles.value}>
-            {item.lastLogin 
-              ? new Date(item.lastLogin).toLocaleDateString() 
+            {item.lastLogin
+              ? new Date(item.lastLogin).toLocaleDateString()
               : 'Nunca'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Plan actual:</Text>
-          <Text style={styles.value}>
-            {item.currentPlan || 'Sin plan'}
-          </Text>
+          <Text style={styles.value}>{item.currentPlan || 'Sin plan'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
           <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
         </View>
-        
+
         {item.membership && (
           <View style={styles.membershipSection}>
             <Text style={styles.membershipLabel}>Membresía:</Text>
-            <Text style={[styles.membershipStatus, {
-              color: item.membership.isActive ? '#4caf50' : '#ff6b6b'
-            }]}>
+            <Text
+              style={[
+                styles.membershipStatus,
+                {
+                  color: item.membership.isActive ? '#4caf50' : '#ff6b6b',
+                },
+              ]}
+            >
               {item.membership.isActive ? '✓ Activa' : '✗ Inactiva'}
             </Text>
             {item.membership.expiresAt && (
               <Text style={styles.membershipExpiry}>
-                Expira: {new Date(item.membership.expiresAt).toLocaleDateString()}
+                Expira:{' '}
+                {new Date(item.membership.expiresAt).toLocaleDateString()}
               </Text>
             )}
           </View>

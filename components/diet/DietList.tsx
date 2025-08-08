@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { dietService } from '@/services';
 
-export function DietList() {
+const DietList = React.memo(() => {
   const loadDiets = useCallback(async () => {
     const response = await dietService.getAllDiets();
     return response.Data || [];
   }, []);
+
+DietList.displayName = 'DietList';
+
+
 
   const renderDietItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,36 +27,40 @@ export function DietList() {
             {item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
-          <Text style={styles.value}>{item.type || item.dietType || 'General'}</Text>
+          <Text style={styles.value}>
+            {item.type || item.dietType || 'General'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Calorías:</Text>
-          <Text style={styles.value}>{item.calories || item.totalCalories || 0} kcal</Text>
+          <Text style={styles.value}>
+            {item.calories || item.totalCalories || 0} kcal
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
           <Text style={styles.value}>{item.duration || 'N/A'} días</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuarios:</Text>
           <Text style={styles.value}>{item.userCount || 0} siguiendo</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Comidas:</Text>
           <Text style={styles.value}>{item.mealCount || 0} configuradas</Text>
         </View>
-        
+
         {item.nutritionist && (
           <View style={styles.row}>
             <Text style={styles.label}>Nutricionista:</Text>

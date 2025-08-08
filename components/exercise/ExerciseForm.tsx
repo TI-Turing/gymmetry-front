@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TextInput } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import FormInput from '@/components/common/FormInput';

@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function CommentList() {
+const CommentList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadComments = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+CommentList.displayName = 'CommentList';
+
+
 
   const renderCommentItem = useCallback(
     ({ item }: { item: any }) => (
@@ -173,9 +180,7 @@ export function CommentList() {
 
         {item.moderatorNote && (
           <View style={styles.moderatorSection}>
-            <Text style={styles.moderatorLabel}>
-              🛡️ Nota del moderador:
-            </Text>
+            <Text style={styles.moderatorLabel}>🛡️ Nota del moderador:</Text>
             <Text style={styles.moderatorText}>{item.moderatorNote}</Text>
           </View>
         )}

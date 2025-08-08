@@ -6,49 +6,49 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { planTypeService } from '@/services';
 
-export function PlanTypeList() {
+const PlanTypeList = React.memo(() => {
   const loadPlanTypes = useCallback(async () => {
     const response = await planTypeService.getAllPlanTypes();
     return response.Data || [];
   }, []);
 
+PlanTypeList.displayName = 'PlanTypeList';
+
+
+
   const renderPlanTypeItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || 'Plan sin nombre'}
-          </Text>
+          <Text style={styles.title}>{item.name || 'Plan sin nombre'}</Text>
           <Text style={styles.statusText}>
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
           <Text style={styles.value}>
             ${item.price || 0} {item.currency || 'USD'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
           <Text style={styles.value}>
             {item.duration || 'N/A'} {item.durationType || 'días'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuarios:</Text>
-          <Text style={styles.value}>
-            {item.userCount || 0} activos
-          </Text>
+          <Text style={styles.value}>{item.userCount || 0} activos</Text>
         </View>
-        
+
         {item.features && (
           <View style={styles.featuresContainer}>
             <Text style={styles.featuresTitle}>Características:</Text>

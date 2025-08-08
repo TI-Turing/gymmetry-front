@@ -6,11 +6,16 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { routineExerciseFunctionsService } from '@/services/functions';
 
-export function RoutineExerciseList() {
+const RoutineExerciseList = React.memo(() => {
   const loadRoutineExercises = useCallback(async () => {
-    const response = await routineExerciseFunctionsService.getAllRoutineExercises();
+    const response =
+      await routineExerciseFunctionsService.getAllRoutineExercises();
     return response.Data || [];
   }, []);
+
+RoutineExerciseList.displayName = 'RoutineExerciseList';
+
+
 
   const renderRoutineExerciseItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,34 +28,32 @@ export function RoutineExerciseList() {
             {item.isCompleted ? 'Realizado' : 'Pendiente'}
           </Text>
         </View>
-        
+
         <Text style={styles.routine}>
           Rutina: {item.routineName || item.routineId || 'N/A'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Series:</Text>
           <Text style={styles.value}>{item.sets || 0}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Repeticiones:</Text>
           <Text style={styles.value}>{item.reps || 0}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Peso:</Text>
           <Text style={styles.value}>{item.weight || 'N/A'} kg</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Descanso:</Text>
           <Text style={styles.value}>{item.restTime || 'N/A'} seg</Text>
         </View>
-        
-        {item.notes && (
-          <Text style={styles.notes}>Notas: {item.notes}</Text>
-        )}
+
+        {item.notes && <Text style={styles.notes}>Notas: {item.notes}</Text>}
       </View>
     ),
     []

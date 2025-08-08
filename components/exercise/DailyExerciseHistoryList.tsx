@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function DailyExerciseHistoryList() {
+const DailyExerciseHistoryList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadDailyExerciseHistory = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+DailyExerciseHistoryList.displayName = 'DailyExerciseHistoryList';
+
+
 
   const renderDailyExerciseHistoryItem = useCallback(
     ({ item }: { item: any }) => (
@@ -228,13 +235,13 @@ export function DailyExerciseHistoryList() {
 
   return (
     <EntityList
-      title="Historial de Ejercicios Diarios"
+      title='Historial de Ejercicios Diarios'
       loadFunction={loadDailyExerciseHistory}
       renderItem={renderDailyExerciseHistoryItem}
       keyExtractor={keyExtractor}
-      emptyTitle="No hay historial"
-      emptyMessage="No se encontró historial de ejercicios"
-      loadingMessage="Cargando historial de ejercicios..."
+      emptyTitle='No hay historial'
+      emptyMessage='No se encontró historial de ejercicios'
+      loadingMessage='Cargando historial de ejercicios...'
     />
   );
 }

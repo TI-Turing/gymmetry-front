@@ -1,13 +1,12 @@
-import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   BackHandler,
 } from 'react-native';
-import { View, Text } from '../Themed';
-import { useColorScheme } from '../useColorScheme';
-import Colors from '@/constants/Colors';
+import { View } from '../Themed';
+// import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import StepsBar from './steps/StepsBar';
 import Step1 from './steps/Step1';
@@ -37,7 +36,7 @@ const stepTitles = [
 
 const RegisterForm = memo<RegisterFormProps>(
   ({ onRegister, onSwitchToLogin }) => {
-    const colorScheme = useColorScheme();
+    // const colorScheme = useColorScheme();
     const authContext = useAuthContext();
     const { showError, showSuccess, AlertComponent } = useCustomAlert();
 
@@ -45,7 +44,7 @@ const RegisterForm = memo<RegisterFormProps>(
       currentStep,
       showWelcomeScreen,
       registrationData,
-      setCurrentStep,
+      // setCurrentStep,
       handleSkipToWelcome,
       handleStep1Next,
       handleStep2Next,

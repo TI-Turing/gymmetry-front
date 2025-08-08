@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { signalRFunctionsService } from '@/services/functions';
 
-export function SignalRList() {
+const SignalRList = React.memo(() => {
   const loadSignalRItems = useCallback(async () => {
     // SignalR es un servicio de comunicación en tiempo real, no tiene listado
     return [];
   }, []);
+
+SignalRList.displayName = 'SignalRList';
+
+
 
   const renderSignalRItem = useCallback(
     ({ item }: { item: any }) => (
@@ -19,26 +23,24 @@ export function SignalRList() {
           <Text style={styles.title}>
             Conexión {item.id?.slice(0, 8) || 'N/A'}
           </Text>
-          <Text style={styles.statusText}>
-            {item.status || 'Conectado'}
-          </Text>
+          <Text style={styles.statusText}>{item.status || 'Conectado'}</Text>
         </View>
-        
+
         <Text style={styles.connectionId}>
           ID: {item.connectionId || 'N/A'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
-          <Text style={styles.value}>
-            {item.userId || 'Anónimo'}
-          </Text>
+          <Text style={styles.value}>{item.userId || 'Anónimo'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Conectado:</Text>
           <Text style={styles.value}>
-            {item.connectedAt ? new Date(item.connectedAt).toLocaleString() : 'N/A'}
+            {item.connectedAt
+              ? new Date(item.connectedAt).toLocaleString()
+              : 'N/A'}
           </Text>
         </View>
       </View>

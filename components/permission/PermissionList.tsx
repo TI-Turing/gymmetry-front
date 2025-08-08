@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function PermissionList() {
+const PermissionList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadPermissions = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+PermissionList.displayName = 'PermissionList';
+
+
 
   const renderPermissionItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,94 +33,118 @@ export function PermissionList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Permiso del sistema'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Módulo:</Text>
           <Text style={styles.value}>{item.module || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Acción:</Text>
           <Text style={styles.value}>
-            {item.action === 'create' ? '➕ Crear' :
-             item.action === 'read' ? '👁️ Leer' :
-             item.action === 'update' ? '✏️ Actualizar' :
-             item.action === 'delete' ? '🗑️ Eliminar' :
-             item.action || 'Personalizada'}
+            {item.action === 'create'
+              ? '➕ Crear'
+              : item.action === 'read'
+                ? '👁️ Leer'
+                : item.action === 'update'
+                  ? '✏️ Actualizar'
+                  : item.action === 'delete'
+                    ? '🗑️ Eliminar'
+                    : item.action || 'Personalizada'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Nivel:</Text>
-          <Text style={[styles.value, {
-            color: item.level === 'admin' ? '#ff6b6b' :
-                  item.level === 'manager' ? '#ffa726' :
-                  item.level === 'user' ? '#4caf50' : Colors.light.text
-          }]}>
-            {item.level === 'admin' ? '🔴 Administrador' :
-             item.level === 'manager' ? '🟡 Gerente' :
-             item.level === 'user' ? '🟢 Usuario' :
-             item.level || 'Personalizado'}
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.level === 'admin'
+                    ? '#ff6b6b'
+                    : item.level === 'manager'
+                      ? '#ffa726'
+                      : item.level === 'user'
+                        ? '#4caf50'
+                        : Colors.light.text,
+              },
+            ]}
+          >
+            {item.level === 'admin'
+              ? '🔴 Administrador'
+              : item.level === 'manager'
+                ? '🟡 Gerente'
+                : item.level === 'user'
+                  ? '🟢 Usuario'
+                  : item.level || 'Personalizado'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Recurso:</Text>
           <Text style={styles.value}>{item.resource || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Código:</Text>
           <Text style={styles.value} numberOfLines={1}>
             {item.code || item.permissionCode || 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuarios asignados:</Text>
           <Text style={styles.value}>
             {item.usersCount || item.assignedUsers?.length || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Roles asignados:</Text>
           <Text style={styles.value}>
             {item.rolesCount || item.assignedRoles?.length || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Creado:</Text>
           <Text style={styles.value}>
-            {item.createdAt 
-              ? new Date(item.createdAt).toLocaleDateString() 
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Requiere 2FA:</Text>
-          <Text style={[styles.value, {
-            color: item.requiresTwoFactor ? '#ffa726' : Colors.light.text
-          }]}>
+          <Text
+            style={[
+              styles.value,
+              {
+                color: item.requiresTwoFactor ? '#ffa726' : Colors.light.text,
+              },
+            ]}
+          >
             {item.requiresTwoFactor ? '🔐 Sí' : '🔓 No'}
           </Text>
         </View>
-        
+
         {item.constraints && Array.isArray(item.constraints) && (
           <View style={styles.constraintsSection}>
             <Text style={styles.constraintsLabel}>Restricciones:</Text>
             <View style={styles.constraintsList}>
-              {item.constraints.slice(0, 3).map((constraint: string, index: number) => (
-                <Text key={index} style={styles.constraint}>
-                  ⚠️ {constraint}
-                </Text>
-              ))}
+              {item.constraints
+                .slice(0, 3)
+                .map((constraint: string, index: number) => (
+                  <Text key={index} style={styles.constraint}>
+                    ⚠️ {constraint}
+                  </Text>
+                ))}
               {item.constraints.length > 3 && (
                 <Text style={styles.moreConstraints}>
                   +{item.constraints.length - 3} más...

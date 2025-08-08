@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { userTypeFunctionsService } from '@/services/functions';
 
-export function UserTypeList() {
+const UserTypeList = React.memo(() => {
   const loadUserTypes = useCallback(async () => {
     const response = await userTypeFunctionsService.getAllUserTypes();
     return response.Data || [];
   }, []);
+
+UserTypeList.displayName = 'UserTypeList';
+
+
 
   const renderUserTypeItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,25 +27,21 @@ export function UserTypeList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
         )}
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Permisos:</Text>
-          <Text style={styles.value}>
-            {item.permissions?.length || 0}
-          </Text>
+          <Text style={styles.value}>{item.permissions?.length || 0}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuarios:</Text>
-          <Text style={styles.value}>
-            {item.userCount || 0}
-          </Text>
+          <Text style={styles.value}>{item.userCount || 0}</Text>
         </View>
       </View>
     ),

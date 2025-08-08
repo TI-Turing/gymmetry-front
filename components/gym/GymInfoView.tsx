@@ -3,9 +3,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View as RNView,
   Image,
-  Dimensions,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
@@ -26,14 +24,14 @@ export default function GymInfoView({
   onRefresh,
   onAddBranch,
 }: GymInfoViewProps) {
-  const { width } = Dimensions.get('window');
+  // const { width } = Dimensions.get('window');
   const router = useRouter();
 
   // Verificar si el usuario actual es el propietario del gimnasio
   const currentUserId = authService.getUserId();
   const isOwner = currentUserId === gym.Owner_UserId;
   // Verificar si el gimnasio tiene un plan activo
-  const hasActivePlan = gym.SubscriptionPlanId != null;
+  const hasActivePlan = gym.SubscriptionPlanId !== null;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {

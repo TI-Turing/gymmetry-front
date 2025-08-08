@@ -8,7 +8,8 @@ import { accessMethodTypeFunctionsService } from '@/services/functions';
 
 export function AccessMethodTypeList() {
   const loadAccessMethodTypes = useCallback(async () => {
-    const response = await accessMethodTypeFunctionsService.getAllAccessMethodTypes();
+    const response =
+      await accessMethodTypeFunctionsService.getAllAccessMethodTypes();
     return response.Data || [];
   }, []);
 
@@ -23,25 +24,21 @@ export function AccessMethodTypeList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
         )}
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
-          <Text style={styles.value}>
-            {item.type || 'Estándar'}
-          </Text>
+          <Text style={styles.value}>{item.type || 'Estándar'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Seguridad:</Text>
-          <Text style={styles.value}>
-            {item.securityLevel || 'Media'}
-          </Text>
+          <Text style={styles.value}>{item.securityLevel || 'Media'}</Text>
         </View>
       </View>
     ),

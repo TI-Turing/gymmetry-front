@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { gymImageService } from '@/services';
 
-export function GymImageList() {
+const GymImageList = React.memo(() => {
   const loadGymImages = useCallback(async () => {
     const response = await gymImageService.getAllGymImages();
     return response.Data || [];
   }, []);
+
+GymImageList.displayName = 'GymImageList';
+
+
 
   const renderGymImageItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,52 +27,56 @@ export function GymImageList() {
             {item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
           <Text style={styles.value}>{item.gymName || item.gym || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Formato:</Text>
-          <Text style={styles.value}>{item.format || item.fileType || 'JPG'}</Text>
+          <Text style={styles.value}>
+            {item.format || item.fileType || 'JPG'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tamaño:</Text>
           <Text style={styles.value}>
             {item.fileSize ? `${(item.fileSize / 1024).toFixed(1)} KB` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Resolución:</Text>
           <Text style={styles.value}>
             {item.width && item.height ? `${item.width}x${item.height}` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Subida:</Text>
           <Text style={styles.value}>
-            {item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString() : 'N/A'}
+            {item.uploadedAt
+              ? new Date(item.uploadedAt).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Por:</Text>
           <Text style={styles.value}>{item.uploadedBy || 'Sistema'}</Text>
         </View>
-        
+
         {item.url && (
           <View style={styles.urlSection}>
             <Text style={styles.urlLabel}>URL:</Text>

@@ -5,108 +5,116 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function JourneyEmployeeList() {
+const JourneyEmployeeList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadJourneyEmployees = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+JourneyEmployeeList.displayName = 'JourneyEmployeeList';
+
+
 
   const renderJourneyEmployeeItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.employeeName || 'Empleado'}
-          </Text>
+          <Text style={styles.title}>{item.employeeName || 'Empleado'}</Text>
           <Text style={styles.statusText}>
-            {item.status === 'working' ? 'Trabajando' :
-             item.status === 'break' ? 'Descanso' :
-             item.status === 'finished' ? 'Terminado' : 'Inactivo'}
+            {item.status === 'working'
+              ? 'Trabajando'
+              : item.status === 'break'
+                ? 'Descanso'
+                : item.status === 'finished'
+                  ? 'Terminado'
+                  : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.position || 'Registro de jornada laboral'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Empleado:</Text>
           <Text style={styles.value}>{item.employeeName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Posición:</Text>
           <Text style={styles.value}>{item.position || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.date 
-              ? new Date(item.date).toLocaleDateString() 
-              : 'N/A'}
+            {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Hora entrada:</Text>
           <Text style={styles.value}>
-            {item.checkIn 
-              ? new Date(item.checkIn).toLocaleTimeString() 
-              : 'N/A'}
+            {item.checkIn ? new Date(item.checkIn).toLocaleTimeString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Hora salida:</Text>
           <Text style={styles.value}>
-            {item.checkOut 
-              ? new Date(item.checkOut).toLocaleTimeString() 
+            {item.checkOut
+              ? new Date(item.checkOut).toLocaleTimeString()
               : 'Pendiente'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Horas trabajadas:</Text>
           <Text style={styles.value}>
-            {item.hoursWorked 
-              ? `${item.hoursWorked.toFixed(1)}h` 
+            {item.hoursWorked
+              ? `${item.hoursWorked.toFixed(1)}h`
               : 'Calculando...'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Horas extra:</Text>
-          <Text style={[styles.value, {
-            color: item.overtimeHours > 0 ? '#ffa726' : Colors.light.text
-          }]}>
-            {item.overtimeHours 
-              ? `${item.overtimeHours.toFixed(1)}h` 
-              : '0h'}
+          <Text
+            style={[
+              styles.value,
+              {
+                color: item.overtimeHours > 0 ? '#ffa726' : Colors.light.text,
+              },
+            ]}
+          >
+            {item.overtimeHours ? `${item.overtimeHours.toFixed(1)}h` : '0h'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Sucursal:</Text>
           <Text style={styles.value}>{item.branchName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Área:</Text>
           <Text style={styles.value}>{item.workArea || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Descansos:</Text>
           <Text style={styles.value}>
             {item.breakCount || 0} ({item.breakDuration || 0} min)
           </Text>
         </View>
-        
+
         {item.notes && (
           <View style={styles.notesSection}>
             <Text style={styles.notesLabel}>Notas:</Text>
@@ -115,7 +123,7 @@ export function JourneyEmployeeList() {
             </Text>
           </View>
         )}
-        
+
         {item.tasks && Array.isArray(item.tasks) && (
           <View style={styles.tasksSection}>
             <Text style={styles.tasksLabel}>Tareas asignadas:</Text>

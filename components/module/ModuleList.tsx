@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function ModuleList() {
+const ModuleList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadModules = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch (_error) {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+ModuleList.displayName = 'ModuleList';
+
+
 
   const renderModuleItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,76 +33,78 @@ export function ModuleList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Versión:</Text>
           <Text style={styles.value}>{item.version || '1.0.0'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
           <Text style={styles.value}>
             {item.price ? `$${item.price.toFixed(2)}` : 'Gratis'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Instalaciones:</Text>
           <Text style={styles.value}>
             {item.installations || item.installCount || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Submódulos:</Text>
           <Text style={styles.value}>
             {item.subModules?.length || item.subModuleCount || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Desarrollador:</Text>
           <Text style={styles.value}>
             {item.developer || item.author || 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha creación:</Text>
           <Text style={styles.value}>
-            {item.createdAt 
-              ? new Date(item.createdAt).toLocaleDateString() 
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Última actualización:</Text>
           <Text style={styles.value}>
-            {item.updatedAt 
-              ? new Date(item.updatedAt).toLocaleDateString() 
+            {item.updatedAt
+              ? new Date(item.updatedAt).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         {item.features && Array.isArray(item.features) && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características:</Text>
             <View style={styles.featuresList}>
-              {item.features.slice(0, 3).map((feature: string, index: number) => (
-                <Text key={index} style={styles.feature}>
-                  • {feature}
-                </Text>
-              ))}
+              {item.features
+                .slice(0, 3)
+                .map((feature: string, index: number) => (
+                  <Text key={index} style={styles.feature}>
+                    • {feature}
+                  </Text>
+                ))}
               {item.features.length > 3 && (
                 <Text style={styles.moreFeatures}>
                   +{item.features.length - 3} más...

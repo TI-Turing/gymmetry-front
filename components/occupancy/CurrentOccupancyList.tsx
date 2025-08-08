@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function CurrentOccupancyList() {
+const CurrentOccupancyList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadCurrentOccupancy = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+CurrentOccupancyList.displayName = 'CurrentOccupancyList';
+
+
 
   const renderCurrentOccupancyItem = useCallback(
     ({ item }: { item: any }) => (
@@ -102,16 +109,12 @@ export function CurrentOccupancyList() {
 
         <View style={styles.row}>
           <Text style={styles.label}>Pico de ocupación:</Text>
-          <Text style={styles.value}>
-            {item.peakTime || 'No determinado'}
-          </Text>
+          <Text style={styles.value}>{item.peakTime || 'No determinado'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Tiempo valle:</Text>
-          <Text style={styles.value}>
-            {item.lowTime || 'No determinado'}
-          </Text>
+          <Text style={styles.value}>{item.lowTime || 'No determinado'}</Text>
         </View>
 
         <View style={styles.row}>
@@ -196,7 +199,9 @@ export function CurrentOccupancyList() {
 
         {item.restrictions && Array.isArray(item.restrictions) && (
           <View style={styles.restrictionsSection}>
-            <Text style={styles.restrictionsLabel}>Restricciones actuales:</Text>
+            <Text style={styles.restrictionsLabel}>
+              Restricciones actuales:
+            </Text>
             <View style={styles.restrictionsList}>
               {item.restrictions.map((restriction: string, index: number) => (
                 <Text key={index} style={styles.restriction}>
@@ -209,9 +214,7 @@ export function CurrentOccupancyList() {
 
         {item.recommendations && (
           <View style={styles.recommendationsSection}>
-            <Text style={styles.recommendationsLabel}>
-              Recomendaciones:
-            </Text>
+            <Text style={styles.recommendationsLabel}>Recomendaciones:</Text>
             <Text style={styles.recommendationsText}>
               💡 {item.recommendations}
             </Text>
@@ -230,13 +233,13 @@ export function CurrentOccupancyList() {
 
   return (
     <EntityList
-      title="Ocupación Actual"
+      title='Ocupación Actual'
       loadFunction={loadCurrentOccupancy}
       renderItem={renderCurrentOccupancyItem}
       keyExtractor={keyExtractor}
-      emptyTitle="No hay datos de ocupación"
-      emptyMessage="No se encontraron datos de ocupación actual"
-      loadingMessage="Cargando ocupación actual..."
+      emptyTitle='No hay datos de ocupación'
+      emptyMessage='No se encontraron datos de ocupación actual'
+      loadingMessage='Cargando ocupación actual...'
     />
   );
 }

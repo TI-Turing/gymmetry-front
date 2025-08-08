@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function BranchList() {
+const BranchList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadBranches = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+BranchList.displayName = 'BranchList';
+
+
 
   const renderBranchItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,77 +33,79 @@ export function BranchList() {
             {item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sucursal del gimnasio'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Dirección:</Text>
           <Text style={styles.value}>{item.address || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Ciudad:</Text>
           <Text style={styles.value}>{item.city || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Teléfono:</Text>
           <Text style={styles.value}>{item.phone || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Horario:</Text>
           <Text style={styles.value}>
-            {item.openingTime && item.closingTime 
-              ? `${item.openingTime} - ${item.closingTime}` 
+            {item.openingTime && item.closingTime
+              ? `${item.openingTime} - ${item.closingTime}`
               : 'Consultar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad:</Text>
           <Text style={styles.value}>
             {item.currentOccupancy || 0} / {item.maxCapacity || 0}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Servicios:</Text>
           <Text style={styles.value}>
             {item.servicesCount || item.services?.length || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Entrenadores:</Text>
           <Text style={styles.value}>
             {item.trainersCount || item.trainers?.length || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Rating:</Text>
           <Text style={styles.value}>
             ⭐ {item.rating || '0.0'} ({item.reviewCount || 0})
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gerente:</Text>
           <Text style={styles.value}>{item.manager || 'N/A'}</Text>
         </View>
-        
+
         {item.amenities && Array.isArray(item.amenities) && (
           <View style={styles.amenitiesSection}>
             <Text style={styles.amenitiesLabel}>Amenidades:</Text>
             <View style={styles.amenitiesList}>
-              {item.amenities.slice(0, 4).map((amenity: string, index: number) => (
-                <Text key={index} style={styles.amenity}>
-                  ✓ {amenity}
-                </Text>
-              ))}
+              {item.amenities
+                .slice(0, 4)
+                .map((amenity: string, index: number) => (
+                  <Text key={index} style={styles.amenity}>
+                    ✓ {amenity}
+                  </Text>
+                ))}
               {item.amenities.length > 4 && (
                 <Text style={styles.moreAmenities}>
                   +{item.amenities.length - 4} más...

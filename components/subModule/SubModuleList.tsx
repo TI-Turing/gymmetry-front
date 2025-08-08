@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { subModuleFunctionsService } from '@/services/functions';
 
-export function SubModuleList() {
+const SubModuleList = React.memo(() => {
   const loadSubModules = useCallback(async () => {
     const response = await subModuleFunctionsService.getAllSubModules();
     return response.Data || [];
   }, []);
+
+SubModuleList.displayName = 'SubModuleList';
+
+
 
   const renderSubModuleItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,29 +27,25 @@ export function SubModuleList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.module}>
           Módulo: {item.moduleName || item.moduleId || 'N/A'}
         </Text>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
         )}
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Orden:</Text>
-          <Text style={styles.value}>
-            {item.order || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{item.order || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Permisos:</Text>
-          <Text style={styles.value}>
-            {item.permissions?.length || 0}
-          </Text>
+          <Text style={styles.value}>{item.permissions?.length || 0}</Text>
         </View>
       </View>
     ),

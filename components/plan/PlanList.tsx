@@ -7,11 +7,15 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { planFunctionsService } from '@/services/functions';
 import { Plan } from '@/dto/plan/Plan';
 
-export function PlanList() {
+const PlanList = React.memo(() => {
   const loadPlans = useCallback(async () => {
     const response = await planFunctionsService.getAllPlans();
     return response.Data || [];
   }, []);
+
+PlanList.displayName = 'PlanList';
+
+
 
   const renderPlanItem = useCallback(
     ({ item }: { item: Plan }) => (
@@ -106,3 +110,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
   },
 });
+
+export default PlanList;

@@ -19,22 +19,20 @@ export function BillList() {
           <Text style={styles.title}>
             Factura {item.id?.slice(0, 8) || 'N/A'}
           </Text>
-          <Text style={styles.statusText}>
-            {item.status || 'Pendiente'}
-          </Text>
+          <Text style={styles.statusText}>{item.status || 'Pendiente'}</Text>
         </View>
-        
-        <Text style={styles.amount}>
-          Monto: ${item.amount || '0.00'}
-        </Text>
-        
+
+        <Text style={styles.amount}>Monto: ${item.amount || '0.00'}</Text>
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}

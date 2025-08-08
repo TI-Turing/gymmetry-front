@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { branchMediaFunctionsService } from '@/services/functions';
 
-export function BranchMediaList() {
+const BranchMediaList = React.memo(() => {
   const loadBranchMedia = useCallback(async () => {
     const response = await branchMediaFunctionsService.getAllBranchMedia();
     return response.Data || [];
   }, []);
+
+BranchMediaList.displayName = 'BranchMediaList';
+
+
 
   const renderBranchMediaItem = useCallback(
     ({ item }: { item: any }) => (

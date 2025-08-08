@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { ScrollView, TouchableOpacity } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Button from '@/components/common/Button';
@@ -16,7 +16,7 @@ export default function GymStep5({
   initialData,
 }: GymStepProps<GymStep5Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
-  const [formData, setFormData] = useState<GymStep5Data>({
+  const [formData] = useState<GymStep5Data>({
     Id: gymId,
     logo: initialData?.logo || null,
     coverImage: initialData?.coverImage || null,

@@ -5,97 +5,123 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function OtpList() {
+const OtpList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadOtps = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+OtpList.displayName = 'OtpList';
+
+
 
   const renderOtpItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.code || 'Código OTP'}
-          </Text>
-          <Text style={[styles.statusText, {
-            backgroundColor: item.isUsed 
-              ? '#ff6b6b' 
-              : item.isExpired 
-                ? '#ffa726' 
-                : Colors.light.tabIconSelected
-          }]}>
-            {item.isUsed ? 'Usado' : 
-             item.isExpired ? 'Expirado' : 'Activo'}
+          <Text style={styles.title}>{item.code || 'Código OTP'}</Text>
+          <Text
+            style={[
+              styles.statusText,
+              {
+                backgroundColor: item.isUsed
+                  ? '#ff6b6b'
+                  : item.isExpired
+                    ? '#ffa726'
+                    : Colors.light.tabIconSelected,
+              },
+            ]}
+          >
+            {item.isUsed ? 'Usado' : item.isExpired ? 'Expirado' : 'Activo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.purpose || 'Código de verificación temporal'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
-          <Text style={styles.value}>{item.userEmail || item.phone || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.userEmail || item.phone || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
           <Text style={styles.value}>
-            {item.type === 'email' ? '📧 Email' :
-             item.type === 'sms' ? '📲 SMS' :
-             item.type === 'call' ? '📞 Llamada' : 'Desconocido'}
+            {item.type === 'email'
+              ? '📧 Email'
+              : item.type === 'sms'
+                ? '📲 SMS'
+                : item.type === 'call'
+                  ? '📞 Llamada'
+                  : 'Desconocido'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Propósito:</Text>
           <Text style={styles.value}>
-            {item.purpose === 'registration' ? 'Registro' :
-             item.purpose === 'login' ? 'Inicio de sesión' :
-             item.purpose === 'password_reset' ? 'Recuperar contraseña' :
-             item.purpose === 'verification' ? 'Verificación' : 'Otro'}
+            {item.purpose === 'registration'
+              ? 'Registro'
+              : item.purpose === 'login'
+                ? 'Inicio de sesión'
+                : item.purpose === 'password_reset'
+                  ? 'Recuperar contraseña'
+                  : item.purpose === 'verification'
+                    ? 'Verificación'
+                    : 'Otro'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Creado:</Text>
           <Text style={styles.value}>
-            {item.createdAt 
-              ? new Date(item.createdAt).toLocaleString() 
-              : 'N/A'}
+            {item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Expira:</Text>
-          <Text style={[styles.value, {
-            color: item.isExpired ? '#ff6b6b' : Colors.light.text
-          }]}>
-            {item.expiresAt 
-              ? new Date(item.expiresAt).toLocaleString() 
-              : 'N/A'}
+          <Text
+            style={[
+              styles.value,
+              {
+                color: item.isExpired ? '#ff6b6b' : Colors.light.text,
+              },
+            ]}
+          >
+            {item.expiresAt ? new Date(item.expiresAt).toLocaleString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Intentos:</Text>
-          <Text style={[styles.value, {
-            color: item.attempts >= 3 ? '#ff6b6b' : Colors.light.text
-          }]}>
+          <Text
+            style={[
+              styles.value,
+              {
+                color: item.attempts >= 3 ? '#ff6b6b' : Colors.light.text,
+              },
+            ]}
+          >
             {item.attempts || 0} / {item.maxAttempts || 3}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>IP origen:</Text>
           <Text style={styles.value}>{item.originIp || 'N/A'}</Text>
         </View>
-        
+
         {item.isUsed && item.usedAt && (
           <View style={styles.usageSection}>
             <Text style={styles.usageLabel}>Usado el:</Text>

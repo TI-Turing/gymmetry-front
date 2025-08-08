@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { fitUserService } from '@/services';
 
-export function FitUserList() {
+const FitUserList = React.memo(() => {
   const loadFitUsers = useCallback(async () => {
     const response = await fitUserService.getAllFitUsers();
     return response.Data || [];
   }, []);
+
+FitUserList.displayName = 'FitUserList';
+
+
 
   const renderFitUserItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,50 +27,58 @@ export function FitUserList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.email}>
           {item.email || 'Sin email configurado'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Edad:</Text>
           <Text style={styles.value}>{item.age || 'N/A'} años</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Peso:</Text>
           <Text style={styles.value}>{item.weight || 'N/A'} kg</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Altura:</Text>
           <Text style={styles.value}>{item.height || 'N/A'} cm</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Objetivo:</Text>
-          <Text style={styles.value}>{item.goal || item.fitnessGoal || 'Sin objetivo'}</Text>
+          <Text style={styles.value}>
+            {item.goal || item.fitnessGoal || 'Sin objetivo'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Nivel:</Text>
-          <Text style={styles.value}>{item.fitnessLevel || 'Principiante'}</Text>
+          <Text style={styles.value}>
+            {item.fitnessLevel || 'Principiante'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Rutinas:</Text>
           <Text style={styles.value}>{item.routineCount || 0} asignadas</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Progreso:</Text>
-          <Text style={styles.value}>{item.progressPercentage || 0}% completado</Text>
+          <Text style={styles.value}>
+            {item.progressPercentage || 0}% completado
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Inscripción:</Text>
           <Text style={styles.value}>
-            {item.joinDate ? new Date(item.joinDate).toLocaleDateString() : 'N/A'}
+            {item.joinDate
+              ? new Date(item.joinDate).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
       </View>

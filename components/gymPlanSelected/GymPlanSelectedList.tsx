@@ -6,12 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export function GymPlanSelectedList() {
+  const servicePlaceholder = () => Promise.resolve([]);
   const loadGymPlanSelected = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch (error) {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
 
@@ -26,57 +29,58 @@ export function GymPlanSelectedList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Plan de gimnasio seleccionado'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
           <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
           <Text style={styles.value}>{item.userName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha inicio:</Text>
           <Text style={styles.value}>
-            {item.startDate 
-              ? new Date(item.startDate).toLocaleDateString() 
-              : 'N/A'
-            }
+            {item.startDate
+              ? new Date(item.startDate).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha fin:</Text>
           <Text style={styles.value}>
-            {item.endDate 
-              ? new Date(item.endDate).toLocaleDateString() 
-              : 'N/A'
-            }
+            {item.endDate ? new Date(item.endDate).toLocaleDateString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
           <Text style={styles.value}>
             {item.price ? `$${item.price.toFixed(2)}` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Estado pago:</Text>
-          <Text style={[styles.value, { 
-            color: item.isPaid ? Colors.light.tabIconSelected : '#ff6b6b' 
-          }]}>
+          <Text
+            style={[
+              styles.value,
+              {
+                color: item.isPaid ? Colors.light.tabIconSelected : '#ff6b6b',
+              },
+            ]}
+          >
             {item.isPaid ? 'Pagado' : 'Pendiente'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Módulos:</Text>
           <Text style={styles.value}>

@@ -53,15 +53,7 @@ function GymScreen() {
   }, [userGymId, cachedGym, gymData, refreshGymData]);
 
   // Debug: Descomenta para ver el estado
-  // console.log('Debug GymScreen:', {
-  //   userGymId,
-  //   hasGymData: !!gymData,
-  //   hasCachedGym: !!cachedGym,
-  //   hasGym,
-  //   isLoading,
-  // });
-
-  const handleGymConnection = (connected: boolean) => {
+  //const handleGymConnection = (connected: boolean) => {
     setIsConnectedToGym(connected);
   };
 

@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { routineDayFunctionsService } from '@/services/functions';
 
-export function RoutineDayList() {
+const RoutineDayList = React.memo(() => {
   const loadRoutineDays = useCallback(async () => {
     const response = await routineDayFunctionsService.getAllRoutineDays();
     return response.Data || [];
   }, []);
+
+RoutineDayList.displayName = 'RoutineDayList';
+
+
 
   const renderRoutineDayItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,29 +27,27 @@ export function RoutineDayList() {
             {item.isCompleted ? 'Completado' : 'Pendiente'}
           </Text>
         </View>
-        
+
         <Text style={styles.routine}>
           Rutina: {item.routineName || item.routineId || 'N/A'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>
-            {item.exerciseCount || 0}
-          </Text>
+          <Text style={styles.value}>{item.exerciseCount || 0}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration || 'N/A'} min
-          </Text>
+          <Text style={styles.value}>{item.duration || 'N/A'} min</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Completado:</Text>
           <Text style={styles.value}>
-            {item.completedAt ? new Date(item.completedAt).toLocaleDateString() : 'Pendiente'}
+            {item.completedAt
+              ? new Date(item.completedAt).toLocaleDateString()
+              : 'Pendiente'}
           </Text>
         </View>
       </View>

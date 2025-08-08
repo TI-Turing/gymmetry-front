@@ -6,7 +6,7 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { gymService } from '@/services';
 
-export function GymTypeList() {
+const GymTypeList = React.memo(() => {
   const loadGymTypes = useCallback(async () => {
     try {
       const response = await gymService.getAllGymTypes();
@@ -16,6 +16,10 @@ export function GymTypeList() {
       return [];
     }
   }, []);
+
+GymTypeList.displayName = 'GymTypeList';
+
+
 
   const renderGymTypeItem = useCallback(
     ({ item }: { item: any }) => (
@@ -28,72 +32,69 @@ export function GymTypeList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>
-            {item.category || 'Comercial'}
-          </Text>
+          <Text style={styles.value}>{item.category || 'Comercial'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad típica:</Text>
           <Text style={styles.value}>
             {item.typicalCapacity || item.capacity || 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Área sugerida:</Text>
           <Text style={styles.value}>
             {item.suggestedArea ? `${item.suggestedArea} m²` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Equipamiento:</Text>
           <Text style={styles.value}>
             {item.equipment || item.requiredEquipment || 'Estándar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Servicios:</Text>
           <Text style={styles.value}>
             {item.services || item.includedServices || 'Básicos'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Precio base:</Text>
           <Text style={styles.value}>
-            {item.basePrice 
-              ? `$${item.basePrice.toFixed(2)}` 
-              : 'Consultar'
-            }
+            {item.basePrice ? `$${item.basePrice.toFixed(2)}` : 'Consultar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasios:</Text>
           <Text style={styles.value}>
             {item.gymCount || item.totalGyms || '0'}
           </Text>
         </View>
-        
+
         {item.features && Array.isArray(item.features) && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características:</Text>
             <View style={styles.featuresList}>
-              {item.features.slice(0, 3).map((feature: string, index: number) => (
-                <Text key={index} style={styles.feature}>
-                  • {feature}
-                </Text>
-              ))}
+              {item.features
+                .slice(0, 3)
+                .map((feature: string, index: number) => (
+                  <Text key={index} style={styles.feature}>
+                    • {feature}
+                  </Text>
+                ))}
               {item.features.length > 3 && (
                 <Text style={styles.moreFeatures}>
                   +{item.features.length - 3} más...

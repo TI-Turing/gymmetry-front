@@ -6,11 +6,16 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { uninstallOptionFunctionsService } from '@/services/functions';
 
-export function UninstallOptionList() {
+const UninstallOptionList = React.memo(() => {
   const loadUninstallOptions = useCallback(async () => {
-    const response = await uninstallOptionFunctionsService.getAllUninstallOptions();
+    const response =
+      await uninstallOptionFunctionsService.getAllUninstallOptions();
     return response.Data || [];
   }, []);
+
+UninstallOptionList.displayName = 'UninstallOptionList';
+
+
 
   const renderUninstallOptionItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,24 +28,24 @@ export function UninstallOptionList() {
             {item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
         )}
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Razón:</Text>
-          <Text style={styles.value}>
-            {item.reason || 'No especificada'}
-          </Text>
+          <Text style={styles.value}>{item.reason || 'No especificada'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
       </View>

@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function MachineList() {
+const MachineList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadMachines = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+MachineList.displayName = 'MachineList';
+
+
 
   const renderMachineItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,113 +30,142 @@ export function MachineList() {
             {item.name || item.machineName || 'Máquina'}
           </Text>
           <Text style={styles.statusText}>
-            {item.status === 'available' ? 'Disponible' :
-             item.status === 'occupied' ? 'Ocupada' :
-             item.status === 'maintenance' ? 'Mantenimiento' : 'Fuera de servicio'}
+            {item.status === 'available'
+              ? 'Disponible'
+              : item.status === 'occupied'
+                ? 'Ocupada'
+                : item.status === 'maintenance'
+                  ? 'Mantenimiento'
+                  : 'Fuera de servicio'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Máquina de gimnasio'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Marca:</Text>
           <Text style={styles.value}>{item.brand || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Modelo:</Text>
           <Text style={styles.value}>{item.model || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Área objetivo:</Text>
           <Text style={styles.value}>
             {item.targetMuscle || item.muscleGroup || 'Múltiples'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Ubicación:</Text>
-          <Text style={styles.value}>{item.location || item.zone || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.location || item.zone || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario actual:</Text>
           <Text style={styles.value}>
-            {item.currentUser || (item.status === 'available' ? 'Libre' : 'N/A')}
+            {item.currentUser ||
+              (item.status === 'available' ? 'Libre' : 'N/A')}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tiempo uso:</Text>
           <Text style={styles.value}>
-            {item.sessionTime 
-              ? `${Math.floor(item.sessionTime / 60)}:${String(item.sessionTime % 60).padStart(2, '0')}` 
+            {item.sessionTime
+              ? `${Math.floor(item.sessionTime / 60)}:${String(item.sessionTime % 60).padStart(2, '0')}`
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Dificultad:</Text>
-          <Text style={[styles.value, {
-            color: item.difficulty === 'hard' ? '#ff6b6b' :
-                  item.difficulty === 'medium' ? '#ffa726' : '#4caf50'
-          }]}>
-            {item.difficulty === 'hard' ? '🔴 Difícil' :
-             item.difficulty === 'medium' ? '🟡 Medio' : '🟢 Fácil'}
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.difficulty === 'hard'
+                    ? '#ff6b6b'
+                    : item.difficulty === 'medium'
+                      ? '#ffa726'
+                      : '#4caf50',
+              },
+            ]}
+          >
+            {item.difficulty === 'hard'
+              ? '🔴 Difícil'
+              : item.difficulty === 'medium'
+                ? '🟡 Medio'
+                : '🟢 Fácil'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Peso máximo:</Text>
           <Text style={styles.value}>
             {item.maxWeight ? `${item.maxWeight} kg` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Último mantenim.:</Text>
           <Text style={styles.value}>
-            {item.lastMaintenance 
-              ? new Date(item.lastMaintenance).toLocaleDateString() 
+            {item.lastMaintenance
+              ? new Date(item.lastMaintenance).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Próximo mantenim.:</Text>
-          <Text style={[styles.value, {
-            color: item.nextMaintenance && 
-                  new Date(item.nextMaintenance) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
-                  ? '#ffa726' : Colors.light.text
-          }]}>
-            {item.nextMaintenance 
-              ? new Date(item.nextMaintenance).toLocaleDateString() 
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.nextMaintenance &&
+                  new Date(item.nextMaintenance) <=
+                    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    ? '#ffa726'
+                    : Colors.light.text,
+              },
+            ]}
+          >
+            {item.nextMaintenance
+              ? new Date(item.nextMaintenance).toLocaleDateString()
               : 'No programado'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usos hoy:</Text>
           <Text style={styles.value}>{item.dailyUsage || '0'}</Text>
         </View>
-        
+
         {item.features && Array.isArray(item.features) && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características:</Text>
             <View style={styles.featuresList}>
-              {item.features.slice(0, 3).map((feature: string, index: number) => (
-                <Text key={index} style={styles.feature}>
-                  ⚙️ {feature}
-                </Text>
-              ))}
+              {item.features
+                .slice(0, 3)
+                .map((feature: string, index: number) => (
+                  <Text key={index} style={styles.feature}>
+                    ⚙️ {feature}
+                  </Text>
+                ))}
               {item.features.length > 3 && (
                 <Text style={styles.moreFeatures}>
                   +{item.features.length - 3} más...

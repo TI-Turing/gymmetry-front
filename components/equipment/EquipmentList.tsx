@@ -6,49 +6,59 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { equipmentService } from '@/services';
 
-export function EquipmentList() {
+const EquipmentList = React.memo(() => {
   const loadEquipment = useCallback(async () => {
     const response = await equipmentService.getAllEquipment();
     return response.Data || [];
   }, []);
 
+EquipmentList.displayName = 'EquipmentList';
+
+
+
   const renderEquipmentItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>{item.name || 'Equipamiento sin nombre'}</Text>
+          <Text style={styles.title}>
+            {item.name || 'Equipamiento sin nombre'}
+          </Text>
           <Text style={styles.statusText}>
             {item.isAvailable ? 'Disponible' : 'No disponible'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Marca:</Text>
           <Text style={styles.value}>{item.brand || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Estado:</Text>
           <Text style={styles.value}>{item.condition || 'Bueno'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Ubicación:</Text>
-          <Text style={styles.value}>{item.location || item.zone || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.location || item.zone || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>{item.exerciseCount || 0} configurados</Text>
+          <Text style={styles.value}>
+            {item.exerciseCount || 0} configurados
+          </Text>
         </View>
       </View>
     ),

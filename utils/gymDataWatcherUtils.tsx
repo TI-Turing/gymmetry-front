@@ -1,6 +1,11 @@
 // Ejemplo de cómo integrar el sistema de observador en la aplicación principal
 
 import React, { useEffect } from 'react';
+
+interface EventListener {
+  (event: Event): void;
+}
+
 import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
 import { gymDataWatcher } from '@/services/gymDataWatcher';
 

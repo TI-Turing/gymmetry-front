@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function MachineCategoryList() {
+const MachineCategoryList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadMachineCategories = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+MachineCategoryList.displayName = 'MachineCategoryList';
+
+
 
   const renderMachineCategoryItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,87 +33,101 @@ export function MachineCategoryList() {
             {item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Categoría de equipamiento de gimnasio'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
           <Text style={styles.value}>{item.type || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Área objetivo:</Text>
           <Text style={styles.value}>
             {item.targetArea || item.muscleGroup || 'Múltiples'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Máquinas:</Text>
           <Text style={styles.value}>
             {item.machinesCount || item.machines?.length || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Dificultad:</Text>
-          <Text style={[styles.value, {
-            color: item.difficulty === 'advanced' ? '#ff6b6b' :
-                  item.difficulty === 'intermediate' ? '#ffa726' : '#4caf50'
-          }]}>
-            {item.difficulty === 'advanced' ? 'Avanzado' :
-             item.difficulty === 'intermediate' ? 'Intermedio' : 'Principiante'}
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.difficulty === 'advanced'
+                    ? '#ff6b6b'
+                    : item.difficulty === 'intermediate'
+                      ? '#ffa726'
+                      : '#4caf50',
+              },
+            ]}
+          >
+            {item.difficulty === 'advanced'
+              ? 'Avanzado'
+              : item.difficulty === 'intermediate'
+                ? 'Intermedio'
+                : 'Principiante'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Espacio requerido:</Text>
           <Text style={styles.value}>
             {item.spaceRequired ? `${item.spaceRequired} m²` : 'Variable'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Mantenimiento:</Text>
           <Text style={styles.value}>
             {item.maintenanceFrequency || 'Mensual'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Costo promedio:</Text>
           <Text style={styles.value}>
-            {item.averageCost 
-              ? `$${item.averageCost.toLocaleString()}` 
+            {item.averageCost
+              ? `$${item.averageCost.toLocaleString()}`
               : 'Consultar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Capacitación:</Text>
           <Text style={styles.value}>
             {item.requiresTraining ? 'Requerida' : 'No requerida'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Vida útil:</Text>
           <Text style={styles.value}>
             {item.lifespan ? `${item.lifespan} años` : 'N/A'}
           </Text>
         </View>
-        
+
         {item.benefits && Array.isArray(item.benefits) && (
           <View style={styles.benefitsSection}>
             <Text style={styles.benefitsLabel}>Beneficios:</Text>
             <View style={styles.benefitsList}>
-              {item.benefits.slice(0, 3).map((benefit: string, index: number) => (
-                <Text key={index} style={styles.benefit}>
-                  💪 {benefit}
-                </Text>
-              ))}
+              {item.benefits
+                .slice(0, 3)
+                .map((benefit: string, index: number) => (
+                  <Text key={index} style={styles.benefit}>
+                    💪 {benefit}
+                  </Text>
+                ))}
               {item.benefits.length > 3 && (
                 <Text style={styles.moreBenefits}>
                   +{item.benefits.length - 3} más...

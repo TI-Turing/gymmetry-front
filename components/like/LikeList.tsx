@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function LikeList() {
+const LikeList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadLikes = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+LikeList.displayName = 'LikeList';
+
+
 
   const renderLikeItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,82 +33,94 @@ export function LikeList() {
             {item.isActive ? 'Activo' : 'Eliminado'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
-          {item.contentType === 'post' ? 'Me gusta en publicación' :
-           item.contentType === 'comment' ? 'Me gusta en comentario' :
-           item.contentType === 'routine' ? 'Me gusta en rutina' :
-           'Me gusta'}
+          {item.contentType === 'post'
+            ? 'Me gusta en publicación'
+            : item.contentType === 'comment'
+              ? 'Me gusta en comentario'
+              : item.contentType === 'routine'
+                ? 'Me gusta en rutina'
+                : 'Me gusta'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
           <Text style={styles.value}>{item.userName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Contenido:</Text>
           <Text style={styles.value}>
-            {item.contentType === 'post' ? '📝 Publicación' :
-             item.contentType === 'comment' ? '💬 Comentario' :
-             item.contentType === 'routine' ? '🏋️ Rutina' :
-             item.contentType === 'exercise' ? '💪 Ejercicio' : 'Otro'}
+            {item.contentType === 'post'
+              ? '📝 Publicación'
+              : item.contentType === 'comment'
+                ? '💬 Comentario'
+                : item.contentType === 'routine'
+                  ? '🏋️ Rutina'
+                  : item.contentType === 'exercise'
+                    ? '💪 Ejercicio'
+                    : 'Otro'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Título contenido:</Text>
           <Text style={styles.value} numberOfLines={2}>
             {item.contentTitle || item.postTitle || 'Sin título'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Autor contenido:</Text>
-          <Text style={styles.value}>
-            {item.contentAuthor || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{item.contentAuthor || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha like:</Text>
           <Text style={styles.value}>
-            {item.createdAt 
-              ? new Date(item.createdAt).toLocaleString() 
-              : 'N/A'}
+            {item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Desde app:</Text>
           <Text style={styles.value}>
-            {item.platform === 'mobile' ? '📱 Móvil' :
-             item.platform === 'web' ? '💻 Web' : 
-             'Desconocido'}
+            {item.platform === 'mobile'
+              ? '📱 Móvil'
+              : item.platform === 'web'
+                ? '💻 Web'
+                : 'Desconocido'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Total likes:</Text>
           <Text style={styles.value}>
             {item.totalLikes || item.contentLikes || '0'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
           <Text style={styles.value}>{item.gymName || 'General'}</Text>
         </View>
-        
+
         {item.reaction && item.reaction !== 'like' && (
           <View style={styles.reactionSection}>
             <Text style={styles.reactionLabel}>Reacción específica:</Text>
             <Text style={styles.reaction}>
-              {item.reaction === 'love' ? '😍 Me encanta' :
-               item.reaction === 'laugh' ? '😂 Me divierte' :
-               item.reaction === 'wow' ? '😮 Me asombra' :
-               item.reaction === 'sad' ? '😢 Me entristece' :
-               item.reaction === 'angry' ? '😠 Me molesta' : item.reaction}
+              {item.reaction === 'love'
+                ? '😍 Me encanta'
+                : item.reaction === 'laugh'
+                  ? '😂 Me divierte'
+                  : item.reaction === 'wow'
+                    ? '😮 Me asombra'
+                    : item.reaction === 'sad'
+                      ? '😢 Me entristece'
+                      : item.reaction === 'angry'
+                        ? '😠 Me molesta'
+                        : item.reaction}
             </Text>
           </View>
         )}

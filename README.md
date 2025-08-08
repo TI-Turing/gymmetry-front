@@ -240,18 +240,21 @@ El proyecto implementa un **patrón arquitectónico unificado** para la gestión
 #### Características del Patrón
 
 **🎨 UI Rica y Contextual:**
+
 - Tarjetas con información específica por dominio
 - Headers con título y estado visual
 - Secciones especializadas (récords, consejos, restricciones)
 - Metadatos relevantes por tipo de entidad
 
 **⚡ Estados Bien Definidos:**
+
 - Loading states con animaciones Lottie
 - Empty states informativos
 - Error handling robusto
 - Success states con datos ricos
 
 **🎯 Configuración Flexible:**
+
 ```typescript
 <EntityList
   title='Ejercicios del Día'
@@ -267,29 +270,35 @@ El proyecto implementa un **patrón arquitectónico unificado** para la gestión
 #### Componentes Implementados
 
 **👥 Gestión de Usuarios (9 componentes):**
+
 - UserList, EmployeeUserList, FitUserList, UserTypeList
 - OtpList, PermissionList, LogUninstallList, EmployeeTypeList
 - EmployeeRegisterDailyList
 
 **🏋️ Gimnasios y Facilities (12 componentes):**
+
 - GymList, BranchList, GymTypeList, GymImageList, GymPlanSelectedList
 - MachineList, EquipmentList, MachineCategoryList, ScheduleList
 - CurrentOccupancyList, BranchMediaList, GymPlanSelectedTypeList
 
 **📋 Planes y Rutinas (8 componentes):**
+
 - PlanList, PlanTypeList, RoutineTemplateList, RoutineDayList
 - RoutineAssignedList, ExerciseList, DailyExerciseList, DailyExerciseHistoryList
 
 **💬 Social y Contenido (6 componentes):**
+
 - FeedList, PostList, CommentList, LikeList
 - NotificationList, NotificationOptionList
 
 **💰 Administración (10 componentes):**
+
 - BillList, PaymentMethodList, AccessMethodTypeList, ModuleList
 - SubModuleList, DietList, PhysicalAssessmentList, UninstallOptionList
 - SignalRList, JourneyEmployeeList
 
 **📊 Historial y Analytics (2 componentes):**
+
 - DailyHistoryList, LogUninstallList
 
 #### Beneficios Arquitectónicos
@@ -299,7 +308,7 @@ El proyecto implementa un **patrón arquitectónico unificado** para la gestión
 ✅ **Escalabilidad**: Fácil agregar nuevos componentes  
 ✅ **Testabilidad**: Patrón predecible para testing  
 ✅ **Performance**: Optimizado con lazy loading  
-✅ **Accesibilidad**: Soporte uniforme para a11y  
+✅ **Accesibilidad**: Soporte uniforme para a11y
 
 ---
 
@@ -521,29 +530,35 @@ npx eas build --platform all
 #### Componentes Refactorizados con EntityList
 
 **Gestión de Usuarios y Autenticación:**
+
 - UserList, EmployeeUserList, FitUserList, UserTypeList
 - OtpList, PermissionList, LogUninstallList
 
 **Gestión de Gimnasios y Facilities:**
+
 - GymList, BranchList, GymTypeList, GymImageList
 - MachineList, EquipmentList, MachineCategoryList
 - CurrentOccupancyList, ScheduleList
 
 **Sistema de Planes y Rutinas:**
+
 - PlanList, PlanTypeList, GymPlanSelectedList, GymPlanSelectedTypeList
 - RoutineTemplateList, RoutineDayList, RoutineAssignedList
 - ExerciseList, DailyExerciseList, DailyExerciseHistoryList
 
 **Social y Contenido:**
+
 - FeedList, PostList, CommentList, LikeList
 - NotificationList, NotificationOptionList
 
 **Administración y Catálogos:**
+
 - BillList, PaymentMethodList, AccessMethodTypeList
 - ModuleList, SubModuleList, EmployeeTypeList
 - DietList, PhysicalAssessmentList
 
 **Historial y Tracking:**
+
 - DailyHistoryList, JourneyEmployeeList
 - EmployeeRegisterDailyList, UninstallOptionList
 

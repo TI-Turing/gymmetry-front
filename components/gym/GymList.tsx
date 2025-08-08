@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { gymService } from '@/services';
 
-export function GymList() {
+const GymList = React.memo(() => {
   const loadGyms = useCallback(async () => {
     const response = await gymService.getAllGyms();
     return response.Data || [];
   }, []);
+
+GymList.displayName = 'GymList';
+
+
 
   const renderGymItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,11 +27,11 @@ export function GymList() {
             {item.isActive ? 'Abierto' : 'Cerrado'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.addressSection}>
           <Text style={styles.address}>
             📍 {item.address || item.fullAddress || 'Dirección no disponible'}
@@ -36,41 +40,43 @@ export function GymList() {
             {item.city || ''} {item.state || ''} {item.zipCode || ''}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Teléfono:</Text>
-          <Text style={styles.value}>{item.phone || item.phoneNumber || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.phone || item.phoneNumber || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Email:</Text>
           <Text style={styles.value}>{item.email || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad:</Text>
           <Text style={styles.value}>
             {item.currentOccupancy || 0} / {item.maxCapacity || 0} personas
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Horarios:</Text>
           <Text style={styles.value}>
             {item.openTime || '06:00'} - {item.closeTime || '22:00'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Servicios:</Text>
           <Text style={styles.value}>{item.serviceCount || 0} disponibles</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Miembros:</Text>
           <Text style={styles.value}>{item.memberCount || 0} activos</Text>
         </View>
-        
+
         {item.rating && (
           <View style={styles.ratingSection}>
             <Text style={styles.rating}>

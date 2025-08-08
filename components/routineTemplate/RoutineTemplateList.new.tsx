@@ -8,7 +8,8 @@ import { routineTemplateFunctionsService } from '@/services/functions';
 
 export function RoutineTemplateList() {
   const loadRoutineTemplates = useCallback(async () => {
-    const response = await routineTemplateFunctionsService.getAllRoutineTemplates();
+    const response =
+      await routineTemplateFunctionsService.getAllRoutineTemplates();
     return response.Data || [];
   }, []);
 
@@ -23,31 +24,29 @@ export function RoutineTemplateList() {
             {item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={3}>
             {item.description}
           </Text>
         )}
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>
-            {item.exerciseCount || '0'}
-          </Text>
+          <Text style={styles.value}>{item.exerciseCount || '0'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration || 'N/A'} min
-          </Text>
+          <Text style={styles.value}>{item.duration || 'N/A'} min</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Creada:</Text>
           <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
       </View>

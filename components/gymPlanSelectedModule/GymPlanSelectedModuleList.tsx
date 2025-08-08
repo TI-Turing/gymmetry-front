@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function GymPlanSelectedModuleList() {
+const GymPlanSelectedModuleList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadGymPlanSelectedModules = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+GymPlanSelectedModuleList.displayName = 'GymPlanSelectedModuleList';
+
+
 
   const renderGymPlanSelectedModuleItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,73 +33,73 @@ export function GymPlanSelectedModuleList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Módulo seleccionado del plan de gimnasio'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Plan:</Text>
           <Text style={styles.value}>{item.planName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
           <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Módulo:</Text>
           <Text style={styles.value}>{item.moduleName || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
           <Text style={styles.value}>{item.category || 'General'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
           <Text style={styles.value}>
             {item.price ? `$${item.price.toFixed(2)}` : 'Incluido'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha inclusión:</Text>
           <Text style={styles.value}>
-            {item.addedAt 
-              ? new Date(item.addedAt).toLocaleDateString() 
-              : 'N/A'}
+            {item.addedAt ? new Date(item.addedAt).toLocaleDateString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Configurado por:</Text>
           <Text style={styles.value}>{item.configuredBy || 'Sistema'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Límite uso:</Text>
           <Text style={styles.value}>
             {item.usageLimit ? `${item.usageLimit} usos` : 'Ilimitado'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usos actuales:</Text>
           <Text style={styles.value}>{item.currentUsage || '0'}</Text>
         </View>
-        
+
         {item.features && Array.isArray(item.features) && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características incluidas:</Text>
             <View style={styles.featuresList}>
-              {item.features.slice(0, 2).map((feature: string, index: number) => (
-                <Text key={index} style={styles.feature}>
-                  • {feature}
-                </Text>
-              ))}
+              {item.features
+                .slice(0, 2)
+                .map((feature: string, index: number) => (
+                  <Text key={index} style={styles.feature}>
+                    • {feature}
+                  </Text>
+                ))}
               {item.features.length > 2 && (
                 <Text style={styles.moreFeatures}>
                   +{item.features.length - 2} más...
@@ -107,10 +114,10 @@ export function GymPlanSelectedModuleList() {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => 
-      item.id || 
-      item.selectionId || 
-      `${item.planId}-${item.moduleId}` || 
+    (item: any) =>
+      item.id ||
+      item.selectionId ||
+      `${item.planId}-${item.moduleId}` ||
       String(Math.random()),
     []
   );

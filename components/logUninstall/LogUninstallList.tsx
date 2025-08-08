@@ -5,105 +5,136 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function LogUninstallList() {
+const LogUninstallList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadLogUninstalls = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+LogUninstallList.displayName = 'LogUninstallList';
+
+
 
   const renderLogUninstallItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            Desinstalación #{item.id || 'N/A'}
-          </Text>
+          <Text style={styles.title}>Desinstalación #{item.id || 'N/A'}</Text>
           <Text style={styles.statusText}>
-            {item.status === 'completed' ? 'Completado' :
-             item.status === 'failed' ? 'Fallido' : 'En proceso'}
+            {item.status === 'completed'
+              ? 'Completado'
+              : item.status === 'failed'
+                ? 'Fallido'
+                : 'En proceso'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.reason || 'Registro de desinstalación de la aplicación'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
-          <Text style={styles.value}>{item.userName || item.userId || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.userName || item.userId || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Dispositivo:</Text>
           <Text style={styles.value}>
-            {item.device === 'android' ? '🤖 Android' :
-             item.device === 'ios' ? '🍎 iOS' :
-             item.device === 'web' ? '🌐 Web' : item.device || 'Desconocido'}
+            {item.device === 'android'
+              ? '🤖 Android'
+              : item.device === 'ios'
+                ? '🍎 iOS'
+                : item.device === 'web'
+                  ? '🌐 Web'
+                  : item.device || 'Desconocido'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Versión app:</Text>
           <Text style={styles.value}>{item.appVersion || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.uninstallDate || item.createdAt 
-              ? new Date(item.uninstallDate || item.createdAt).toLocaleString() 
+            {item.uninstallDate || item.createdAt
+              ? new Date(item.uninstallDate || item.createdAt).toLocaleString()
               : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Motivo principal:</Text>
           <Text style={styles.value}>
-            {item.primaryReason === 'bugs' ? '🐛 Errores/Bugs' :
-             item.primaryReason === 'performance' ? '⚡ Rendimiento' :
-             item.primaryReason === 'features' ? '🔧 Faltan funciones' :
-             item.primaryReason === 'design' ? '🎨 Diseño' :
-             item.primaryReason === 'price' ? '💰 Precio' :
-             item.primaryReason === 'competitor' ? '🏆 Competencia' :
-             item.primaryReason || 'Otro'}
+            {item.primaryReason === 'bugs'
+              ? '🐛 Errores/Bugs'
+              : item.primaryReason === 'performance'
+                ? '⚡ Rendimiento'
+                : item.primaryReason === 'features'
+                  ? '🔧 Faltan funciones'
+                  : item.primaryReason === 'design'
+                    ? '🎨 Diseño'
+                    : item.primaryReason === 'price'
+                      ? '💰 Precio'
+                      : item.primaryReason === 'competitor'
+                        ? '🏆 Competencia'
+                        : item.primaryReason || 'Otro'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tiempo de uso:</Text>
           <Text style={styles.value}>
-            {item.usageDays 
-              ? `${item.usageDays} días` 
-              : item.usageHours 
-                ? `${item.usageHours} horas` 
+            {item.usageDays
+              ? `${item.usageDays} días`
+              : item.usageHours
+                ? `${item.usageHours} horas`
                 : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Valoración:</Text>
-          <Text style={[styles.value, {
-            color: item.rating >= 4 ? '#4caf50' :
-                  item.rating >= 2 ? '#ffa726' : '#ff6b6b'
-          }]}>
-            {item.rating ? `${'⭐'.repeat(item.rating)} (${item.rating}/5)` : 'Sin valorar'}
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.rating >= 4
+                    ? '#4caf50'
+                    : item.rating >= 2
+                      ? '#ffa726'
+                      : '#ff6b6b',
+              },
+            ]}
+          >
+            {item.rating
+              ? `${'⭐'.repeat(item.rating)} (${item.rating}/5)`
+              : 'Sin valorar'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Plataforma:</Text>
           <Text style={styles.value}>{item.platform || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>IP origen:</Text>
           <Text style={styles.value}>{item.ipAddress || 'N/A'}</Text>
         </View>
-        
+
         {item.feedback && (
           <View style={styles.feedbackSection}>
             <Text style={styles.feedbackLabel}>Comentarios:</Text>
@@ -112,7 +143,7 @@ export function LogUninstallList() {
             </Text>
           </View>
         )}
-        
+
         {item.suggestions && (
           <View style={styles.suggestionsSection}>
             <Text style={styles.suggestionsLabel}>Sugerencias:</Text>

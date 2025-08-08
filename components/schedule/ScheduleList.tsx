@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function ScheduleList() {
+const ScheduleList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadSchedules = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+ScheduleList.displayName = 'ScheduleList';
+
+
 
   const renderScheduleItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,78 +33,78 @@ export function ScheduleList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Horario de actividades'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Día:</Text>
           <Text style={styles.value}>{item.dayOfWeek || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Hora inicio:</Text>
-          <Text style={styles.value}>
-            {item.startTime || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{item.startTime || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Hora fin:</Text>
-          <Text style={styles.value}>
-            {item.endTime || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{item.endTime || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
           <Text style={styles.value}>
             {item.duration ? `${item.duration} min` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Actividad:</Text>
           <Text style={styles.value}>
             {item.activity || item.className || 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Instructor:</Text>
           <Text style={styles.value}>
             {item.instructor || item.trainerName || 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Sala:</Text>
           <Text style={styles.value}>{item.room || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad:</Text>
-          <Text style={[styles.value, {
-            color: item.currentParticipants >= item.maxCapacity 
-              ? '#ff6b6b' 
-              : Colors.light.text
-          }]}>
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.currentParticipants >= item.maxCapacity
+                    ? '#ff6b6b'
+                    : Colors.light.text,
+              },
+            ]}
+          >
             {item.currentParticipants || 0} / {item.maxCapacity || 0}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
           <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
         </View>
-        
+
         {item.requirements && (
           <View style={styles.requirementsSection}>
             <Text style={styles.requirementsLabel}>Requisitos:</Text>
-            <Text style={styles.requirements}>
-              {item.requirements}
-            </Text>
+            <Text style={styles.requirements}>{item.requirements}</Text>
           </View>
         )}
       </View>

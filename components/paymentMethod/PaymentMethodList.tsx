@@ -6,11 +6,15 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { paymentMethodService } from '@/services';
 
-export function PaymentMethodList() {
+const PaymentMethodList = React.memo(() => {
   const loadPaymentMethods = useCallback(async () => {
     const response = await paymentMethodService.getAllPaymentMethods();
     return response.Data || [];
   }, []);
+
+PaymentMethodList.displayName = 'PaymentMethodList';
+
+
 
   const renderPaymentMethodItem = useCallback(
     ({ item }: { item: any }) => (
@@ -23,38 +27,44 @@ export function PaymentMethodList() {
             {item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.description || 'Sin descripción disponible'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
-          <Text style={styles.value}>{item.type || item.paymentType || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.type || item.paymentType || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Proveedor:</Text>
-          <Text style={styles.value}>{item.provider || item.gateway || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {item.provider || item.gateway || 'N/A'}
+          </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Comisión:</Text>
           <Text style={styles.value}>{item.fee || 0}% por transacción</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Monedas:</Text>
           <Text style={styles.value}>
             {item.supportedCurrencies?.join(', ') || item.currency || 'USD'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Transacciones:</Text>
-          <Text style={styles.value}>{item.transactionCount || 0} procesadas</Text>
+          <Text style={styles.value}>
+            {item.transactionCount || 0} procesadas
+          </Text>
         </View>
-        
+
         {item.minAmount && (
           <View style={styles.row}>
             <Text style={styles.label}>Monto mínimo:</Text>

@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function NotificationList() {
+const NotificationList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadNotifications = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch (_error) {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+NotificationList.displayName = 'NotificationList';
+
+
 
   const renderNotificationItem = useCallback(
     ({ item }: { item: any }) => (
@@ -26,70 +33,68 @@ export function NotificationList() {
             {item.isRead ? 'Leída' : 'Nueva'}
           </Text>
         </View>
-        
+
         <Text style={styles.description}>
           {item.message || item.body || 'Sin mensaje'}
         </Text>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
           <Text style={styles.value}>
             {item.type || item.category || 'General'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Prioridad:</Text>
-          <Text style={[styles.value, {
-            color: item.priority === 'high' 
-              ? '#ff6b6b' 
-              : item.priority === 'medium' 
-                ? '#ffa726' 
-                : Colors.light.text
-          }]}>
-            {item.priority === 'high' 
-              ? 'Alta' 
-              : item.priority === 'medium' 
-                ? 'Media' 
+          <Text
+            style={[
+              styles.value,
+              {
+                color:
+                  item.priority === 'high'
+                    ? '#ff6b6b'
+                    : item.priority === 'medium'
+                      ? '#ffa726'
+                      : Colors.light.text,
+              },
+            ]}
+          >
+            {item.priority === 'high'
+              ? 'Alta'
+              : item.priority === 'medium'
+                ? 'Media'
                 : 'Baja'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Remitente:</Text>
           <Text style={styles.value}>
             {item.sender || item.from || 'Sistema'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Destinatario:</Text>
-          <Text style={styles.value}>
-            {item.recipient || item.to || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{item.recipient || item.to || 'N/A'}</Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.createdAt 
-              ? new Date(item.createdAt).toLocaleString() 
-              : 'N/A'}
+            {item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Canal:</Text>
-          <Text style={styles.value}>
-            {item.channel || 'App'}
-          </Text>
+          <Text style={styles.value}>{item.channel || 'App'}</Text>
         </View>
-        
+
         {item.actionRequired && (
           <View style={styles.actionSection}>
-            <Text style={styles.actionText}>
-              ⚠️ Acción requerida
-            </Text>
+            <Text style={styles.actionText}>⚠️ Acción requerida</Text>
           </View>
         )}
       </View>

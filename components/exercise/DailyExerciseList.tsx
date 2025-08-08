@@ -5,15 +5,22 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
-export function DailyExerciseList() {
+const DailyExerciseList = React.memo(() => {
+  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadDailyExercises = useCallback(async () => {
     try {
       // Placeholder for actual service call
-      return [];
-    } catch {
-      return [];
+
+      const result = await servicePlaceholder();
+
+      return result || [];
+    } catch (error) {return [];
     }
   }, []);
+
+DailyExerciseList.displayName = 'DailyExerciseList';
+
+
 
   const renderDailyExerciseItem = useCallback(
     ({ item }: { item: any }) => (
@@ -100,7 +107,8 @@ export function DailyExerciseList() {
             style={[
               styles.value,
               {
-                color: item.currentSets === item.targetSets ? '#4caf50' : '#ffa726',
+                color:
+                  item.currentSets === item.targetSets ? '#4caf50' : '#ffa726',
               },
             ]}
           >
