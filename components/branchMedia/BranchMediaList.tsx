@@ -19,32 +19,32 @@ export function BranchMediaList() {
           <Text style={styles.title}>
             {item.title || `Media ${item.id?.slice(0, 8)}`}
           </Text>
-          <Text style={styles.statusText}>
-            {item.type || 'Imagen'}
-          </Text>
+          <Text style={styles.statusText}>{item.type || 'Imagen'}</Text>
         </View>
-        
+
         <Text style={styles.branch}>
           Sucursal: {item.branchName || item.branchId || 'N/A'}
         </Text>
-        
+
         {item.description && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
         )}
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Tamaño:</Text>
           <Text style={styles.value}>
             {item.size ? `${(item.size / 1024).toFixed(2)} KB` : 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.row}>
           <Text style={styles.label}>Subido:</Text>
           <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
+            {item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
       </View>
