@@ -16,6 +16,7 @@ export { branchMediaService } from './branchMediaService';
 export { planService } from './planService';
 export { planTypeService } from './planTypeService';
 export { gymPlanService } from './gymPlanService';
+export * as functionServices from './functions';
 
 // Auto-importar el watcher para que se active globalmente
 export { gymDataWatcher } from './gymDataWatcher';

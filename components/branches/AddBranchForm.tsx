@@ -105,7 +105,7 @@ export default function AddBranchForm({
       const response = await BranchService.createBranch(createRequest);
 
       if (response.Success) {
-        setBranchId(response.Data);
+        setBranchId(response.Data || '');
         setCurrentStep(2);
         Alert.alert('Éxito', 'Sede creada correctamente');
       } else {

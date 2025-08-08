@@ -67,12 +67,13 @@ export default function GymAdminDropdown({
 
       if (response.Success) {
         //TODO: filtrar por empleados del gym.
-        setEmployees(response.Data);
+        const items = response.Data || [];
+        setEmployees(items);
 
         // Si solo hay un empleado, seleccionarlo automáticamente y deshabilitar
-        if (response.Data.length === 1) {
-          onValueChange(response.Data[0].id);
-        } else if (!value && response.Data.length > 0) {
+        if (items.length === 1) {
+          onValueChange(items[0].id);
+        } else if (!value && items.length > 0) {
           // Si hay múltiples empleados y no hay valor seleccionado, no seleccionar automáticamente
         }
       } else {

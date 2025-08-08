@@ -48,7 +48,7 @@ export default function AccessMethodDropdown({
       const response = await BranchService.getAccessMethodTypes();
 
       if (response.Success) {
-        setAccessMethods(response.Data);
+        setAccessMethods(response.Data || []);
         // No seleccionar automáticamente el primer método
       } else {
         setError(response.Message || 'Error al cargar métodos de acceso');

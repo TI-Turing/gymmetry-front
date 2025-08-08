@@ -1,7 +1,7 @@
 import type { GymCompleteData as TGymCompleteData } from '@/dto/gym/GymCompleteData';
 
 // Re-export de tipos de dominio (DTOs)
-export type { BackendApiResponse } from '@/dto/gym/BackendApiResponse';
+export type { ApiResponse } from '@/dto/common/ApiResponse';
 export type { Gym } from '@/dto/gym/Gym';
 export type { GymType } from '@/dto/gym/GymType';
 export type { GymStep1Data } from '@/dto/gym/GymStep1Data';

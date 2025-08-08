@@ -3,7 +3,6 @@ import { apiService, ApiResponse } from './apiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GymStep1Data } from '../dto/gym/GymStep1Data';
 import { GymCompleteData } from '../dto/gym/GymCompleteData';
-import { BackendApiResponse } from '../dto/gym/BackendApiResponse';
 import { GymType } from '../dto/gym/GymType';
 import { Gym } from '../dto/gym/Gym';
 import {
@@ -31,16 +30,11 @@ const GYM_DATA_KEY = '@gym_data';
 export class GymService {
   private static cachedGym: CachedGymData | null = null;
 
-  // Helper para transformar respuesta del apiService a formato del backend C#
+  // Helper passthrough (apiService ya devuelve ApiResponse<T> con la forma del backend)
   private static transformResponse<T>(
     apiResponse: ApiResponse<T>
-  ): BackendApiResponse<T> {
-    return {
-      Success: apiResponse.Success,
-      Message: apiResponse.Message || '',
-      Data: apiResponse.Data,
-      StatusCode: 200, // El apiService no retorna StatusCode, asumimos 200 si es exitoso
-    };
+  ): ApiResponse<T> {
+    return apiResponse;
   }
 
   // Paso 1: Registrar gimnasio inicial
@@ -87,16 +81,7 @@ export class GymService {
   // Obtener información de un gimnasio por ID
   static async getGymById(gymId: string): Promise<GymGetResponse> {
     const response = await apiService.get<any>(`/gym/${gymId}`);
-    const backendResponse = response.Data;
-
-    const transformedResponse: GymGetResponse = {
-      Success: backendResponse?.Success || false,
-      Message: backendResponse?.Message || '',
-      Data: backendResponse?.Data || null,
-      StatusCode: backendResponse?.StatusCode || 200,
-    };
-
-    return transformedResponse;
+    return response;
   }
 
   // Método helper para actualizar paso específico

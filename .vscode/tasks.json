@@ -1,14 +1,52 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "start-expo",
-      "type": "shell",
-      "command": "npm",
-      "args": ["start"],
-      "group": "build",
-      "isBackground": true,
-      "problemMatcher": []
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "start-expo",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"start"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "typecheck",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"type-check"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "type-check",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"type-check"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "type-check",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"type-check"
+			],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
 }

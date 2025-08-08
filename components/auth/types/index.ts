@@ -103,12 +103,8 @@ export interface Step5Data {
   profileImage?: string;
 }
 
-export interface ApiResponse<T = any> {
-  Success: boolean;
-  Message?: string;
-  Data?: T;
-  StatusCode?: number;
-}
+// Unificar ApiResponse con la versión global en dto/common
+export type { ApiResponse } from '@/dto/common/ApiResponse';
 
 // Interfaces para validación de nombre de usuario
 export interface UsernameCheckRequest {

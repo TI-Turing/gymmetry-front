@@ -82,7 +82,7 @@ export default function GymSearchModal({
       const response = await gymServiceExtensions.findGymsByName(name);
 
       if (response.Success) {
-        setGyms(response.Data);
+        setGyms(response.Data || []);
       } else {
         setError(response.Message || 'Error al buscar gimnasios');
         setGyms([]);

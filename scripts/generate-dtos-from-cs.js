@@ -10,7 +10,8 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC_DIR = path.resolve(__dirname, '..', 'Dto - Base');
-const OUT_DIR = path.resolve(__dirname, '..', 'dto', '_generated');
+// Output directamente en la carpeta dto (sin _generated), como se definió en la estandarización
+const OUT_DIR = path.resolve(__dirname, '..', 'dto');
 
 if (!fs.existsSync(SRC_DIR)) {
   console.error(`Source folder not found: ${SRC_DIR}`);
@@ -20,7 +21,11 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
 
 /** @type {Record<string, string>} */
 const typeMap = {
-  string: 'string',
+  const SRC_DIRS = [
+    path.resolve(__dirname, '..', 'Dto - Base'),
+    path.resolve(__dirname, '..', 'DTO - Base'),
+  ].filter((p) => fs.existsSync(p));
+  const entries = SRC_DIRS.flatMap(SRC_DIR => fs.readdirSync(SRC_DIR, { withFileTypes: true }));
   String: 'string',
   int: 'number',
   long: 'number',
@@ -73,16 +78,62 @@ function mapCSTypeToTS(csType) {
   return isNullable ? `${tsBasic} | null` : tsBasic;
 }
 
+/**
+ * Busca una carpeta existente en OUT_DIR que coincida (case-insensitive) con entityName
+ * para reutilizar su casing físico y evitar crear duplicados en Windows.
+ * Si no existe, devuelve el nombre original de la entidad para crearla tal cual.
+ */
+function resolveExistingEntityDirName(baseDir, entityName) {
+  try {
+    const entries = fs
+      .readdirSync(baseDir, { withFileTypes: true })
+      .filter(d => d.isDirectory())
+      .map(d => d.name);
+    const found = entries.find(
+      n => n.toLowerCase() === entityName.toLowerCase()
+    );
+    return found || entityName;
+  } catch {
+    return entityName;
+  }
+}
+
+/** Prefer nullable type when two types conflict (e.g., 'string' vs 'string | null') */
+function pickPreferredType(a, b) {
+  if (a === b) return a;
+  const aNullable = /\|\s*null\b/.test(a);
+  const bNullable = /\|\s*null\b/.test(b);
+  if (aNullable && !bNullable) return a;
+  if (!aNullable && bNullable) return b;
+  // fallback: keep first
+  return a;
+}
+
 function parseProperties(content) {
+  /** @type {Array<{name:string, tsType:string}>} */
   const props = [];
-  const propRegex = /public\s+(?:virtual\s+)?([\w<>?,\[\]]+)\s+(\w+)\s*\{\s*get;\s*set;\s*\}/g;
+  const propRegex =
+    /public\s+(?:virtual\s+)?([\w<>?,\[\]]+)\s+(\w+)\s*\{\s*get;\s*set;\s*\}/g;
   let m;
   while ((m = propRegex.exec(content)) !== null) {
     const [, csTypeRaw, name] = m;
     const tsType = mapCSTypeToTS(csTypeRaw);
     props.push({ name, tsType });
   }
-  return props;
+  // De-duplicate by property name, preferring nullable types when conflicts occur
+  const map = new Map();
+  for (const p of props) {
+    if (map.has(p.name)) {
+      const prev = map.get(p.name);
+      map.set(p.name, {
+        name: p.name,
+        tsType: pickPreferredType(prev.tsType, p.tsType),
+      });
+    } else {
+      map.set(p.name, p);
+    }
+  }
+  return Array.from(map.values());
 }
 
 function generateInterface(name, props) {
@@ -106,6 +157,10 @@ function processCsFile(inFile, outDir) {
   const classMatch = content.match(/class\s+(\w+)/);
   if (!classMatch) return null;
   const name = classMatch[1];
+  // Never overwrite our unified ApiResponse definition
+  if (name === 'ApiResponse' && outDir.includes(path.join('dto', 'common'))) {
+    return null;
+  }
   const props = parseProperties(content);
   const ts = generateInterface(name, props);
   const outFile = path.join(outDir, `${name}.ts`);
@@ -133,12 +188,13 @@ function generate() {
     const entityDir = path.join(SRC_DIR, entityName);
     const reqDir = path.join(entityDir, 'Request');
     const resDir = path.join(entityDir, 'Response');
+    const outEntityDirName = resolveExistingEntityDirName(OUT_DIR, entityName);
 
     if (fs.existsSync(reqDir)) {
       const files = fs.readdirSync(reqDir).filter(n => n.endsWith('.cs'));
       for (const f of files) {
         const inFile = path.join(reqDir, f);
-        const outDir = path.join(OUT_DIR, entityName, 'Request');
+        const outDir = path.join(OUT_DIR, outEntityDirName, 'Request');
         if (processCsFile(inFile, outDir)) count++;
       }
     }
@@ -146,32 +202,13 @@ function generate() {
       const files = fs.readdirSync(resDir).filter(n => n.endsWith('.cs'));
       for (const f of files) {
         const inFile = path.join(resDir, f);
-        const outDir = path.join(OUT_DIR, entityName, 'Response');
+        const outDir = path.join(OUT_DIR, outEntityDirName, 'Response');
         if (processCsFile(inFile, outDir)) count++;
       }
     }
   }
 
-  // Write a root barrel index
-  try {
-    const barrelLines = [];
-    const walk = (dir) => {
-      for (const name of fs.readdirSync(dir)) {
-        const full = path.join(dir, name);
-        const stat = fs.statSync(full);
-        if (stat.isDirectory()) {
-          walk(full);
-        } else if (name.endsWith('.ts')) {
-          const rel = path.relative(OUT_DIR, full).replace(/\\/g, '/');
-          barrelLines.push(`export * from './${rel.replace(/\.ts$/, '')}';`);
-        }
-      }
-    };
-    walk(OUT_DIR);
-    writeFileEnsured(path.join(OUT_DIR, 'index.ts'), barrelLines.sort().join('\n') + '\n');
-  } catch (e) {
-    console.error('Failed to write barrel index:', e);
-  }
+  // Ya no generamos barrel automáticamente para no pisar el índice curado a mano
 
   console.log(`Generated ${count} DTO interfaces into ${OUT_DIR}`);
 }

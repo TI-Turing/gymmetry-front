@@ -1,6 +1,6 @@
-import { BackendApiResponse } from './BackendApiResponse';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import { Gym } from './Gym';
 
-export type GymRegistrationResponse = BackendApiResponse<string>;
-export type GymUpdateResponse = BackendApiResponse<any>;
-export type GymGetResponse = BackendApiResponse<Gym>;
+export type GymRegistrationResponse = ApiResponse<string>;
+export type GymUpdateResponse = ApiResponse<any>;
+export type GymGetResponse = ApiResponse<Gym>;

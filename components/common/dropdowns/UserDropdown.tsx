@@ -51,12 +51,13 @@ export default function UserDropdown({
 
       if (response.Success) {
         //TODO: filtrar por empleados del gym.
-        setUsers(response.Data);
+        const items = response.Data || [];
+        setUsers(items);
 
         // Si solo hay un usuario, seleccionarlo automáticamente y deshabilitar
-        if (response.Data.length === 1) {
-          onValueChange(response.Data[0].id);
-        } else if (!value && response.Data.length > 0) {
+        if (items.length === 1) {
+          onValueChange(items[0].id);
+        } else if (!value && items.length > 0) {
           // Si hay múltiples usuarios y no hay valor seleccionado, no seleccionar automáticamente
         }
       } else {

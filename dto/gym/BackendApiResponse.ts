@@ -1,6 +1,2 @@
-export interface BackendApiResponse<T> {
-  Success: boolean;
-  Message: string;
-  Data: T | null;
-  StatusCode: number;
-}
+// Deprecated: use ApiResponse from '@/dto/common/ApiResponse' instead
+export {};

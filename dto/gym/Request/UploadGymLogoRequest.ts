@@ -5,5 +5,4 @@ export interface UploadGymLogoRequest {
   FileName: string | null;
   ContentType: string | null;
   UserId: string;
-  Image: any[];
 }

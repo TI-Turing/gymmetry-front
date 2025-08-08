@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { Environment } from '../environment';
-import type { ApiResponse } from '@/dto/common/ApiResponse';
+import type { ApiResponse as BackendApiResponse } from '@/dto/common/ApiResponse';
 
 export interface RequestOptions {
   headers?: Record<string, string>;
@@ -47,13 +47,16 @@ class ApiService {
 
         const fullUrl = `${config.baseURL}${config.url}`;
 
-        const curlCommand = generateCurlCommand(
-          (config.method?.toUpperCase() as HttpMethod) || 'GET',
-          fullUrl,
-          config.headers,
-          config.data
-        );
-        console.log('📋 CURL del request:', curlCommand);
+        if (Environment.DEBUG) {
+          const curlCommand = generateCurlCommand(
+            (config.method?.toUpperCase() as HttpMethod) || 'GET',
+            fullUrl,
+            config.headers,
+            config.data
+          );
+          // eslint-disable-next-line no-console
+          console.log('📋 CURL del request:', curlCommand);
+        }
         return config;
       },
       error => {
@@ -241,12 +244,15 @@ class ApiService {
   async get<T>(
     endpoint: string,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BackendApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.get<ApiResponse<T>>(endpoint, {
-        headers: options?.headers,
-        timeout: options?.timeout,
-      });
+      const response = await this.axiosInstance.get<BackendApiResponse<T>>(
+        endpoint,
+        {
+          headers: options?.headers,
+          timeout: options?.timeout,
+        }
+      );
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
@@ -263,9 +269,9 @@ class ApiService {
     endpoint: string,
     body: any,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BackendApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.post<ApiResponse<T>>(
+      const response = await this.axiosInstance.post<BackendApiResponse<T>>(
         endpoint,
         body,
         {
@@ -289,9 +295,9 @@ class ApiService {
     endpoint: string,
     body: any,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BackendApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.put<ApiResponse<T>>(
+      const response = await this.axiosInstance.put<BackendApiResponse<T>>(
         endpoint,
         body,
         {
@@ -315,9 +321,9 @@ class ApiService {
     endpoint: string,
     body: any,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BackendApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.patch<ApiResponse<T>>(
+      const response = await this.axiosInstance.patch<BackendApiResponse<T>>(
         endpoint,
         body,
         {
@@ -340,9 +346,9 @@ class ApiService {
   async delete<T>(
     endpoint: string,
     options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
+  ): Promise<BackendApiResponse<T>> {
     try {
-      const response = await this.axiosInstance.delete<ApiResponse<T>>(
+      const response = await this.axiosInstance.delete<BackendApiResponse<T>>(
         endpoint,
         {
           headers: options?.headers,
@@ -383,3 +389,6 @@ export const apiService = new ApiService();
 
 // Exportar la clase para casos específicos donde se necesite múltiples instancias
 export default ApiService;
+
+// Re-export del tipo para mantener compatibilidad con importaciones existentes en servicios
+export type ApiResponse<T = any> = BackendApiResponse<T>;

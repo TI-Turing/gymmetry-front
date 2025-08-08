@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService, ApiResponse } from './apiService';
+import { Environment } from '@/environment';
 import {
   LoginRequest,
   LoginResponseData,
@@ -48,20 +49,27 @@ class AuthService {
         '/auth/login',
         credentials
       );
-      console.log('🔐 Respuesta de login:', response.Success);
+      if (Environment.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log('🔐 Respuesta de login:', response.Success);
+      }
       if (response.Success) {
-        // Guardar token y datos del usuario
-        this.token = response.Data.Token;
-        this.refreshToken = response.Data.RefreshToken;
-        this.tokenExpiration = new Date(response.Data.TokenExpiration);
-        this.refreshTokenExpiration = new Date(
-          response.Data.RefreshTokenExpiration
-        );
-        const user = response.Data.User;
+        // Guardar token y datos del usuario (solo si hay Data)
+        if (!response.Data) {
+          return response; // sin datos, devolver tal cual para manejo en UI
+        }
+
+        // Narrowing tras null-check
+        const data = response.Data;
+        this.token = data.Token;
+        this.refreshToken = data.RefreshToken;
+        this.tokenExpiration = new Date(data.TokenExpiration);
+        this.refreshTokenExpiration = new Date(data.RefreshTokenExpiration);
+        const user = data.User;
         this.userData = {
-          userId: response.Data.UserId,
-          userName: response.Data.UserName || user.UserName || '',
-          email: response.Data.Email,
+          userId: data.UserId,
+          userName: data.UserName || user.UserName || '',
+          email: data.Email,
           planId: user.PlanId,
           gymId: user.GymId,
         };
@@ -96,8 +104,10 @@ class AuthService {
           }
         }
 
-        // Configurar token en el servicio API
-        apiService.setAuthToken(this.token);
+        // Configurar token en el servicio API (solo si existe)
+        if (this.token) {
+          apiService.setAuthToken(this.token);
+        }
 
         // Consultar información del gym si existe (ahora delegado al GymService)
         if (this.userData.gymId) {
@@ -120,7 +130,10 @@ class AuthService {
         return response;
       }
     } catch (error) {
-      console.log('❌ Error en login:', error);
+      if (Environment.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log('❌ Error en login:', error);
+      }
       throw error;
     }
   }
@@ -224,14 +237,23 @@ class AuthService {
         // Verificar si el token necesita ser refrescado
         if (this.tokenExpiration <= new Date()) {
           // Token expirado, intentar refrescar
-          console.log('🔄 Token expirado, intentando refresh...');
+          if (Environment.DEBUG) {
+            // eslint-disable-next-line no-console
+            console.log('🔄 Token expirado, intentando refresh...');
+          }
           const refreshed = await this.refreshAuthToken();
           if (!refreshed) {
-            console.log('❌ Refresh falló, cerrando sesión');
+            if (Environment.DEBUG) {
+              // eslint-disable-next-line no-console
+              console.log('❌ Refresh falló, cerrando sesión');
+            }
             await this.logout();
             return false;
           }
-          console.log('✅ Token refrescado exitosamente');
+          if (Environment.DEBUG) {
+            // eslint-disable-next-line no-console
+            console.log('✅ Token refrescado exitosamente');
+          }
         }
 
         return true;
@@ -315,11 +337,17 @@ class AuthService {
   async refreshAuthToken(): Promise<boolean> {
     try {
       if (!this.token || !this.refreshToken) {
-        console.log('❌ Refresh falló: No hay token o refresh token');
+        if (Environment.DEBUG) {
+          // eslint-disable-next-line no-console
+          console.log('❌ Refresh falló: No hay token o refresh token');
+        }
         return false;
       }
 
-      console.log('🔄 Intentando refresh token...');
+      if (Environment.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log('🔄 Intentando refresh token...');
+      }
 
       const response = await apiService.post<RefreshTokenResponseData>(
         '/auth/refresh-token',
@@ -330,7 +358,10 @@ class AuthService {
       );
 
       if (response.Success && response.Data?.NewToken) {
-        console.log('✅ Refresh exitoso, actualizando token');
+        if (Environment.DEBUG) {
+          // eslint-disable-next-line no-console
+          console.log('✅ Refresh exitoso, actualizando token');
+        }
 
         // Actualizar el token y su expiración
         this.token = response.Data.NewToken;
@@ -351,13 +382,19 @@ class AuthService {
         return true;
       }
 
-      console.log(
-        '❌ Refresh falló: Respuesta inválida del servidor',
-        response.Data
-      );
+      if (Environment.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log(
+          '❌ Refresh falló: Respuesta inválida del servidor',
+          response.Data
+        );
+      }
       return false;
     } catch (error) {
-      console.log('❌ Error en refresh token:', error);
+      if (Environment.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log('❌ Error en refresh token:', error);
+      }
       // Si falla el refresh, limpiar sesión
       await this.logout();
       return false;
@@ -413,7 +450,10 @@ class AuthService {
 
       return false;
     } catch (error) {
-      console.log('❌ Error refrescando datos del usuario:', error);
+      if (Environment.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log('❌ Error refrescando datos del usuario:', error);
+      }
       return false;
     }
   }

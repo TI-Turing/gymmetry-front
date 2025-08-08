@@ -1,7 +1,8 @@
-// Auto-generated from C# DTO ApiResponse. Do not edit manually.
-export interface ApiResponse {
+// Unified API response envelope used across the app.
+// Keep this generic and do NOT overwrite from generators.
+export interface ApiResponse<T = any> {
   Success: boolean;
   Message: string;
-  Data: any | null;
+  Data: T | null;
   StatusCode: number;
 }
