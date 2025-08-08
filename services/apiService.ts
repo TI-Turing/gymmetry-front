@@ -1,12 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { Environment } from '../environment';
-
-export interface ApiResponse<T = any> {
-  Success: boolean;
-  Message: string;
-  Data: T;
-  StatusCode: number;
-}
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 
 export interface RequestOptions {
   headers?: Record<string, string>;
