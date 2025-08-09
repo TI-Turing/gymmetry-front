@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { logUninstallFunctionsService } from '@/services/functions';
+import { logUninstallService } from '@/services';
 
 export function LogUninstallDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function LogUninstallDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await logUninstallFunctionsService.getLogUninstallById(id);
+      const res = await logUninstallService.getLogUninstallById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

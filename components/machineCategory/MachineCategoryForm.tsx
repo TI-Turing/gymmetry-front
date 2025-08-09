@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { machineCategoryFunctionsService } from '@/services/functions';
+import { machineCategoryService } from '@/services';
 
 export function MachineCategoryForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function MachineCategoryForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await machineCategoryFunctionsService.addMachineCategory(body);
+        await machineCategoryService.addMachineCategory(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function MachineCategoryForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await machineCategoryFunctionsService.updateMachineCategory(body);
+        await machineCategoryService.updateMachineCategory(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function MachineCategoryForm() {
     setMsg(null);
     try {
       const res =
-        await machineCategoryFunctionsService.deleteMachineCategory(id);
+        await machineCategoryService.deleteMachineCategory(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

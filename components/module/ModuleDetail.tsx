@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { moduleFunctionsService } from '@/services/functions';
+import { moduleService } from '@/services';
 
 export function ModuleDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function ModuleDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await moduleFunctionsService.getModuleById(id);
+      const res = await moduleService.getModuleById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

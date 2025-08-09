@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { notificationOptionFunctionsService } from '@/services/functions';
+import { notificationOptionService } from '@/services';
 
 export function NotificationOptionForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function NotificationOptionForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await notificationOptionFunctionsService.addNotificationOption(body);
+        await notificationOptionService.addNotificationOption(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function NotificationOptionForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await notificationOptionFunctionsService.updateNotificationOption(body);
+        await notificationOptionService.updateNotificationOption(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function NotificationOptionForm() {
     setMsg(null);
     try {
       const res =
-        await notificationOptionFunctionsService.deleteNotificationOption(id);
+        await notificationOptionService.deleteNotificationOption(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

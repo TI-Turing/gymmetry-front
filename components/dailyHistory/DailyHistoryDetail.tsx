@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyHistoryFunctionsService } from '@/services/functions';
+import { dailyHistoryService } from '@/services';
 
 export function DailyHistoryDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function DailyHistoryDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await dailyHistoryFunctionsService.getDailyHistoryById(id);
+      const res = await dailyHistoryService.getDailyHistoryById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

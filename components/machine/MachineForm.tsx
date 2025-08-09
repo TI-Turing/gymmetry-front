@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { machineFunctionsService } from '@/services/functions';
+import { machineService } from '@/services';
 
 export function MachineForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function MachineForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await machineFunctionsService.addMachine(body);
+      const res = await machineService.addMachine(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function MachineForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await machineFunctionsService.updateMachine(body);
+      const res = await machineService.updateMachine(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function MachineForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await machineFunctionsService.deleteMachine(id);
+      const res = await machineService.deleteMachine(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { physicalAssessmentFunctionsService } from '@/services/functions';
+import { physicalAssessmentService } from '@/services';
 
 export function PhysicalAssessmentForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function PhysicalAssessmentForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await physicalAssessmentFunctionsService.addPhysicalAssessment(body);
+        await physicalAssessmentService.addPhysicalAssessment(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function PhysicalAssessmentForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await physicalAssessmentFunctionsService.updatePhysicalAssessment(body);
+        await physicalAssessmentService.updatePhysicalAssessment(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function PhysicalAssessmentForm() {
     setMsg(null);
     try {
       const res =
-        await physicalAssessmentFunctionsService.deletePhysicalAssessment(id);
+        await physicalAssessmentService.deletePhysicalAssessment(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { employeeRegisterDailyFunctionsService } from '@/services/functions';
+import { employeeRegisterDailyService } from '@/services';
 
 export function EmployeeRegisterDailyForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function EmployeeRegisterDailyForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await employeeRegisterDailyFunctionsService.addEmployeeRegisterDaily(
+        await employeeRegisterDailyService.addEmployeeRegisterDaily(
           body
         );
       setMsg(res.Message || 'Creado');
@@ -36,7 +36,7 @@ export function EmployeeRegisterDailyForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await employeeRegisterDailyFunctionsService.updateEmployeeRegisterDaily(
+        await employeeRegisterDailyService.updateEmployeeRegisterDaily(
           body
         );
       setMsg(res.Message || 'Actualizado');
@@ -52,7 +52,7 @@ export function EmployeeRegisterDailyForm() {
     setMsg(null);
     try {
       const res =
-        await employeeRegisterDailyFunctionsService.deleteEmployeeRegisterDaily(
+        await employeeRegisterDailyService.deleteEmployeeRegisterDaily(
           id
         );
       setMsg(res.Message || 'Eliminado');

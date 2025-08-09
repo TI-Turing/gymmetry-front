@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyHistoryFunctionsService } from '@/services/functions';
+import { dailyHistoryService } from '@/services';
 
 export function DailyHistoryForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function DailyHistoryForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dailyHistoryFunctionsService.addDailyHistory(body);
+      const res = await dailyHistoryService.addDailyHistory(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function DailyHistoryForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dailyHistoryFunctionsService.updateDailyHistory(body);
+      const res = await dailyHistoryService.updateDailyHistory(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function DailyHistoryForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await dailyHistoryFunctionsService.deleteDailyHistory(id);
+      const res = await dailyHistoryService.deleteDailyHistory(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

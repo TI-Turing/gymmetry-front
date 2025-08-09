@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { employeeRegisterDailyFunctionsService } from '@/services/functions';
+import { employeeRegisterDailyService } from '@/services';
 
 export function EmployeeRegisterDailyDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function EmployeeRegisterDailyDetail() {
     setError(null);
     try {
       const res =
-        await employeeRegisterDailyFunctionsService.getEmployeeRegisterDailyById(
+        await employeeRegisterDailyService.getEmployeeRegisterDailyById(
           id
         );
       setItem(res.Data);

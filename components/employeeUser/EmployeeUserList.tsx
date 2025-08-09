@@ -9,7 +9,7 @@ import { employeeUserService } from '@/services';
 const EmployeeUserList = React.memo(() => {
   const loadEmployeeUsers = useCallback(async () => {
     const response = await employeeUserService.getAllEmployeeUsers();
-    return response || [];
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderEmployeeUserItem = useCallback(

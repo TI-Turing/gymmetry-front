@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { fitUserFunctionsService } from '@/services/functions';
+import { fitUserService } from '@/services';
 
 export function FitUserForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function FitUserForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await fitUserFunctionsService.addFitUser(body);
+      const res = await fitUserService.addFitUser(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function FitUserForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await fitUserFunctionsService.updateFitUser(body);
+      const res = await fitUserService.updateFitUser(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function FitUserForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await fitUserFunctionsService.deleteFitUser(id);
+      const res = await fitUserService.deleteFitUser(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

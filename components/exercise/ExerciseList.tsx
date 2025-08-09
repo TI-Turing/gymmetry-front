@@ -9,7 +9,7 @@ import { exerciseService } from '@/services';
 const ExerciseList = React.memo(() => {
   const loadExercises = useCallback(async () => {
     const response = await exerciseService.getAllExercises();
-    return response || [];
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderExerciseItem = useCallback(

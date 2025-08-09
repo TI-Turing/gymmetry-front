@@ -9,7 +9,7 @@ import { gymImageService } from '@/services';
 const GymImageList = React.memo(() => {
   const loadGymImages = useCallback(async () => {
     const response = await gymImageService.getAllGymImages();
-    return response || [];
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderGymImageItem = useCallback(

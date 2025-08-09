@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { branchMediaFunctionsService } from '@/services/functions';
+import { branchMediaService } from '@/services';
 
 export function BranchMediaForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function BranchMediaForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await branchMediaFunctionsService.addBranchMedia(body);
+      const res = await branchMediaService.addBranchMedia(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function BranchMediaForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await branchMediaFunctionsService.updateBranchMedia(body);
+      const res = await branchMediaService.updateBranchMedia(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function BranchMediaForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await branchMediaFunctionsService.deleteBranchMedia(id);
+      const res = await branchMediaService.deleteBranchMedia(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

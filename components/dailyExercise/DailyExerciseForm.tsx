@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyExerciseFunctionsService } from '@/services/functions';
+import { dailyExerciseService } from '@/services';
 
 export function DailyExerciseForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function DailyExerciseForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dailyExerciseFunctionsService.addDailyExercise(body);
+      const res = await dailyExerciseService.addDailyExercise(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function DailyExerciseForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dailyExerciseFunctionsService.updateDailyExercise(body);
+      const res = await dailyExerciseService.updateDailyExercise(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function DailyExerciseForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await dailyExerciseFunctionsService.deleteDailyExercise(id);
+      const res = await dailyExerciseService.deleteDailyExercise(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

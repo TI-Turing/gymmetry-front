@@ -4,7 +4,7 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { signalRFunctionsService } from '@/services/functions';
+import { signalRService } from '@/services';
 
 export function SignalRList() {
   const loadSignalRItems = useCallback(async () => {

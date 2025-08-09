@@ -9,7 +9,7 @@ import { dietService } from '@/services';
 const DietList = React.memo(() => {
   const loadDiets = useCallback(async () => {
     const response = await dietService.getAllDiets();
-    return response || [];
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderDietItem = useCallback(

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { logUninstallFunctionsService } from '@/services/functions';
+import { logUninstallService } from '@/services';
 
 export function LogUninstallForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function LogUninstallForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await logUninstallFunctionsService.addLogUninstall(body);
+      const res = await logUninstallService.addLogUninstall(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function LogUninstallForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await logUninstallFunctionsService.updateLogUninstall(body);
+      const res = await logUninstallService.updateLogUninstall(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function LogUninstallForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await logUninstallFunctionsService.deleteLogUninstall(id);
+      const res = await logUninstallService.deleteLogUninstall(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

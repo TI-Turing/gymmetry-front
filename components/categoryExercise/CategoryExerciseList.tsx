@@ -4,7 +4,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { categoryExerciseFunctionsService } from '@/services/functions';
+import { categoryExerciseService } from '@/services';
 
 export function CategoryExerciseList() {
   const [items, setItems] = useState<any[]>([]);
@@ -16,7 +16,7 @@ export function CategoryExerciseList() {
     setError(null);
     try {
       const res =
-        await categoryExerciseFunctionsService.getAllCategoryExercises();
+        await categoryExerciseService.getAllCategoryExercises();
       setItems(res.Data || []);
     } catch (_e) {
       setError('Error al cargar');

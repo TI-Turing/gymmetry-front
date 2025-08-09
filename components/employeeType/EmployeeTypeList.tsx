@@ -9,7 +9,7 @@ import { employeeTypeService } from '@/services';
 const EmployeeTypeList = React.memo(() => {
   const loadEmployeeTypes = useCallback(async () => {
     const response = await employeeTypeService.getAllEmployeeTypes();
-    return response || [];
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderEmployeeTypeItem = useCallback(

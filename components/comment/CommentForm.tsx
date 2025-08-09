@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { commentFunctionsService } from '@/services/functions';
+import { commentService } from '@/services';
 
 export function CommentForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function CommentForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await commentFunctionsService.createComment(body);
+      const res = await commentService.createComment(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function CommentForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await commentFunctionsService.updateComment(id, body);
+      const res = await commentService.updateComment(id, body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function CommentForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await commentFunctionsService.deleteComment(id);
+      const res = await commentService.deleteComment(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

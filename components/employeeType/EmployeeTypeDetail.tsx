@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { employeeTypeFunctionsService } from '@/services/functions';
+import { employeeTypeService } from '@/services';
 
 export function EmployeeTypeDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function EmployeeTypeDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await employeeTypeFunctionsService.getEmployeeTypeById(id);
+      const res = await employeeTypeService.getEmployeeTypeById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

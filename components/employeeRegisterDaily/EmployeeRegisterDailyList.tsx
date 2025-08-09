@@ -9,8 +9,8 @@ import { employeeRegisterDailyService } from '@/services';
 const EmployeeRegisterDailyList = React.memo(() => {
   const loadEmployeeRegisters = useCallback(async () => {
     const response =
-      await employeeRegisterDailyService.getAllEmployeeRegisterDaily();
-    return response || [];
+      await employeeRegisterDailyService.getAllEmployeeRegisterDailies();
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderEmployeeRegisterItem = useCallback(

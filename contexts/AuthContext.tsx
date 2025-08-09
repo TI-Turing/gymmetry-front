@@ -6,7 +6,7 @@ interface AuthContextType {
   isLoading: boolean;
   userData: UserData | null;
   user: UserData | null; // Alias para userData
-  login: (userNameOrEmail: string, password: string) => Promise<boolean>;
+  login: (UserNameOrEmail: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const isInitialized = await authService.initializeFromStorage();
       if (isInitialized) {
         setIsAuthenticated(true);
-        setUserData(authService.getUserData());
+        setUserData(await authService.getUserData());
       }
     } catch (_error) {
       // Error al inicializar, mantenemos el estado sin autenticar
@@ -48,15 +48,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = async (
-    userNameOrEmail: string,
+    UserNameOrEmail: string,
     password: string
   ): Promise<boolean> => {
     try {
-      const response = await authService.login({ userNameOrEmail, password });
+      const response = await authService.login({ UserNameOrEmail, Password: password });
 
       if (response.Success) {
         setIsAuthenticated(true);
-        setUserData(authService.getUserData());
+        setUserData(await authService.getUserData());
 
         // Trigger preload después de login exitoso (usando callback para evitar dependencias)
         setTimeout(() => {

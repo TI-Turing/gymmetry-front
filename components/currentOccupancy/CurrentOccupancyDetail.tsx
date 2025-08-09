@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { currentOccupancyFunctionsService } from '@/services/functions';
+import { currentOccupancyService } from '@/services';
 
 export function CurrentOccupancyDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function CurrentOccupancyDetail() {
     setError(null);
     try {
       const res =
-        await currentOccupancyFunctionsService.getCurrentOccupancyById(id);
+        await currentOccupancyService.getCurrentOccupancyById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

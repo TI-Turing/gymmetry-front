@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { branchFunctionsService } from '@/services/functions';
+import { branchService } from '@/services';
 
 export function BranchDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function BranchDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await branchFunctionsService.getBranchById(id);
+      const res = await branchService.getBranchById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

@@ -68,12 +68,24 @@ export default function GymAdminDropdown({
       if (response.Success) {
         //TODO: filtrar por empleados del gym.
         const items = response.Data || [];
-        setEmployees(items);
+        
+        // Mapear User a UserBasicInfo
+        const mappedUsers = items.map(user => ({
+          id: user.Id,
+          name: user.Name || '',
+          lastName: user.LastName || '',
+          userName: user.UserName || '',
+          email: user.Email,
+          gymId: user.GymId || undefined,
+          userTypeId: user.UserTypeId || undefined,
+        }));
+        
+        setEmployees(mappedUsers);
 
         // Si solo hay un empleado, seleccionarlo automáticamente y deshabilitar
-        if (items.length === 1) {
-          onValueChange(items[0].id);
-        } else if (!value && items.length > 0) {
+        if (mappedUsers.length === 1) {
+          onValueChange(mappedUsers[0].id);
+        } else if (!value && mappedUsers.length > 0) {
           // Si hay múltiples empleados y no hay valor seleccionado, no seleccionar automáticamente
         }
       } else {

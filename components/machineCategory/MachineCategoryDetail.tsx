@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { machineCategoryFunctionsService } from '@/services/functions';
+import { machineCategoryService } from '@/services';
 
 export function MachineCategoryDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function MachineCategoryDetail() {
     setError(null);
     try {
       const res =
-        await machineCategoryFunctionsService.getMachineCategoryById(id);
+        await machineCategoryService.getMachineCategoryById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

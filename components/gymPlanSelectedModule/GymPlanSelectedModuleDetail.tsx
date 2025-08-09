@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { gymPlanSelectedModuleFunctionsService } from '@/services/functions';
+import { gymPlanSelectedModuleService } from '@/services';
 
 export function GymPlanSelectedModuleDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function GymPlanSelectedModuleDetail() {
     setError(null);
     try {
       const res =
-        await gymPlanSelectedModuleFunctionsService.getGymPlanSelectedModuleById(
+        await gymPlanSelectedModuleService.getGymPlanSelectedModuleById(
           id
         );
       setItem(res.Data);

@@ -4,11 +4,11 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { billFunctionsService } from '@/services/functions';
+import { billService } from '@/services';
 
 export function BillList() {
   const loadBills = useCallback(async () => {
-    const response = await billFunctionsService.getAllBills();
+    const response = await billService.getAllBills();
     return response.Data || [];
   }, []);
 

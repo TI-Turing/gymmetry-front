@@ -1,60 +1,51 @@
-// Servicio para AccessMethodType basado en las Azure Functions y DTOs del backend
 import { apiService, ApiResponse } from './apiService';
-import { AddAccessMethodTypeRequest } from '@/dto/accessMethodType/AddAccessMethodTypeRequest';
-import { UpdateAccessMethodTypeRequest } from '@/dto/accessMethodType/UpdateAccessMethodTypeRequest';
-import { FindAccessMethodTypesByFieldsRequest } from '@/dto/accessMethodType/FindAccessMethodTypesByFieldsRequest';
-import { AccessMethodTypeBasicInfo } from '@/dto/accessMethodType/AccessMethodTypeBasicInfo';
+import type { AddAccessMethodTypeRequest } from '@/dto/accessMethodType/AddAccessMethodTypeRequest';
+import type { AccessMethodType } from '@/models/AccessMethodType';
+import type { FindAccessMethodTypesByFieldsRequest } from '@/dto/accessMethodType/FindAccessMethodTypesByFieldsRequest';
+import type { UpdateAccessMethodTypeRequest } from '@/dto/accessMethodType/UpdateAccessMethodTypeRequest';
 
-// Funciones del servicio
+// Auto-generated service for AccessMethodType Azure Functions
 export const accessMethodTypeService = {
   async addAccessMethodType(
     request: AddAccessMethodTypeRequest
-  ): Promise<ApiResponse<string>> {
-    // POST /accessmethodtype/add (según la ruta de la Azure Function)
-    const response = await apiService.post<string>(
-      '/accessmethodtype/add',
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/accessmethodtype/add`,
       request
     );
     return response;
   },
-
-  async getAccessMethodTypeById(id: string): Promise<ApiResponse<any>> {
-    // GET /accessmethodtype/{id} (según la ruta de la Azure Function)
-    const response = await apiService.get<any>(`/accessmethodtype/${id}`);
+  async deleteAccessMethodType(id: string): Promise<ApiResponse<any>> {
+    const response = await apiService.delete<any>(`/accessmethodtype/${id}`);
     return response;
   },
-
-  async updateAccessMethodType(
-    request: UpdateAccessMethodTypeRequest
-  ): Promise<ApiResponse<boolean>> {
-    // PUT /accessmethodtype/update (según la ruta de la Azure Function)
-    const response = await apiService.put<boolean>(
-      '/accessmethodtype/update',
-      request
-    );
-    return response;
-  },
-
-  async deleteAccessMethodType(id: string): Promise<ApiResponse<boolean>> {
-    // DELETE /accessmethodtype/{id} (según la ruta de la Azure Function)
-    const response = await apiService.delete<boolean>(
+  async getAccessMethodTypeById(
+    id: string
+  ): Promise<ApiResponse<AccessMethodType>> {
+    const response = await apiService.get<AccessMethodType>(
       `/accessmethodtype/${id}`
     );
     return response;
   },
-
-  async getAllAccessMethodTypes(): Promise<ApiResponse<any[]>> {
-    // GET /accessmethodtype (según la ruta de la Azure Function)
-    const response = await apiService.get<any[]>('/accessmethodtype');
+  async getAllAccessMethodTypes(): Promise<ApiResponse<AccessMethodType[]>> {
+    const response =
+      await apiService.get<AccessMethodType[]>(`/accessmethodtypes`);
     return response;
   },
-
   async findAccessMethodTypesByFields(
     request: FindAccessMethodTypesByFieldsRequest
-  ): Promise<ApiResponse<AccessMethodTypeBasicInfo[]>> {
-    // POST /accessmethodtype/find (genérica para buscar por cualquier campo)
-    const response = await apiService.post<AccessMethodTypeBasicInfo[]>(
-      '/accessmethodtype/find',
+  ): Promise<ApiResponse<AccessMethodType[]>> {
+    const response = await apiService.post<AccessMethodType[]>(
+      `/accessmethodtypes/find`,
+      request
+    );
+    return response;
+  },
+  async updateAccessMethodType(
+    request: UpdateAccessMethodTypeRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(
+      `/accessmethodtype/update`,
       request
     );
     return response;

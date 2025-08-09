@@ -57,21 +57,29 @@ export const useStep4Form = ({
     };
 
     try {
-      const updateData = {
-        ...(stepData.fitnessGoal && { fitnessGoal: stepData.fitnessGoal }),
-        ...(stepData.healthRestrictions && {
-          physicalExceptions: stepData.healthRestrictions,
-        }),
-        ...(stepData.additionalInfo && {
-          physicalExceptionsNotes: stepData.additionalInfo,
-        }),
-        ...(stepData.rh && { RH: stepData.rh }),
+      const updateData: any = {
+        Id: userId,
+        Name: 'Usuario', // Valor temporal
+        LastName: 'Usuario', // Valor temporal
+        UserName: 'Usuario Usuario', // Valor temporal
+        IdEps: null,
+        IdGender: null,
+        BirthDate: null,
+        DocumentTypeId: null,
+        Phone: null,
+        CountryId: null,
+        Address: null,
+        CityId: null,
+        RegionId: null,
+        Rh: stepData.rh || null,
+        EmergencyName: null,
+        EmergencyPhone: null,
+        PhysicalExceptions: stepData.healthRestrictions || null,
+        UserTypeId: null,
+        PhysicalExceptionsNotes: stepData.additionalInfo || null,
       };
 
-      const response = await userService.updateUser({
-        id: userId,
-        ...updateData,
-      });
+      const response = await userService.updateUser(updateData);
 
       if (!response.Success) {
         showError(

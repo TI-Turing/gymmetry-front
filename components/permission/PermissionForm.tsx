@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { permissionFunctionsService } from '@/services/functions';
+import { permissionService } from '@/services';
 
 export function PermissionForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function PermissionForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await permissionFunctionsService.addPermission(body);
+      const res = await permissionService.addPermission(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function PermissionForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await permissionFunctionsService.updatePermission(body);
+      const res = await permissionService.updatePermission(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function PermissionForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await permissionFunctionsService.deletePermission(id);
+      const res = await permissionService.deletePermission(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

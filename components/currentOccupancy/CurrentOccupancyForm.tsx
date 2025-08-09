@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { currentOccupancyFunctionsService } from '@/services/functions';
+import { currentOccupancyService } from '@/services';
 
 export function CurrentOccupancyForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function CurrentOccupancyForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await currentOccupancyFunctionsService.addCurrentOccupancy(body);
+        await currentOccupancyService.addCurrentOccupancy(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function CurrentOccupancyForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await currentOccupancyFunctionsService.updateCurrentOccupancy(body);
+        await currentOccupancyService.updateCurrentOccupancy(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function CurrentOccupancyForm() {
     setMsg(null);
     try {
       const res =
-        await currentOccupancyFunctionsService.deleteCurrentOccupancy(id);
+        await currentOccupancyService.deleteCurrentOccupancy(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

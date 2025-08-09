@@ -62,7 +62,7 @@ function ProfileScreen() {
           <FontAwesome name='camera' size={16} color='#FFFFFF' />
         </TouchableOpacity>
       </View>
-      <Text style={styles.userName}>{user?.userName || 'Usuario'}</Text>
+      <Text style={styles.userName}>{user?.email || 'Usuario'}</Text>
       <Text style={styles.userEmail}>{user?.email || 'email@ejemplo.com'}</Text>
       <Text style={styles.joinDate}>Miembro desde {userStats.joinDate}</Text>
     </View>

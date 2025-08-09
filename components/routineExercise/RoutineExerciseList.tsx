@@ -4,12 +4,12 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { routineExerciseFunctionsService } from '@/services/functions';
+import { routineexerciseService } from '@/services';
 
 const RoutineExerciseList = React.memo(() => {
   const loadRoutineExercises = useCallback(async () => {
     const response =
-      await routineExerciseFunctionsService.getAllRoutineExercises();
+      await routineexerciseService.getAllRoutineExercises();
     return response.Data || [];
   }, []);
 

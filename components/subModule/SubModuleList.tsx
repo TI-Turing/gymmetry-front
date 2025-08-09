@@ -4,11 +4,11 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { subModuleFunctionsService } from '@/services/functions';
+import { submoduleService } from '@/services';
 
 const SubModuleList = React.memo(() => {
   const loadSubModules = useCallback(async () => {
-    const response = await subModuleFunctionsService.getAllSubModules();
+    const response = await submoduleService.getAllSubModules();
     return response.Data || [];
   }, []);
 

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { subModuleFunctionsService } from '@/services/functions';
+import { submoduleService } from '@/services';
 
 export function SubModuleDetail() {
   const [id, setId] = useState('');

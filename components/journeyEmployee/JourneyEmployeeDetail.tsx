@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { journeyEmployeeFunctionsService } from '@/services/functions';
+import { journeyEmployeeService } from '@/services';
 
 export function JourneyEmployeeDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function JourneyEmployeeDetail() {
     setError(null);
     try {
       const res =
-        await journeyEmployeeFunctionsService.getJourneyEmployeeById(id);
+        await journeyEmployeeService.getJourneyEmployeeById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

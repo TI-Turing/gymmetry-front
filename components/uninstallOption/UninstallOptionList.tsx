@@ -4,12 +4,12 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { uninstallOptionFunctionsService } from '@/services/functions';
+import { uninstallOptionService } from '@/services';
 
 const UninstallOptionList = React.memo(() => {
   const loadUninstallOptions = useCallback(async () => {
     const response =
-      await uninstallOptionFunctionsService.getAllUninstallOptions();
+      await uninstallOptionService.getAllUninstallOptions();
     return response.Data || [];
   }, []);
 

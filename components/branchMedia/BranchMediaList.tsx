@@ -4,11 +4,11 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { branchMediaFunctionsService } from '@/services/functions';
+import { branchMediaService } from '@/services';
 
 const BranchMediaList = React.memo(() => {
   const loadBranchMedia = useCallback(async () => {
-    const response = await branchMediaFunctionsService.getAllBranchMedias();
+    const response = await branchMediaService.getAllBranchMedias();
     return response.Data || [];
   }, []);
 

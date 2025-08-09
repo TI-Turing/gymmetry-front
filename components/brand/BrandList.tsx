@@ -4,7 +4,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { brandFunctionsService } from '@/services/functions';
+import { brandService } from '@/services';
 
 export function BrandList() {
   const [items, setItems] = useState<any[]>([]);
@@ -15,7 +15,7 @@ export function BrandList() {
     setLoading(true);
     setError(null);
     try {
-      const res = await brandFunctionsService.getAllBrands();
+      const res = await brandService.getAllBrands();
       setItems(res.Data || []);
     } catch (_e) {
       setError('Error al cargar');

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { routineExerciseFunctionsService } from '@/services/functions';
+import { routineexerciseService } from '@/services';
 
 export function RoutineExerciseDetail() {
   const [id, setId] = useState('');

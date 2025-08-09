@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { moduleFunctionsService } from '@/services/functions';
+import { moduleService } from '@/services';
 
 export function ModuleForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function ModuleForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await moduleFunctionsService.addModule(body);
+      const res = await moduleService.addModule(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function ModuleForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await moduleFunctionsService.updateModule(body);
+      const res = await moduleService.updateModule(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function ModuleForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await moduleFunctionsService.deleteModule(id);
+      const res = await moduleService.deleteModule(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

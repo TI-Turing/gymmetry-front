@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { brandFunctionsService } from '@/services/functions';
+import { brandService } from '@/services';
 
 export function BrandForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function BrandForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await brandFunctionsService.addBrand(body);
+      const res = await brandService.addBrand(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function BrandForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await brandFunctionsService.updateBrand(body);
+      const res = await brandService.updateBrand(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function BrandForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await brandFunctionsService.deleteBrand(id);
+      const res = await brandService.deleteBrand(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

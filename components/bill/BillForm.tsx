@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { billFunctionsService } from '@/services/functions';
+import { billService } from '@/services';
 
 export function BillForm() {
   const [payload, setPayload] = useState<string>('{}');

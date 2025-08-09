@@ -4,12 +4,12 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { planFunctionsService } from '@/services/functions';
+import { planService } from '@/services';
 import { Plan } from '@/dto/plan/Plan';
 
 const PlanList = React.memo(() => {
   const loadPlans = useCallback(async () => {
-    const response = await planFunctionsService.getAllPlans();
+    const response = await planService.getAllPlans();
     return response.Data || [];
   }, []);
 

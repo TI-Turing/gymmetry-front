@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { journeyEmployeeFunctionsService } from '@/services/functions';
+import { journeyEmployeeService } from '@/services';
 
 export function JourneyEmployeeForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function JourneyEmployeeForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await journeyEmployeeFunctionsService.addJourneyEmployee(body);
+        await journeyEmployeeService.addJourneyEmployee(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function JourneyEmployeeForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await journeyEmployeeFunctionsService.updateJourneyEmployee(body);
+        await journeyEmployeeService.updateJourneyEmployee(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function JourneyEmployeeForm() {
     setMsg(null);
     try {
       const res =
-        await journeyEmployeeFunctionsService.deleteJourneyEmployee(id);
+        await journeyEmployeeService.deleteJourneyEmployee(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyExerciseHistoryFunctionsService } from '@/services/functions';
+import { dailyExerciseHistoryService } from '@/services';
 
 export function DailyExerciseHistoryDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function DailyExerciseHistoryDetail() {
     setError(null);
     try {
       const res =
-        await dailyExerciseHistoryFunctionsService.getDailyExerciseHistoryById(
+        await dailyExerciseHistoryService.getDailyExerciseHistoryById(
           id
         );
       setItem(res.Data);

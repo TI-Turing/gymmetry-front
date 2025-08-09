@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { physicalAssessmentFunctionsService } from '@/services/functions';
+import { physicalAssessmentService } from '@/services';
 
 export function PhysicalAssessmentDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function PhysicalAssessmentDetail() {
     setError(null);
     try {
       const res =
-        await physicalAssessmentFunctionsService.getPhysicalAssessmentById(id);
+        await physicalAssessmentService.getPhysicalAssessmentById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

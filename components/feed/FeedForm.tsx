@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { feedFunctionsService } from '@/services/functions';
+import { feedService } from '@/services';
 
 export function FeedForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function FeedForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await feedFunctionsService.createFeed(body);
+      const res = await feedService.createFeed(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function FeedForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await feedFunctionsService.updateFeed(id, body);
+      const res = await feedService.updateFeed(id, body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function FeedForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await feedFunctionsService.deleteFeed(id);
+      const res = await feedService.deleteFeed(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

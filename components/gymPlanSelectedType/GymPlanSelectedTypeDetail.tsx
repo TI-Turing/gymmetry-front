@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { gymPlanSelectedTypeFunctionsService } from '@/services/functions';
+import { gymPlanSelectedTypeService } from '@/services';
 
 export function GymPlanSelectedTypeDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function GymPlanSelectedTypeDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await gymPlanSelectedTypeFunctionsService.getById(id);
+      const res = await gymPlanSelectedTypeService.getById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

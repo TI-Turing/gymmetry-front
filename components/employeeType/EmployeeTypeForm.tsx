@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { employeeTypeFunctionsService } from '@/services/functions';
+import { employeeTypeService } from '@/services';
 
 export function EmployeeTypeForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function EmployeeTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await employeeTypeFunctionsService.addEmployeeType(body);
+      const res = await employeeTypeService.addEmployeeType(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function EmployeeTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await employeeTypeFunctionsService.updateEmployeeType(body);
+      const res = await employeeTypeService.updateEmployeeType(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function EmployeeTypeForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await employeeTypeFunctionsService.deleteEmployeeType(id);
+      const res = await employeeTypeService.deleteEmployeeType(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

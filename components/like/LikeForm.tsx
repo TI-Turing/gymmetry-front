@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { likeFunctionsService } from '@/services/functions';
+import { likeService } from '@/services';
 
 export function LikeForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function LikeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await likeFunctionsService.createLike(body);
+      const res = await likeService.createLike(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -43,7 +43,7 @@ export function LikeForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await likeFunctionsService.deleteLike(id);
+      const res = await likeService.deleteLike(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

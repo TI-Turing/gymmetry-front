@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { categoryExerciseFunctionsService } from '@/services/functions';
+import { categoryExerciseService } from '@/services';
 
 export function CategoryExerciseForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function CategoryExerciseForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await categoryExerciseFunctionsService.addCategoryExercise(body);
+        await categoryExerciseService.addCategoryExercise(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function CategoryExerciseForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await categoryExerciseFunctionsService.updateCategoryExercise(body);
+        await categoryExerciseService.updateCategoryExercise(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function CategoryExerciseForm() {
     setMsg(null);
     try {
       const res =
-        await categoryExerciseFunctionsService.deleteCategoryExercise(id);
+        await categoryExerciseService.deleteCategoryExercise(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

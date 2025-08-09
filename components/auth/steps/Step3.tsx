@@ -220,31 +220,30 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     };
 
     try {
-      const updateData = {
-        emergencyName: stepData.emergencyContact,
-        emergencyPhone: stepData.emergencyPhone,
-        address: stepData.address,
-        ...(stepData.documentNumber && {
-          documentNumber: stepData.documentNumber,
-        }),
-        ...(stepData.eps && { eps: stepData.eps }),
-        ...(stepData.epsId && { EpsId: stepData.epsId }),
-        ...(stepData.country && { country: stepData.country }),
-        ...(stepData.countryId && { CountryId: stepData.countryId }),
-        ...(stepData.region && { region: stepData.region }),
-        ...(stepData.regionId && { regionId: stepData.regionId }),
-        ...(stepData.city && { city: stepData.city }),
-        ...(stepData.cityId && { cityId: stepData.cityId }),
-        ...(stepData.documentType && { DocumentType: stepData.documentType }),
-        ...(stepData.documentTypeId && {
-          DocumentTypeId: stepData.documentTypeId,
-        }),
+      // Crear objeto UpdateRequest completo
+      const updateRequest = {
+        Id: userId,
+        IdEps: stepData.epsId || null,
+        Name: 'Usuario', // Valor temporal - se puede mejorar obteniendo del contexto
+        LastName: 'Usuario', // Valor temporal
+        UserName: 'Usuario Usuario', // Valor temporal
+        IdGender: null,
+        BirthDate: null,
+        DocumentTypeId: stepData.documentTypeId || null,
+        Phone: null,
+        CountryId: stepData.countryId || null,
+        Address: stepData.address || null,
+        CityId: stepData.cityId || null,
+        RegionId: stepData.regionId || null,
+        Rh: null,
+        EmergencyName: stepData.emergencyContact || null,
+        EmergencyPhone: stepData.emergencyPhone || null,
+        PhysicalExceptions: null,
+        UserTypeId: null,
+        PhysicalExceptionsNotes: null,
       };
 
-      const response = await userService.updateUser({
-        id: userId,
-        ...updateData,
-      });
+      const response = await userService.updateUser(updateRequest);
 
       if (!response.Success) {
         showError(

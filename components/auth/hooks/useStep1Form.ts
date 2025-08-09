@@ -116,8 +116,8 @@ export const useStep1Form = ({
 
       // Crear usuario
       const response = (await userService.addUser({
-        email,
-        password,
+        Email: email,
+        Password: password,
       })) as ApiResponse;
 
       if (!response.Success) {

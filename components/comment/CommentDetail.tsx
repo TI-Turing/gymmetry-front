@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { commentFunctionsService } from '@/services/functions';
+import { commentService } from '@/services';
 
 export function CommentDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function CommentDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await commentFunctionsService.getCommentById(id);
+      const res = await commentService.getCommentById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

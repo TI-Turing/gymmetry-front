@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { machineFunctionsService } from '@/services/functions';
+import { machineService } from '@/services';
 
 export function MachineDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function MachineDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await machineFunctionsService.getMachineById(id);
+      const res = await machineService.getMachineById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

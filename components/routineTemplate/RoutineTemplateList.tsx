@@ -4,12 +4,12 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { routineTemplateFunctionsService } from '@/services/functions';
+import { routineTemplateService } from '@/services';
 
 const RoutineTemplateList = React.memo(() => {
   const loadRoutineTemplates = useCallback(async () => {
     const response =
-      await routineTemplateFunctionsService.getAllRoutineTemplates();
+      await routineTemplateService.getAllRoutineTemplates();
     return response.Data || [];
   }, []);
 

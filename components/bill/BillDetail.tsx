@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { billFunctionsService } from '@/services/functions';
+import { billService } from '@/services';
 
 export function BillDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function BillDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await billFunctionsService.getBillById(id);
+      const res = await billService.getBillById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

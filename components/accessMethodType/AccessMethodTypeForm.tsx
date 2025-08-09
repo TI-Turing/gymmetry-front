@@ -6,7 +6,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { accessMethodTypeFunctionsService } from '@/services/functions';
+import { accessMethodTypeService } from '@/services';
 
 export function AccessMethodTypeForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -20,7 +20,7 @@ export function AccessMethodTypeForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await accessMethodTypeFunctionsService.addAccessMethodType(body);
+        await accessMethodTypeService.addAccessMethodType(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -35,7 +35,7 @@ export function AccessMethodTypeForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await accessMethodTypeFunctionsService.updateAccessMethodType(body);
+        await accessMethodTypeService.updateAccessMethodType(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -49,7 +49,7 @@ export function AccessMethodTypeForm() {
     setMsg(null);
     try {
       const res =
-        await accessMethodTypeFunctionsService.deleteAccessMethodType(id);
+        await accessMethodTypeService.deleteAccessMethodType(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

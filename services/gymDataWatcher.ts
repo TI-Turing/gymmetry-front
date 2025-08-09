@@ -1,5 +1,5 @@
 import { asyncStorageObserver } from './asyncStorageObserver';
-import { GymService } from './gymService';
+import { gymService } from './gymService';
 import { logger } from '@/utils';
 
 const GYM_DATA_KEY = '@gym_data';
@@ -124,7 +124,7 @@ class GymDataWatcher {
         _error
       );
       // Si hay error parseando, intentar con el gymId del cache actual
-      const currentGymId = GymService.getCachedGymData()?.gym?.Id;
+      const currentGymId = gymService.getCachedGymData()?.gym?.Id;
       logger.debug('[GymDataWatcher] currentGymId del cache:', currentGymId);
       if (currentGymId) {
         await this.refetchGymData(currentGymId);
@@ -135,9 +135,9 @@ class GymDataWatcher {
   // Consultar datos actualizados del gym
   private async refetchGymData(gymId: string): Promise<void> {
     try {
-      // Usar el método del GymService que maneja el caching
+      // Usar el método del gymService que maneja el caching
       logger.info('[GymDataWatcher] Refetching gym data for gymId:', gymId);
-      await GymService.updateCacheFromObserver(gymId);
+      await gymService.updateCacheFromObserver(gymId);
 
       // Opcional: Notificar a otros componentes que los datos se actualizaron
       // Esto se puede usar para mostrar notificaciones o actualizar UI específica

@@ -6,7 +6,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { authFunctionsService } from '@/services/functions';
+import { authService } from '@/services';
 
 export function AuthForm() {
   const [payload, setPayload] = useState<string>('{}');

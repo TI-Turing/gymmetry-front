@@ -327,15 +327,29 @@ export const useStep2Form = ({
 
     try {
       const updateData = {
-        name: stepData.firstName,
-        lastName: stepData.lastName,
-        ...(stepData.phone && { phone: stepData.phone }),
-        ...(stepData.birthDate && { birthDate: stepData.birthDate }),
-        ...(stepData.genderId && { IdGender: stepData.genderId }),
+        Name: stepData.firstName,
+        LastName: stepData.lastName,
+        UserName: stepData.firstName + ' ' + stepData.lastName,
+        Phone: stepData.phone || null,
+        BirthDate: stepData.birthDate || null,
+        IdGender: stepData.genderId || null,
+        // Propiedades requeridas con valores por defecto
+        IdEps: null,
+        DocumentTypeId: null,
+        CountryId: null,
+        Address: null,
+        CityId: null,
+        RegionId: null,
+        Rh: null,
+        EmergencyName: null,
+        EmergencyPhone: null,
+        PhysicalExceptions: null,
+        UserTypeId: null,
+        PhysicalExceptionsNotes: null,
       };
 
       const response = await userService.updateUser({
-        id: userId,
+        Id: userId,
         ...updateData,
       });
 

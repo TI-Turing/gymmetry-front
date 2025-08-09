@@ -4,11 +4,11 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { userTypeFunctionsService } from '@/services/functions';
+import { userTypeService } from '@/services';
 
 const UserTypeList = React.memo(() => {
   const loadUserTypes = useCallback(async () => {
-    const response = await userTypeFunctionsService.getAllUserTypes();
+    const response = await userTypeService.getAllUserTypes();
     return response.Data || [];
   }, []);
 

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { gymTypeFunctionsService } from '@/services/functions';
+import { gymTypeService } from '@/services';
 
 export function GymTypeForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function GymTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await gymTypeFunctionsService.addGymType(body);
+      const res = await gymTypeService.addGymType(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function GymTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await gymTypeFunctionsService.updateGymType(body);
+      const res = await gymTypeService.updateGymType(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function GymTypeForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await gymTypeFunctionsService.deleteGymType(id);
+      const res = await gymTypeService.deleteGymType(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

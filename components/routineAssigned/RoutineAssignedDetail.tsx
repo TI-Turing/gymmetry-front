@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { routineAssignedFunctionsService } from '@/services/functions';
+import { routineAssignedService } from '@/services';
 
 export function RoutineAssignedDetail() {
   const [id, setId] = useState('');

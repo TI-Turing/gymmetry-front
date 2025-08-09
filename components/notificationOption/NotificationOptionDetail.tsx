@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { notificationOptionFunctionsService } from '@/services/functions';
+import { notificationOptionService } from '@/services';
 
 export function NotificationOptionDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function NotificationOptionDetail() {
     setError(null);
     try {
       const res =
-        await notificationOptionFunctionsService.getNotificationOptionById(id);
+        await notificationOptionService.getNotificationOptionById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

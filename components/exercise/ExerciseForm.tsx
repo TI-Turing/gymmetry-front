@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { exerciseFunctionsService } from '@/services/functions';
+import { exerciseService } from '@/services';
 
 export function ExerciseForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function ExerciseForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await exerciseFunctionsService.addExercise(body);
+      const res = await exerciseService.addExercise(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function ExerciseForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await exerciseFunctionsService.updateExercise(body);
+      const res = await exerciseService.updateExercise(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function ExerciseForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await exerciseFunctionsService.deleteExercise(id);
+      const res = await exerciseService.deleteExercise(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

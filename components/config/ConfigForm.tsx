@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { configFunctionsService } from '@/services/functions';
+import { configService } from '@/services';
 
 export function ConfigForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -29,7 +29,7 @@ export function ConfigForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await configFunctionsService.updateUsdPriceTimer();
+      const res = await configService.updateUsdPriceTimer();
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');

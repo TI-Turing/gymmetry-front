@@ -4,7 +4,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyFunctionsService } from '@/services/functions';
+import { dailyService } from '@/services';
 
 export function DailyList() {
   const [items, setItems] = useState<any[]>([]);
@@ -15,7 +15,7 @@ export function DailyList() {
     setLoading(true);
     setError(null);
     try {
-      const res = await dailyFunctionsService.getAllDailies();
+      const res = await dailyService.getAllDailies();
       setItems(res.Data || []);
     } catch (_e) {
       setError('Error al cargar');

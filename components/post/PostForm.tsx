@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { postFunctionsService } from '@/services/functions';
+import { postService } from '@/services';
 
 export function PostForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function PostForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await postFunctionsService.createPost(body);
+      const res = await postService.createPost(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function PostForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await postFunctionsService.updatePost(id, body);
+      const res = await postService.updatePost(id, body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function PostForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await postFunctionsService.deletePost(id);
+      const res = await postService.deletePost(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

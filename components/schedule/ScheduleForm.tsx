@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { scheduleFunctionsService } from '@/services/functions';
+import { scheduleService } from '@/services';
 
 export function ScheduleForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function ScheduleForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await scheduleFunctionsService.addSchedule(body);
+      const res = await scheduleService.addSchedule(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function ScheduleForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await scheduleFunctionsService.updateSchedule(body);
+      const res = await scheduleService.updateSchedule(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function ScheduleForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await scheduleFunctionsService.deleteSchedule(id);
+      const res = await scheduleService.deleteSchedule(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

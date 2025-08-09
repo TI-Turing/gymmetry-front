@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { accessMethodTypeFunctionsService } from '@/services/functions';
+import { accessMethodTypeService } from '@/services';
 
 export function AccessMethodTypeDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function AccessMethodTypeDetail() {
     setError(null);
     try {
       const res =
-        await accessMethodTypeFunctionsService.getAccessMethodTypeById(id);
+        await accessMethodTypeService.getAccessMethodTypeById(id);
       setItem(res.Data);
     } catch (e) {
       setError('Error al consultar');

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { categoryExerciseFunctionsService } from '@/services/functions';
+import { categoryExerciseService } from '@/services';
 
 export function CategoryExerciseDetail() {
   const [id, setId] = useState('');
@@ -18,7 +18,7 @@ export function CategoryExerciseDetail() {
     setError(null);
     try {
       const res =
-        await categoryExerciseFunctionsService.getCategoryExerciseById(id);
+        await categoryExerciseService.getCategoryExerciseById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

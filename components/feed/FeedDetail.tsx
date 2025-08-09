@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { feedFunctionsService } from '@/services/functions';
+import { feedService } from '@/services';
 
 export function FeedDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function FeedDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await feedFunctionsService.getFeedById(id);
+      const res = await feedService.getFeedById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

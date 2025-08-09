@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyFunctionsService } from '@/services/functions';
+import { dailyService } from '@/services';
 
 export function DailyForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function DailyForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dailyFunctionsService.addDaily(body);
+      const res = await dailyService.addDaily(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function DailyForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dailyFunctionsService.updateDaily(body);
+      const res = await dailyService.updateDaily(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function DailyForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await dailyFunctionsService.deleteDaily(id);
+      const res = await dailyService.deleteDaily(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

@@ -4,12 +4,12 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { accessMethodTypeFunctionsService } from '@/services/functions';
+import { accessMethodTypeService } from '@/services';
 
 export function AccessMethodTypeList() {
   const loadAccessMethodTypes = useCallback(async () => {
     const response =
-      await accessMethodTypeFunctionsService.getAllAccessMethodTypes();
+      await accessMethodTypeService.getAllAccessMethodTypes();
     return response.Data || [];
   }, []);
 

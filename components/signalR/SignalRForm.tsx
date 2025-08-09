@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { signalRFunctionsService } from '@/services/functions';
+import { signalRService } from '@/services';
 
 export function SignalRForm() {
   const [payload, setPayload] = useState<string>('{}');

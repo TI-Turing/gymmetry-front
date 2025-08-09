@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { postFunctionsService } from '@/services/functions';
+import { postService } from '@/services';
 
 export function PostDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function PostDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await postFunctionsService.getPostById(id);
+      const res = await postService.getPostById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

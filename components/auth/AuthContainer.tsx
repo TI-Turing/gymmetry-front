@@ -51,8 +51,8 @@ export default function AuthContainer({
     setIsLoading(true);
     try {
       const response = await authService.login({
-        userNameOrEmail: email.trim(),
-        password: password,
+        UserNameOrEmail: email.trim(),
+        Password: password,
       });
 
       // Verificar que la respuesta tenga la estructura esperada
@@ -63,13 +63,13 @@ export default function AuthContainer({
 
       if (response.Success) {
         // Login exitoso
-        const userData = authService.getUserData();
+        const userData = await authService.getUserData();
         if (userData) {
           const user: User = {
-            id: parseInt(userData.userId),
+            id: parseInt(userData.id),
             email: userData.email,
-            firstName: userData.userName.split(' ')[0] || 'Usuario',
-            lastName: userData.userName.split(' ')[1] || '',
+            firstName: 'Usuario', // Valor por defecto, se puede obtener del backend más tarde
+            lastName: '',
             avatar: null,
           };
 

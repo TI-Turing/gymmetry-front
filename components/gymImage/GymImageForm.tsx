@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { gymImageFunctionsService } from '@/services/functions';
+import { gymImageService } from '@/services';
 
 export function GymImageForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function GymImageForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await gymImageFunctionsService.addGymImage(body);
+      const res = await gymImageService.addGymImage(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function GymImageForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await gymImageFunctionsService.updateGymImage(body);
+      const res = await gymImageService.updateGymImage(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function GymImageForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await gymImageFunctionsService.deleteGymImage(id);
+      const res = await gymImageService.deleteGymImage(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

@@ -52,12 +52,24 @@ export default function UserDropdown({
       if (response.Success) {
         //TODO: filtrar por empleados del gym.
         const items = response.Data || [];
-        setUsers(items);
+        
+        // Mapear User a UserBasicInfo
+        const mappedUsers = items.map(user => ({
+          id: user.Id,
+          name: user.Name || '',
+          lastName: user.LastName || '',
+          userName: user.UserName || '',
+          email: user.Email,
+          gymId: user.GymId || undefined,
+          userTypeId: user.UserTypeId || undefined,
+        }));
+        
+        setUsers(mappedUsers);
 
         // Si solo hay un usuario, seleccionarlo automáticamente y deshabilitar
-        if (items.length === 1) {
-          onValueChange(items[0].id);
-        } else if (!value && items.length > 0) {
+        if (mappedUsers.length === 1) {
+          onValueChange(mappedUsers[0].id);
+        } else if (!value && mappedUsers.length > 0) {
           // Si hay múltiples usuarios y no hay valor seleccionado, no seleccionar automáticamente
         }
       } else {

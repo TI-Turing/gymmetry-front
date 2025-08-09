@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { branchMediaFunctionsService } from '@/services/functions';
+import { branchMediaService } from '@/services';
 
 export function BranchMediaDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function BranchMediaDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await branchMediaFunctionsService.getBranchMediaById(id);
+      const res = await branchMediaService.getBranchMediaById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

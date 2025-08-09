@@ -1,134 +1,108 @@
-// Servicio para User basado en las Azure Functions y DTOs del backend
 import { apiService, ApiResponse } from './apiService';
-import { AddUserRequest } from '@/dto/user/AddUserRequest';
-import { UpdateUserRequest } from '@/dto/user/UpdateUserRequest';
-import { OtpRequest } from '@/dto/user/OtpRequest';
-import { ValidateOtpRequest } from '@/dto/user/ValidateOtpRequest';
-import { PasswordUserRequest } from '@/dto/user/PasswordUserRequest';
-import { UpdateUserGymRequest } from '@/dto/user/UpdateUserGymRequest';
-import { AddUserResponse } from '@/dto/user/AddUserResponse';
-import { ValidateUserFieldsResponse } from '@/dto/user/ValidateUserFieldsResponse';
-import { FindUsersByFieldsRequest } from '@/dto/user/FindUsersByFieldsRequest';
-import { UserBasicInfo } from '@/dto/user/UserBasicInfo';
+import type { AddResponse } from '@/dto/user/Response/AddResponse';
+import type { AddRequest } from '@/dto/user/Request/AddRequest';
+import type { User } from '@/models/User';
+import type { FindUsersByFieldsRequest } from '@/dto/user/FindUsersByFieldsRequest';
+import type { ValidateUserFieldsResponse } from '@/dto/user/ValidateUserFieldsResponse';
+import type { PasswordUserRequest } from '@/dto/user/PasswordUserRequest';
+import type { PaymentRequestDto } from '@/dto/user/Request/PaymentRequestDto';
+import type { UpdateRequest } from '@/dto/user/Request/UpdateRequest';
+import type { UpdateUserGymRequest } from '@/dto/user/UpdateUserGymRequest';
 
-// Funciones del servicio
+// Auto-generated service for User Azure Functions
 export const userService = {
-  async addUser(
-    request: AddUserRequest
-  ): Promise<ApiResponse<AddUserResponse>> {
-    // POST /user/add (según la ruta de la Azure Function)
-    const response = await apiService.post<AddUserResponse>(
-      '/user/add',
-      request
-    );
+  async addUser(request: AddRequest): Promise<ApiResponse<AddResponse>> {
+    const response = await apiService.post<AddResponse>(`/user/add`, request);
     return response;
   },
-
-  async getUserById(id: string): Promise<ApiResponse<any>> {
-    // GET /user/{id} (según la ruta de la Azure Function)
-    const response = await apiService.get<any>(`/user/${id}`);
+  async deleteUser(id: string): Promise<ApiResponse<any>> {
+    const response = await apiService.delete<any>(`/user/${id}`);
     return response;
   },
-
-  async updateUser(request: UpdateUserRequest): Promise<ApiResponse<boolean>> {
-    // PUT /user/update (según la ruta de la Azure Function)
-    const response = await apiService.put<boolean>('/user/update', request);
+  async getUserById(id: string): Promise<ApiResponse<User>> {
+    const response = await apiService.get<User>(`/user/${id}`);
     return response;
   },
-
-  async deleteUser(id: string): Promise<ApiResponse<boolean>> {
-    // DELETE /user/{id} (según la ruta de la Azure Function)
-    const response = await apiService.delete<boolean>(`/user/${id}`);
+  async getAllUsers(): Promise<ApiResponse<User[]>> {
+    const response = await apiService.get<User[]>(`/users`);
     return response;
   },
-
-  async passwordUser(
-    request: PasswordUserRequest
-  ): Promise<ApiResponse<boolean>> {
-    // POST /user/password/update (según la ruta de la Azure Function)
-    const response = await apiService.post<boolean>(
-      '/user/password/update',
-      request
-    );
-    return response;
-  },
-
-  async requestOtp(request: OtpRequest): Promise<ApiResponse<boolean>> {
-    // POST /user/otp/request (según la ruta de la Azure Function)
-    const response = await apiService.post<boolean>(
-      '/user/otp/request',
-      request
-    );
-    return response;
-  },
-
-  async validateOtp(
-    request: ValidateOtpRequest
-  ): Promise<ApiResponse<boolean>> {
-    // POST /user/otp/validate (según la ruta de la Azure Function)
-    const response = await apiService.post<boolean>(
-      '/user/otp/validate',
-      request
-    );
-    return response;
-  },
-
-  async updateUserGym(
-    request: UpdateUserGymRequest
-  ): Promise<ApiResponse<boolean>> {
-    // PUT /user/update-gym (según el endpoint proporcionado)
-    const response = await apiService.put<boolean>('/user/update-gym', request);
-    return response;
-  },
-
-  async validateUserFields(
-    id: string
-  ): Promise<ApiResponse<ValidateUserFieldsResponse>> {
-    // GET /user/validate-fields/{id} (según la ruta de la Azure Function)
-    const response = await apiService.get<ValidateUserFieldsResponse>(
-      `/user/validate-fields/${id}`
-    );
-    return response;
-  },
-
   async findUsersByFields(
     request: FindUsersByFieldsRequest
-  ): Promise<ApiResponse<UserBasicInfo[]>> {
-    // POST /user/find (según User_FindUsersByFieldsFunction)
-    const response = await apiService.post<UserBasicInfo[]>(
-      '/user/find',
+  ): Promise<ApiResponse<User[]>> {
+    const response = await apiService.post<User[]>(`/users/find`, request);
+    return response;
+  },
+  async getInfoUserById(
+    id: string
+  ): Promise<ApiResponse<ValidateUserFieldsResponse>> {
+    const response = await apiService.get<ValidateUserFieldsResponse>(
+      `/user/getinfo/${id}`
+    );
+    return response;
+  },
+  async phoneExists(): Promise<ApiResponse<any>> {
+    const response = await apiService.get<any>(`/user/phone-exists/{phone}`);
+    return response;
+  },
+  async passwordUser(request: PasswordUserRequest): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/user/password/update`,
+      request
+    );
+    return response;
+  },
+  async generatePaymentUrl(
+    request: PaymentRequestDto
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(`/user/payment-url`, request);
+    return response;
+  },
+  async paymentWebhook(request: any): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(`/webhook/payment`, request);
+    return response;
+  },
+  async updateUser(request: UpdateRequest): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(`/user/update`, request);
+    return response;
+  },
+  async updateUserGym(
+    request: UpdateUserGymRequest
+  ): Promise<ApiResponse<any>> {
+    const response = await apiService.put<any>(`/user/update-gym`, request);
+    return response;
+  },
+  async uploadProfileImage(request: any): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(
+      `/user/upload-profile-image`,
       request
     );
     return response;
   },
 
-  async getAllUsers(): Promise<ApiResponse<UserBasicInfo[]>> {
-    // GET /user/all (según GetUserFunction - GetAllUsers)
-    const response = await apiService.get<UserBasicInfo[]>('/user/all');
-    return response;
-  },
-
-  async getUsersByGym(gymId: string): Promise<ApiResponse<UserBasicInfo[]>> {
-    // POST /user/find (búsqueda directa por gymId)
-    const response = await apiService.post<UserBasicInfo[]>('/users/find', {
-      fields: { gymId },
-    });
+  // Métodos adicionales para compatibilidad
+  async checkEmailExists(email: string): Promise<ApiResponse<boolean>> {
+    const response = await apiService.get<boolean>(`/user/check-email/${email}`);
     return response;
   },
 
   async checkPhoneExists(phone: string): Promise<ApiResponse<boolean>> {
-    // GET /user/phone-exists/{phone}
-    const response = await apiService.get<boolean>(
-      `/user/phone-exists/${encodeURIComponent(phone)}`
-    );
+    const response = await apiService.get<boolean>(`/user/check-phone/${phone}`);
     return response;
   },
 
-  async checkEmailExists(email: string): Promise<ApiResponse<boolean>> {
-    // GET /user/email-exists/{email}
-    const response = await apiService.get<boolean>(
-      `/user/email-exists/${encodeURIComponent(email)}`
-    );
+  async requestOtp(request: any): Promise<ApiResponse<any>> {
+    const response = await apiService.post<any>(`/user/request-otp`, request);
     return response;
   },
+
+  async validateOtp(request: any): Promise<ApiResponse<boolean>> {
+    const response = await apiService.post<boolean>(`/user/validate-otp`, request);
+    return response;
+  },
+
+  async getUsersByGym(gymId: string): Promise<ApiResponse<User[]>> {
+    const response = await apiService.get<User[]>(`/user/by-gym/${gymId}`);
+    return response;
+  }
 };

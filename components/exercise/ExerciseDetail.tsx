@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { exerciseFunctionsService } from '@/services/functions';
+import { exerciseService } from '@/services';
 
 export function ExerciseDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function ExerciseDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await exerciseFunctionsService.getExerciseById(id);
+      const res = await exerciseService.getExerciseById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

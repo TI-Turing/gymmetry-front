@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dietFunctionsService } from '@/services/functions';
+import { dietService } from '@/services';
 
 export function DietDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function DietDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await dietFunctionsService.getDietById(id);
+      const res = await dietService.getDietById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

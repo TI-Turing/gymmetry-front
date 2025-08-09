@@ -4,11 +4,11 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { routineDayFunctionsService } from '@/services/functions';
+import { routineDayService } from '@/services';
 
 const RoutineDayList = React.memo(() => {
   const loadRoutineDays = useCallback(async () => {
-    const response = await routineDayFunctionsService.getAllRoutineDays();
+    const response = await routineDayService.getAllRoutineDays();
     return response.Data || [];
   }, []);
 

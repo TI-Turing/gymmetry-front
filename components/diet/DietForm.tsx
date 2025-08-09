@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dietFunctionsService } from '@/services/functions';
+import { dietService } from '@/services';
 
 export function DietForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function DietForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dietFunctionsService.addDiet(body);
+      const res = await dietService.addDiet(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function DietForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await dietFunctionsService.updateDiet(body);
+      const res = await dietService.updateDiet(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function DietForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await dietFunctionsService.deleteDiet(id);
+      const res = await dietService.deleteDiet(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

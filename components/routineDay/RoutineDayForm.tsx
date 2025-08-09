@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { routineDayFunctionsService } from '@/services/functions';
+import { routineDayService } from '@/services';
 
 export function RoutineDayForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function RoutineDayForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await routineDayFunctionsService.addRoutineDay(body);
+      const res = await routineDayService.addRoutineDay(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function RoutineDayForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await routineDayFunctionsService.updateRoutineDay(body);
+      const res = await routineDayService.updateRoutineDay(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function RoutineDayForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await routineDayFunctionsService.deleteRoutineDay(id);
+      const res = await routineDayService.deleteRoutineDay(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

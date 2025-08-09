@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyExerciseHistoryFunctionsService } from '@/services/functions';
+import { dailyExerciseHistoryService } from '@/services';
 
 export function DailyExerciseHistoryForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function DailyExerciseHistoryForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await dailyExerciseHistoryFunctionsService.addDailyExerciseHistory(
+        await dailyExerciseHistoryService.addDailyExerciseHistory(
           body
         );
       setMsg(res.Message || 'Creado');
@@ -36,7 +36,7 @@ export function DailyExerciseHistoryForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await dailyExerciseHistoryFunctionsService.updateDailyExerciseHistory(
+        await dailyExerciseHistoryService.updateDailyExerciseHistory(
           body
         );
       setMsg(res.Message || 'Actualizado');
@@ -52,7 +52,7 @@ export function DailyExerciseHistoryForm() {
     setMsg(null);
     try {
       const res =
-        await dailyExerciseHistoryFunctionsService.deleteDailyExerciseHistory(
+        await dailyExerciseHistoryService.deleteDailyExerciseHistory(
           id
         );
       setMsg(res.Message || 'Eliminado');

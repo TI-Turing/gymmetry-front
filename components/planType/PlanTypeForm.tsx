@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { planTypeFunctionsService } from '@/services/functions';
+import { planTypeService } from '@/services';
 
 export function PlanTypeForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function PlanTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await planTypeFunctionsService.addPlanType(body);
+      const res = await planTypeService.addPlanType(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function PlanTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await planTypeFunctionsService.updatePlanType(body);
+      const res = await planTypeService.updatePlanType(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function PlanTypeForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await planTypeFunctionsService.deletePlanType(id);
+      const res = await planTypeService.deletePlanType(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

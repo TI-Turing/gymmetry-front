@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { routineTemplateFunctionsService } from '@/services/functions';
+import { routineTemplateService } from '@/services';
 
 export function RoutineTemplateDetail() {
   const [id, setId] = useState('');

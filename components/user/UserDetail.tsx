@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { userFunctionsService } from '@/services/functions';
+import { userService } from '@/services';
 
 export function UserDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function UserDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await userFunctionsService.getUserById(id);
+      const res = await userService.getUserById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

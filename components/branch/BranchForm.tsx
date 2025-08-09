@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { branchFunctionsService } from '@/services/functions';
+import { branchService } from '@/services';
 
 export function BranchForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function BranchForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await branchFunctionsService.addBranch(body);
+      const res = await branchService.addBranch(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function BranchForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await branchFunctionsService.updateBranch(body);
+      const res = await branchService.updateBranch(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function BranchForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await branchFunctionsService.deleteBranch(id);
+      const res = await branchService.deleteBranch(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

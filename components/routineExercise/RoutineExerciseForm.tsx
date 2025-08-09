@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { routineExerciseFunctionsService } from '@/services/functions';
+import { routineexerciseService } from '@/services';
 
 export function RoutineExerciseForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function RoutineExerciseForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await routineExerciseFunctionsService.addRoutineExercise(body);
+        await routineexerciseService.addRoutineExercise(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function RoutineExerciseForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await routineExerciseFunctionsService.updateRoutineExercise(body);
+        await routineexerciseService.updateRoutineExercise(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function RoutineExerciseForm() {
     setMsg(null);
     try {
       const res =
-        await routineExerciseFunctionsService.deleteRoutineExercise(id);
+        await routineexerciseService.deleteRoutineExercise(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

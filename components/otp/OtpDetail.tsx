@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { otpFunctionsService } from '@/services/functions';
+import { otpService } from '@/services';
 
 export function OtpDetail() {
   const [id, setId] = useState('');

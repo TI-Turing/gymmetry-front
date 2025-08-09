@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { userFunctionsService } from '@/services/functions';
+import { userService } from '@/services';
 
 export function UserForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function UserForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await userFunctionsService.addUser(body);
+      const res = await userService.addUser(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function UserForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await userFunctionsService.updateUser(body);
+      const res = await userService.updateUser(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function UserForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await userFunctionsService.deleteUser(id);
+      const res = await userService.deleteUser(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { employeeUserFunctionsService } from '@/services/functions';
+import { employeeUserService } from '@/services';
 
 export function EmployeeUserForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -18,7 +18,7 @@ export function EmployeeUserForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await employeeUserFunctionsService.addEmployeeUser(body);
+      const res = await employeeUserService.addEmployeeUser(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -32,7 +32,7 @@ export function EmployeeUserForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res = await employeeUserFunctionsService.updateEmployeeUser(body);
+      const res = await employeeUserService.updateEmployeeUser(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -45,7 +45,7 @@ export function EmployeeUserForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res = await employeeUserFunctionsService.deleteEmployeeUser(id);
+      const res = await employeeUserService.deleteEmployeeUser(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

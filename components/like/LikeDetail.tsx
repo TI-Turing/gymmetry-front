@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { likeFunctionsService } from '@/services/functions';
+import { likeService } from '@/services';
 
 export function LikeDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function LikeDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await likeFunctionsService.getLikeById(id);
+      const res = await likeService.getLikeById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

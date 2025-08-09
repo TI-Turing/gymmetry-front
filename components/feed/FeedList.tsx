@@ -9,7 +9,7 @@ import { feedService } from '@/services';
 const FeedList = React.memo(() => {
   const loadFeeds = useCallback(async () => {
     const response = await feedService.getAllFeeds();
-    return response || [];
+    return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderFeedItem = useCallback(

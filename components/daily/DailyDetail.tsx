@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { dailyFunctionsService } from '@/services/functions';
+import { dailyService } from '@/services';
 
 export function DailyDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function DailyDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await dailyFunctionsService.getDailyById(id);
+      const res = await dailyService.getDailyById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

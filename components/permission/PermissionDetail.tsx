@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { permissionFunctionsService } from '@/services/functions';
+import { permissionService } from '@/services';
 
 export function PermissionDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function PermissionDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await permissionFunctionsService.getPermissionById(id);
+      const res = await permissionService.getPermissionById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

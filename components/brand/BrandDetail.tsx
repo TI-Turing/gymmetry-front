@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { brandFunctionsService } from '@/services/functions';
+import { brandService } from '@/services';
 
 export function BrandDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function BrandDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await brandFunctionsService.getBrandById(id);
+      const res = await brandService.getBrandById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');

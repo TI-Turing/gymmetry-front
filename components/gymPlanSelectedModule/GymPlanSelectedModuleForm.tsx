@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { gymPlanSelectedModuleFunctionsService } from '@/services/functions';
+import { gymPlanSelectedModuleService } from '@/services';
 
 export function GymPlanSelectedModuleForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function GymPlanSelectedModuleForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await gymPlanSelectedModuleFunctionsService.addGymPlanSelectedModule(
+        await gymPlanSelectedModuleService.addGymPlanSelectedModule(
           body
         );
       setMsg(res.Message || 'Creado');
@@ -36,7 +36,7 @@ export function GymPlanSelectedModuleForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await gymPlanSelectedModuleFunctionsService.updateGymPlanSelectedModule(
+        await gymPlanSelectedModuleService.updateGymPlanSelectedModule(
           body
         );
       setMsg(res.Message || 'Actualizado');
@@ -52,7 +52,7 @@ export function GymPlanSelectedModuleForm() {
     setMsg(null);
     try {
       const res =
-        await gymPlanSelectedModuleFunctionsService.deleteGymPlanSelectedModule(
+        await gymPlanSelectedModuleService.deleteGymPlanSelectedModule(
           id
         );
       setMsg(res.Message || 'Eliminado');

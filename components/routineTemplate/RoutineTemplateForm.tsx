@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { routineTemplateFunctionsService } from '@/services/functions';
+import { routineTemplateService } from '@/services';
 
 export function RoutineTemplateForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -19,7 +19,7 @@ export function RoutineTemplateForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await routineTemplateFunctionsService.addRoutineTemplate(body);
+        await routineTemplateService.addRoutineTemplate(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,7 +34,7 @@ export function RoutineTemplateForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await routineTemplateFunctionsService.updateRoutineTemplate(body);
+        await routineTemplateService.updateRoutineTemplate(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -48,7 +48,7 @@ export function RoutineTemplateForm() {
     setMsg(null);
     try {
       const res =
-        await routineTemplateFunctionsService.deleteRoutineTemplate(id);
+        await routineTemplateService.deleteRoutineTemplate(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');

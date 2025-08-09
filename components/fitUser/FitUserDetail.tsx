@@ -5,7 +5,7 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { fitUserFunctionsService } from '@/services/functions';
+import { fitUserService } from '@/services';
 
 export function FitUserDetail() {
   const [id, setId] = useState('');
@@ -17,7 +17,7 @@ export function FitUserDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fitUserFunctionsService.getFitUserById(id);
+      const res = await fitUserService.getFitUserById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
