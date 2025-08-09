@@ -2,6 +2,32 @@
   "extends": [
     "expo"
   ],
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2022,
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "jsx": true
+        }
+      },
+      "plugins": ["@typescript-eslint"],
+      "extends": [
+        "expo",
+        "@typescript-eslint/recommended"
+      ],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-redeclare": "off"
+      }
+    }
+  ],
   "env": {
     "browser": true,
     "node": true,
@@ -9,18 +35,22 @@
     "jest": true
   },
   "rules": {
-    "@typescript-eslint/no-unused-vars": "off",
     "no-unused-vars": "off",
     "react-hooks/exhaustive-deps": "off",
     "import/no-unresolved": "off",
     "react/no-unescaped-entities": "off",
-    "@typescript-eslint/no-redeclare": "off",
     "consistent-return": "off",
     "no-undef": "off"
   },
   "ignorePatterns": [
     "node_modules/",
     ".expo/",
-    "dist/"
+    "dist/",
+    "*.js",
+    "**/*.js",
+    "scripts/",
+    "babel.config.js",
+    "metro.config.js",
+    "env-loader.js"
   ]
 }
