@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 import { routineexerciseService, exerciseService } from '@/services';
 import BodyMusclesDiagram from '@/components/body/BodyMusclesDiagram';
+
 import { mapTagsToOverlayOpacities } from '@/components/body/overlayMapping';
 import type { Exercise } from '@/models/Exercise';
 
@@ -18,6 +19,7 @@ export function RoutineExerciseDetail() {
   const [overlayOpacities, setOverlayOpacities] = useState<Record<string, number>>({});
   // Nuevos: mantener los tags crudos (0..1) para el gráfico 0..10
   const [muscleTags01, setMuscleTags01] = useState<Record<string, number>>({});
+
 
   const DEFAULT_EXERCISE_ID = 'C1A5BC8E-E264-4B32-A902-D25EEECF35B9';
 
@@ -41,11 +43,10 @@ export function RoutineExerciseDetail() {
           tags = {};
         }
       }
-    
-  // No usar datos mock; mostrar solo lo que venga del backend
-      // Guardar para el gráfico (0..1) y para overlays
+
+      // No usar datos mock; mostrar solo lo que venga del backend
       setMuscleTags01(tags);
-  const overlay = mapTagsToOverlayOpacities(tags);
+      const overlay = mapTagsToOverlayOpacities(tags);
       setOverlayOpacities(overlay);
     } catch (_e) {
       setError('Error al consultar');
@@ -123,6 +124,7 @@ export function RoutineExerciseDetail() {
                 ))}
               </View>
             </View>
+
           </>
         )}
       </ScrollView>
