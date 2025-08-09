@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
 import BodyMusclesDiagram from '@/components/body/BodyMusclesDiagram';
 import { exerciseService } from '@/services/exerciseService';
 import type { Exercise } from '@/models/Exercise';
@@ -18,38 +18,23 @@ export default function ExerciseOverlayPreviewScreen() {
       try {
         setLoading(true);
         const res = await exerciseService.getExerciseById(TARGET_ID);
-        const exercise = res.Data as Exercise | null;
+  const exercise = res.Data as Exercise | null;
         let tags: Record<string, number> = {};
         if (exercise?.TagsMuscle) {
           try {
-            tags = JSON.parse(exercise.TagsMuscle) as Record<string, number>;
+            if (typeof exercise.TagsMuscle === 'string') {
+              tags = JSON.parse(exercise.TagsMuscle) as Record<string, number>;
+            } else if (typeof exercise.TagsMuscle === 'object') {
+              tags = exercise.TagsMuscle as any;
+            }
           } catch {
             tags = {};
           }
         }
-        if (!tags || Object.keys(tags).length === 0) {
-          tags = {
-            Dorsal: 0.0,
-            'Glúteos': 0.0,
-            Isquiotibiales: 0.0,
-            Pantorrillas: 0.0,
-            'Sóleo': 0.0,
-            Trapecio: 0.1,
-            'Tríceps': 0.0,
-            'Serrato anterior': 0.0,
-            'Bíceps': 0.8,
-            'Cuádriceps': 0.0,
-            Deltoides: 0.2,
-            Dorsales: 0.0,
-            Oblicuos: 0.1,
-            'Pectoral mayor': 0.0,
-            'Recto abdominal': 0.1,
-          } as any;
-        }
-        const overlay = mapTagsToOverlayOpacities(tags);
+  const overlay = mapTagsToOverlayOpacities(tags);
         if (!cancelled) {
           setOverlayOpacities(overlay);
-          setError(null);
+          setError(exercise ? null : 'Ejercicio no encontrado o sin datos');
         }
       } catch (e: any) {
         if (!cancelled) setError(e?.message || 'Error cargando ejercicio');
@@ -72,12 +57,14 @@ export default function ExerciseOverlayPreviewScreen() {
   }
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
-      <Text style={{ marginBottom: 8 }}>Preview overlays para ejercicio {TARGET_ID}</Text>
-      <View style={{ height: '70%' }}>
-        <BodyMusclesDiagram palette="mono" width="100%" height="100%" overlayOpacities={overlayOpacities} />
-      </View>
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 24 }}>
+        {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
+        <Text style={{ marginBottom: 8 }}>Preview overlays para ejercicio {TARGET_ID}</Text>
+        <View style={{ height: 420 }}>
+          <BodyMusclesDiagram palette="mono" width="100%" height="100%" overlayOpacities={overlayOpacities} />
+        </View>
+      </ScrollView>
     </View>
   );
 }

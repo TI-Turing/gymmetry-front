@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Environment } from '../environment';
 import { logger } from '@/utils';
 import type { ApiResponse as BackendApiResponse } from '@/dto/common/ApiResponse';
@@ -28,11 +29,13 @@ class ApiService {
         'Accept-Encoding': 'gzip, deflate, br',
         Connection: 'keep-alive',
         'User-Agent': 'ExpoApp/1.0.0',
+  // Azure Functions (API principal)
+  'x-functions-key': Environment.API_MAIN_FUNCTIONS_KEY,
       },
     });
 
     this.axiosInstance.interceptors.request.use(
-      config => {
+      async config => {
         if (config.headers) {
           // Extraer host dinámicamente de la URL base
           const baseUrl = config.baseURL || Environment.API_BASE_URL;
@@ -44,6 +47,27 @@ class ApiService {
             config.headers['Host'] = 'localhost:7160';
           }
           config.headers['Cache-Control'] = 'no-cache';
+          // Asegurar la clave de funciones para el API principal
+          if (!config.headers['x-functions-key']) {
+            config.headers['x-functions-key'] = Environment.API_MAIN_FUNCTIONS_KEY;
+          }
+
+          // Inyectar Authorization si no viene en el request y hay token guardado
+          const hasAuthHeader =
+            !!config.headers['Authorization'] || !!config.headers['authorization'];
+          if (!hasAuthHeader) {
+            try {
+              let token = await AsyncStorage.getItem('authToken');
+              if (!token) {
+                token = await AsyncStorage.getItem('@auth_token');
+              }
+              if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+              }
+            } catch {
+              // Ignorar errores de lectura de storage
+            }
+          }
         }
 
         const fullUrl = `${config.baseURL}${config.url}`;
@@ -73,7 +97,10 @@ class ApiService {
       let curlCommand = `curl -X ${method}`;
       Object.keys(headers || {}).forEach(key => {
         if (headers[key] && key !== 'common') {
-          const headerValue = String(headers[key]).replace(/"/g, '\\"');
+          const isAuth = key.toLowerCase() === 'authorization';
+          const headerValue = isAuth
+            ? 'Bearer ****'
+            : String(headers[key]).replace(/"/g, '\\"');
           curlCommand += ` ^
   -H "${key}: ${headerValue}"`;
         }
@@ -130,9 +157,20 @@ class ApiService {
             const { authService } = await import('./authService');
             const refreshed = await authService.refreshAuthToken();
 
-            if (refreshed) {
+            if (refreshed?.Success && refreshed.Data) {
               // Procesar cola de requests fallidos
               this.processQueue(null);
+              // Leer y setear el nuevo token en defaults y en el request original
+              try {
+                const newToken = await AsyncStorage.getItem('authToken');
+                if (newToken) {
+                  this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+                  if (!originalRequest.headers) originalRequest.headers = {};
+                  originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                }
+              } catch {
+                // si falla la lectura, igual reintentamos
+              }
               // Reintentar el request original
               return this.axiosInstance(originalRequest);
             } else {

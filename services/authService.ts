@@ -22,6 +22,14 @@ export const authService = {
     // Guardar datos del usuario en AsyncStorage si el login es exitoso
     if (response.Success && response.Data) {
       await AsyncStorage.setItem('@user_data', JSON.stringify(response.Data));
+      // Guardar tokens si existen y configurar Authorization global
+      if (response.Data.Token) {
+        await AsyncStorage.setItem('authToken', response.Data.Token);
+        apiService.setAuthToken(response.Data.Token);
+      }
+      if (response.Data.RefreshToken) {
+        await AsyncStorage.setItem('refreshToken', response.Data.RefreshToken);
+      }
     }
     
     return response;
@@ -83,7 +91,10 @@ export const authService = {
   async logout(): Promise<void> {
     try {
       await AsyncStorage.removeItem('@user_data');
-      await AsyncStorage.removeItem('@auth_token');
+  await AsyncStorage.removeItem('@auth_token');
+  await AsyncStorage.removeItem('authToken');
+  await AsyncStorage.removeItem('refreshToken');
+  apiService.removeAuthToken();
     } catch {
       // Handle error silently
     }

@@ -9,6 +9,7 @@ import FloatingActionButton from '@/components/home/FloatingActionButton';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { router } from 'expo-router';
+import Button from '@/components/common/Button';
 
 type DayStatus = 'completed' | 'failed' | 'rest';
 
@@ -107,6 +108,10 @@ function HomeScreen() {
     router.push('/routine-day-detail');
   };
 
+  const handleOpenRoutineExerciseDetail = () => {
+    router.push('/routine-exercise-detail');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {Platform.OS !== 'web' && <MobileHeader />}
@@ -142,6 +147,16 @@ function HomeScreen() {
           onPress={handleRoutinePress}
         />
 
+        {/* Acceso directo a RoutineExercise - Detalle */}
+    <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
+          <Text style={{ color: '#B0B0B0', marginBottom: 8 }}>
+            Navegación de depuración
+          </Text>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+      <Button title='Abrir RoutineExercise - Detalle' onPress={handleOpenRoutineExerciseDetail} />
+          </View>
+        </View>
+
         {/* Espacio extra para el botón flotante */}
         <View style={styles.spacer} />
       </ScrollView>
@@ -152,6 +167,8 @@ function HomeScreen() {
         icon='play'
         backgroundColor='#FF6B35'
       />
+
+  {/* Fin navegación de depuración */}
 
       {/* Componente de Alertas */}
       <AlertComponent />

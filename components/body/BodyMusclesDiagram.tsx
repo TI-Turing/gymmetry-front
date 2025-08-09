@@ -65,11 +65,10 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
     const load = async () => {
       try {
         setLoading(true);
-        const frontAsset = Asset.fromModule(require('../../assets/images/muscles/muscular_system_front.svg'));
-        const backAsset = Asset.fromModule(require('../../assets/images/muscles/muscular_system_back.svg'));
-
-        // Declaración explícita de capas (solo carpeta main, nombres actualizados)
-        const overlayModules = [
+        // Definir módulos (ids de require) y metadatos para overlays
+        const frontMod = require('../../assets/images/muscles/muscular_system_front.svg');
+        const backMod = require('../../assets/images/muscles/muscular_system_back.svg');
+        const overlayDefs = [
           { mod: require('../../assets/images/muscles/main/front-biceps.svg'), key: 'front-biceps', side: 'front' as const },
           { mod: require('../../assets/images/muscles/main/front-cuadriceps.svg'), key: 'front-cuadriceps', side: 'front' as const },
           { mod: require('../../assets/images/muscles/main/front-deltoides.svg'), key: 'front-deltoides', side: 'front' as const },
@@ -87,32 +86,41 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
           { mod: require('../../assets/images/muscles/main/back-triceps.svg'), key: 'back-triceps', side: 'back' as const },
         ];
 
-        // Descargar base y overlays
-        await Promise.all([
-          frontAsset.downloadAsync(),
-          backAsset.downloadAsync(),
-          ...overlayModules.map(m => Asset.fromModule(m.mod).downloadAsync()),
+        // Cargar todos los assets de una vez y obtener instancias con localUri
+        const allAssets = await Asset.loadAsync([
+          frontMod,
+          backMod,
+          ...overlayDefs.map(d => d.mod),
         ]);
+        const frontAsset = allAssets[0];
+        const backAsset = allAssets[1];
+        const overlayAssets = allAssets.slice(2);
+
         const readText = async (asset: Asset) => {
           const uri = asset.localUri || asset.uri;
+          if (!uri) throw new Error('URI de asset no disponible');
           if (uri.startsWith('file://') || uri.startsWith('content://')) {
             return await FileSystem.readAsStringAsync(uri);
           }
           const resp = await fetch(uri);
           return await resp.text();
         };
-        const [frontText, backText] = await Promise.all([
+
+        const [frontText, backText, overlayTexts] = await Promise.all([
           readText(frontAsset),
           readText(backAsset),
+          Promise.all(overlayAssets.map(a => readText(a))),
         ]);
-        const overlaysText = await Promise.all(
-          overlayModules.map(({ mod }) => readText(Asset.fromModule(mod)))
-        );
+
         if (!cancelled) {
           setFrontXml(monoTransform(frontText));
           setBackXml(monoTransform(backText));
-          // Inicializar todas las capas con opacity 0
-          const initialLayers: OverlayLayer[] = overlaysText.map((xml, idx) => ({ key: overlayModules[idx].key, xml, opacity: 0, side: overlayModules[idx].side }));
+          const initialLayers: OverlayLayer[] = overlayTexts.map((xml, idx) => ({
+            key: overlayDefs[idx].key,
+            xml,
+            opacity: 0,
+            side: overlayDefs[idx].side,
+          }));
           setOverlayLayers(initialLayers);
           setError(null);
         }

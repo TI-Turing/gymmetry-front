@@ -19,6 +19,10 @@ const TAG_TO_OVERLAY_KEY: Record<string, string> = {
   dorsales: 'front-dorsales',
   oblicuos: 'front-oblicuos',
   'pectoral mayor': 'front-pectoralMayor',
+  // Alias comunes reportados por backend
+  pectoral: 'front-pectoralMayor',
+  pectorales: 'front-pectoralMayor',
+  pecho: 'front-pectoralMayor',
   'recto abdominal': 'front-rectoAbdominal',
   'serrato anterior': 'front-serratoAnterior',
   // Espalda
