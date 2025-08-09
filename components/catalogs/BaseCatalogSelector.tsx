@@ -23,8 +23,8 @@ interface BaseCatalogSelectorProps {
 export const BaseCatalogSelector = memo<BaseCatalogSelectorProps>(
   ({
     label,
-    value,
-    placeholder = 'Seleccionar...',
+  value,
+  placeholder = 'Seleccione',
     disabled = false,
     loading = false,
     required = false,
@@ -41,7 +41,7 @@ export const BaseCatalogSelector = memo<BaseCatalogSelectorProps>(
       return data.find(item => item.Id === value);
     }, [data, value]);
 
-    const displayText = selectedItem?.Nombre || placeholder;
+  const displayText = selectedItem?.Nombre || placeholder;
     const isSelected = !!selectedItem;
 
     return (

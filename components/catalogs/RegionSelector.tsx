@@ -8,8 +8,7 @@ export const RegionSelector = memo<RegionSelectorProps>(
     regions,
     countryId,
     value,
-    onSelect,
-    placeholder = 'Seleccionar región/estado',
+  onSelect,
     disabled = false,
     loading = false,
     required = false,
@@ -38,7 +37,6 @@ export const RegionSelector = memo<RegionSelectorProps>(
         <BaseCatalogSelector
           label='Región/Estado'
           value={value}
-          placeholder={placeholder}
           disabled={isDisabled}
           loading={loading}
           required={required}
@@ -56,6 +54,9 @@ export const RegionSelector = memo<RegionSelectorProps>(
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}
           loading={loading}
+          selectedId={value}
+          showSearch
+          searchPlaceholder='Buscar región...'
         />
       </>
     );

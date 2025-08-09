@@ -8,7 +8,7 @@ import { commonStyles } from '../styles/common';
 import { PasswordInput } from '../PasswordInput';
 import { PasswordRequirements } from '../PasswordRequirements';
 import { useStep1Form } from '../hooks/useStep1Form';
-import { useCustomAlert } from '../CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface Step1Props {
   onNext: (data: Step1Data) => void;

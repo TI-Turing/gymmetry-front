@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../../Themed';
 import { useColorScheme } from '../../useColorScheme';
@@ -10,9 +10,9 @@ import { userSessionService } from '@/services/userSessionService';
 import { Step3Data, Country } from '../types';
 // import { handleApiError } from '../utils/api';
 import { commonStyles } from '../styles/common';
-import { FilterableModal } from '../FilterableModal';
+// import { FilterableModal } from '../FilterableModal';
 import { useStep3Form } from '../hooks/useStep3Form';
-import { useCustomAlert } from '../CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import {
   Country as CountryType,
   Region,
@@ -20,6 +20,10 @@ import {
   EPS,
   DocumentType,
 } from '@/dto/common';
+import { RegionSelector } from '@/components/catalogs/RegionSelector';
+import { CitySelector } from '@/components/catalogs/CitySelector';
+import { DocumentTypeSelector } from '@/components/catalogs/DocumentTypeSelector';
+import { EPSSelector } from '@/components/catalogs/EPSSelector';
 
 interface Step3Props {
   userId: string;
@@ -37,7 +41,10 @@ interface CatalogData {
   userCountryData: { id: string; name: string } | null;
 }
 
-export default function Step3({ userId, onNext, initialData }: Step3Props) {
+export default forwardRef(function Step3(
+  { userId, onNext, onBack, initialData }: Step3Props,
+  ref
+) {
   const colorScheme = useColorScheme();
   const { showError, AlertComponent } = useCustomAlert();
   const formData = useStep3Form(initialData);
@@ -171,19 +178,19 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     loadEPS();
   }, [loadUserCountry, loadCountries, loadEPS]); // cargar una vez
 
-  // Load dependent data - solo depende del selectedCountryId, no de las funciones
+  // Load dependent data - solo depende del selectedCountryId
   useEffect(() => {
     if (formData.selectedCountryId) {
       loadRegions(formData.selectedCountryId);
       loadDocumentTypes(formData.selectedCountryId);
     }
-  }, [formData.selectedCountryId, loadRegions, loadDocumentTypes]);
+  }, [formData.selectedCountryId]);
 
   useEffect(() => {
     if (formData.selectedRegionId) {
       loadCities(formData.selectedRegionId);
     }
-  }, [formData.selectedRegionId, loadCities]);
+  }, [formData.selectedRegionId]);
 
   // Auto-select user's country
   useEffect(() => {
@@ -261,65 +268,70 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
     }
   }, [formData, selectedCountry, userId, onNext, showError]);
 
-  const handleRegionSelect = useCallback(
-    (item: Region) => {
-      formData.setRegion(item.Nombre);
-      formData.setSelectedRegionId(item.Id);
-      formData.setShowRegionModal(false);
-      formData.setRegionFilter('');
-      formData.clearCityData();
+  // Exponer snapshot para preservar datos al retroceder
+  useImperativeHandle(ref, () => ({
+    snapshot: () => ({
+      eps: formData.eps || undefined,
+      epsId: formData.selectedEpsId || undefined,
+      country: formData.country || undefined,
+      countryId: formData.selectedCountryId || undefined,
+      region: formData.region || undefined,
+      regionId: formData.selectedRegionId || undefined,
+      city: formData.city || undefined,
+      cityId: formData.selectedCityId || undefined,
+      documentType: formData.documentType || undefined,
+      documentTypeId: formData.selectedDocumentTypeId || undefined,
+      documentNumber: formData.documentNumber || undefined,
+      emergencyContact: formData.emergencyContact || undefined,
+      emergencyPhone: formData.emergencyPhone || undefined,
+      address: formData.address || undefined,
+    }),
+  }));
+
+  // Handlers al usar componentes de catálogos reutilizables
+  const onRegionSelect = useCallback(
+    (id: string) => {
+      const item = catalogData.regions.find(r => r.Id === id);
+      if (item) {
+        formData.setRegion(item.Nombre);
+        formData.setSelectedRegionId(item.Id);
+        formData.clearCityData();
+      }
     },
-    [formData]
+    [catalogData.regions, formData]
   );
 
-  const handleCitySelect = useCallback(
-    (item: City) => {
-      formData.setCity(item.Nombre);
-      formData.setSelectedCityId(item.Id);
-      formData.setShowCityModal(false);
-      formData.setCityFilter('');
+  const onCitySelect = useCallback(
+    (id: string) => {
+      const item = catalogData.cities.find(c => c.Id === id);
+      if (item) {
+        formData.setCity(item.Nombre);
+        formData.setSelectedCityId(item.Id);
+      }
     },
-    [formData]
+    [catalogData.cities, formData]
   );
 
-  const handleDocumentTypeSelect = useCallback(
-    (item: DocumentType) => {
-      formData.setDocumentType(item.Nombre);
-      formData.setSelectedDocumentTypeId(item.Id);
-      formData.setShowDocumentTypeModal(false);
-      formData.setDocumentTypeFilter('');
+  const onDocumentTypeSelect = useCallback(
+    (id: string) => {
+      const item = catalogData.documentTypes.find(d => d.Id === id);
+      if (item) {
+        formData.setDocumentType(item.Nombre);
+        formData.setSelectedDocumentTypeId(item.Id);
+      }
     },
-    [formData]
+    [catalogData.documentTypes, formData]
   );
 
-  const handleEpsSelect = useCallback(
-    (item: EPS) => {
-      formData.setEps(item.Nombre);
-      formData.setSelectedEpsId(item.Id);
-      formData.setShowEpsModal(false);
-      formData.setEpsFilter('');
+  const onEpsSelect = useCallback(
+    (id: string) => {
+      const item = catalogData.epsOptions.find(e => e.Id === id);
+      if (item) {
+        formData.setEps(item.Nombre);
+        formData.setSelectedEpsId(item.Id);
+      }
     },
-    [formData]
-  );
-
-  const filteredRegions = useMemo(
-    () => formData.getFilteredRegions(catalogData.regions),
-    [formData, catalogData.regions]
-  );
-
-  const filteredCities = useMemo(
-    () => formData.getFilteredCities(catalogData.cities),
-    [formData, catalogData.cities]
-  );
-
-  const filteredEps = useMemo(
-    () => formData.getFilteredEps(catalogData.epsOptions),
-    [formData, catalogData.epsOptions]
-  );
-
-  const filteredDocumentTypes = useMemo(
-    () => formData.getFilteredDocumentTypes(catalogData.documentTypes),
-    [formData, catalogData.documentTypes]
+    [catalogData.epsOptions, formData]
   );
 
   return (
@@ -366,149 +378,33 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         </View>
 
         {/* Región */}
-        <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
-            Región
-          </Text>
-          <TouchableOpacity
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              },
-            ]}
-            onPress={() => {
-              if (!formData.selectedCountryId) {
-                return;
-              }
-              formData.setShowRegionModal(true);
-              if (catalogData.regions.length === 0) {
-                loadRegions(formData.selectedCountryId);
-              }
-            }}
-            disabled={!formData.selectedCountryId}
-          >
-            <Text
-              style={{
-                color: formData.selectedRegionId
-                  ? Colors[colorScheme].text
-                  : `${Colors[colorScheme].text}60`,
-              }}
-            >
-              {formData.selectedRegionId
-                ? catalogData.regions.find(
-                    (r: Region) => r.Id === formData.selectedRegionId
-                  )?.Nombre || 'Región seleccionada'
-                : formData.selectedCountryId
-                  ? 'Selecciona una región'
-                  : 'Selecciona un país primero'}
-            </Text>
-            <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
-              ▼
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <RegionSelector
+          regions={catalogData.regions as any}
+          countryId={formData.selectedCountryId}
+          value={formData.selectedRegionId}
+          onSelect={onRegionSelect}
+          disabled={!formData.selectedCountryId}
+          loading={regionsLoading}
+        />
 
         {/* Ciudad */}
-        <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
-            Ciudad
-          </Text>
-          <TouchableOpacity
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              },
-            ]}
-            onPress={() => {
-              if (!formData.selectedRegionId) {
-                return;
-              }
-              formData.setShowCityModal(true);
-              if (catalogData.cities.length === 0) {
-                loadCities(formData.selectedRegionId);
-              }
-            }}
-            disabled={!formData.selectedRegionId}
-          >
-            <Text
-              style={{
-                color: formData.selectedCityId
-                  ? Colors[colorScheme].text
-                  : `${Colors[colorScheme].text}60`,
-              }}
-            >
-              {formData.selectedCityId
-                ? catalogData.cities.find(
-                    (c: City) => c.Id === formData.selectedCityId
-                  )?.Nombre || 'Ciudad seleccionada'
-                : formData.selectedRegionId
-                  ? 'Selecciona una ciudad'
-                  : 'Selecciona una región primero'}
-            </Text>
-            <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
-              ▼
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <CitySelector
+          cities={catalogData.cities as any}
+          regionId={formData.selectedRegionId}
+          value={formData.selectedCityId}
+          onSelect={onCitySelect}
+          disabled={!formData.selectedRegionId}
+          loading={citiesLoading}
+        />
 
         {/* Tipo de documento */}
-        <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
-            Tipo de documento
-          </Text>
-          <TouchableOpacity
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              },
-            ]}
-            onPress={() => {
-              formData.setShowDocumentTypeModal(true);
-              if (catalogData.documentTypes.length === 0) {
-                loadDocumentTypes();
-              }
-            }}
-          >
-            <Text
-              style={{
-                color: formData.selectedDocumentTypeId
-                  ? Colors[colorScheme].text
-                  : `${Colors[colorScheme].text}60`,
-              }}
-            >
-              {formData.selectedDocumentTypeId
-                ? catalogData.documentTypes.find(
-                    (d: DocumentType) =>
-                      d.Id === formData.selectedDocumentTypeId
-                  )?.Nombre || 'Documento seleccionado'
-                : 'Selecciona tipo de documento'}
-            </Text>
-            <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
-              ▼
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <DocumentTypeSelector
+          documentTypes={catalogData.documentTypes as any}
+          countryId={formData.selectedCountryId}
+          value={formData.selectedDocumentTypeId}
+          onSelect={onDocumentTypeSelect}
+          loading={documentTypesLoading}
+        />
 
         {/* Número de documento */}
         <View style={commonStyles.inputContainer}>
@@ -536,43 +432,12 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         </View>
 
         {/* EPS */}
-        <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
-            EPS
-          </Text>
-          <TouchableOpacity
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              },
-            ]}
-            onPress={() => formData.setShowEpsModal(true)}
-          >
-            <Text
-              style={{
-                color: formData.selectedEpsId
-                  ? Colors[colorScheme].text
-                  : `${Colors[colorScheme].text}60`,
-              }}
-            >
-              {formData.selectedEpsId
-                ? catalogData.epsOptions.find(
-                    (e: EPS) => e.Id === formData.selectedEpsId
-                  )?.Nombre || 'EPS seleccionada'
-                : 'Selecciona tu EPS'}
-            </Text>
-            <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
-              ▼
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <EPSSelector
+          epsOptions={catalogData.epsOptions as any}
+          value={formData.selectedEpsId}
+          onSelect={onEpsSelect}
+          loading={epsLoading}
+        />
 
         {/* Contacto de emergencia */}
         <View style={commonStyles.inputContainer}>
@@ -675,73 +540,10 @@ export default function Step3({ userId, onNext, initialData }: Step3Props) {
         </TouchableOpacity>
       </View>
 
-      {/* Modals */}
-      <FilterableModal
-        visible={formData.showRegionModal}
-        onClose={() => {
-          formData.setShowRegionModal(false);
-          formData.setRegionFilter('');
-        }}
-        title='Seleccionar Región'
-        data={filteredRegions}
-        selectedId={formData.selectedRegionId}
-        onSelect={handleRegionSelect}
-        filter={formData.regionFilter}
-        onFilterChange={formData.setRegionFilter}
-        getItemId={(item: Region) => item.Id}
-        getItemName={(item: Region) => item.Nombre}
-      />
-
-      <FilterableModal
-        visible={formData.showCityModal}
-        onClose={() => {
-          formData.setShowCityModal(false);
-          formData.setCityFilter('');
-        }}
-        title='Seleccionar Ciudad'
-        data={filteredCities}
-        selectedId={formData.selectedCityId}
-        onSelect={handleCitySelect}
-        filter={formData.cityFilter}
-        onFilterChange={formData.setCityFilter}
-        getItemId={(item: City) => item.Id}
-        getItemName={(item: City) => item.Nombre}
-      />
-
-      <FilterableModal
-        visible={formData.showDocumentTypeModal}
-        onClose={() => {
-          formData.setShowDocumentTypeModal(false);
-          formData.setDocumentTypeFilter('');
-        }}
-        title='Seleccionar Tipo de Documento'
-        data={filteredDocumentTypes}
-        selectedId={formData.selectedDocumentTypeId}
-        onSelect={handleDocumentTypeSelect}
-        filter={formData.documentTypeFilter}
-        onFilterChange={formData.setDocumentTypeFilter}
-        getItemId={(item: DocumentType) => item.Id}
-        getItemName={(item: DocumentType) => item.Nombre}
-      />
-
-      <FilterableModal
-        visible={formData.showEpsModal}
-        onClose={() => {
-          formData.setShowEpsModal(false);
-          formData.setEpsFilter('');
-        }}
-        title='Seleccionar EPS'
-        data={filteredEps}
-        selectedId={formData.selectedEpsId}
-        onSelect={handleEpsSelect}
-        filter={formData.epsFilter}
-        onFilterChange={formData.setEpsFilter}
-        getItemId={(item: EPS) => item.Id}
-        getItemName={(item: EPS) => item.Nombre}
-      />
+  {/* Modals propios removidos: usando componentes de catálogos reutilizables */}
 
       {/* Componente de alertas personalizado */}
       <AlertComponent />
     </ScrollView>
   );
-}
+});

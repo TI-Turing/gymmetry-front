@@ -27,7 +27,7 @@ interface AccessMethodDropdownProps {
 export default function AccessMethodDropdown({
   value,
   onValueChange,
-  placeholder = 'Seleccione un método de acceso',
+  placeholder = 'Seleccione',
   disabled = false,
   required = false,
   label,

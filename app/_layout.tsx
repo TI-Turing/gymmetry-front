@@ -86,12 +86,12 @@ function RootLayoutNav() {
     const first = segments[0] as string | undefined; // p.ej. '(tabs)', 'login', 'register', 'plans', 'modal', etc.
 
     // Rutas de la app a las que un usuario autenticado SÍ puede entrar aunque no sean parte de (tabs)
-    const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal']);
+    const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal', 'routine-day-detail']);
 
     // Usuario NO autenticado intentando entrar a la app (tabs, plans, modal) -> mandar a login
     if (
       !isAuthenticated &&
-      (first === '(tabs)' || first === 'plans' || first === 'modal')
+      (first === '(tabs)' || first === 'plans' || first === 'modal' || first === 'routine-day-detail')
     ) {
       router.replace('/login');
       return;
@@ -125,6 +125,10 @@ function RootLayoutNav() {
         <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
         <Stack.Screen
           name='plans'
+          options={{ presentation: 'modal', headerShown: false }}
+        />
+        <Stack.Screen
+          name='routine-day-detail'
           options={{ presentation: 'modal', headerShown: false }}
         />
       </Stack>

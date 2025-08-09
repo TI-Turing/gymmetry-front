@@ -161,7 +161,6 @@ export default function CountryCodePicker({
               ]}
               value={searchText}
               onChangeText={setSearchText}
-              placeholder='Buscar país...'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
 

@@ -9,10 +9,13 @@ import {
   EPS,
   DocumentType,
 } from '../dto/common';
-import { createJSReanimatedModule } from 'react-native-reanimated/lib/typescript/ReanimatedModule/js-reanimated';
 
 class CatalogService {
   private catalogsAPI: AxiosInstance;
+  // Caché en memoria por clave (endpoint+parámetros)
+  private cache = new Map<string, { timestamp: number; data: any }>();
+  private inFlight = new Map<string, Promise<any>>();
+  private readonly TTL_MS = 10 * 60 * 1000; // 10 minutos
 
   constructor() {
     this.catalogsAPI = axios.create({
@@ -63,6 +66,41 @@ class CatalogService {
     );
   }
 
+  private getFromCache<T>(key: string): T | undefined {
+    const entry = this.cache.get(key);
+    if (entry && Date.now() - entry.timestamp < this.TTL_MS) {
+      return entry.data as T;
+    }
+    // Expirado
+    if (entry) this.cache.delete(key);
+    return undefined;
+  }
+
+  private setCache<T>(key: string, data: T): void {
+    this.cache.set(key, { timestamp: Date.now(), data });
+  }
+
+  private async getOrFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+    const cached = this.getFromCache<T>(key);
+    if (cached !== undefined) return cached;
+
+    const ongoing = this.inFlight.get(key) as Promise<T> | undefined;
+    if (ongoing) return ongoing;
+
+    const promise = (async () => {
+      try {
+        const data = await fetcher();
+        this.setCache(key, data);
+        return data;
+      } finally {
+        this.inFlight.delete(key);
+      }
+    })();
+
+    this.inFlight.set(key, promise);
+    return promise;
+  }
+
   private generateCurlCommand(
     method: string,
     url: string,
@@ -98,73 +136,90 @@ class CatalogService {
   }
 
   async getGenders(): Promise<Gender[]> {
-    try {
-      const response = await this.catalogsAPI.get<Gender[]>('/generos');
-      const genders = response.data || [];
-      return this.sortByName(genders);
-    } catch (error) {
-      throw error;
-    }
+    const key = 'genders';
+    return this.getOrFetch<Gender[]>(key, async () => {
+      try {
+        const response = await this.catalogsAPI.get<Gender[]>('/generos');
+        const genders = response.data || [];
+        return this.sortByName(genders);
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   async getCountries(): Promise<Country[]> {
-    try {
-      const response = await this.catalogsAPI.get<Country[]>('/paises');
-      const countries = response.data || [];
-      return this.sortByName(countries);
-    } catch (error) {
-      throw error;
-    }
+    const key = 'countries';
+    return this.getOrFetch<Country[]>(key, async () => {
+      try {
+        const response = await this.catalogsAPI.get<Country[]>('/paises');
+        const countries = response.data || [];
+        return this.sortByName(countries);
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   async getRegionsByCountry(countryId: string): Promise<Region[]> {
-    try {
-      const response = await this.catalogsAPI.get<Region[]>(
-        `/regiones?paisId=${countryId}`
-      );
-      const regions = response.data || [];
-      return this.sortByName(regions);
-    } catch (error) {
-      throw error;
-    }
+    const key = `regions:${countryId}`;
+    return this.getOrFetch<Region[]>(key, async () => {
+      try {
+        const response = await this.catalogsAPI.get<Region[]>(
+          `/regiones?paisId=${countryId}`
+        );
+        const regions = response.data || [];
+        return this.sortByName(regions);
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   async getCitiesByRegion(regionId: string): Promise<City[]> {
-    try {
-      const response = await this.catalogsAPI.get<City[]>(
-        `/ciudades?regionId=${regionId}`
-      );
-      const cities = response.data || [];
-      return this.sortByName(cities);
-    } catch (error) {
-      throw error;
-    }
+    const key = `cities:${regionId}`;
+    return this.getOrFetch<City[]>(key, async () => {
+      try {
+        const response = await this.catalogsAPI.get<City[]>(
+          `/ciudades?regionId=${regionId}`
+        );
+        const cities = response.data || [];
+        return this.sortByName(cities);
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   async getEPS(): Promise<EPS[]> {
-    try {
-      const response = await this.catalogsAPI.get<EPS[]>('/eps');
-      const epsOptions = response.data || [];
-      return this.sortByName(epsOptions);
-    } catch (error) {
-      throw error;
-    }
+    const key = 'eps';
+    return this.getOrFetch<EPS[]>(key, async () => {
+      try {
+        const response = await this.catalogsAPI.get<EPS[]>('/eps');
+        const epsOptions = response.data || [];
+        return this.sortByName(epsOptions);
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   async getDocumentTypes(countryId?: string): Promise<DocumentType[]> {
-    try {
-      // Si no se proporciona countryId, usar el país del usuario de la sesión
-      const finalCountryId = countryId || userSessionService.getUserCountryId();
-      const url = finalCountryId
-        ? `/tiposdocumento?paisId=${finalCountryId}`
-        : '/tiposdocumento';
-
-      const response = await this.catalogsAPI.get<DocumentType[]>(url);
-      const documentTypes = response.data || [];
-      return this.sortByName(documentTypes);
-    } catch (error) {
-      throw error;
-    }
+    // Si no se proporciona countryId, usar el país del usuario de la sesión
+    const finalCountryId = countryId || userSessionService.getUserCountryId();
+    const key = `documentTypes:${finalCountryId ?? 'all'}`;
+    return this.getOrFetch<DocumentType[]>(key, async () => {
+      try {
+        const url = finalCountryId
+          ? `/tiposdocumento?paisId=${finalCountryId}`
+          : '/tiposdocumento';
+        const response = await this.catalogsAPI.get<DocumentType[]>(url);
+        const documentTypes = response.data || [];
+        return this.sortByName(documentTypes);
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   async getDocumentTypesByCountry(countryId?: string): Promise<DocumentType[]> {

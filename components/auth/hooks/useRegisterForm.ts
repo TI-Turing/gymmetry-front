@@ -12,6 +12,7 @@ interface RegistrationData {
   phone?: string;
   birthDate?: string;
   genderId?: string;
+  phoneVerified?: boolean;
   eps?: string;
   country?: string;
   region?: string;
@@ -22,6 +23,10 @@ interface RegistrationData {
   documentType?: string;
   documentTypeId?: string;
   countryId?: string;
+  regionId?: string;
+  cityId?: string;
+  epsId?: string;
+  documentNumber?: string;
   fitnessGoal?: string;
   healthRestrictions?: string;
   additionalInfo?: string;
@@ -41,6 +46,12 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
     email: '',
     password: '',
   });
+
+  // Permite actualizar parcialmente los datos entre pasos (p.ej., al retroceder)
+  const patchRegistrationData = useCallback((patch: Partial<RegistrationData>) => {
+    if (!patch) return;
+    setRegistrationData(prev => ({ ...prev, ...patch }));
+  }, []);
 
   const handleSkipToWelcome = useCallback(() => {
     if (registrationData.token) {
@@ -138,6 +149,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
     showWelcomeScreen,
     registrationData,
     setCurrentStep,
+  patchRegistrationData,
     handleSkipToWelcome,
     handleStep1Next,
     handleStep2Next,

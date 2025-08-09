@@ -60,16 +60,51 @@ export const catalogStyles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  searchInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+    borderColor: '#666',
+    fontSize: 16,
+  // color definido por getColorSchemeStyles.searchInputText
+  },
+  searchWrapper: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  searchIcon: {
+    position: 'absolute',
+    right: 12,
+  top: '50%',
+  transform: [{ translateY: -9 }],
+  },
   loadingContainer: {
     alignItems: 'center',
     padding: 20,
   },
   optionItem: {
-    padding: 16,
-    borderBottomWidth: 1,
+  padding: 16,
+  borderBottomWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   optionText: {
     fontSize: 16,
+  },
+  optionItemSelected: {
+    // leve indicación de selección
+    backgroundColor: 'transparent',
+  },
+  optionTextSelected: {
+    fontWeight: '600',
+  },
+  checkMark: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 12,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -95,6 +130,9 @@ export const getColorSchemeStyles = (colorScheme: 'light' | 'dark') => ({
   placeholderText: {
     color: `${Colors[colorScheme].text}60`,
   },
+  searchInputText: {
+    color: Colors[colorScheme].text,
+  },
   modalContent: {
     backgroundColor: Colors[colorScheme].background,
   },
@@ -102,7 +140,7 @@ export const getColorSchemeStyles = (colorScheme: 'light' | 'dark') => ({
     color: Colors[colorScheme].text,
   },
   optionItem: {
-    borderBottomColor: `${Colors[colorScheme].text}20`,
+  borderBottomColor: 'transparent',
   },
   optionText: {
     color: Colors[colorScheme].text,

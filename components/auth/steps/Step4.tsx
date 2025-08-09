@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, forwardRef, useImperativeHandle } from 'react';
 import { TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { Text, View } from '../../Themed';
 import { useColorScheme } from '../../useColorScheme';
@@ -9,7 +9,7 @@ import { commonStyles } from '../styles/common';
 import { FITNESS_GOALS, HEALTH_CONDITIONS } from '../data/fitness';
 import { rhTypes } from '../data/formData';
 import { useStep4Form } from '../hooks/useStep4Form';
-import { useCustomAlert } from '../CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface Step4Props {
   userId: string;
@@ -18,7 +18,8 @@ interface Step4Props {
   initialData?: Step4Data;
 }
 
-const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
+const Step4Inner = forwardRef<any, Step4Props>(
+  ({ userId, onNext, onBack, initialData }, ref) => {
   const colorScheme = useColorScheme();
   const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const {
@@ -33,6 +34,15 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
     setRh,
     handleNext,
   } = useStep4Form({ userId, onNext, initialData, showError, showSuccess });
+
+  useImperativeHandle(ref, () => ({
+    snapshot: () => ({
+      fitnessGoal,
+      healthRestrictions,
+      additionalInfo,
+      rh,
+    }),
+  }));
 
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
@@ -58,7 +68,6 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
       <View style={commonStyles.form}>
         <Dropdown
           label='Objetivo principal'
-          placeholder='¿Cuál es tu objetivo?'
           options={FITNESS_GOALS}
           value={fitnessGoal}
           onSelect={setFitnessGoal}
@@ -66,7 +75,6 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
 
         <Dropdown
           label='Condiciones de salud'
-          placeholder='¿Tienes alguna restricción?'
           options={HEALTH_CONDITIONS}
           value={healthRestrictions}
           onSelect={setHealthRestrictions}
@@ -74,7 +82,6 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
 
         <Dropdown
           label='Tipo de sangre (RH)'
-          placeholder='Selecciona tu tipo de sangre'
           options={rhTypes}
           value={rh}
           onSelect={setRh}
@@ -102,7 +109,6 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
             ]}
             value={additionalInfo}
             onChangeText={setAdditionalInfo}
-            placeholder='Información adicional relevante...'
             placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
             multiline
             numberOfLines={4}
@@ -132,8 +138,9 @@ const Step4 = memo<Step4Props>(({ userId, onNext, initialData }) => {
       <AlertComponent />
     </ScrollView>
   );
-});
+  }
+);
 
-Step4.displayName = 'Step4';
+Step4Inner.displayName = 'Step4';
 
-export default Step4;
+export default memo(Step4Inner);

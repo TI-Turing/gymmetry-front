@@ -157,6 +157,68 @@ class ApiService {
     );
   }
 
+  // Helper: construir URL absoluta con baseURL + endpoint
+  private buildFullUrl(endpoint: string): string {
+    // Si ya es absoluta, regresar tal cual
+    if (/^https?:\/\//i.test(endpoint)) return endpoint;
+    const base = (this.axiosInstance.defaults.baseURL || '').replace(/\/+$/, '');
+    const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    return `${base}${path}`;
+  }
+
+  // Helper: fusionar headers por defecto del axiosInstance con los pasados por options
+  private mergeHeaders(extra?: Record<string, string>): Record<string, string> {
+    const merged: Record<string, string> = {};
+    const defaults: any = this.axiosInstance.defaults.headers as any;
+    // headers comunes definidos en axios
+    if (defaults && defaults.common) {
+      for (const k of Object.keys(defaults.common)) {
+        if (defaults.common[k] != null) merged[k] = String(defaults.common[k]);
+      }
+    }
+    // Content-Type específico si existe en defaults
+    if (defaults && defaults['Content-Type']) merged['Content-Type'] = String(defaults['Content-Type']);
+    if (defaults && defaults['content-type']) merged['content-type'] = String(defaults['content-type']);
+    // Asegurar algunos headers útiles
+    merged['Accept'] = merged['Accept'] || '*/*';
+    // Extra sobrescribe
+    if (extra) {
+      for (const k of Object.keys(extra)) {
+        if (extra[k] != null) merged[k] = String(extra[k]);
+      }
+    }
+    return merged;
+  }
+
+  // Nueva función pública: genera un comando curl para Windows (CMD) y lo retorna como string
+  public generateWindowsCurl(
+    method: HttpMethod,
+    url: string,
+    headers: Record<string, string> = {},
+    data?: any
+  ): string {
+    let curlCommand = `curl -X ${method}`;
+    Object.keys(headers || {}).forEach(key => {
+      if (headers[key] && key !== 'common') {
+        const headerValue = String(headers[key]).replace(/"/g, '\\"');
+        curlCommand += ` ^\n  -H "${key}: ${headerValue}"`;
+      }
+    });
+    if (data != null && ['POST', 'PUT', 'PATCH'].includes(method)) {
+      const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
+      const escapedData = jsonData.replace(/"/g, '\\"');
+      curlCommand += ` ^\n  -d "${escapedData}"`;
+      const hasContentType = Object.keys(headers).some(
+        h => h.toLowerCase() === 'content-type'
+      );
+      if (!hasContentType) {
+        curlCommand += ` ^\n  -H "Content-Type: application/json"`;
+      }
+    }
+    curlCommand += ` ^\n  "${url}"`;
+    return curlCommand;
+  }
+
   // Método para procesar la cola de requests fallidos
   private processQueue(error: any) {
     this.failedQueue.forEach(({ resolve, reject }) => {
@@ -246,6 +308,8 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
+  // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+  // console.log(__curl);
       const response = await this.axiosInstance.get<BackendApiResponse<T>>(
         endpoint,
         {
@@ -271,6 +335,9 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
+      //Show curl
+      // const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      // console.log(__curl);
       const response = await this.axiosInstance.post<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -297,6 +364,8 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
+  // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+  // console.log(__curl);
       const response = await this.axiosInstance.put<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -323,6 +392,8 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
+  // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+  // console.log(__curl);
       const response = await this.axiosInstance.patch<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -348,6 +419,8 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
+  // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+  // console.log(__curl);
       const response = await this.axiosInstance.delete<BackendApiResponse<T>>(
         endpoint,
         {

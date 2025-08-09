@@ -8,12 +8,12 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
     documentTypes,
     countryId,
     value,
-    onSelect,
-    placeholder = 'Seleccionar tipo de documento',
-    disabled = false,
+  onSelect,
+  disabled = false,
     loading = false,
     required = false,
     error,
+  placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar tipo de documento',
     accessibilityHint = 'Presiona para abrir la lista de tipos de documento',
   }) => {
@@ -56,6 +56,9 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}
           loading={loading}
+          selectedId={value}
+          showSearch
+          searchPlaceholder='Buscar tipo de documento...'
         />
       </>
     );

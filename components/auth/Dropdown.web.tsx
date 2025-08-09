@@ -21,7 +21,7 @@ interface DropdownProps {
 
 export default function Dropdown({
   label,
-  placeholder,
+  placeholder = 'Seleccione',
   options,
   value,
   onSelect,
@@ -86,9 +86,7 @@ export default function Dropdown({
           >
             {value || placeholder}
           </Text>
-          <Text style={[styles.arrow, { color: Colors[colorScheme].text }]}>
-            ▼
-          </Text>
+          {/* icono de flecha removido para consistencia con catálogos */}
         </TouchableOpacity>
       </View>
 
@@ -139,7 +137,6 @@ export default function Dropdown({
                 ]}
                 value={searchText}
                 onChangeText={setSearchText}
-                placeholder='Buscar...'
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
               />
             )}

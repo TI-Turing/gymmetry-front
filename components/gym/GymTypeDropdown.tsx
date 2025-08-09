@@ -19,7 +19,7 @@ interface GymTypeDropdownProps {
 
 export default function GymTypeDropdown({
   label,
-  placeholder,
+  placeholder = 'Seleccione',
   options,
   value,
   onSelect,
@@ -30,7 +30,7 @@ export default function GymTypeDropdown({
   const colorScheme = useColorScheme();
 
   const selectedOption = options.find(option => option.Id === value);
-  const selectedName = selectedOption?.Name || '';
+  const selectedName = selectedOption?.Name || placeholder;
 
   const handleSelect = (typeId: string) => {
     // eslint-disable-next-line no-console

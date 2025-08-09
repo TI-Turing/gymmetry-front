@@ -5,7 +5,9 @@ import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import { User } from './types';
 import { authService } from '@/services/authService';
-import { CustomAlert } from './CustomAlert';
+import { CustomAlert } from '@/components/common/CustomAlert';
+import { LoginRequest } from '@/dto/auth/requests';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthContainerProps {
   onAuthSuccess: (user: User) => void;
@@ -16,6 +18,7 @@ export default function AuthContainer({
   onAuthSuccess,
   onBack,
 }: AuthContainerProps) {
+  const auth = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -36,34 +39,25 @@ export default function AuthContainer({
   const switchToRegister = () => setIsLogin(false);
   const switchToLogin = () => setIsLogin(true);
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async ({userNameOrEmail, password}: LoginRequest) => {
     // Prevenir múltiples llamadas simultáneas
     if (isLoading) {
       return { Success: false, error: 'Operación en progreso' };
     }
 
     // Validaciones adicionales
-    if (!email?.trim() || !password?.trim()) {
+    if (!userNameOrEmail?.trim() || !password?.trim()) {
       showAlert('Por favor completa todos los campos');
       return { Success: false, error: 'Campos incompletos' };
     }
 
     setIsLoading(true);
     try {
-      const response = await authService.login({
-        UserNameOrEmail: email.trim(),
-        Password: password,
-      });
+      const success = await auth.login(userNameOrEmail.trim(), password);
 
-      // Verificar que la respuesta tenga la estructura esperada
-      if (!response || typeof response.Success !== 'boolean') {
-        showAlert('Error en la respuesta del servidor');
-        return { Success: false, error: 'Respuesta malformada' };
-      }
-
-      if (response.Success) {
+      if (success) {
         // Login exitoso
-        const userData = await authService.getUserData();
+        const userData = auth.userData || (await authService.getUserData());
         if (userData) {
           const user: User = {
             id: parseInt(userData.id),
@@ -83,7 +77,7 @@ export default function AuthContainer({
             onAuthSuccess(user);
           }, 1500);
 
-          return { Success: true };
+      return { Success: true };
         } else {
           // No se pudieron obtener los datos del usuario
           showAlert('Error al obtener los datos del usuario');
@@ -92,12 +86,12 @@ export default function AuthContainer({
             error: 'Error al obtener los datos del usuario',
           };
         }
-      } else {
-        // Login falló - mostrar mensaje del servidor
-        const errorMessage = response.Message || 'Credenciales incorrectas';
-        showAlert(errorMessage);
-        return { Success: false, error: errorMessage };
-      }
+    }
+
+    // Login falló
+    const errorMessage = 'Credenciales incorrectas';
+    showAlert(errorMessage);
+    return { Success: false, error: errorMessage };
     } catch (error: any) {
       // Determinar el tipo de error
       let errorMessage =

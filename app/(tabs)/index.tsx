@@ -8,6 +8,7 @@ import TodayRoutine from '@/components/home/TodayRoutine';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
+import { router } from 'expo-router';
 
 type DayStatus = 'completed' | 'failed' | 'rest';
 
@@ -103,12 +104,7 @@ function HomeScreen() {
   };
 
   const handleRoutinePress = () => {
-    showSuccess('Abriendo rutina detallada', {
-      confirmText: 'Ver Rutina',
-      onConfirm: () => {
-        // Navegación a rutina detallada
-      },
-    });
+    router.push('/routine-day-detail');
   };
 
   return (

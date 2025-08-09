@@ -230,7 +230,6 @@ export default function CountryCodePicker({
               ]}
               value={searchText}
               onChangeText={setSearchText}
-              placeholder='Buscar país o código...'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
           </View>

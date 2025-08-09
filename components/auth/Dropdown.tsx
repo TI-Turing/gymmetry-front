@@ -23,7 +23,7 @@ interface DropdownProps {
 
 export default function Dropdown({
   label,
-  placeholder,
+  placeholder = 'Seleccione',
   options,
   value,
   onSelect,
@@ -86,13 +86,9 @@ export default function Dropdown({
             },
           ]}
         >
-          {value || ''}
+          {value || placeholder}
         </Text>
-        <FontAwesome
-          name='chevron-down'
-          size={16}
-          color={Colors[colorScheme].text}
-        />
+  {/* icono de flecha removido para consistencia con catálogos */}
       </TouchableOpacity>
 
       <Modal

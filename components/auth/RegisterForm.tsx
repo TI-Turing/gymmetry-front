@@ -1,13 +1,12 @@
-import React, { memo, useCallback, useEffect } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   BackHandler,
 } from 'react-native';
-import { View } from '../Themed';
+import { Text, View } from '../Themed';
 // import Colors from '@/constants/Colors';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import StepsBar from './steps/StepsBar';
 import Step1 from './steps/Step1';
 import Step2 from './steps/Step2';
@@ -19,7 +18,7 @@ import { useAuthContext } from '@/components/auth/AuthContext';
 import { commonStyles } from './styles/common';
 import { useRegisterForm } from './hooks/useRegisterForm';
 import { SkipButton } from './SkipButton';
-import { useCustomAlert } from './CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface RegisterFormProps {
   onRegister: (userData: any) => void;
@@ -36,6 +35,12 @@ const stepTitles = [
 
 const RegisterForm = memo<RegisterFormProps>(
   ({ onRegister, onSwitchToLogin }) => {
+  // Refs para snapshots de cada paso
+  const step2Ref = useRef<any>(null);
+  const step3Ref = useRef<any>(null);
+  const step4Ref = useRef<any>(null);
+  const step5Ref = useRef<any>(null);
+
     // const colorScheme = useColorScheme();
     const authContext = useAuthContext();
     const { showError, showSuccess, AlertComponent } = useCustomAlert();
@@ -45,6 +50,7 @@ const RegisterForm = memo<RegisterFormProps>(
       showWelcomeScreen,
       registrationData,
       // setCurrentStep,
+    patchRegistrationData,
       handleSkipToWelcome,
       handleStep1Next,
       handleStep2Next,
@@ -95,6 +101,22 @@ const RegisterForm = memo<RegisterFormProps>(
       }
     }, [currentStep, handleSkipToWelcome]);
 
+    // Atrás con preservación de estado
+    const handleBackPreservingState = useCallback(() => {
+      try {
+        if (currentStep === 1 && step2Ref.current?.snapshot) {
+          patchRegistrationData(step2Ref.current.snapshot());
+        } else if (currentStep === 2 && step3Ref.current?.snapshot) {
+          patchRegistrationData(step3Ref.current.snapshot());
+        } else if (currentStep === 3 && step4Ref.current?.snapshot) {
+          patchRegistrationData(step4Ref.current.snapshot());
+        } else if (currentStep === 4 && step5Ref.current?.snapshot) {
+          patchRegistrationData(step5Ref.current.snapshot());
+        }
+      } catch {}
+      handleGoBack();
+    }, [currentStep, patchRegistrationData, handleGoBack]);
+
     const renderCurrentStep = () => {
       switch (currentStep) {
         case 0:
@@ -112,6 +134,7 @@ const RegisterForm = memo<RegisterFormProps>(
         case 1:
           return (
             <Step2
+              ref={step2Ref}
               userId={registrationData.userId || ''}
               onNext={handleStep2Next}
               initialData={{
@@ -120,35 +143,42 @@ const RegisterForm = memo<RegisterFormProps>(
                 phone: registrationData.phone,
                 birthDate: registrationData.birthDate,
                 genderId: registrationData.genderId,
+                phoneVerified: registrationData.phoneVerified,
               }}
             />
           );
         case 2:
           return (
             <Step3
+              ref={step3Ref}
               userId={registrationData.userId || ''}
               onNext={handleStep3Next}
-              onBack={handleGoBack}
+              onBack={handleBackPreservingState}
               initialData={{
                 eps: registrationData.eps || '',
+                epsId: registrationData.epsId,
                 country: registrationData.country || '',
+                countryId: registrationData.countryId,
                 region: registrationData.region || '',
+                regionId: registrationData.regionId,
                 city: registrationData.city || '',
+                cityId: registrationData.cityId,
                 emergencyContact: registrationData.emergencyContact || '',
                 emergencyPhone: registrationData.emergencyPhone || '',
                 address: registrationData.address || '',
                 documentType: registrationData.documentType || '',
                 documentTypeId: registrationData.documentTypeId,
-                countryId: registrationData.countryId,
+                documentNumber: registrationData.documentNumber,
               }}
             />
           );
         case 3:
           return (
             <Step4
+              ref={step4Ref}
               userId={registrationData.userId || ''}
               onNext={handleStep4Next}
-              onBack={handleGoBack}
+              onBack={handleBackPreservingState}
               initialData={{
                 fitnessGoal: registrationData.fitnessGoal || '',
                 healthRestrictions: registrationData.healthRestrictions || '',
@@ -160,9 +190,10 @@ const RegisterForm = memo<RegisterFormProps>(
         case 4:
           return (
             <Step5
+              ref={step5Ref}
               userId={registrationData.userId || ''}
               onNext={handleStep5Next}
-              onBack={handleGoBack}
+              onBack={handleBackPreservingState}
               initialData={{
                 username: registrationData.username || '',
                 profileImage: registrationData.profileImage || '',
@@ -201,21 +232,19 @@ const RegisterForm = memo<RegisterFormProps>(
               {currentStep === 0 && (
                 <TouchableOpacity
                   onPress={onSwitchToLogin}
-                  accessibilityLabel='Volver al inicio de sesión'
+                  accessibilityLabel='Volver'
                   accessibilityRole='button'
                 >
-                  <FontAwesome name='chevron-left' size={20} color='white' />
+                  <Text style={[commonStyles.headerButtonText, { color: 'white' }]}>Atrás</Text>
                 </TouchableOpacity>
               )}
-              {(currentStep === 2 ||
-                currentStep === 3 ||
-                currentStep === 4) && (
+              {currentStep >= 2 && (
                 <TouchableOpacity
-                  onPress={handleGoBack}
+                  onPress={handleBackPreservingState}
                   accessibilityLabel='Volver al paso anterior'
                   accessibilityRole='button'
                 >
-                  <FontAwesome name='chevron-left' size={20} color='white' />
+                  <Text style={[commonStyles.headerButtonText, { color: 'white' }]}>Atrás</Text>
                 </TouchableOpacity>
               )}
             </View>

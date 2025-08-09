@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { TextInput, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Text, View } from '../../Themed';
 import { useColorScheme } from '../../useColorScheme';
@@ -21,7 +21,7 @@ import {
 } from '../utils/format';
 import { commonStyles } from '../styles/common';
 import { FontAwesome } from '@expo/vector-icons';
-import { useCustomAlert } from '../CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface Step2Props {
   userId: string;
@@ -29,8 +29,10 @@ interface Step2Props {
   onBack?: () => void;
   initialData?: Step2Data;
 }
-
-export default function Step2({ userId, onNext, initialData }: Step2Props) {
+export default forwardRef(function Step2(
+  { userId, onNext, initialData }: Step2Props,
+  ref
+) {
   const { genders, loading: gendersLoading } = useGenders(true); // autoLoad = true
   const { showError, showSuccess, AlertComponent } = useCustomAlert();
 
@@ -45,7 +47,9 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     }
   );
   const [phone, setPhone] = useState(initialData?.phone || '');
-  const [selectedGender, setSelectedGender] = useState<string>('');
+  const [selectedGender, setSelectedGender] = useState<string>(
+    initialData?.genderId || ''
+  );
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -202,6 +206,20 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
     setOtpCode('');
   };
 
+  // Exponer snapshot de valores actuales para preservar al retroceder
+  useImperativeHandle(ref, () => ({
+    snapshot: () => ({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      phone: phone.trim()
+        ? `${selectedCountry.dialCode}${phone.trim()}`
+        : undefined,
+      birthDate: birthDate || undefined,
+      genderId: selectedGender || undefined,
+      phoneVerified: phoneVerified,
+    }),
+  }));
+
   const handleNext = async () => {
     setIsLoading(true);
 
@@ -300,7 +318,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               ]}
               value={firstName}
               onChangeText={setFirstName}
-              placeholder='Juan'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
               autoCapitalize='words'
             />
@@ -323,7 +340,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
               ]}
               value={lastName}
               onChangeText={setLastName}
-              placeholder='Pérez'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
               autoCapitalize='words'
             />
@@ -411,7 +427,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                 value={phone}
                 keyboardType='number-pad'
                 onChangeText={handlePhoneChange}
-                placeholder='3001234567'
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
                 maxLength={10}
                 editable={!phoneVerified}
@@ -501,9 +516,7 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                 {
                   backgroundColor: Colors[colorScheme].background,
                   borderColor: '#666',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  justifyContent: 'center',
                 },
               ]}
               onPress={() => setShowGenderModal(true)}
@@ -519,9 +532,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   ? genders.find(g => g.Id === selectedGender)?.Nombre ||
                     'Género seleccionado'
                   : 'Selecciona tu género'}
-              </Text>
-              <Text style={{ color: Colors[colorScheme].text, fontSize: 16 }}>
-                ▼
               </Text>
             </TouchableOpacity>
           )}
@@ -885,7 +895,6 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
                   }}
                   value={otpCode}
                   onChangeText={setOtpCode}
-                  placeholder='000000'
                   placeholderTextColor={`${Colors[colorScheme].text}60`}
                   keyboardType='number-pad'
                   maxLength={6}
@@ -937,4 +946,4 @@ export default function Step2({ userId, onNext, initialData }: Step2Props) {
       <AlertComponent />
     </ScrollView>
   );
-}
+});

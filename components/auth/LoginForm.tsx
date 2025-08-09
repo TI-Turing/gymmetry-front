@@ -15,11 +15,11 @@ import { useColorScheme } from '../useColorScheme';
 import { handleApiError } from '@/utils';
 import { commonStyles } from './styles/common';
 import Colors from '@/constants/Colors';
+import { LoginRequest } from '@/dto/auth/requests';
 
 interface LoginFormProps {
   onLogin: (
-    userNameOrEmail: string,
-    password: string
+    login: LoginRequest
   ) => Promise<{ Success: boolean; error?: string }>;
   onSwitchToRegister: () => void;
   showAlert?: (message: string, type?: 'success' | 'error') => void;
@@ -48,7 +48,7 @@ export default function LoginForm({
 
     setIsLoading(true);
     try {
-      const result = await onLogin(userNameOrEmail, password);
+      const result = await onLogin({ userNameOrEmail, password });
       if (!result.Success && showAlert) {
         showAlert(result.error || 'Error desconocido');
       }

@@ -27,7 +27,7 @@ interface GymAdminDropdownProps {
 export default function GymAdminDropdown({
   value,
   onValueChange,
-  placeholder = 'Selecciona un administrador',
+  placeholder = 'Seleccione',
   disabled = false,
   required = false,
   label = 'Administrador principal',

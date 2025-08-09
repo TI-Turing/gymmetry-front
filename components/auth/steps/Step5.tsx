@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import {
   TextInput,
   TouchableOpacity,
@@ -21,7 +21,7 @@ import { Environment } from '@/environment';
 import { Step5Data, UsernameCheckRequest } from '../types';
 import { handleApiError } from '../utils/api';
 import { commonStyles } from '../styles/common';
-import { useCustomAlert } from '../CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import { LoadingAnimation } from '../LoadingAnimation';
 
 interface Step5Props {
@@ -31,7 +31,10 @@ interface Step5Props {
   initialData?: Step5Data;
 }
 
-export default function Step5({ userId, onNext, initialData }: Step5Props) {
+export default forwardRef(function Step5(
+  { userId, onNext, onBack, initialData }: Step5Props,
+  ref
+) {
   const colorScheme = useColorScheme();
   const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const [username, setUsername] = useState(initialData?.username || '');
@@ -277,6 +280,13 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       preventKeyboardClose.current = false;
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    snapshot: () => ({
+      username: username.trim() || undefined,
+      profileImage: profileImage || undefined,
+    }),
+  }));
 
   // Función para redimensionar imagen y validar tamaño máximo de 2MB
   const resizeImageTo2MB = async (uri: string): Promise<string> => {
@@ -587,7 +597,6 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
               onChangeText={handleUsernameChange}
               onBlur={handleUsernameBlur}
               onFocus={handleUsernameFocus}
-              placeholder='usuario123'
               placeholderTextColor={`${Colors[colorScheme].text}60`}
               autoCapitalize='none'
               autoCorrect={false}
@@ -752,7 +761,7 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
                     <FontAwesome
                       name='camera'
                       size={40}
-                      color={Colors[colorScheme].text + '60'}
+                      color={Colors[colorScheme].tint}
                     />
                     <Text
                       style={[
@@ -932,4 +941,4 @@ export default function Step5({ userId, onNext, initialData }: Step5Props) {
       <AlertComponent />
     </ScrollView>
   );
-}
+});

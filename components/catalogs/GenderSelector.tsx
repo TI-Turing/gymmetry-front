@@ -7,12 +7,12 @@ export const GenderSelector = memo<GenderSelectorProps>(
   ({
     genders,
     value,
-    onSelect,
-    placeholder = 'Seleccionar género',
-    disabled = false,
+  onSelect,
+  disabled = false,
     loading = false,
     required = false,
     error,
+  placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar género',
     accessibilityHint = 'Presiona para abrir la lista de géneros',
   }) => {

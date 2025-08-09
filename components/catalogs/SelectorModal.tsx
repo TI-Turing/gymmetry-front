@@ -1,5 +1,6 @@
-import React, { memo } from 'react';
-import { TouchableOpacity, Modal, ScrollView } from 'react-native';
+import React, { memo, useMemo, useState } from 'react';
+import { TouchableOpacity, Modal, ScrollView, TextInput } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import { Text, View } from '@/components/Themed';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -13,12 +14,38 @@ interface SelectorModalProps {
   onSelect: (id: string) => void;
   onClose: () => void;
   loading?: boolean;
+  selectedId?: string;
+  showSearch?: boolean;
+  searchPlaceholder?: string;
 }
 
 export const SelectorModal = memo<SelectorModalProps>(
-  ({ visible, title, data, onSelect, onClose, loading = false }) => {
+  ({
+    visible,
+    title,
+    data,
+    onSelect,
+    onClose,
+    loading = false,
+    selectedId,
+    showSearch = false,
+    searchPlaceholder = 'Buscar...',
+  }) => {
     const colorScheme = useColorScheme();
     const colorStyles = getColorSchemeStyles(colorScheme);
+    const [term, setTerm] = useState('');
+
+    const normalize = (s: string) =>
+      s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}+/gu, '');
+
+    const filtered = useMemo(() => {
+      const t = normalize(term.trim());
+      if (!t) return data;
+      return data.filter(item => normalize(item.Nombre).includes(t));
+    }, [data, term]);
 
     return (
       <Modal
@@ -40,26 +67,55 @@ export const SelectorModal = memo<SelectorModalProps>(
               {title}
             </Text>
 
+            {showSearch && (
+              <View style={catalogStyles.searchWrapper}>
+                <TextInput
+                  style={[catalogStyles.searchInput, colorStyles.searchInputText]}
+                  // Sin placeholder visible por requerimiento
+                  placeholderTextColor={colorStyles.placeholderText.color}
+                  onChangeText={setTerm}
+                  value={term}
+                />
+                <FontAwesome
+                  name='search'
+                  size={18}
+                  color={colorStyles.selectorText.color}
+                  style={catalogStyles.searchIcon}
+                />
+              </View>
+            )}
+
             {loading ? (
               <View style={catalogStyles.loadingContainer}>
                 <LoadingSpinner size='large' />
               </View>
             ) : (
               <ScrollView showsVerticalScrollIndicator={false}>
-                {data.map(item => (
+                {filtered.map(item => (
                   <TouchableOpacity
                     key={item.Id}
-                    style={[catalogStyles.optionItem, colorStyles.optionItem]}
+                    style={[
+                      catalogStyles.optionItem,
+                      colorStyles.optionItem,
+                      selectedId === item.Id && catalogStyles.optionItemSelected,
+                    ]}
                     onPress={() => onSelect(item.Id)}
                   >
                     <Text
-                      style={[catalogStyles.optionText, colorStyles.optionText]}
+                      style={[
+                        catalogStyles.optionText,
+                        colorStyles.optionText,
+                        selectedId === item.Id && catalogStyles.optionTextSelected,
+                      ]}
                     >
                       {item.Nombre}
                     </Text>
+                    {selectedId === item.Id && (
+                      <Text style={catalogStyles.checkMark}>✓</Text>
+                    )}
                   </TouchableOpacity>
                 ))}
-                {data.length === 0 && !loading && (
+                {filtered.length === 0 && !loading && (
                   <View style={catalogStyles.emptyContainer}>
                     <Text
                       style={[catalogStyles.emptyText, colorStyles.emptyText]}

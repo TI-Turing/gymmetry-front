@@ -26,7 +26,7 @@ interface UserDropdownProps {
 export default function UserDropdown({
   value,
   onValueChange,
-  placeholder = 'Selecciona un administrador',
+  placeholder = 'Seleccione',
   disabled = false,
   required = false,
   label,
@@ -44,6 +44,7 @@ export default function UserDropdown({
       const gymId = authService.getGymId();
       if (!gymId) {
         setError('No se encontró ID del gym');
+        setIsLoading(false);
         return;
       }
 
@@ -75,7 +76,7 @@ export default function UserDropdown({
       } else {
         setError(response.Message || 'Error al cargar usuarios del gym');
       }
-    } catch {
+  } catch {
       setError('Error al cargar usuarios del gym');
     } finally {
       setIsLoading(false);

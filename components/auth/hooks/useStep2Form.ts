@@ -10,7 +10,7 @@ import { useGenders } from './useLazyCatalogs';
 import { userService } from '@/services/userService';
 import { handleApiError } from '../utils/api';
 import { formatDateToDisplay, formatDateForBackend } from '../utils/format';
-import { useCustomAlert } from '../CustomAlert';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface UseStep2FormProps {
   userId: string;

@@ -24,4 +24,5 @@ export interface Exercise {
   RoutineExercises: RoutineExercise[];
   Machine: Machine | null;
   RoutineDays: RoutineDay[];
+  TagsMuscle: string | null;
 }

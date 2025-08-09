@@ -7,12 +7,12 @@ export const CountrySelector = memo<CountrySelectorProps>(
   ({
     countries,
     value,
-    onSelect,
-    placeholder = 'Seleccionar país',
-    disabled = false,
+  onSelect,
+  disabled = false,
     loading = false,
     required = false,
     error,
+  placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar país',
     accessibilityHint = 'Presiona para abrir la lista de países',
   }) => {
