@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
+import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -17,7 +18,7 @@ export function ConfigDetail() {
     setError(null);
     try {
       setError('Consulta por Id no disponible');
-    } catch (e) {
+    } catch (_e) {
       setError('Error al consultar');
     } finally {
       setLoading(false);

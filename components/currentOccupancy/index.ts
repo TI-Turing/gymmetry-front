@@ -1,3 +1,1 @@
-export { CurrentOccupancyList } from './CurrentOccupancyList';
-export { CurrentOccupancyDetail } from './CurrentOccupancyDetail';
-export { CurrentOccupancyForm } from './CurrentOccupancyForm';
+export { default as CurrentOccupancyList } from './CurrentOccupancyList';

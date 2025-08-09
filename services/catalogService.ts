@@ -168,9 +168,53 @@ class CatalogService {
   }
 
   async getDocumentTypesByCountry(countryId?: string): Promise<DocumentType[]> {
-    // Si no se proporciona countryId, usar el país del usuario de la sesión
-    const finalCountryId = countryId || userSessionService.getUserCountryId();
-    return this.getDocumentTypes(finalCountryId || undefined);
+    return this.getDocumentTypes(countryId);
+  }
+
+  // Métodos placeholder para servicios específicos
+  async getAllDiets(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllEmployeeRegisterDaily(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllEmployeeTypes(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllEmployeeUsers(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllEquipment(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllExercises(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllFeeds(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllGymImages(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
+  }
+
+  async getAllPaymentMethods(): Promise<any[]> {
+    // Placeholder - implementar cuando el endpoint esté disponible
+    return [];
   }
 }
 

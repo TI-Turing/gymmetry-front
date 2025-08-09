@@ -9,12 +9,8 @@ import { dietService } from '@/services';
 const DietList = React.memo(() => {
   const loadDiets = useCallback(async () => {
     const response = await dietService.getAllDiets();
-    return response.Data || [];
+    return response || [];
   }, []);
-
-DietList.displayName = 'DietList';
-
-
 
   const renderDietItem = useCallback(
     ({ item }: { item: any }) => (
@@ -88,8 +84,7 @@ DietList.displayName = 'DietList';
       loadingMessage='Cargando dietas...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -147,5 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+DietList.displayName = 'DietList';
 
 export default DietList;

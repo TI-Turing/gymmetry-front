@@ -1,3 +1,1 @@
-export { EmployeeRegisterDailyList } from './EmployeeRegisterDailyList';
-export { EmployeeRegisterDailyDetail } from './EmployeeRegisterDailyDetail';
-export { EmployeeRegisterDailyForm } from './EmployeeRegisterDailyForm';
+export { default as EmployeeRegisterDailyList } from './EmployeeRegisterDailyList';

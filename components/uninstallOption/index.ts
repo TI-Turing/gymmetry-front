@@ -1,3 +1,1 @@
-export { UninstallOptionList } from './UninstallOptionList';
-export { UninstallOptionDetail } from './UninstallOptionDetail';
-export { UninstallOptionForm } from './UninstallOptionForm';
+export { default as UninstallOptionList } from './UninstallOptionList';

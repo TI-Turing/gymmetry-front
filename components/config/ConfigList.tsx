@@ -1,3 +1,4 @@
+import { FlatList, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
@@ -15,7 +16,7 @@ export function ConfigList() {
     setError(null);
     try {
       setError('Listado no disponible');
-    } catch (e) {
+    } catch (_e) {
       setError('Error al cargar');
     } finally {
       setLoading(false);

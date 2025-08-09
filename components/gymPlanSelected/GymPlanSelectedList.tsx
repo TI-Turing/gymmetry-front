@@ -14,7 +14,8 @@ export function GymPlanSelectedList() {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
+    } catch (error) {
+      return [];
     }
   }, []);
 

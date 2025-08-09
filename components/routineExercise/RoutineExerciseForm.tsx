@@ -1,4 +1,6 @@
+import { TextInput, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
+import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';

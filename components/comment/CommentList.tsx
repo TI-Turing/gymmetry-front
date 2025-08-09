@@ -14,13 +14,12 @@ const CommentList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
+    } catch (_error) {
+      return [];
     }
   }, []);
 
-CommentList.displayName = 'CommentList';
-
-
+  CommentList.displayName = 'CommentList';
 
   const renderCommentItem = useCallback(
     ({ item }: { item: any }) => (
@@ -238,8 +237,7 @@ CommentList.displayName = 'CommentList';
       loadingMessage='Cargando comentarios...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -357,5 +355,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
+
+CommentList.displayName = 'CommentList';
 
 export default CommentList;

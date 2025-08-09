@@ -14,13 +14,9 @@ const GymPlanSelectedTypeList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
-    }
+    } catch (_error) {return [];
+  }
   }, []);
-
-GymPlanSelectedTypeList.displayName = 'GymPlanSelectedTypeList';
-
-
 
   const renderGymPlanSelectedTypeItem = useCallback(
     ({ item }: { item: any }) => (
@@ -90,8 +86,8 @@ GymPlanSelectedTypeList.displayName = 'GymPlanSelectedTypeList';
                     ? '#4caf50'
                     : item.accessLevel === 'limited'
                       ? '#ffa726'
-                      : '#ff6b6b',
-              },
+                      : '#ff6b6b'
+  },
             ]}
           >
             {item.accessLevel === 'full'
@@ -129,8 +125,8 @@ GymPlanSelectedTypeList.displayName = 'GymPlanSelectedTypeList';
             style={[
               styles.value,
               {
-                color: item.isPaid ? '#4caf50' : '#ff6b6b',
-              },
+                color: item.isPaid ? '#4caf50' : '#ff6b6b'
+  },
             ]}
           >
             {item.isPaid ? '✅ Pagado' : '❌ Pendiente'}
@@ -181,8 +177,7 @@ GymPlanSelectedTypeList.displayName = 'GymPlanSelectedTypeList';
       loadingMessage='Cargando tipos seleccionados...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -193,20 +188,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -215,56 +210,58 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20,
+    lineHeight: 20
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: SPACING.xs
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 120,
+    minWidth: 120
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1,
+    flex: 1
   },
   benefitsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20',
+    borderTopColor: Colors.light.tabIconDefault + '20'
   },
   benefitsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   benefitsList: {
-    gap: SPACING.xs,
+    gap: SPACING.xs
   },
   benefit: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    marginLeft: SPACING.sm,
+    marginLeft: SPACING.sm
   },
   moreBenefits: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
     fontStyle: 'italic',
-    marginLeft: SPACING.sm,
-  },
-});
+    marginLeft: SPACING.sm
+
+}});
+
+GymPlanSelectedTypeList.displayName = 'GymPlanSelectedTypeList';
 
 export default GymPlanSelectedTypeList;

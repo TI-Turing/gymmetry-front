@@ -78,6 +78,12 @@ export class GymService {
     return response;
   }
 
+  // Obtener todos los gimnasios
+  static async getAllGyms(): Promise<ApiResponse<any[]>> {
+    const response = await apiService.get<any[]>('/gyms');
+    return response;
+  }
+
   // Obtener información de un gimnasio por ID
   static async getGymById(gymId: string): Promise<GymGetResponse> {
     const response = await apiService.get<any>(`/gym/${gymId}`);

@@ -1,3 +1,1 @@
-export { RoutineDayList } from './RoutineDayList';
-export { RoutineDayDetail } from './RoutineDayDetail';
-export { RoutineDayForm } from './RoutineDayForm';
+export { default as RoutineDayList } from './RoutineDayList';

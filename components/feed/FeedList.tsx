@@ -9,12 +9,8 @@ import { feedService } from '@/services';
 const FeedList = React.memo(() => {
   const loadFeeds = useCallback(async () => {
     const response = await feedService.getAllFeeds();
-    return response.Data || [];
+    return response || [];
   }, []);
-
-FeedList.displayName = 'FeedList';
-
-
 
   const renderFeedItem = useCallback(
     ({ item }: { item: any }) => (
@@ -86,8 +82,7 @@ FeedList.displayName = 'FeedList';
       loadingMessage='Cargando feed...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -98,20 +93,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -120,13 +115,13 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   content: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.text,
     marginBottom: SPACING.sm,
-    lineHeight: 20,
+    lineHeight: 20
   },
   authorSection: {
     flexDirection: 'row',
@@ -135,16 +130,16 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20',
+    borderTopColor: Colors.light.tabIconDefault + '20'
   },
   author: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   date: {
     fontSize: FONT_SIZES.sm,
-    color: Colors.light.tabIconDefault,
+    color: Colors.light.tabIconDefault
   },
   statsContainer: {
     flexDirection: 'row',
@@ -152,29 +147,31 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: Colors.light.tabIconDefault + '20',
+    borderColor: Colors.light.tabIconDefault + '20'
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   statLabel: {
     fontSize: FONT_SIZES.xs,
     color: Colors.light.tabIconDefault,
-    marginBottom: 2,
+    marginBottom: 2
   },
   statValue: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   tagsContainer: {
-    marginTop: SPACING.sm,
+    marginTop: SPACING.sm
   },
   tags: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
-    fontStyle: 'italic',
-  },
-});
+    fontStyle: 'italic'
+
+}});
+
+FeedList.displayName = 'FeedList';
 
 export default FeedList;

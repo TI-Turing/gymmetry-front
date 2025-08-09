@@ -1,3 +1,1 @@
-export { DailyExerciseList } from './DailyExerciseList';
-export { DailyExerciseDetail } from './DailyExerciseDetail';
-export { DailyExerciseForm } from './DailyExerciseForm';
+export { default as DailyExerciseList } from './DailyExerciseList';

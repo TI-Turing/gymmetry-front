@@ -14,13 +14,9 @@ const RoutineAssignedList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
-    }
+    } catch (_error) {return [];
+  }
   }, []);
-
-RoutineAssignedList.displayName = 'RoutineAssignedList';
-
-
 
   const renderRoutineAssignedItem = useCallback(
     ({ item }: { item: any }) => (
@@ -71,8 +67,8 @@ RoutineAssignedList.displayName = 'RoutineAssignedList';
                     ? '#ff6b6b'
                     : item.difficulty === 'medium'
                       ? '#ffa726'
-                      : '#4caf50',
-              },
+                      : '#4caf50'
+  },
             ]}
           >
             {item.difficulty === 'hard'
@@ -159,8 +155,7 @@ RoutineAssignedList.displayName = 'RoutineAssignedList';
       loadingMessage='Cargando rutinas asignadas...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -171,20 +166,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -193,56 +188,58 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20,
+    lineHeight: 20
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: SPACING.xs
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 100,
+    minWidth: 100
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1,
+    flex: 1
   },
   goalsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20',
+    borderTopColor: Colors.light.tabIconDefault + '20'
   },
   goalsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   goalsList: {
-    gap: SPACING.xs,
+    gap: SPACING.xs
   },
   goal: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    marginLeft: SPACING.sm,
+    marginLeft: SPACING.sm
   },
   moreGoals: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
     fontStyle: 'italic',
-    marginLeft: SPACING.sm,
-  },
-});
+    marginLeft: SPACING.sm
+
+}});
+
+RoutineAssignedList.displayName = 'RoutineAssignedList';
 
 export default RoutineAssignedList;

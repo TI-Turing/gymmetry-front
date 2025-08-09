@@ -1,3 +1,1 @@
-export { BranchServiceList } from './BranchServiceList';
-export { BranchServiceDetail } from './BranchServiceDetail';
-export { BranchServiceForm } from './BranchServiceForm';
+export { default as BranchServiceList } from './BranchServiceList';

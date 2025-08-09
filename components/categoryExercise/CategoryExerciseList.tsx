@@ -1,3 +1,4 @@
+import { FlatList, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
@@ -17,7 +18,7 @@ export function CategoryExerciseList() {
       const res =
         await categoryExerciseFunctionsService.getAllCategoryExercises();
       setItems(res.Data || []);
-    } catch (e) {
+    } catch (_e) {
       setError('Error al cargar');
     } finally {
       setLoading(false);

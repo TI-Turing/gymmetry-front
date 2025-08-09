@@ -1,3 +1,1 @@
-export { RoutineAssignedList } from './RoutineAssignedList';
-export { RoutineAssignedDetail } from './RoutineAssignedDetail';
-export { RoutineAssignedForm } from './RoutineAssignedForm';
+export { default as RoutineAssignedList } from './RoutineAssignedList';

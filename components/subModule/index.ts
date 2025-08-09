@@ -1,3 +1,1 @@
-export { SubModuleList } from './SubModuleList';
-export { SubModuleDetail } from './SubModuleDetail';
-export { SubModuleForm } from './SubModuleForm';
+export { default as SubModuleList } from './SubModuleList';

@@ -1,3 +1,1 @@
-export { GymPlanSelectedTypeList } from './GymPlanSelectedTypeList';
-export { GymPlanSelectedTypeDetail } from './GymPlanSelectedTypeDetail';
-export { GymPlanSelectedTypeForm } from './GymPlanSelectedTypeForm';
+export { default as GymPlanSelectedTypeList } from './GymPlanSelectedTypeList';

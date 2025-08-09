@@ -1,3 +1,1 @@
-export { NotificationOptionList } from './NotificationOptionList';
-export { NotificationOptionDetail } from './NotificationOptionDetail';
-export { NotificationOptionForm } from './NotificationOptionForm';
+export { default as NotificationOptionList } from './NotificationOptionList';

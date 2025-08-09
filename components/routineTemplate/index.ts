@@ -1,3 +1,1 @@
-export { RoutineTemplateList } from './RoutineTemplateList';
-export { RoutineTemplateDetail } from './RoutineTemplateDetail';
-export { RoutineTemplateForm } from './RoutineTemplateForm';
+export { default as RoutineTemplateList } from './RoutineTemplateList';

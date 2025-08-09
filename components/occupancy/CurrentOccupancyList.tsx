@@ -14,13 +14,9 @@ const CurrentOccupancyList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
-    }
+    } catch (_error) {return [];
+  }
   }, []);
-
-CurrentOccupancyList.displayName = 'CurrentOccupancyList';
-
-
 
   const renderCurrentOccupancyItem = useCallback(
     ({ item }: { item: any }) => (
@@ -38,8 +34,8 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
                     ? '#ff6b6b'
                     : item.occupancyLevel === 'medium'
                       ? '#ffa726'
-                      : '#4caf50',
-              },
+                      : '#4caf50'
+  },
             ]}
           >
             {item.occupancyLevel === 'high'
@@ -65,8 +61,8 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
                     ? '#ff6b6b'
                     : item.currentOccupancy / item.maxCapacity > 0.6
                       ? '#ffa726'
-                      : '#4caf50',
-              },
+                      : '#4caf50'
+  },
             ]}
           >
             {item.currentOccupancy || '0'} / {item.maxCapacity || '0'} personas
@@ -84,8 +80,8 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
                     ? '#ff6b6b'
                     : (item.currentOccupancy / item.maxCapacity) * 100 > 60
                       ? '#ffa726'
-                      : '#4caf50',
-              },
+                      : '#4caf50'
+  },
             ]}
           >
             {item.maxCapacity
@@ -123,7 +119,7 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
             {item.lastUpdate
               ? new Date(item.lastUpdate).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit',
+                  minute: '2-digit'
                 })
               : 'Hace unos momentos'}
           </Text>
@@ -135,8 +131,8 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
             style={[
               styles.value,
               {
-                color: item.isOpen ? '#4caf50' : '#ff6b6b',
-              },
+                color: item.isOpen ? '#4caf50' : '#ff6b6b'
+  },
             ]}
           >
             {item.isOpen ? '🟢 Abierto' : '🔴 Cerrado'}
@@ -242,8 +238,7 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
       loadingMessage='Cargando ocupación actual...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -254,20 +249,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -275,29 +270,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20,
+    lineHeight: 20
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: SPACING.xs
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 160,
+    minWidth: 160
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1,
+    flex: 1
   },
   restrictionsSection: {
     marginTop: SPACING.sm,
@@ -306,40 +301,41 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.light.tabIconDefault + '20',
     backgroundColor: '#fff3cd',
     padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.sm
   },
   restrictionsLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#856404',
     fontWeight: '600',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   restrictionsList: {
-    gap: SPACING.xs,
+    gap: SPACING.xs
   },
   restriction: {
     fontSize: FONT_SIZES.sm,
     color: '#856404',
-    marginLeft: SPACING.sm,
+    marginLeft: SPACING.sm
   },
   recommendationsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20',
+    borderTopColor: Colors.light.tabIconDefault + '20'
   },
   recommendationsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   recommendationsText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     fontStyle: 'italic',
     lineHeight: 18,
-  },
-});
+}});
+
+CurrentOccupancyList.displayName = 'CurrentOccupancyList';
 
 export default CurrentOccupancyList;

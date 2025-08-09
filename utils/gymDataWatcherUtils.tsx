@@ -2,12 +2,12 @@
 
 import React, { useEffect } from 'react';
 
+import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
+import { gymDataWatcher } from '@/services/gymDataWatcher';
+
 interface EventListener {
   (event: Event): void;
 }
-
-import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
-import { gymDataWatcher } from '@/services/gymDataWatcher';
 
 // Componente ejemplo que se beneficia del observador global
 export function GymAwareComponent() {

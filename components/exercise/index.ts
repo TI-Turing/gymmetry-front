@@ -1,3 +1,1 @@
-export { ExerciseList } from './ExerciseList';
-export { ExerciseDetail } from './ExerciseDetail';
-export { ExerciseForm } from './ExerciseForm';
+export { default as ExerciseList } from './ExerciseList';

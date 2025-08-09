@@ -8,13 +8,11 @@ import { branchMediaFunctionsService } from '@/services/functions';
 
 const BranchMediaList = React.memo(() => {
   const loadBranchMedia = useCallback(async () => {
-    const response = await branchMediaFunctionsService.getAllBranchMedia();
+    const response = await branchMediaFunctionsService.getAllBranchMedias();
     return response.Data || [];
   }, []);
 
-BranchMediaList.displayName = 'BranchMediaList';
-
-
+  BranchMediaList.displayName = 'BranchMediaList';
 
   const renderBranchMediaItem = useCallback(
     ({ item }: { item: any }) => (

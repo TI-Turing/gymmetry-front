@@ -13,24 +13,20 @@ const PlanList = React.memo(() => {
     return response.Data || [];
   }, []);
 
-PlanList.displayName = 'PlanList';
-
-
-
   const renderPlanItem = useCallback(
     ({ item }: { item: Plan }) => (
       <View style={styles.card}>
         <Text style={styles.cardTitle}>
-          Plan {item.planType?.name || 'Sin tipo'}
+          Plan: {item.planType?.name || 'Sin tipo'}
         </Text>
         {item.user?.name && (
           <Text style={styles.cardUser}>Usuario: {item.user.name}</Text>
         )}
         <Text style={styles.cardDate}>
-          Inicio: {new Date(item.startDate).toLocaleDateString()}
+          Inicio: {new Date(item.startDate).toLocaleDateString()},
         </Text>
         <Text style={styles.cardDate}>
-          Fin: {new Date(item.endDate).toLocaleDateString()}
+          Fin: {new Date(item.endDate).toLocaleDateString()},
         </Text>
         <View style={styles.statusContainer}>
           <Text
@@ -39,7 +35,7 @@ PlanList.displayName = 'PlanList';
               {
                 color: item.isActive
                   ? Colors.light.tabIconSelected
-                  : Colors.light.tabIconDefault,
+                  : Colors.light.tabIconDefault
               },
             ]}
           >
@@ -67,7 +63,7 @@ PlanList.displayName = 'PlanList';
       loadingMessage='Cargando planes...'
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -79,27 +75,27 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   cardTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     marginBottom: SPACING.xs,
-    color: Colors.light.text,
+    color: Colors.light.text
   },
   cardUser: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   cardDate: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   statusContainer: {
     marginTop: SPACING.xs,
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -107,8 +103,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
-    backgroundColor: Colors.light.background,
-  },
-});
+    backgroundColor: Colors.light.background
+}});
+
+PlanList.displayName = 'PlanList';
 
 export default PlanList;

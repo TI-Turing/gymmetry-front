@@ -1,3 +1,1 @@
-export { BranchMediaList } from './BranchMediaList';
-export { BranchMediaDetail } from './BranchMediaDetail';
-export { BranchMediaForm } from './BranchMediaForm';
+export { default as BranchMediaList } from './BranchMediaList';

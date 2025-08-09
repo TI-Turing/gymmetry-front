@@ -1,3 +1,1 @@
-export { MachineList } from './MachineList';
-export { MachineDetail } from './MachineDetail';
-export { MachineForm } from './MachineForm';
+export { default as MachineList } from './MachineList';

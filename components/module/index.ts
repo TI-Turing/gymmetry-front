@@ -1,3 +1,1 @@
-export { ModuleList } from './ModuleList';
-export { ModuleDetail } from './ModuleDetail';
-export { ModuleForm } from './ModuleForm';
+export { default as ModuleList } from './ModuleList';

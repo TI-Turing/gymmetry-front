@@ -1,3 +1,1 @@
-export { SignalRList } from './SignalRList';
-export { SignalRDetail } from './SignalRDetail';
-export { SignalRForm } from './SignalRForm';
+export { default as SignalRList } from './SignalRList';

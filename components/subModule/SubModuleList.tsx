@@ -12,10 +12,6 @@ const SubModuleList = React.memo(() => {
     return response.Data || [];
   }, []);
 
-SubModuleList.displayName = 'SubModuleList';
-
-
-
   const renderSubModuleItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
@@ -68,7 +64,7 @@ SubModuleList.displayName = 'SubModuleList';
       loadingMessage='Cargando sub-módulos...'
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -80,20 +76,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -102,36 +98,38 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   module: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconSelected,
     marginBottom: SPACING.sm,
-    fontWeight: '500',
+    fontWeight: '500'
   },
   description: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     marginBottom: SPACING.sm,
-    lineHeight: 18,
+    lineHeight: 18
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: SPACING.xs
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 70,
+    minWidth: 70
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1,
-  },
-});
+    flex: 1
+
+}});
+
+SubModuleList.displayName = 'SubModuleList';
 
 export default SubModuleList;

@@ -98,6 +98,31 @@ export const API_CONSTANTS = {
   RETRY_DELAY: 1000,
 } as const;
 
+// Error messages constants
+export const ERROR_MESSAGES = {
+  NETWORK: {
+    CONNECTION_ERROR: 'Error de conexión. Verifica tu conexión a internet.',
+    TIMEOUT: 'La solicitud ha excedido el tiempo límite.',
+    SERVER_ERROR: 'Error del servidor. Inténtalo de nuevo más tarde.',
+  },
+  VALIDATION: {
+    REQUIRED: 'Este campo es requerido.',
+    INVALID_EMAIL: 'Formato de email inválido.',
+    INVALID_PHONE: 'Formato de teléfono inválido.',
+    PASSWORD_TOO_SHORT: 'La contraseña debe tener al menos 8 caracteres.',
+    PASSWORDS_NOT_MATCH: 'Las contraseñas no coinciden.',
+  },
+  AUTH: {
+    INVALID_CREDENTIALS: 'Credenciales inválidas.',
+    USER_NOT_FOUND: 'Usuario no encontrado.',
+    ACCESS_DENIED: 'Acceso denegado.',
+  },
+  GENERIC: {
+    UNEXPECTED_ERROR: 'Ha ocurrido un error inesperado.',
+    TRY_AGAIN: 'Inténtalo de nuevo.',
+  },
+} as const;
+
 // Application constants
 export const APP_CONSTANTS = {
   NAME: 'GYMMETRY',

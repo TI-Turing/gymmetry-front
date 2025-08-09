@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import FormInput from '../../common/FormInput';
 import { Text } from '@/components/Themed';
-import { FormInput } from '@/components/common';
 import { AccessMethodDropdown } from '@/components/common/dropdowns';
 import { GymAdminDropdown } from '@/components/gym';
 import { UI_CONSTANTS } from '@/constants/AppConstants';
@@ -32,7 +32,7 @@ export default function Step1({
       <FormInput
         label='Nombre de la sede'
         value={formData.name}
-        onChangeText={text => onFormDataChange('name', text)}
+        onChangeText={(text: string) => onFormDataChange('name', text)}
         required
         error={errors?.name}
       />
@@ -40,7 +40,7 @@ export default function Step1({
       <FormInput
         label='Dirección'
         value={formData.address}
-        onChangeText={text => onFormDataChange('address', text)}
+        onChangeText={(text: string) => onFormDataChange('address', text)}
         required
         error={errors?.address}
       />

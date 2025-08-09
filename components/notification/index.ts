@@ -1,3 +1,1 @@
-export { NotificationList } from './NotificationList';
-export { NotificationDetail } from './NotificationDetail';
-export { NotificationForm } from './NotificationForm';
+export { default as NotificationList } from './NotificationList';

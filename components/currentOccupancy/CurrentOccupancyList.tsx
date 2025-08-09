@@ -13,14 +13,10 @@ const CurrentOccupancyList = React.memo(() => {
     }
   }, []);
 
-CurrentOccupancyList.displayName = 'CurrentOccupancyList';
-
-
-
   const renderCurrentOccupancyItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.itemContainer}>
-        <Text style={styles.itemTitle}>CurrentOccupancy {item.id}</Text>
+        <Text style={styles.itemTitle}>CurrentOccupancy: {item.id}</Text>
         <Text style={styles.itemSubtitle}>
           {item.name || 'CurrentOccupancy name'}
         </Text>
@@ -38,8 +34,7 @@ CurrentOccupancyList.displayName = 'CurrentOccupancyList';
       emptyMessage='No current occupancies found'
     />
   );
-}
-
+});
 // Temporary placeholder function
 async function servicePlaceholder() {
   return Promise.resolve([]);
@@ -55,22 +50,24 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 2
     },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 5
   },
   itemTitle: {
     fontSize: FONT_SIZES.md,
     fontWeight: 'bold',
     marginBottom: SPACING.xs,
-    color: '#333',
+    color: '#333'
   },
   itemSubtitle: {
     fontSize: FONT_SIZES.sm,
-    color: '#666',
-  },
+    color: '#666'
+  }
 });
+
+CurrentOccupancyList.displayName = 'CurrentOccupancyList';
 
 export default CurrentOccupancyList;

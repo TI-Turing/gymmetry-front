@@ -12,10 +12,6 @@ const GymList = React.memo(() => {
     return response.Data || [];
   }, []);
 
-GymList.displayName = 'GymList';
-
-
-
   const renderGymItem = useCallback(
     ({ item }: { item: any }) => (
       <View style={styles.card}>
@@ -105,7 +101,7 @@ GymList.displayName = 'GymList';
       loadingMessage='Cargando gimnasios...'
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -117,20 +113,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -139,58 +135,60 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20,
+    lineHeight: 20
   },
   addressSection: {
     marginBottom: SPACING.sm,
     paddingBottom: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.tabIconDefault + '20',
+    borderBottomColor: Colors.light.tabIconDefault + '20'
   },
   address: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     fontWeight: '500',
-    marginBottom: 2,
+    marginBottom: 2
   },
   city: {
     fontSize: FONT_SIZES.sm,
-    color: Colors.light.tabIconDefault,
+    color: Colors.light.tabIconDefault
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: SPACING.xs
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 100,
+    minWidth: 100
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1,
+    flex: 1
   },
   ratingSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20',
+    borderTopColor: Colors.light.tabIconDefault + '20'
   },
   rating: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
     fontWeight: '600',
-    textAlign: 'center',
-  },
-});
+    textAlign: 'center'
+
+}});
+
+GymList.displayName = 'GymList';
 
 export default GymList;

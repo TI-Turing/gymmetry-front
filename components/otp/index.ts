@@ -1,3 +1,1 @@
-export { OtpList } from './OtpList';
-export { OtpDetail } from './OtpDetail';
-export { OtpForm } from './OtpForm';
+export { default as OtpList } from './OtpList';

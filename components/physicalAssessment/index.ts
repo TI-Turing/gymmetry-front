@@ -1,3 +1,1 @@
-export { PhysicalAssessmentList } from './PhysicalAssessmentList';
-export { PhysicalAssessmentDetail } from './PhysicalAssessmentDetail';
-export { PhysicalAssessmentForm } from './PhysicalAssessmentForm';
+export { default as PhysicalAssessmentList } from './PhysicalAssessmentList';

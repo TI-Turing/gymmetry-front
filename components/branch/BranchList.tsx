@@ -10,17 +10,12 @@ const BranchList = React.memo(() => {
   const loadBranches = useCallback(async () => {
     try {
       // Placeholder for actual service call
-
       const result = await servicePlaceholder();
-
       return result || [];
-    } catch (error) {return [];
+    } catch (_error) {
+      return [];
     }
   }, []);
-
-BranchList.displayName = 'BranchList';
-
-
 
   const renderBranchItem = useCallback(
     ({ item }: { item: any }) => (
@@ -135,7 +130,7 @@ BranchList.displayName = 'BranchList';
       loadingMessage='Cargando sucursales...'
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -220,5 +215,7 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.sm,
   },
 });
+
+BranchList.displayName = 'BranchList';
 
 export default BranchList;

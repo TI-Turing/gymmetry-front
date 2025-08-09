@@ -6,17 +6,17 @@ import { ERROR_MESSAGES } from '@/constants';
  */
 export const handleApiError = (error: any): string => {
   if (!error) {
-    return ERROR_MESSAGES.GENERIC;
+    return ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR;
   }
 
   // Network errors
   if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
-    return ERROR_MESSAGES.NETWORK;
+    return ERROR_MESSAGES.NETWORK.CONNECTION_ERROR;
   }
 
   // Timeout errors
   if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-    return ERROR_MESSAGES.TIMEOUT;
+    return ERROR_MESSAGES.NETWORK.TIMEOUT;
   }
 
   // HTTP status errors
@@ -29,7 +29,7 @@ export const handleApiError = (error: any): string => {
       case 401:
         return ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS;
       case 403:
-        return ERROR_MESSAGES.AUTH.ACCOUNT_DISABLED;
+        return ERROR_MESSAGES.AUTH.ACCESS_DENIED;
       case 404:
         return 'Recurso no encontrado';
       case 409:
@@ -45,7 +45,7 @@ export const handleApiError = (error: any): string => {
       case 503:
         return 'Servicio no disponible temporalmente';
       default:
-        return error.response.data?.message || ERROR_MESSAGES.GENERIC;
+        return error.response.data?.message || ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR;
     }
   }
 
@@ -59,7 +59,7 @@ export const handleApiError = (error: any): string => {
     return error.message;
   }
 
-  return ERROR_MESSAGES.GENERIC;
+  return ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR;
 };
 
 /**

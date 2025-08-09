@@ -14,7 +14,8 @@ export function UserList() {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
+    } catch (error) {
+      return [];
     }
   }, []);
 

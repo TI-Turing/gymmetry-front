@@ -14,13 +14,9 @@ const DailyExerciseList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (error) {return [];
-    }
+    } catch (_error) {return [];
+  }
   }, []);
-
-DailyExerciseList.displayName = 'DailyExerciseList';
-
-
 
   const renderDailyExerciseItem = useCallback(
     ({ item }: { item: any }) => (
@@ -37,8 +33,8 @@ DailyExerciseList.displayName = 'DailyExerciseList';
                   ? '#4caf50'
                   : item.isInProgress
                     ? '#ffa726'
-                    : '#ff6b6b',
-              },
+                    : '#ff6b6b'
+  },
             ]}
           >
             {item.isCompleted
@@ -108,8 +104,8 @@ DailyExerciseList.displayName = 'DailyExerciseList';
               styles.value,
               {
                 color:
-                  item.currentSets === item.targetSets ? '#4caf50' : '#ffa726',
-              },
+                  item.currentSets === item.targetSets ? '#4caf50' : '#ffa726'
+  },
             ]}
           >
             {item.currentSets || '0'} / {item.targetSets || '0'} series
@@ -134,8 +130,8 @@ DailyExerciseList.displayName = 'DailyExerciseList';
                     ? '#ff6b6b'
                     : item.difficulty === 'medium'
                       ? '#ffa726'
-                      : '#4caf50',
-              },
+                      : '#4caf50'
+  },
             ]}
           >
             {item.difficulty === 'hard'
@@ -166,7 +162,7 @@ DailyExerciseList.displayName = 'DailyExerciseList';
             {item.startTime
               ? new Date(item.startTime).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit',
+                  minute: '2-digit'
                 })
               : 'No iniciado'}
           </Text>
@@ -178,8 +174,8 @@ DailyExerciseList.displayName = 'DailyExerciseList';
             {item.endTime
               ? new Date(item.endTime).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit',
-                })
+                  minute: '2-digit'
+})
               : 'No finalizado'}
           </Text>
         </View>
@@ -265,8 +261,7 @@ DailyExerciseList.displayName = 'DailyExerciseList';
       loadingMessage='Cargando ejercicios del día...'
     />
   );
-}
-
+});
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
@@ -277,20 +272,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.sm
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm,
+    marginRight: SPACING.sm
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -298,29 +293,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
-    color: Colors.light.background,
+    color: Colors.light.background
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20,
+    lineHeight: 20
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs,
+    marginVertical: SPACING.xs
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 150,
+    minWidth: 150
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1,
+    flex: 1
   },
   recordSection: {
     marginTop: SPACING.sm,
@@ -329,18 +324,18 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.light.tabIconDefault + '20',
     backgroundColor: '#e8f5e8',
     padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.sm
   },
   recordLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#2e7d32',
     fontWeight: '600',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   recordText: {
     fontSize: FONT_SIZES.sm,
     color: '#2e7d32',
-    fontWeight: '500',
+    fontWeight: '500'
   },
   tipsSection: {
     marginTop: SPACING.sm,
@@ -349,45 +344,46 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.light.tabIconDefault + '20',
     backgroundColor: '#f3e5f5',
     padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.sm
   },
   tipsLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#7b1fa2',
     fontWeight: '600',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   tipsList: {
-    gap: SPACING.xs,
+    gap: SPACING.xs
   },
   tip: {
     fontSize: FONT_SIZES.sm,
     color: '#7b1fa2',
-    lineHeight: 18,
+    lineHeight: 18
   },
   moreTips: {
     fontSize: FONT_SIZES.sm,
     color: '#7b1fa2',
-    fontStyle: 'italic',
+    fontStyle: 'italic'
   },
   notesSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20',
+    borderTopColor: Colors.light.tabIconDefault + '20'
   },
   notesLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs
   },
   notesText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     fontStyle: 'italic',
     lineHeight: 18,
-  },
-});
+}});
+
+DailyExerciseList.displayName = 'DailyExerciseList';
 
 export default DailyExerciseList;

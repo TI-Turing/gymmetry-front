@@ -23,7 +23,7 @@ interface FormInputProps extends Omit<TextInputProps, 'style'> {
   maxLines?: number;
 }
 
-export const FormInput: React.FC<FormInputProps> = ({
+const FormInput: React.FC<FormInputProps> = ({
   label,
   icon,
   error,
