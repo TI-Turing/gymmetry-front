@@ -13,6 +13,7 @@ import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
 import { GymCompleteData } from './types';
 import { GymService } from '@/services/gymService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function GymScreen(): React.JSX.Element {
   const { AlertComponent } = useCustomAlert();
@@ -25,11 +26,12 @@ function GymScreen(): React.JSX.Element {
   const [cachedGym, setCachedGym] = useState<any>(null);
 
   // Función para actualizar datos del usuario
-  const updateUserData = () => {
-    const currentUserGymId = authService.getGymId();
+  const updateUserData = async () => {
+    const currentUserGymId = await AsyncStorage.getItem('@gym_id');
     const currentCachedGym = GymService.getCachedGym();
     setUserGymId(currentUserGymId);
     setCachedGym(currentCachedGym);
+    console.log('User data updated:', { currentUserGymId, currentCachedGym });
   };
 
   // Usuario tiene gym si tiene gymId Y (tiene datos en caché O datos en preload)

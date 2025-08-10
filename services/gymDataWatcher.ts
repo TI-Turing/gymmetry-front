@@ -123,13 +123,7 @@ class GymDataWatcher {
         '[GymDataWatcher] Error parseando newValue, intentando con el gymId actual del cache.',
         _error
       );
-      // Si hay error parseando, intentar con el gymId del cache actual
-      const currentGymId = gymService.getCachedGymData()?.gym?.Id;
-      logger.debug('[GymDataWatcher] currentGymId del cache:', currentGymId);
-      if (currentGymId) {
-        await this.refetchGymData(currentGymId);
       }
-    }
   }
 
   // Consultar datos actualizados del gym

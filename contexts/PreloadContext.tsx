@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { authService } from '@/services/authService';
 import { Gym } from '../dto/gym/Gym';
+import { useAuth } from './AuthContext';
 // import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
 
 interface PreloadContextType {
@@ -39,20 +40,21 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
   const [inicioData, setInicioData] = useState<any | null>(null);
   const [isPreloading, setIsPreloading] = useState(false);
   const [preloadError, setPreloadError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   const refreshGymData = useCallback(async () => {
     try {
       const { GymService } = await import('@/services/gymService');
-      const cachedGym = GymService.getCachedGym();
+      const cachedGym = await GymService.getCachedGym();
       if (cachedGym) {
         setGymData(cachedGym);
-      } else {
-        // Si no hay datos en caché, intentar recargar
-        const gymId = authService.getGymId();
-        if (gymId) {
-          const gym = await GymService.fetchAndCacheGymData(gymId);
-          setGymData(gym);
-        }
+        return;
+      }
+      // Si no hay datos en caché, intentar recargar
+      const gymId = authService.getGymId();
+      if (gymId) {
+        const gym = await GymService.generateCachedGym(gymId);
+        setGymData(gym ?? null);
       }
     } catch {
       setPreloadError('Error al cargar datos del gimnasio');
@@ -90,11 +92,11 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
   }, [refreshGymData]);
 
   useEffect(() => {
-    // Precargar datos cuando el proveedor se monta
-    if (authService.isAuthenticated()) {
+    // Precargar datos cuando hay sesión activa (al montar y al loguear)
+    if (isAuthenticated) {
       precargarDatos();
     }
-  }, [precargarDatos]);
+  }, [isAuthenticated, precargarDatos]);
 
   const value: PreloadContextType = {
     gymData,

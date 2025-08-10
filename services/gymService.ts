@@ -7,6 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Auto-generated service for Gym Azure Functions
 export const gymService = {
+
+  cachedGym: null as any | null,
+
   async addGym(request: AddGymRequest): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/gym/add`, request);
     return response;
@@ -47,10 +50,22 @@ export const gymService = {
     return response;
   },
 
+  async generateCachedGym(gymId: string) {
+    if (!gymId) return null;
+    const gymData = await this.fetchAndCacheGymData(gymId);
+    this.cachedGym = gymData ?? null;
+    return this.cachedGym;
+  },
 
-  getCachedGymData(): any {
+  async getCachedGymData(): Promise<any> {
     // Implementación básica para compatibilidad
-    return null;
+    const gymId = await AsyncStorage.getItem('@gym_id');
+    if (gymId) {
+      if (this.cachedGym == null) {
+        this.cachedGym = await this.generateCachedGym(gymId);
+      }
+    }
+    return this.cachedGym;
   },
 
   // Alias para compatibilidad con getCachedGym
@@ -60,7 +75,7 @@ export const gymService = {
 
   async updateCacheFromObserver(gymId: string): Promise<void> {
     // Implementación básica para compatibilidad
-    console.log('updateCacheFromObserver called with gymId:', gymId);
+    await this.generateCachedGym(gymId);
   },
 
   // Método para refrescar datos del gimnasio
@@ -72,7 +87,13 @@ export const gymService = {
   // Métodos adicionales para los pasos del gimnasio
   async registerGym(payload: any): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/gym/add`, payload);
-    await AsyncStorage.setItem('@gym_id', JSON.stringify(response.Data));
+    if (response.Success) {
+      // Guardar solo el ID del gym
+      const createdGymId = typeof response.Data === 'string' ? response.Data : response.Data?.Id ?? response.Data?.id;
+      if (createdGymId) {
+        await AsyncStorage.setItem('@gym_id', createdGymId);
+      }
+    }
     return response;
   },
 
@@ -83,7 +104,9 @@ export const gymService = {
 
   async fetchAndCacheGymData(gymId: string): Promise<any> {
     const response = await this.getGymById(gymId);
-    return response.Success ? response.Data : null;
+    const data = response.Success ? response.Data : null;
+    this.cachedGym = data ?? null;
+    return this.cachedGym;
   }
 };
 
