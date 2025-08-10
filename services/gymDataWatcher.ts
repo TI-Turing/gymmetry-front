@@ -2,7 +2,7 @@ import { asyncStorageObserver } from './asyncStorageObserver';
 import { gymService } from './gymService';
 import { logger } from '@/utils';
 
-const GYM_DATA_KEY = '@gym_data';
+const GYM_DATA_KEY = '@gym_id';
 
 class GymDataWatcher {
   private static instance: GymDataWatcher;

@@ -168,9 +168,11 @@ class CatalogService {
         const response = await this.catalogsAPI.get<Region[]>(
           `/regiones?paisId=${countryId}`
         );
+        console.log('Fetched regions:', response.data);
         const regions = response.data || [];
         return this.sortByName(regions);
       } catch (error) {
+        console.error('Error fetching regions by country:', error);
         throw error;
       }
     });

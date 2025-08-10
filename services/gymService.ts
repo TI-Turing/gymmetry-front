@@ -3,6 +3,7 @@ import type { AddGymRequest } from '@/dto/gym/Request/AddGymRequest';
 import type { FindGymsByFieldsRequest } from '@/dto/gym/FindGymsByFieldsRequest';
 import type { UpdateGymRequest } from '@/dto/gym/Request/UpdateGymRequest';
 import type { GenerateGymQrRequest } from '@/dto/gym/GenerateGymQrRequest';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Auto-generated service for Gym Azure Functions
 export const gymService = {
@@ -46,11 +47,6 @@ export const gymService = {
     return response;
   },
 
-  // Métodos adicionales para compatibilidad
-  async getGymTypes(): Promise<ApiResponse<any[]>> {
-    const response = await apiService.get<any[]>(`/gym/types`);
-    return response;
-  },
 
   getCachedGymData(): any {
     // Implementación básica para compatibilidad
@@ -75,12 +71,13 @@ export const gymService = {
 
   // Métodos adicionales para los pasos del gimnasio
   async registerGym(payload: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/gym/register`, payload);
+    const response = await apiService.post<any>(`/gym/add`, payload);
+    await AsyncStorage.setItem('@gym_id', JSON.stringify(response.Data));
     return response;
   },
 
   async updateGymStep(formData: any): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/gym/update-step`, formData);
+    const response = await apiService.put<any>(`/gym/update`, formData);
     return response;
   },
 

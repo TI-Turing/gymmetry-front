@@ -70,7 +70,7 @@ function GymScreen(): React.JSX.Element {
 
       // Refrescar la información del usuario para obtener el gymId actualizado
       const userRefreshed = await authService.refreshUserData();
-
+      console.log('User refreshed:', userRefreshed);
       if (userRefreshed) {
         // Actualizar el estado local con los nuevos datos del usuario
         updateUserData();

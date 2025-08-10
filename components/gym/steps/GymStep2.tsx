@@ -7,6 +7,7 @@ import Button from '@/components/common/Button';
 import GymTypeDropdown from '../GymTypeDropdown';
 import { GymStep2Data, GymStepProps, GymType } from '../types';
 import { GymService } from '@/services/gymService';
+import { gymTypeService } from '@/services/gymTypeService';
 import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStyles } from '../styles';
@@ -37,7 +38,7 @@ export default function GymStep2({
 
   const loadGymTypes = useCallback(async () => {
     try {
-      const response = await GymService.getGymTypes();
+      const response = await gymTypeService.getAllGymTypes();
       if (response.Success) {
         setGymTypes(response.Data || []);
       } else {

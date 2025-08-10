@@ -79,7 +79,6 @@ export default function GymStep1({
       const payload = { ...formData, owner_UserId: userId };
       const response = await GymService.registerGym(payload);
       if (response.Success && response.Data) {
-        AsyncStorage.setItem('GYM_DATA_KEY', response.Data);
         // Pasar los datos junto con gymId y owner_UserId al siguiente paso
         onNext({
           ...formData,

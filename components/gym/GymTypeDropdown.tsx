@@ -120,7 +120,7 @@ export default function GymTypeDropdown({
                   key={item.Id}
                   style={[
                     GymStyles.optionItem,
-                    { borderBottomColor: `${Colors[colorScheme].text}20` },
+                    { borderBottomColor: `${Colors[colorScheme].text}` },
                   ]}
                   onPress={() => handleSelect(item.Id)}
                 >

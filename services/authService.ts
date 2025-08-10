@@ -22,6 +22,7 @@ export const authService = {
     // Guardar datos del usuario en AsyncStorage si el login es exitoso
     if (response.Success && response.Data) {
       await AsyncStorage.setItem('@user_data', JSON.stringify(response.Data));
+      await AsyncStorage.setItem('@user_id', response.Data.UserId);
       // Guardar tokens si existen y configurar Authorization global
       if (response.Data.Token) {
         await AsyncStorage.setItem('authToken', response.Data.Token);
