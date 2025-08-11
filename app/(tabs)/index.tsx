@@ -96,12 +96,7 @@ function HomeScreen() {
   };
 
   const handleFloatingButtonPress = () => {
-    showSuccess('¡Accediendo a la rutina de hoy!', {
-      confirmText: 'Continuar',
-      onConfirm: () => {
-        // Aquí navegarías a la pantalla de rutina
-      },
-    });
+    router.push('/routine-day');
   };
 
   const handleRoutinePress = () => {

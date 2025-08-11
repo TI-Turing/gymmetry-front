@@ -1,135 +1,181 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,
   SafeAreaView,
   Platform,
+  FlatList,
+  ScrollView,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
+import type { Post } from '@/models/Post';
+import type { Comment } from '@/models/Comment';
+import type { User } from '@/models/User';
+import PostComposer from '@/components/social/PostComposer';
+import PostCard from '@/components/social/PostCard';
+import CommentsModal from '@/components/social/CommentsModal';
+import { feedService } from '@/services';
+import type { FeedResponseDto } from '@/dto/Feed/Response/FeedResponseDto';
+import Skeleton from '@/components/common/Skeleton';
 
 function FeedScreen() {
-  const [showComposer, setShowComposer] = useState(false);
-  const [postText, setPostText] = useState('');
+  const [posts, setPosts] = useState<any[]>(() => {
+    const now = new Date().toISOString();
+    const userA: User = {
+      Id: 'u1', Email: 'u1@mail.com', Password: '', IdEps: null, Name: 'Carlos', LastName: 'Mendoza', UserName: 'carlos.m', IdGender: null,
+      BirthDate: null, ProfileImageUrl: 'https://via.placeholder.com/40', DocumentTypeId: null, Phone: null, CountryId: null, Address: null,
+      CityId: null, RegionId: null, Rh: null, EmergencyName: null, EmergencyPhone: null, PhysicalExceptions: null, PhysicalExceptionsNotes: null,
+      CreatedAt: now, UpdatedAt: now, DeletedAt: null, Ip: null, IsActive: true, UserTypeId: null, PlanId: null, UserFitUserUserId: null,
+      UserDietUserId: null, EmployeeRegisterDailyUserUserId: null, ScheduleUserUserId: null, UserEmployeeUserUserId: null, GymId: null,
+      RegistrationCompleted: true,
+      BillUserSellers: [], BillUsers: [], Dailies: [], DailyHistories: [], Diets: [], EmployeeRegisterDailyUserUser: null, Gym: null,
+      LogChanges: [], LogErrors: [], LogLogins: [], LogUninstalls: [], NotificationOptions: [], Notifications: [], Permissions: [],
+      PhysicalAssessments: [], Plan: null, RoutineAssigneds: [], RoutineTemplates: [], ScheduleUserUser: null, UserDietUser: null,
+      UserEmployeeUser: null, UserFitUser: null, UserType: null, PaymentAttempts: [], Posts: [], Comments: [], Likes: []
+    };
+    const userB: User = { ...userA, Id: 'u2', Name: 'Ana', LastName: 'García', UserName: 'ana.g', ProfileImageUrl: 'https://via.placeholder.com/40?text=A' };
+    const userC: User = { ...userA, Id: 'u3', Name: 'Miguel', LastName: 'Torres', UserName: 'miguel.t', ProfileImageUrl: 'https://via.placeholder.com/40?text=M' };
 
-  const posts = [
-    {
-      id: 1,
-      user: {
-        name: 'Carlos Mendoza',
-        avatar: 'https://via.placeholder.com/40',
-        gym: 'PowerGym Centro',
-      },
-      time: 'hace 2 horas',
-      content: '¡Nuevo PR en peso muerto! 180kg 💪',
-      image: 'https://via.placeholder.com/300x200',
-      likes: 15,
-      comments: 3,
-      liked: false,
-    },
-    {
-      id: 2,
-      user: {
-        name: 'Ana García',
-        avatar: 'https://via.placeholder.com/40',
-        gym: 'FitZone Norte',
-      },
-      time: 'hace 4 horas',
-      content:
-        'Completé mi primera rutina de 10K en cinta. ¡Qué sensación tan increíble!',
-      likes: 23,
-      comments: 7,
-      liked: true,
-    },
-    {
-      id: 3,
-      user: {
-        name: 'Miguel Torres',
-        avatar: 'https://via.placeholder.com/40',
-        gym: 'EliteGym Plaza',
-      },
-      time: 'hace 6 horas',
-      content: 'Día de piernas intenso. Mañana no podré caminar 😅',
-      image: 'https://via.placeholder.com/300x200',
-      likes: 8,
-      comments: 2,
-      liked: false,
-    },
-  ];
+    const p1: Post = { Id: 'p1', UserId: 'u1', Content: '¡Nuevo PR en peso muerto! 180kg 💪', MediaUrl: 'https://via.placeholder.com/600x400', MediaType: 'image',
+      CreatedAt: now, UpdatedAt: null, DeletedAt: null, Ip: null, IsActive: true, IsDeleted: false, User: userA, Comments: [], Likes: [] };
+    const p2: Post = { Id: 'p2', UserId: 'u2', Content: 'Completé mi primera rutina de 10K en cinta. ¡Qué sensación tan increíble!', MediaUrl: null, MediaType: null,
+      CreatedAt: now, UpdatedAt: null, DeletedAt: null, Ip: null, IsActive: true, IsDeleted: false, User: userB, Comments: [], Likes: [{ Id: 'l1', PostId: 'p2', UserId: 'u1', CreatedAt: now, DeletedAt: null, IsActive: true, IsDeleted: false, Post: {} as any, User: userA }] };
+    const p3: Post = { Id: 'p3', UserId: 'u3', Content: 'Día de piernas intenso. Mañana no podré caminar 😅', MediaUrl: 'https://via.placeholder.com/600x400', MediaType: 'image',
+      CreatedAt: now, UpdatedAt: null, DeletedAt: null, Ip: null, IsActive: true, IsDeleted: false, User: userC, Comments: [], Likes: [] };
 
-  const renderPostComposer = () => (
-    <View style={styles.composerCard}>
-      <View style={styles.composerHeader}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/40' }}
-          style={styles.userAvatar}
-        />
-        <TouchableOpacity
-          style={styles.composerInput}
-          onPress={() => setShowComposer(true)}
-        >
-          <Text style={styles.composerPlaceholder}>
-            ¿Cómo fue tu entrenamiento hoy?
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.composerActions}>
-        <TouchableOpacity style={styles.composerButton}>
-          <FontAwesome name='camera' size={16} color='#B0B0B0' />
-          <Text style={styles.composerButtonText}>Foto</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.composerButton}>
-          <FontAwesome name='map-marker' size={16} color='#B0B0B0' />
-          <Text style={styles.composerButtonText}>Ubicación</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    return [p1, p2, p3];
+  });
+  const [openPostId, setOpenPostId] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 10;
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [allCache, setAllCache] = useState<any[] | null>(null);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const endReachedAt = useRef<number>(0);
+  const END_REACHED_DEBOUNCE_MS = 800;
+  const openPost = useMemo(() => posts.find(p => p.Id === openPostId) || null, [openPostId, posts]);
 
-  const renderPost = (post: (typeof posts)[0]) => (
-    <View key={post.id} style={styles.postCard}>
-      <View style={styles.postHeader}>
-        <Image source={{ uri: post.user.avatar }} style={styles.userAvatar} />
-        <View style={styles.postUserInfo}>
-          <Text style={styles.userName}>{post.user.name}</Text>
-          <Text style={styles.userGym}>{post.user.gym}</Text>
-          <Text style={styles.postTime}>{post.time}</Text>
-        </View>
-        <TouchableOpacity style={styles.postMenu}>
-          <FontAwesome name='ellipsis-h' size={16} color='#B0B0B0' />
-        </TouchableOpacity>
-      </View>
+  const addMockPost = async (content: string) => {
+    const now = new Date().toISOString();
+    // Crear en backend Feed (si el servicio lo permite) o fallback a mock local
+    try {
+      const res = await feedService.createFeed({
+        UserId: null,
+        Title: content.slice(0, 60),
+        Description: content,
+        Media: null,
+        MediaType: null,
+        FileName: null,
+        Id: '',
+        FeedId: '',
+        ContentType: null,
+        Hashtag: null,
+      });
+      if (res.Success && res.Data) {
+        // Volver a cargar feeds
+        await loadFeeds();
+        return;
+      }
+    } catch {}
+    const me = posts[0]?.User; // mock fallback
+    const newPost = { Id: 'p' + (Math.random() * 100000).toFixed(0), UserId: me?.Id || 'me', Content: content, MediaUrl: null, MediaType: null, CreatedAt: now, UpdatedAt: null, DeletedAt: null, Ip: null, IsActive: true, IsDeleted: false, User: me as User, Comments: [], Likes: [] };
+    setPosts(prev => [newPost, ...prev]);
+  };
 
-      <Text style={styles.postContent}>{post.content}</Text>
+  const toggleLike = (postId: string) => {
+    // mock: sólo ajusta la lista de Likes localmente
+    setPosts(prev => prev.map(p => {
+      if (p.Id !== postId) return p;
+      const meId = 'me';
+      const hasLike = p.Likes?.some((l: any) => l.UserId === meId);
+      if (hasLike) {
+        return { ...p, Likes: p.Likes.filter((l: any) => l.UserId !== meId) };
+      }
+      const now = new Date().toISOString();
+      const like = { Id: 'l' + Math.random(), PostId: p.Id, UserId: meId, CreatedAt: now, DeletedAt: null, IsActive: true, IsDeleted: false, Post: p as any, User: p.User };
+      return { ...p, Likes: [...(p.Likes || []), like] };
+    }));
+  };
 
-      {post.image && (
-        <Image source={{ uri: post.image }} style={styles.postImage} />
-      )}
+  const addComment = (text: string) => {
+    if (!openPost) return;
+    const p = openPost;
+    const now = new Date().toISOString();
+    const me = p.User; // reutilizar mock
+    const comment: Comment = { Id: 'c' + Math.random(), PostId: p.Id, UserId: me?.Id || 'me', Content: text, CreatedAt: now, UpdatedAt: null, DeletedAt: null, Ip: null, IsActive: true, IsDeleted: false, Post: p as any, User: me as any };
+    setPosts(prev => prev.map(pp => pp.Id === p.Id ? { ...pp, Comments: [...(pp.Comments || []), comment] } : pp));
+  };
 
-      <View style={styles.postActions}>
-        <TouchableOpacity style={styles.actionButton}>
-          <FontAwesome
-            name={post.liked ? 'heart' : 'heart-o'}
-            size={20}
-            color={post.liked ? '#FF6B6B' : '#B0B0B0'}
-          />
-          <Text style={styles.actionText}>{post.likes}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <FontAwesome name='comment-o' size={20} color='#B0B0B0' />
-          <Text style={styles.actionText}>{post.comments}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <FontAwesome name='share' size={20} color='#B0B0B0' />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const mapFeedToPostCard = (feed: FeedResponseDto): any => {
+    return {
+      Id: feed.Id,
+      Content: feed.Description || feed.Title,
+      MediaUrl: feed.MediaUrl,
+      User: { UserName: 'Usuario', Name: feed.Title, ProfileImageUrl: 'https://via.placeholder.com/40' },
+      Likes: [],
+      Comments: [],
+    };
+  };
+
+  const loadFeeds = async () => {
+    setLoading(true);
+    try {
+      await loadPage(1, false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPage = async (targetPage: number, append: boolean) => {
+    // Intentar paginación desde backend
+    try {
+      const res = await feedService.searchFeeds({ Page: targetPage, PageSize: pageSize });
+      if (res.Success && Array.isArray(res.Data)) {
+        const mapped = (res.Data as FeedResponseDto[]).map(mapFeedToPostCard);
+        setPosts(prev => (append ? [...prev, ...mapped] : mapped));
+        setHasMore(mapped.length >= pageSize);
+        setPage(targetPage);
+        setAllCache(null);
+        return;
+      }
+    } catch {
+      // Ignorar y hacer fallback
+    }
+
+    // Fallback: cargar todo y paginar local
+    if (!allCache) {
+      const resAll = await feedService.getAllFeeds();
+      if (resAll.Success && Array.isArray(resAll.Data)) {
+        const mappedAll = (resAll.Data as FeedResponseDto[]).map(mapFeedToPostCard);
+        setAllCache(mappedAll);
+        const end = targetPage * pageSize;
+        setPosts(mappedAll.slice(0, end));
+        setHasMore(mappedAll.length > end);
+        setPage(targetPage);
+        return;
+      }
+      // Si tampoco hay data, deja vacío
+      setPosts([]);
+      setHasMore(false);
+      setPage(1);
+      return;
+    } else {
+      const end = targetPage * pageSize;
+      setPosts(allCache.slice(0, end));
+      setHasMore(allCache.length > end);
+      setPage(targetPage);
+    }
+  };
+
+  useEffect(() => {
+    loadFeeds();
+  }, []);
 
   const renderActiveUsers = () => (
     <View style={styles.activeUsersCard}>
@@ -155,53 +201,107 @@ function FeedScreen() {
     </View>
   );
 
-  if (showComposer) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.composerHeader}>
-          <TouchableOpacity onPress={() => setShowComposer(false)}>
-            <FontAwesome name='times' size={24} color='#FFFFFF' />
-          </TouchableOpacity>
-          <Text style={styles.composerTitle}>Nuevo Post</Text>
-          <TouchableOpacity style={styles.publishButton}>
-            <Text style={styles.publishButtonText}>Publicar</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.composerBody}>
-          <TextInput
-            style={styles.composerTextInput}
-            placeholderTextColor='#B0B0B0'
-            multiline
-            value={postText}
-            onChangeText={setPostText}
-            autoFocus
-          />
-        </View>
+  const renderHeader = () => (
+    <>
+      <View style={styles.header}>
+        <Text style={styles.title}>Feed</Text>
+        <TouchableOpacity style={styles.notificationButton}>
+          <FontAwesome name='bell' size={24} color='#FFFFFF' />
+        </TouchableOpacity>
       </View>
-    );
-  }
+      {renderActiveUsers()}
+      <PostComposer avatarUrl={posts[0]?.User?.ProfileImageUrl || null} onSubmit={addMockPost} />
+      {loading && (
+        <View style={{ paddingHorizontal: 20, gap: 12 }}>
+          {[1,2,3].map(i => (
+            <View key={i} style={{ backgroundColor: '#1E1E1E', borderRadius: 16, padding: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <Skeleton width={40} height={40} borderRadius={20} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <Skeleton width={'60%'} height={12} />
+                  <Skeleton width={'40%'} height={10} />
+                </View>
+              </View>
+              <Skeleton width={'100%'} height={12} style={{ marginBottom: 8 }} />
+              <Skeleton width={'80%'} height={12} style={{ marginBottom: 12 }} />
+              <Skeleton width={'100%'} height={160} borderRadius={12} />
+            </View>
+          ))}
+        </View>
+      )}
+    </>
+  );
+
+  const onEndReached = async () => {
+  if (loading || loadingMore || !hasMore) return;
+  const now = Date.now();
+  if (now - endReachedAt.current < END_REACHED_DEBOUNCE_MS) return;
+  endReachedAt.current = now;
+    setLoadingMore(true);
+    try {
+      await loadPage(page + 1, true);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       {Platform.OS !== 'web' && <MobileHeader />}
-      <ScrollView
-        style={styles.scrollView}
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.Id}
+        renderItem={({ item }) => (
+          <PostCard post={item} onToggleLike={toggleLike} onOpenComments={setOpenPostId} />
+        )}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={() => (
+          <View style={styles.footer}>
+            {loadingMore ? (
+              <View style={{ paddingHorizontal: 20, gap: 12 }}>
+                {[1, 2].map(i => (
+                  <View key={i} style={{ backgroundColor: '#1E1E1E', borderRadius: 16, padding: 16 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                      <Skeleton width={40} height={40} borderRadius={20} />
+                      <View style={{ flex: 1, gap: 6 }}>
+                        <Skeleton width={'60%'} height={12} />
+                        <Skeleton width={'40%'} height={10} />
+                      </View>
+                    </View>
+                    <Skeleton width={'100%'} height={12} style={{ marginBottom: 8 }} />
+                    <Skeleton width={'80%'} height={12} style={{ marginBottom: 12 }} />
+                    <Skeleton width={'100%'} height={160} borderRadius={12} />
+                  </View>
+                ))}
+              </View>
+            ) : !hasMore ? (
+              <Text style={{ color: '#333', textAlign: 'center' }}>No hay más publicaciones</Text>
+            ) : null}
+          </View>
+        )}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>Feed</Text>
-          <TouchableOpacity style={styles.notificationButton}>
-            <FontAwesome name='bell' size={24} color='#FFFFFF' />
-          </TouchableOpacity>
-        </View>
+        refreshing={refreshing}
+        onRefresh={async () => {
+          setRefreshing(true);
+          try {
+            // Reset y recarga de primera página
+            setAllCache(null);
+            setHasMore(true);
+            await loadPage(1, false);
+          } finally {
+            setRefreshing(false);
+          }
+        }}
+      />
 
-        {renderActiveUsers()}
-        {renderPostComposer()}
-
-        <View style={styles.postsContainer}>{posts.map(renderPost)}</View>
-
-        <View style={styles.footer} />
-      </ScrollView>
+      <CommentsModal
+        visible={!!openPost}
+        comments={openPost?.Comments || []}
+        onClose={() => setOpenPostId(null)}
+        onAddComment={addComment}
+      />
     </SafeAreaView>
   );
 }
@@ -276,136 +376,9 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
     marginTop: 4,
   },
-  composerCard: {
-    backgroundColor: '#1E1E1E',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-  },
-  composerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  composerInput: {
-    flex: 1,
-    marginLeft: 12,
-    padding: 12,
-    backgroundColor: '#333333',
-    borderRadius: 20,
-  },
-  composerPlaceholder: {
-    color: '#B0B0B0',
-    fontSize: 14,
-  },
-  composerActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  composerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  composerButtonText: {
-    color: '#B0B0B0',
-    fontSize: 14,
-  },
-  postCard: {
-    backgroundColor: '#1E1E1E',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-  },
-  postHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  postUserInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  userGym: {
-    fontSize: 12,
-    color: '#B0B0B0',
-    marginTop: 2,
-  },
-  postTime: {
-    fontSize: 12,
-    color: '#B0B0B0',
-    marginTop: 2,
-  },
-  postMenu: {
-    padding: 4,
-  },
-  postContent: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  postImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  postActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 24,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  actionText: {
-    color: '#B0B0B0',
-    fontSize: 14,
-  },
+  // estilos eliminados del composer y post card originales (sustituidos por componentes)
   postsContainer: {
     paddingBottom: 20,
-  },
-  composerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    flex: 1,
-    textAlign: 'center',
-  },
-  publishButton: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  publishButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  composerBody: {
-    flex: 1,
-    padding: 20,
-  },
-  composerTextInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#FFFFFF',
-    textAlignVertical: 'top',
   },
   footer: {
     height: 100,
