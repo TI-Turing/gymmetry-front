@@ -92,9 +92,18 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
   }, [refreshGymData]);
 
   useEffect(() => {
-    // Precargar datos cuando hay sesión activa (al montar y al loguear)
+    // Precargar datos cuando hay sesión activa; si no, limpiar estado
     if (isAuthenticated) {
       precargarDatos();
+    } else {
+      setGymData(null);
+      setInicioData(null);
+      setIsPreloading(false);
+      setPreloadError(null);
+      // También limpiar cache en memoria del servicio, si estuviera presente
+      import('@/services/gymService')
+        .then(({ GymService }) => GymService.clearCache?.())
+        .catch(() => {});
     }
   }, [isAuthenticated, precargarDatos]);
 

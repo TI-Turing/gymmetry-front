@@ -13,7 +13,6 @@ import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
 import { GymCompleteData } from './types';
 import { GymService } from '@/services/gymService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function GymScreen(): React.JSX.Element {
   const { AlertComponent } = useCustomAlert();
@@ -24,44 +23,58 @@ function GymScreen(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [userGymId, setUserGymId] = useState<string | null>(null);
   const [cachedGym, setCachedGym] = useState<any>(null);
+  const [isAdminOwner, setIsAdminOwner] = useState(false);
 
-  // Función para actualizar datos del usuario
+  // Actualiza datos del usuario y del gym según reglas: GymId -> gym enlazado; si no, verificar dueño
   const updateUserData = async () => {
-    const currentUserGymId = await AsyncStorage.getItem('@gym_id');
-    const currentCachedGym = GymService.getCachedGym();
+    const user = await authService.getUserData();
+    const currentUserId = user?.id ?? null;
+    const currentUserGymId = (user?.gymId ?? null) as string | null;
+
+    let currentCachedGym: any = null;
+    let adminOwner = false;
+
+    if (currentUserGymId) {
+      currentCachedGym = await GymService.getCachedGymById?.(currentUserGymId);
+    } else if (currentUserId) {
+      try {
+        const res = await GymService.findGymsByFields?.({ fields: { Owner_UserId: currentUserId } } as any);
+        if (res?.Success && Array.isArray(res.Data) && res.Data.length > 0) {
+          currentCachedGym = res.Data[0];
+          adminOwner = true;
+        }
+      } catch {}
+    }
+
     setUserGymId(currentUserGymId);
     setCachedGym(currentCachedGym);
-    console.log('User data updated:', { currentUserGymId, currentCachedGym });
+    setIsAdminOwner(adminOwner);
+    logger.debug('GymScreen.updateUserData', { currentUserGymId, adminOwner, hasCachedGym: !!currentCachedGym });
   };
 
-  // Usuario tiene gym si tiene gymId Y (tiene datos en caché O datos en preload)
-  const hasGym = userGymId && (cachedGym || gymData);
+  // Debe mostrar GymInfo si (tiene GymId o es dueño) y hay datos
+  const hasGym = Boolean(userGymId || isAdminOwner) && Boolean(cachedGym || gymData);
 
   useEffect(() => {
-    // Actualizar datos del usuario inicialmente
     updateUserData();
   }, []);
 
   useEffect(() => {
     const checkGymStatus = async () => {
-      if (userGymId && !cachedGym && !gymData) {
-        // Si tiene gymId pero no datos en caché, intentar cargar
+      if ((userGymId || isAdminOwner) && !cachedGym && !gymData) {
         await refreshGymData();
       }
       setIsLoading(false);
     };
-
     checkGymStatus();
-  }, [userGymId, cachedGym, gymData, refreshGymData]);
+  }, [userGymId, isAdminOwner, cachedGym, gymData, refreshGymData]);
 
   // Handler para conexión a gimnasio
   const handleGymConnection = (connected: boolean) => {
     setIsConnectedToGym(connected);
   };
 
-  const handleRegisterGym = () => {
-    setShowRegistrationForm(true);
-  };
+  const handleRegisterGym = () => setShowRegistrationForm(true);
 
   const handleRegistrationSubmit = async (data: GymCompleteData) => {
     try {
@@ -95,25 +108,18 @@ function GymScreen(): React.JSX.Element {
   };
 
   const handleRefreshGym = async () => {
-    // Actualizar datos del usuario por si hay cambios
-    updateUserData();
-    // Refrescar datos del gym
+    await updateUserData();
     await refreshGymData();
   };
 
-  const handleAddBranch = () => {
-    setShowAddBranchForm(true);
+  const handleAddBranch = () => setShowAddBranchForm(true);
+
+  const handleBranchFormComplete = (_branchId: string) => {
+    setShowAddBranchForm(false);
+    refreshGymData();
   };
 
-  const handleBranchFormComplete = (branchId: string) => {
-    setShowAddBranchForm(false);
-    refreshGymData(); // Actualizar datos para mostrar la nueva sede
-    // TODO: Mostrar mensaje de éxito o navegar a la vista de la sede
-  };
-
-  const handleBranchFormCancel = () => {
-    setShowAddBranchForm(false);
-  };
+  const handleBranchFormCancel = () => setShowAddBranchForm(false);
 
   return (
     <>
@@ -124,28 +130,15 @@ function GymScreen(): React.JSX.Element {
             <Text>Cargando...</Text>
           </View>
         ) : showAddBranchForm ? (
-          <AddBranchForm
-            onComplete={handleBranchFormComplete}
-            onCancel={handleBranchFormCancel}
-          />
+          <AddBranchForm onComplete={handleBranchFormComplete} onCancel={handleBranchFormCancel} />
         ) : hasGym ? (
-          <GymInfoView
-            gym={gymData || cachedGym!}
-            onRefresh={handleRefreshGym}
-            onAddBranch={handleAddBranch}
-          />
+          <GymInfoView gym={gymData || cachedGym!} onRefresh={handleRefreshGym} onAddBranch={handleAddBranch} />
         ) : showRegistrationForm ? (
-          <GymRegistrationSteps
-            onComplete={handleRegistrationSubmit}
-            onCancel={handleRegistrationCancel}
-          />
+          <GymRegistrationSteps onComplete={handleRegistrationSubmit} onCancel={handleRegistrationCancel} />
         ) : isConnectedToGym ? (
           <GymConnectedView />
         ) : (
-          <NoGymView
-            onConnect={handleGymConnection}
-            onRegisterGym={handleRegisterGym}
-          />
+          <NoGymView onConnect={handleGymConnection} onRegisterGym={handleRegisterGym} />
         )}
         <AlertComponent />
       </View>

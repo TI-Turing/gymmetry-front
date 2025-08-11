@@ -4,12 +4,12 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { gymService } from '@/services';
+import { gymTypeService } from '@/services/gymTypeService';
 
 const GymTypeList = React.memo(() => {
   const loadGymTypes = useCallback(async () => {
     try {
-      const response = await gymService.getGymTypes();
+      const response = await gymTypeService.getAllGymTypes();
       return response.Data || [];
     } catch (_error) {
       // Fallback to mock data if service doesn't exist

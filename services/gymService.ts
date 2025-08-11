@@ -9,6 +9,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const gymService = {
 
   cachedGym: null as any | null,
+  cachedGymId: null as string | null,
+  /**
+   * Limpia completamente la caché en memoria del gimnasio.
+   * No elimina AsyncStorage; para eso, hazlo desde quien maneja sesión (p.ej., authService.logout).
+   */
+  clearCache(): void {
+    this.cachedGym = null;
+    this.cachedGymId = null;
+  },
 
   async addGym(request: AddGymRequest): Promise<ApiResponse<any>> {
     const response = await apiService.post<any>(`/gym/add`, request);
@@ -54,6 +63,7 @@ export const gymService = {
     if (!gymId) return null;
     const gymData = await this.fetchAndCacheGymData(gymId);
     this.cachedGym = gymData ?? null;
+  this.cachedGymId = gymId ?? null;
     return this.cachedGym;
   },
 
@@ -65,12 +75,21 @@ export const gymService = {
         this.cachedGym = await this.generateCachedGym(gymId);
       }
     }
-    return this.cachedGym;
+  return this.cachedGym;
   },
 
   // Alias para compatibilidad con getCachedGym
   getCachedGym(): any {
     return this.getCachedGymData();
+  },
+
+  // Obtiene el gym en caché garantizando que corresponda al gymId actual
+  async getCachedGymById(gymId: string): Promise<any | null> {
+    if (!gymId) return null;
+    if (this.cachedGym && this.cachedGymId === gymId) {
+      return this.cachedGym;
+    }
+    return await this.generateCachedGym(gymId);
   },
 
   async updateCacheFromObserver(gymId: string): Promise<void> {
@@ -106,6 +125,7 @@ export const gymService = {
     const response = await this.getGymById(gymId);
     const data = response.Success ? response.Data : null;
     this.cachedGym = data ?? null;
+  this.cachedGymId = gymId ?? null;
     return this.cachedGym;
   }
 };

@@ -7,7 +7,8 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Modal, View as RNView, Text as RNText, TouchableOpacity, TextInput, Platform } from 'react-native';
 import 'react-native-reanimated';
 import { LogBox } from 'react-native';
 
@@ -113,6 +114,7 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      {isAuthenticated && <BiometricGate />}
       <Stack>
         {/* Grupo principal con tabs */}
         <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
@@ -142,4 +144,163 @@ function RootLayoutNav() {
       </Stack>
     </ThemeProvider>
   );
+}
+
+// Componente ligero para gate biométrico para dueños/admin al entrar
+function BiometricGate() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [visible, setVisible] = useState(false);
+  const [mode, setMode] = useState<'choice' | 'password' | 'working'>('choice');
+  const [error, setError] = useState<string | null>(null);
+  const [password, setPassword] = useState('');
+  const [identifier, setIdentifier] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        // Detectar si es admin/owner: usuario sin GymId pero dueño de algún Gym
+        const { authService } = await import('@/services/authService');
+        const u = await authService.getUserData();
+        if (!u) return; // no user
+        setIdentifier(u.email || u.userName || null);
+        if (u.gymId) {
+          // Tiene GymId enlazado -> no gate biométrico
+          return;
+        }
+        const { gymService } = await import('@/services/gymService');
+        const res: any = await gymService.findGymsByFields?.({ fields: { Owner_UserId: u.id } });
+        const isOwner = !!(res?.Success && Array.isArray(res.Data) && res.Data.length > 0);
+        if (!isOwner) return;
+
+        // Es owner -> mostrar modal de opciones
+        if (!cancelled) {
+          setVisible(true);
+          setMode('choice');
+          setError(null);
+        }
+      } catch {
+        // Ignorar errores de detección; no bloquear
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const tryBiometric = useCallbackAsync(async () => {
+    setMode('working');
+    setError(null);
+    try {
+      // Dynamic import without static analysis to avoid type errors when module is not installed
+      const dynamicImport: any = (Function('return import')() as any);
+      const LocalAuthentication = (await dynamicImport('expo-local-authentication')).default || (await dynamicImport('expo-local-authentication'));
+      const hasHardware = await LocalAuthentication.hasHardwareAsync?.();
+      const supported = await LocalAuthentication.isEnrolledAsync?.();
+      if (!hasHardware || !supported) {
+        setError('Biometría no disponible en este dispositivo. Usa contraseña.');
+        setMode('choice');
+        return;
+      }
+      const res = await LocalAuthentication.authenticateAsync?.({
+        promptMessage: 'Autenticación requerida',
+        fallbackEnabled: true,
+        cancelLabel: Platform.OS === 'ios' ? 'Cancelar' : 'Cerrar sesión',
+        disableDeviceFallback: false,
+      });
+      if (res?.success) {
+        setVisible(false);
+      } else {
+        setError('No se pudo verificar con huella.');
+        setMode('choice');
+      }
+    } catch {
+      setError('No se pudo iniciar la autenticación biométrica. Usa contraseña.');
+      setMode('choice');
+    }
+  });
+
+  const verifyPassword = useCallbackAsync(async () => {
+    if (!identifier || !password) {
+      setError('Ingresa tu contraseña.');
+      return;
+    }
+    setMode('working');
+    setError(null);
+    try {
+      const { authService } = await import('@/services/authService');
+      const res: any = await authService.login({ UserNameOrEmail: identifier, Password: password } as any);
+      if (res?.Success) {
+        setVisible(false);
+      } else {
+        setError(res?.Message || 'Contraseña incorrecta.');
+        setMode('password');
+      }
+    } catch {
+      setError('Error al verificar. Intenta de nuevo.');
+      setMode('password');
+    }
+  });
+
+  const doLogout = async () => {
+    await logout();
+    router.replace('/login');
+  };
+
+  if (!visible) return null;
+  return (
+    <Modal transparent animationType='fade' visible={visible}>
+      <RNView style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <RNView style={{ width: '100%', maxWidth: 360, backgroundColor: '#1E1E1E', borderRadius: 12, padding: 20 }}>
+          <RNText style={{ color: '#fff', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Verificación requerida</RNText>
+          {error ? <RNText style={{ color: '#ff7675', marginBottom: 8 }}>{error}</RNText> : null}
+          {mode === 'choice' && (
+            <>
+              <TouchableOpacity onPress={tryBiometric} style={{ backgroundColor: '#0EA5E9', padding: 12, borderRadius: 8, marginBottom: 8 }}>
+                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Usar huella</RNText>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setMode('password'); setError(null); }} style={{ backgroundColor: '#444', padding: 12, borderRadius: 8, marginBottom: 8 }}>
+                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Verificar por contraseña</RNText>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={doLogout} style={{ backgroundColor: '#EF4444', padding: 12, borderRadius: 8 }}>
+                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Cerrar sesión</RNText>
+              </TouchableOpacity>
+            </>
+          )}
+          {mode === 'password' && (
+            <>
+              <RNText style={{ color: '#ddd', marginBottom: 8 }}>Ingresa tu contraseña para continuar</RNText>
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                placeholder='Contraseña'
+                placeholderTextColor={'#888'}
+                style={{ backgroundColor: '#2A2A2A', color: '#fff', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12 }}
+                autoCapitalize='none'
+                autoCorrect={false}
+              />
+              <TouchableOpacity onPress={verifyPassword} style={{ backgroundColor: '#10B981', padding: 12, borderRadius: 8, marginBottom: 8 }}>
+                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Verificar</RNText>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setMode('choice'); setError(null); }} style={{ padding: 12, borderRadius: 8 }}>
+                <RNText style={{ color: '#bbb', textAlign: 'center' }}>Volver</RNText>
+              </TouchableOpacity>
+            </>
+          )}
+          {mode === 'working' && (
+            <RNText style={{ color: '#bbb' }}>Verificando…</RNText>
+          )}
+        </RNView>
+      </RNView>
+    </Modal>
+  );
+}
+
+// Utilidad para envolver funciones async como callbacks sin re-crear en cada render
+function useCallbackAsync<T extends (...args: any[]) => Promise<any>>(fn: T) {
+  const ref = useRef(fn);
+  ref.current = fn;
+  return useMemo(() => ((...args: any[]) => ref.current(...args)) as T, []);
 }
