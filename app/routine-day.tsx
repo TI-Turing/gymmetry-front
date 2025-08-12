@@ -1,17 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  View as RNView,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
+import { StyleSheet, View as RNView, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import Button from '@/components/common/Button';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { RoutineDay } from '@/models/RoutineDay';
 import { routineDayService } from '@/services';
@@ -207,40 +201,39 @@ export default function RoutineDayScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()}>
-          <FontAwesome name="chevron-left" size={20} color={Colors.light.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rutina de Hoy</Text>
-        <View style={styles.headerBtn} />
-      </View>
-
-      {/* Progreso global */}
-      <View style={styles.overall}>
-        <Text style={styles.overallLabel}>Progreso</Text>
-        <View style={styles.progressBar}>
-          <RNView style={[styles.progressFill, { width: `${overallProgress}%` }]} />
+    <ScreenWrapper
+      headerTitle="Rutina de Hoy"
+      showBackButton
+      onPressBack={() => router.back()}
+      backgroundColor="#121212"
+    >
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+        {/* Progreso global */}
+        <View style={styles.overall}>
+          <Text style={styles.overallLabel}>Progreso</Text>
+          <View style={styles.progressBar}>
+            <RNView style={[styles.progressFill, { width: `${overallProgress}%` }]} />
+          </View>
+          <Text style={styles.progressText}>{overallProgress}%</Text>
         </View>
-        <Text style={styles.progressText}>{overallProgress}%</Text>
-      </View>
 
-      {/* Contenido */}
-      <View style={styles.content}>
-        {loading ? (
-          <LoadingSpinner />
-        ) : error ? (
-          <Text style={styles.error}>{error}</Text>
-        ) : (
-          <FlatList
-            data={exercises}
-            keyExtractor={(it) => it.Id}
-            renderItem={renderItem}
-            contentContainerStyle={{ padding: 16 }}
-          />
-        )}
-      </View>
+        {/* Lista de ejercicios */}
+        <View style={styles.content}>
+          {loading ? (
+            <LoadingSpinner />
+          ) : error ? (
+            <Text style={styles.error}>{error}</Text>
+          ) : (
+            <FlatList
+              data={exercises}
+              keyExtractor={(it) => it.Id}
+              renderItem={renderItem}
+              scrollEnabled={false}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8 }}
+            />
+          )}
+        </View>
+      </ScrollView>
 
       {/* Modal de ejercicio */}
       <Modal visible={!!selectedId} transparent animationType="slide">
@@ -266,23 +259,12 @@ export default function RoutineDayScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  headerBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 18, fontWeight: '600', color: '#FFF' },
   overall: { padding: 16, gap: 8 },
   overallLabel: { color: '#B0B0B0' },
   progressBar: {

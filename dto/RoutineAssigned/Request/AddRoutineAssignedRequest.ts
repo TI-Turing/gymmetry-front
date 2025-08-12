@@ -2,4 +2,5 @@
 export interface AddRoutineAssignedRequest {
   Comments: string | null;
   UserId: string;
+  RoutineTemplateId: string;
 }

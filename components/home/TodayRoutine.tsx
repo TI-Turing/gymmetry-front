@@ -7,12 +7,14 @@ interface TodayRoutineProps {
   routineName: string;
   hasAttended: boolean;
   onPress?: () => void;
+  showTitle?: boolean; // Permite ocultar el título interno cuando el header global ya lo muestra
 }
 
 const TodayRoutine: React.FC<TodayRoutineProps> = ({
   routineName,
   hasAttended,
   onPress,
+  showTitle = true,
 }) => {
   const getStatusIcon = () => {
     return hasAttended ? 'check-circle' : 'clock-o';
@@ -45,7 +47,7 @@ const TodayRoutine: React.FC<TodayRoutineProps> = ({
         </View>
 
         <View style={styles.textContainer}>
-          <Text style={styles.title}>Rutina de Hoy</Text>
+          {showTitle && <Text style={styles.title}>Rutina de Hoy</Text>}
           <Text style={styles.routineName}>{routineName}</Text>
           <Text style={[styles.status, { color: getStatusColor() }]}>
             {getStatusText()}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
@@ -107,8 +107,16 @@ function HomeScreen() {
     router.push('/routine-exercise-detail');
   };
 
+  const headerSubtitle = useMemo(() => {
+    return todayRoutine.routineName ? `Hoy: ${todayRoutine.routineName}` : undefined;
+  }, [todayRoutine.routineName]);
+
   return (
-    <ScreenWrapper>
+    <ScreenWrapper
+      headerTitle="Rutina"
+      headerSubtitle={headerSubtitle}
+      backgroundColor="#121212"
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -133,6 +141,7 @@ function HomeScreen() {
           routineName={todayRoutine.routineName}
           hasAttended={todayRoutine.hasAttended}
           onPress={handleRoutinePress}
+          showTitle={false}
         />
 
         {/* Acceso directo a RoutineExercise - Detalle */}

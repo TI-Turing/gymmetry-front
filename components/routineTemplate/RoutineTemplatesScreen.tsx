@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { ScrollView, RefreshControl, TouchableOpacity, Modal, View as RNView, TextInput, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { routineTemplateService, routineAssignedService } from '@/services';
 import { authService } from '@/services/authService';
@@ -11,6 +11,9 @@ import RoutineAssignedCard from '@/components/routineAssigned';
 import { RoutineTemplateSkeleton } from './RoutineTemplateSkeleton';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import type { MenuOption } from '@/components/layout/MobileHeader';
+import RoutineFilters, { type FilterState } from './RoutineFilters';
+import { applyRoutineFilters, createEmptyFilters, getActiveFiltersCount } from './filterUtils';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 function RoutineTemplatesScreen() {
   // Datos
@@ -25,6 +28,21 @@ function RoutineTemplatesScreen() {
   const [showSkeleton, setShowSkeleton] = useState(false);
   const skeletonTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadCountRef = useRef(0); // detectar doble ejecución en dev (StrictMode)
+  
+  // Estados de filtros
+  const [filters, setFilters] = useState<FilterState>(createEmptyFilters());
+  const [showFilters, setShowFilters] = useState(false);
+  // Modal asignación
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<RoutineTemplate | null>(null);
+  const [assignComment, setAssignComment] = useState('');
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [assignError, setAssignError] = useState<string | null>(null);
+
+  // Rutinas filtradas usando useMemo para optimizar performance
+  const filteredTemplates = useMemo(() => {
+    return applyRoutineFilters(templates, filters);
+  }, [templates, filters]);
 
   // Instrumentación helper
   const log = (label: string, start?: number) => {
@@ -109,6 +127,15 @@ function RoutineTemplatesScreen() {
     setRefreshing(false);
   };
 
+  // Funciones de filtros
+  const handleFiltersChange = useCallback((newFilters: FilterState) => {
+    setFilters(newFilters);
+  }, []);
+
+  const toggleFilters = useCallback(() => {
+    setShowFilters(prev => !prev);
+  }, []);
+
   // Configurar menú específico para rutinas
   const routineMenuOptions: MenuOption[] = [
     {
@@ -151,14 +178,81 @@ function RoutineTemplatesScreen() {
     router.back();
   };
 
+  const openAssignModal = (template: RoutineTemplate) => {
+    setSelectedTemplate(template);
+    setAssignComment('');
+    setAssignError(null);
+    setShowAssignModal(true);
+  };
+
+  const closeAssignModal = () => {
+    if (assignLoading) return;
+    setShowAssignModal(false);
+  };
+
+  const handleAssignRoutine = async () => {
+    if (!selectedTemplate) return;
+    setAssignLoading(true);
+    setAssignError(null);
+    try {
+      const user = await authService.getUserData();
+      if (!user?.id) throw new Error('Usuario no autenticado');
+
+      const request = {
+        Comments: assignComment.trim() || null,
+        UserId: user.id,
+        RoutineTemplateId: selectedTemplate.Id,
+      };
+      const resp = await routineAssignedService.addRoutineAssigned(request);
+      if (!resp?.Success) throw new Error(resp?.Message || 'Error al asignar rutina');
+
+      // Refrescar asignaciones para obtener la activa reciente
+      const assignedRes = await routineAssignedService.findRoutineAssignedsByFields({ field: 'UserId', value: user.id } as any);
+      if (assignedRes?.Success && Array.isArray(assignedRes.Data) && assignedRes.Data.length > 0) {
+        // Tomar la más reciente (asumimos primera) y añadir template seleccionado para mostrar nombre
+        const newest = assignedRes.Data[0];
+        // Asegurar que la plantilla esté disponible para la card
+        if (!newest.RoutineTemplates || newest.RoutineTemplates.length === 0) {
+          newest.RoutineTemplates = [selectedTemplate as any];
+        }
+        setActiveAssignment(newest as any);
+      }
+      setShowAssignModal(false);
+    } catch (e: any) {
+      setAssignError(e.message || 'Error desconocido');
+    } finally {
+      setAssignLoading(false);
+    }
+  };
+
+  // Componente del botón de filtros para el header
+  const FilterButton = () => {
+    const activeCount = getActiveFiltersCount(filters);
+    return (
+      <TouchableOpacity
+        style={styles.filterButton}
+        onPress={toggleFilters}
+        accessibilityLabel="Abrir filtros"
+      >
+        <FontAwesome name="filter" size={20} color="#FFFFFF" />
+        {activeCount > 0 && (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeCount}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <ScreenWrapper
       headerTitle="Rutinas"
+      headerSubtitle={`${filteredTemplates.length} de ${templates.length} rutina${templates.length !== 1 ? 's' : ''}`}
       showBackButton={true}
       onPressBack={handleGoBack}
+      headerRightComponent={<FilterButton />}
       menuOptions={routineMenuOptions}
       backgroundColor="#1A1A1A"
-      useSafeArea={true}
     >
       <ScrollView
         style={[styles.container, { paddingTop: 0 }]}
@@ -169,7 +263,10 @@ function RoutineTemplatesScreen() {
       {activeAssignment ? (
         <>
           <Text style={styles.sectionTitle}>Rutina Activa</Text>
-          <RoutineAssignedCard assignment={activeAssignment} />
+          <RoutineAssignedCard
+            assignment={activeAssignment}
+            onPress={() => router.push('/routine-day')}
+          />
         </>
       ) : (
         !loadingAssignment && <Text style={styles.text}>Sin rutinas activas en este momento.</Text>
@@ -181,18 +278,19 @@ function RoutineTemplatesScreen() {
         <RoutineTemplateSkeleton count={3} />
       ) : (
         <>
-          {templates.length === 0 && (
-            <Text style={styles.text}>No hay más rutinas disponibles.</Text>
+          {filteredTemplates.length === 0 && templates.length > 0 && (
+            <Text style={styles.text}>No hay rutinas que coincidan con los filtros seleccionados.</Text>
           )}
-          {templates.map(t => (
+          {filteredTemplates.length === 0 && templates.length === 0 && (
+            <Text style={styles.text}>No hay rutinas disponibles.</Text>
+          )}
+          {filteredTemplates.map(t => (
             <View key={t.Id} style={styles.card}>
               <Text style={styles.cardTitle}>{t.Name}</Text>
               {t.Comments && <Text style={styles.text}>{t.Comments}</Text>}
               <TouchableOpacity
                 style={styles.assignButton}
-                onPress={() => {
-                  /* TODO: asignar nueva rutina */
-                }}
+                onPress={() => openAssignModal(t)}
               >
                 <Text style={styles.assignLabel}>Configurar</Text>
               </TouchableOpacity>
@@ -201,6 +299,70 @@ function RoutineTemplatesScreen() {
         </>
       )}
       </ScrollView>
+
+      {/* Modal de Filtros */}
+      <RoutineFilters
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        onFiltersChange={handleFiltersChange}
+        currentFilters={filters}
+        totalResults={filteredTemplates.length}
+      />
+
+      {/* Modal asignar rutina */}
+      <Modal visible={showAssignModal} transparent animationType="fade" onRequestClose={closeAssignModal}>
+        <RNView style={{ flex:1, backgroundColor:'rgba(0,0,0,0.6)', justifyContent:'center', padding:24 }}>
+          <RNView style={{ backgroundColor:'#1E1E1E', borderRadius:12, padding:20 }}>
+            <Text style={{ fontSize:18, fontWeight:'600', color:'#FFFFFF', marginBottom:8 }}>
+              Establecer Rutina
+            </Text>
+            <Text style={{ color:'#B0B0B0', marginBottom:12 }}>
+              {selectedTemplate?.Name}
+            </Text>
+            <Text style={{ color:'#FFFFFF', fontWeight:'500', marginBottom:6 }}>Comentario (opcional)</Text>
+            <TextInput
+              style={{
+                backgroundColor:'#262626',
+                borderWidth:1,
+                borderColor:'#333',
+                borderRadius:8,
+                padding:12,
+                minHeight:90,
+                color:'#FFFFFF',
+                textAlignVertical:'top',
+                marginBottom:12,
+              }}
+              placeholder="Agregar un comentario..."
+              placeholderTextColor="#666"
+              multiline
+              value={assignComment}
+              onChangeText={setAssignComment}
+              editable={!assignLoading}
+            />
+            {assignError && <Text style={{ color:'#ff6b6b', marginBottom:8 }}>{assignError}</Text>}
+            <RNView style={{ flexDirection:'row', justifyContent:'flex-end', gap:12 }}>
+              <TouchableOpacity disabled={assignLoading} onPress={closeAssignModal}>
+                <Text style={{ color:'#B0B0B0', fontSize:16 }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleAssignRoutine}
+                disabled={assignLoading}
+                style={{
+                  backgroundColor: assignLoading ? '#444' : '#FF6B35',
+                  paddingHorizontal:20,
+                  paddingVertical:12,
+                  borderRadius:24,
+                  flexDirection:'row',
+                  alignItems:'center'
+                }}
+              >
+                {assignLoading && <ActivityIndicator color="#fff" style={{ marginRight:8 }} />}
+                <Text style={{ color:'#FFFFFF', fontWeight:'600', fontSize:16 }}>Establecer como rutina</Text>
+              </TouchableOpacity>
+            </RNView>
+          </RNView>
+        </RNView>
+      </Modal>
     </ScreenWrapper>
   );
 }
