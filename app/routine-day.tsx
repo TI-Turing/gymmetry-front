@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View as RNView, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { StyleSheet, View as RNView, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import Button from '@/components/common/Button';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ExerciseModal from '@/components/routineDay/ExerciseModal';
 import type { RoutineDay } from '@/models/RoutineDay';
 import { routineDayService } from '@/services';
 
@@ -236,29 +236,15 @@ export default function RoutineDayScreen() {
       </ScrollView>
 
       {/* Modal de ejercicio */}
-      <Modal visible={!!selectedId} transparent animationType="slide">
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{selectedExercise?.Name}</Text>
-              <TouchableOpacity onPress={() => setSelectedId(null)}>
-                <FontAwesome name="times" size={22} color={Colors.light.text} />
-              </TouchableOpacity>
-            </View>
-            {selectedExercise && (
-              <>
-                <Text style={styles.modalSub}>Sets: {selectedExercise.Sets} • Reps: {selectedExercise.Repetitions}</Text>
-                <View style={{ height: 12 }} />
-                <View style={{ gap: 8 }}>
-                  <Button title="Marcar 1 set completado" onPress={() => onMarkSet(selectedExercise.Id)} />
-                  <Button title="Deshacer último set" onPress={() => onUndoSet(selectedExercise.Id)} variant="secondary" />
-                  <Button title="Marcar ejercicio completado" onPress={() => onMarkExercise(selectedExercise.Id)} />
-                </View>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
+      <ExerciseModal
+        visible={!!selectedId}
+        exercise={selectedExercise}
+        completedSets={selectedExercise ? (progressById[selectedExercise.Id]?.completedSets ?? 0) : 0}
+        onClose={() => setSelectedId(null)}
+        onMarkSet={(exerciseId: string) => onMarkSet(exerciseId)}
+        onUndoSet={(exerciseId: string) => onUndoSet(exerciseId)}
+        onMarkExercise={(exerciseId: string) => onMarkExercise(exerciseId)}
+      />
     </ScreenWrapper>
   );
 }
@@ -289,20 +275,4 @@ const styles = StyleSheet.create({
   cardTitle: { color: '#FFF', fontSize: 16, fontWeight: '600' },
   cardMeta: { color: '#B0B0B0' },
   cardSub: { color: '#B0B0B0', marginTop: 6 },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  modalCard: {
-    width: '100%',
-    backgroundColor: '#1D1D1D',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 16,
-  },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  modalTitle: { color: '#FFF', fontSize: 16, fontWeight: '600' },
-  modalSub: { color: '#B0B0B0', marginTop: 4 },
 });
