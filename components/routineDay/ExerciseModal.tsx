@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, TouchableOpacity, Animated, Vibration, StyleSheet, Platform } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Colors from '@/constants/Colors';
 import Button from '@/components/common/Button';
 import type { RoutineDay } from '@/models/RoutineDay';
@@ -170,9 +171,9 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 }
               ]}
             >
-              <FontAwesome
-                name={isExecuting ? "heartbeat" : "play"}
-                size={40}
+              <MaterialCommunityIcons
+                name="dumbbell"
+                size={46}
                 color="#FFF"
               />
             </Animated.View>
