@@ -6,6 +6,8 @@ interface AuthContextType {
   isLoading: boolean;
   userData: UserData | null;
   user: UserData | null; // Alias para userData
+  userRoles: string[];
+  hasRole: (role: string) => boolean;
   login: (UserNameOrEmail: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -90,6 +92,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     userData,
     user: userData, // Alias para userData
+  userRoles: userData?.roles || ['user'],
+  hasRole: (role: string) => !!userData?.roles.includes(role.toLowerCase()),
     login,
     logout,
   };

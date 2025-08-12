@@ -124,7 +124,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginTop: 0, // Sin margen superior para que pegue al header
+    marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

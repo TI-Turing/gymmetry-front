@@ -1,11 +1,11 @@
-import { TextInput, StyleSheet } from 'react-native';
+import { TextInput } from 'react-native';
 import React, { useState } from 'react';
 import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
 import { routineTemplateService } from '@/services';
+import { styles } from './styles';
 
 export function RoutineTemplateForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -58,17 +58,18 @@ export function RoutineTemplateForm() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>RoutineTemplate - Formulario</Text>
-      <Text style={styles.label}>Campos (JSON)</Text>
+    <View style={styles.formContainer}>
+      <Text style={styles.formTitle}>RoutineTemplate - Formulario</Text>
+      <Text style={styles.formLabel}>Campos (JSON)</Text>
       <TextInput
         style={styles.textarea}
         value={payload}
         onChangeText={setPayload}
         multiline
         numberOfLines={8}
+        placeholderTextColor="#666666"
       />
-      <View style={styles.row}>
+      <View style={styles.formRow}>
         <Button title='Crear' onPress={onAdd} />
         <Button title='Actualizar' onPress={onUpdate} />
       </View>
@@ -83,28 +84,4 @@ export function RoutineTemplateForm() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
-  card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
-  },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
-});
-export default styles;
+export default RoutineTemplateForm;

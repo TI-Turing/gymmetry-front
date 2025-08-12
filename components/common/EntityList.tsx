@@ -18,6 +18,8 @@ interface EntityListProps<T> {
   showRefreshButton?: boolean;
   dependencies?: any[];
   extraContent?: ReactNode;
+  skeletonComponent?: ReactNode;
+  useSkeletonLoading?: boolean;
 }
 
 /**
@@ -36,6 +38,8 @@ export function EntityList<T>({
   showRefreshButton = true,
   dependencies = [],
   extraContent,
+  skeletonComponent,
+  useSkeletonLoading = false,
 }: EntityListProps<T>) {
   const { items, loading, error, refreshItems } = useEntityList<T>(
     loadFunction,
@@ -62,16 +66,22 @@ export function EntityList<T>({
 
       {extraContent}
 
-      <FlatList
-        data={items}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        ListEmptyComponent={!loading ? renderEmptyState : null}
-        contentContainerStyle={
-          items?.length === 0 ? styles.emptyContainer : undefined
-        }
-        showsVerticalScrollIndicator={false}
-      />
+      {loading && useSkeletonLoading && skeletonComponent ? (
+        <View style={{ flex: 1 }}>
+          {skeletonComponent}
+        </View>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          ListEmptyComponent={!loading ? renderEmptyState : null}
+          contentContainerStyle={
+            items?.length === 0 ? styles.emptyContainer : undefined
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       {showRefreshButton && (
         <Button
@@ -82,7 +92,9 @@ export function EntityList<T>({
         />
       )}
 
-      <LoadingOverlay visible={loading} message={loadingMessage} />
+      {(!useSkeletonLoading || !skeletonComponent) && (
+        <LoadingOverlay visible={loading} message={loadingMessage} />
+      )}
     </View>
   );
 }

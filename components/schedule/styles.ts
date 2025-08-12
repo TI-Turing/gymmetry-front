@@ -1,0 +1,266 @@
+import { StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.dark.background,
+    padding: SPACING.md,
+  },
+  scheduleCard: {
+    backgroundColor: '#1A1A1A',
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  scheduleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  scheduleTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.dark.text,
+  },
+  scheduleDate: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.tint,
+    fontWeight: '600',
+  },
+  timeSlotContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  timeSlot: {
+    backgroundColor: '#333333',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.md,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  availableSlot: {
+    backgroundColor: Colors.dark.tint,
+  },
+  bookedSlot: {
+    backgroundColor: '#EF4444',
+  },
+  selectedSlot: {
+    backgroundColor: '#10B981',
+  },
+  timeSlotText: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    fontWeight: '500',
+  },
+  availableSlotText: {
+    color: '#FFFFFF',
+  },
+  classCard: {
+    backgroundColor: '#1A1A1A',
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  classHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.sm,
+  },
+  className: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.dark.text,
+    flex: 1,
+    marginRight: SPACING.sm,
+  },
+  classCapacity: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    opacity: 0.8,
+  },
+  classTime: {
+    fontSize: FONT_SIZES.md,
+    color: Colors.dark.tint,
+    fontWeight: '600',
+    marginBottom: SPACING.xs,
+  },
+  classInstructor: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    opacity: 0.8,
+    marginBottom: SPACING.sm,
+  },
+  classDescription: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    opacity: 0.8,
+    lineHeight: 20,
+    marginBottom: SPACING.md,
+  },
+  classActions: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+  },
+  joinButton: {
+    flex: 1,
+    backgroundColor: Colors.dark.tint,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+  },
+  joinButtonText: {
+    color: '#FFFFFF',
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+  },
+  fullClass: {
+    backgroundColor: '#666666',
+  },
+  fullClassText: {
+    color: '#CCCCCC',
+  },
+  waitlistButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.dark.tint,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+    flex: 1,
+  },
+  waitlistButtonText: {
+    color: Colors.dark.tint,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+  },
+  daySelector: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1A1A',
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.xs,
+    marginBottom: SPACING.md,
+  },
+  dayButton: {
+    flex: 1,
+    padding: SPACING.sm,
+    borderRadius: BORDER_RADIUS.sm,
+    alignItems: 'center',
+  },
+  activeDayButton: {
+    backgroundColor: Colors.dark.tint,
+  },
+  dayButtonText: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    fontWeight: '500',
+  },
+  activeDayButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  gymHours: {
+    backgroundColor: '#1A1A1A',
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  hoursTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.dark.text,
+    marginBottom: SPACING.md,
+    textAlign: 'center',
+  },
+  hoursRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333333',
+  },
+  dayText: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    fontWeight: '500',
+  },
+  hoursText: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    opacity: 0.8,
+  },
+  currentDayText: {
+    color: Colors.dark.tint,
+    fontWeight: '600',
+  },
+  occupancyCard: {
+    backgroundColor: '#1A1A1A',
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  occupancyTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.dark.text,
+    marginBottom: SPACING.md,
+    textAlign: 'center',
+  },
+  occupancyLevel: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: Colors.dark.tint,
+    textAlign: 'center',
+    marginBottom: SPACING.sm,
+  },
+  occupancyBar: {
+    height: 12,
+    backgroundColor: '#333333',
+    borderRadius: BORDER_RADIUS.sm,
+    overflow: 'hidden',
+    marginBottom: SPACING.sm,
+  },
+  occupancyFill: {
+    height: '100%',
+    backgroundColor: Colors.dark.tint,
+  },
+  occupancyText: {
+    fontSize: FONT_SIZES.sm,
+    color: Colors.dark.text,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  emptyStateText: {
+    fontSize: FONT_SIZES.lg,
+    color: Colors.dark.text,
+    textAlign: 'center',
+    opacity: 0.6,
+    marginBottom: SPACING.md,
+  },
+  emptyStateSubtext: {
+    fontSize: FONT_SIZES.md,
+    color: Colors.dark.text,
+    textAlign: 'center',
+    opacity: 0.4,
+  },
+});

@@ -10,6 +10,8 @@ export interface UserData {
   email: string;
   gymId?: string | null;
   userName?: string | null;
+  roles: string[]; // Solo 'user' y opcionalmente 'owner'
+  isOwner: boolean;
 }
 
 // Auto-generated service for Auth Azure Functions
@@ -38,7 +40,9 @@ export const authService = {
         }
       } catch {}
 
-      this._rawUser = raw;
+  // Derivar roles antes de guardar
+  raw = await this._deriveAndAttachRoles(raw);
+  this._rawUser = raw;
       await AsyncStorage.setItem('@user_data', JSON.stringify(raw));
       await AsyncStorage.setItem('@user_id', (raw as any).UserId ?? (raw as any).Id ?? '');
       // Guardar tokens si existen y configurar Authorization global
@@ -84,7 +88,17 @@ export const authService = {
       const email = raw.Email ?? raw.email ?? null;
       const gymId = raw.GymId ?? raw.gymId ?? null;
       const userName = raw.UserName ?? raw.userName ?? null;
-      return id && email ? { id, email, gymId, userName } : null;
+      const roles: string[] = Array.isArray(raw.DerivedRoles) ? raw.DerivedRoles : ['user'];
+      return id && email
+        ? {
+            id,
+            email,
+            gymId,
+            userName,
+            roles,
+            isOwner: roles.includes('owner'),
+          }
+        : null;
     } catch {
       return null;
     }
@@ -108,6 +122,13 @@ export const authService = {
     try {
   const data = await AsyncStorage.getItem('@user_data');
   this._rawUser = data ? JSON.parse(data) : null;
+  if (this._rawUser) {
+    // Asegurar que roles estén presentes (en caso de versiones anteriores guardadas sin ellos)
+    if (!Array.isArray(this._rawUser?.DerivedRoles)) {
+      this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
+      await AsyncStorage.setItem('@user_data', JSON.stringify(this._rawUser));
+    }
+  }
   const token = await AsyncStorage.getItem('authToken');
   if (token) apiService.setAuthToken(token);
   return this._rawUser !== null;
@@ -160,6 +181,27 @@ export const authService = {
 
   // Método para refrescar datos del usuario (alias para compatibilidad)
   async refreshUserData(): Promise<UserData | null> {
+    if (this._rawUser) {
+      this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
+      await AsyncStorage.setItem('@user_data', JSON.stringify(this._rawUser));
+    }
     return this.getUserData();
+  },
+
+  async _deriveAndAttachRoles(raw: any): Promise<any> {
+    try {
+      const gymId = raw?.GymId ?? null;
+      const roles: string[] = gymId ? ['user', 'owner'] : ['user'];
+      return { ...raw, DerivedRoles: roles };
+    } catch {
+      return { ...raw, DerivedRoles: ['user'] };
+    }
+  },
+
+  hasRole(role: string): boolean {
+    const raw = this._rawUser;
+    if (!raw) return false;
+    const roles: string[] = Array.isArray(raw?.DerivedRoles) ? raw.DerivedRoles : ['user'];
+    return roles.includes(role.toLowerCase());
   }
 };

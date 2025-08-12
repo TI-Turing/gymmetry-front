@@ -1,1 +1,2 @@
-export { default as RoutineAssignedList } from './RoutineAssignedList';
+// Re-export the RoutineAssignedCard component as default
+export { default } from './RoutineAssignedCard';

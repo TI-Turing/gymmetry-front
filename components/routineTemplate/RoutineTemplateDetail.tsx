@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
 import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
 import { routineTemplateService } from '@/services';
+import { styles } from './styles';
 
 export function RoutineTemplateDetail() {
   const [id, setId] = useState('');
@@ -26,45 +25,21 @@ export function RoutineTemplateDetail() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>RoutineTemplate - Detalle</Text>
+    <View style={styles.formContainer}>
+      <Text style={styles.formTitle}>RoutineTemplate - Detalle</Text>
       <FormInput label='Id' value={id} onChangeText={setId} />
       <Button title='Consultar' onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (
-        <View style={styles.card}>
+        <View style={styles.formCard}>
           <Text style={styles.cardText}>{JSON.stringify(item, null, 2)}</Text>
         </View>
       ) : error ? (
-        <Text style={styles.error}>{error}</Text>
+        <Text style={styles.formError}>{error}</Text>
       ) : null}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
-  card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
-  },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
-});
-export default styles;
+export default RoutineTemplateDetail;

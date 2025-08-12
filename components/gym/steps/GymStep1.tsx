@@ -9,7 +9,7 @@ import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStep1Data, GymStepProps } from '../types';
 import { GymService } from '@/services/gymService';
 import Colors from '@/constants/Colors';
-import { GymStyles } from '../styles';
+import { GymStyles } from '../styles/GymStyles';
 
 export default function GymStep1({
   onNext,

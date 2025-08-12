@@ -87,7 +87,7 @@ function RootLayoutNav() {
     const first = segments[0] as string | undefined; // p.ej. '(tabs)', 'login', 'register', 'plans', 'modal', etc.
 
     // Rutas de la app a las que un usuario autenticado SÍ puede entrar aunque no sean parte de (tabs)
-  const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal', 'routine-day', 'routine-day-detail', 'routine-exercise-detail']);
+  const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal', 'routine-day', 'routine-day-detail', 'routine-exercise-detail', 'routine-templates']);
 
     // Usuario NO autenticado intentando entrar a la app (tabs, plans, modal) -> mandar a login
     if (
@@ -141,6 +141,10 @@ function RootLayoutNav() {
           name='routine-exercise-detail'
           options={{ presentation: 'modal', headerShown: false }}
         />
+        <Stack.Screen
+          name='routine-templates'
+          options={{ presentation: 'modal', headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );
@@ -148,7 +152,7 @@ function RootLayoutNav() {
 
 // Componente ligero para gate biométrico para dueños/admin al entrar
 function BiometricGate() {
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [mode, setMode] = useState<'choice' | 'password' | 'working'>('choice');
@@ -159,29 +163,15 @@ function BiometricGate() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        // Detectar si es admin/owner: usuario sin GymId pero dueño de algún Gym
-        const { authService } = await import('@/services/authService');
-        const u = await authService.getUserData();
-        if (!u) return; // no user
-        setIdentifier(u.email || u.userName || null);
-        if (u.gymId) {
-          // Tiene GymId enlazado -> no gate biométrico
-          return;
-        }
-        const { gymService } = await import('@/services/gymService');
-        const res: any = await gymService.findGymsByFields?.({ fields: { Owner_UserId: u.id } });
-        const isOwner = !!(res?.Success && Array.isArray(res.Data) && res.Data.length > 0);
-        if (!isOwner) return;
-
-        // Es owner -> mostrar modal de opciones
+      if (!user) return;
+      setIdentifier(user.email || user.userName || null);
+      // Gate sólo para roles privilegiados sin gym vinculado aún (dueño en proceso de set up)
+  if (hasRole('owner') && user.gymId) {
         if (!cancelled) {
           setVisible(true);
           setMode('choice');
           setError(null);
         }
-      } catch {
-        // Ignorar errores de detección; no bloquear
       }
     })();
     return () => {

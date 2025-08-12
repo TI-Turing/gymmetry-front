@@ -1,7 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
 import { router } from 'expo-router';
 import AuthContainer from '@/components/auth/AuthContainer';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { User } from '@/components/auth/types';
 
 export default function LoginPage() {
@@ -15,8 +15,8 @@ export default function LoginPage() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScreenWrapper showHeader={false} useSafeArea={true}>
       <AuthContainer onAuthSuccess={handleAuthSuccess} onBack={handleBack} />
-    </View>
+    </ScreenWrapper>
   );
 }

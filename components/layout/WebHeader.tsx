@@ -47,6 +47,9 @@ export default function WebHeader({
       case 'plans':
         router.push('/plans');
         break;
+      case 'routines':
+        router.push('/routine-templates');
+        break;
       case 'theme':
         // TODO: Implementar cambio de tema
         break;
@@ -74,6 +77,12 @@ export default function WebHeader({
   };
 
   const userMenuOptions = [
+    {
+      key: 'routines',
+      icon: 'tasks',
+      label: 'Rutinas',
+      action: () => handleMenuOption('routines'),
+    },
     {
       key: 'plans',
       icon: 'star',

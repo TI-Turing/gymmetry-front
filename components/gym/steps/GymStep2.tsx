@@ -10,7 +10,7 @@ import { GymService } from '@/services/gymService';
 import { gymTypeService } from '@/services/gymTypeService';
 import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
-import { GymStyles } from '../styles';
+import { GymStyles } from '../styles/GymStyles';
 
 interface GymStep2Props extends GymStepProps<GymStep2Data> {
   gymId: string;

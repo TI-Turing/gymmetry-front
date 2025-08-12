@@ -5,7 +5,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import { GymType } from './types';
-import { GymStyles } from './styles';
+// Import directo para evitar conflicto de export en barril styles
+import { GymStyles } from './styles/GymStyles';
 
 interface GymTypeDropdownProps {
   label: string;

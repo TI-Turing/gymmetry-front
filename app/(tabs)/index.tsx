@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, ScrollView, SafeAreaView, Platform } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import DisciplineConsistency from '@/components/home/DisciplineConsistency';
 import PlanInfo from '@/components/home/PlanInfo';
 import TodayRoutine from '@/components/home/TodayRoutine';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
-import MobileHeader from '@/components/layout/MobileHeader';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { router } from 'expo-router';
 import Button from '@/components/common/Button';
@@ -108,19 +108,12 @@ function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {Platform.OS !== 'web' && <MobileHeader />}
+    <ScreenWrapper>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>¡Hola! 👋</Text>
-          <Text style={styles.headerSubtitle}>¿Listo para entrenar hoy?</Text>
-        </View>
-
         {/* Sección 1: Disciplina y Consistencia */}
         <DisciplineConsistency
           data={disciplineData}
@@ -167,7 +160,7 @@ function HomeScreen() {
 
       {/* Componente de Alertas */}
       <AlertComponent />
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 }
 
@@ -183,20 +176,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 20,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 10,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
   },
   spacer: {
     height: 80, // Espacio para el botón flotante

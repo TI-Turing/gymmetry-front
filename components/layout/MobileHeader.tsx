@@ -14,12 +14,31 @@ import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 
+export interface MenuOption {
+  key: string;
+  icon: string;
+  label: string;
+  action: () => void;
+}
+
 interface MobileHeaderProps {
   title?: string;
+  subtitle?: string;
+  showBackButton?: boolean;
+  onPressBack?: () => void;
+  RightComponent?: React.ReactNode;
+  hideMenuButton?: boolean; // si RightComponent cubre el menú
+  menuOptions?: MenuOption[]; // opciones de menú dinámicas
 }
 
 export default function MobileHeader({
   title = 'GYMMETRY',
+  subtitle,
+  showBackButton = false,
+  onPressBack,
+  RightComponent,
+  hideMenuButton = false,
+  menuOptions, // opciones de menú dinámicas
 }: MobileHeaderProps) {
   const { logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
@@ -27,15 +46,14 @@ export default function MobileHeader({
     new Animated.Value(Dimensions.get('window').width)
   );
 
-  if (Platform.OS === 'web') {
-    return null;
-  }
-
   const handleMenuOption = (option: string) => {
     closeMenu();
     switch (option) {
       case 'plans':
         router.push('/plans');
+        break;
+      case 'routines':
+        router.push('/routine-templates');
         break;
       case 'theme':
         // Handle theme change
@@ -86,7 +104,13 @@ export default function MobileHeader({
     });
   };
 
-  const menuOptions = [
+  const defaultMenuOptions: MenuOption[] = [
+    {
+      key: 'routines',
+      icon: 'tasks',
+      label: 'Rutinas',
+      action: () => handleMenuOption('routines'),
+    },
     {
       key: 'plans',
       icon: 'star',
@@ -137,24 +161,56 @@ export default function MobileHeader({
     },
   ];
 
+  // Usar opciones personalizadas o por defecto
+  const currentMenuOptions = menuOptions || defaultMenuOptions;
+
   return (
     <>
-      <View style={styles.header}>
-        {/* Logo izquierdo */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>{title}</Text>
-        </View>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Platform.OS === 'ios' ? 4 : 4,
+            paddingBottom: 2,
+          },
+        ]}
+      >
+        {/* Left slot (back) */}
+          <View style={styles.leftSlot}>
+            {showBackButton && (
+              <TouchableOpacity
+                onPress={onPressBack}
+                accessibilityLabel='Atrás'
+                style={styles.backButton}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <FontAwesome name='chevron-left' size={20} color={Colors.dark.text} />
+              </TouchableOpacity>
+            )}
+          </View>
 
-        {/* Menú hamburguesa derecho */}
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={openMenu}
-          accessibilityLabel='Abrir menú'
-          accessibilityRole='button'
-        >
-          <FontAwesome name='bars' size={24} color='#FFFFFF' />
-        </TouchableOpacity>
-      </View>
+          {/* Center (title / subtitle) */}
+          <View style={styles.centerBlock}>
+            <Text style={styles.logoText}>{title}</Text>
+            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          </View>
+
+            {/* Right slot (menu or custom) */}
+          <View style={styles.rightSlot}>
+            {RightComponent ? (
+              RightComponent
+            ) : !hideMenuButton ? (
+              <TouchableOpacity
+                style={styles.menuButton}
+                onPress={openMenu}
+                accessibilityLabel='Abrir menú'
+                accessibilityRole='button'
+              >
+                <FontAwesome name='bars' size={24} color='#FFFFFF' />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
 
       {/* Modal del menú */}
       <Modal
@@ -193,7 +249,7 @@ export default function MobileHeader({
 
             {/* Opciones del menú */}
             <View style={styles.menuOptions}>
-              {menuOptions.map(option => (
+              {currentMenuOptions.map(option => (
                 <TouchableOpacity
                   key={option.key}
                   style={[
@@ -230,26 +286,48 @@ export default function MobileHeader({
 
 const styles = StyleSheet.create({
   header: {
-    height: 90,
     backgroundColor: '#1A1A1A',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#333333',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 54 : 45, // Más espacio desde la StatusBar
+    paddingHorizontal: 12,
+    minHeight: 38,
+    overflow: 'hidden', // Evitar elementos decorativos
+    zIndex: 1000, // Asegurar que esté por encima de otros elementos
+    height: 55
   },
-  logoContainer: {
+  leftSlot: {
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  rightSlot: {
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  },
+  centerBlock: {
     flex: 1,
+    alignItems: 'center',
   },
   logoText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: Colors.dark.tint,
   },
+  subtitle: {
+    marginTop: 1,
+    fontSize: 10,
+    color: '#B0B0B0',
+  },
+  backButton: {
+    padding: 4,
+    borderRadius: 20,
+  },
   menuButton: {
-    padding: 8,
+    padding: 6,
   },
   overlay: {
     flex: 1,
