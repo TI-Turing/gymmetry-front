@@ -97,7 +97,11 @@ function RoutineTemplatesScreen() {
         .then(assignedRes => {
           log('assigned fetch', tAssignedStart);
           if (assignedRes?.Success && Array.isArray(assignedRes.Data) && assignedRes.Data.length > 0) {
-            setActiveAssignment(assignedRes.Data[0]);
+            const active = assignedRes.Data[0];
+            setActiveAssignment(active);
+            // Persistir RoutineTemplateId activo
+            const rtid = (active as any)?.RoutineTemplateId || active?.RoutineTemplates?.[0]?.Id;
+            if (rtid) authService.setActiveRoutineTemplateId(rtid);
           } else {
             setActiveAssignment(null);
           }
@@ -216,6 +220,8 @@ function RoutineTemplatesScreen() {
           newest.RoutineTemplates = [selectedTemplate as any];
         }
         setActiveAssignment(newest as any);
+  const rtid = (newest as any)?.RoutineTemplateId || newest.RoutineTemplates?.[0]?.Id;
+  if (rtid) await authService.setActiveRoutineTemplateId(rtid);
       }
       setShowAssignModal(false);
     } catch (e: any) {

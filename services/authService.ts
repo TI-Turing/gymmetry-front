@@ -18,6 +18,7 @@ export interface UserData {
 export const authService = {
   // Caché en memoria de la última data de usuario cruda (tal cual viene del backend)
   _rawUser: null as any | null,
+  _activeRoutineTemplateId: null as string | null,
 
   async login(request: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     const response = await apiService.post<LoginResponse>(
@@ -45,6 +46,18 @@ export const authService = {
   this._rawUser = raw;
       await AsyncStorage.setItem('@user_data', JSON.stringify(raw));
       await AsyncStorage.setItem('@user_id', (raw as any).UserId ?? (raw as any).Id ?? '');
+      // Detectar RoutineTemplateId activo (primer RoutineAssigneds si existe)
+      try {
+        const routineAssigneds = (raw as any)?.RoutineAssigneds?.$values || (raw as any)?.RoutineAssigneds || [];
+        if (Array.isArray(routineAssigneds) && routineAssigneds.length > 0) {
+          const active = routineAssigneds[0];
+          const rtid = active?.RoutineTemplateId || active?.routineTemplateId || null;
+          if (rtid) {
+            this._activeRoutineTemplateId = rtid;
+            await AsyncStorage.setItem('@active_routine_template_id', rtid);
+          }
+        }
+      } catch {}
       // Guardar tokens si existen y configurar Authorization global
       if (response.Data.Token) {
         await AsyncStorage.setItem('authToken', response.Data.Token);
@@ -128,6 +141,11 @@ export const authService = {
       this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
       await AsyncStorage.setItem('@user_data', JSON.stringify(this._rawUser));
     }
+    // Cargar RoutineTemplateId activo si existe
+    try {
+      const rid = await AsyncStorage.getItem('@active_routine_template_id');
+      this._activeRoutineTemplateId = rid || null;
+    } catch {}
   }
   const token = await AsyncStorage.getItem('authToken');
   if (token) apiService.setAuthToken(token);
@@ -144,6 +162,7 @@ export const authService = {
   await AsyncStorage.removeItem('@auth_token');
   await AsyncStorage.removeItem('authToken');
   await AsyncStorage.removeItem('refreshToken');
+    await AsyncStorage.removeItem('@active_routine_template_id');
       // Limpiar referencias de gimnasio persistidas para evitar mostrar datos antiguos
       await AsyncStorage.removeItem('@gym_id');
       await AsyncStorage.removeItem('@gym_cache');
@@ -154,6 +173,7 @@ export const authService = {
       } catch {}
   apiService.removeAuthToken();
   this._rawUser = null;
+  this._activeRoutineTemplateId = null;
     } catch {
       // Handle error silently
     }
@@ -203,5 +223,17 @@ export const authService = {
     if (!raw) return false;
     const roles: string[] = Array.isArray(raw?.DerivedRoles) ? raw.DerivedRoles : ['user'];
     return roles.includes(role.toLowerCase());
+  },
+
+  getActiveRoutineTemplateId(): string | null {
+    return this._activeRoutineTemplateId;
+  },
+
+  async setActiveRoutineTemplateId(id: string | null) {
+    this._activeRoutineTemplateId = id;
+    try {
+      if (id) await AsyncStorage.setItem('@active_routine_template_id', id);
+      else await AsyncStorage.removeItem('@active_routine_template_id');
+    } catch {}
   }
 };

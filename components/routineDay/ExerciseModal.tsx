@@ -31,6 +31,36 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [pulseAnim] = useState(new Animated.Value(1));
   const [fadeAnim] = useState(new Animated.Value(0));
+  const isCompleted = exercise ? completedSets >= exercise.Sets : false;
+  // Próximo set a ejecutar
+  const nextSetNumber = exercise ? Math.min(completedSets + 1, exercise.Sets) : 1;
+
+  // Ordinales en español (forma apocopada donde aplica: primer, tercer) hasta 20
+  const getOrdinalEs = (n: number) => {
+    const map: Record<number, string> = {
+      1: 'primer',
+      2: 'segundo',
+      3: 'tercer',
+      4: 'cuarto',
+      5: 'quinto',
+      6: 'sexto',
+      7: 'séptimo',
+      8: 'octavo',
+      9: 'noveno',
+      10: 'décimo',
+      11: 'undécimo',
+      12: 'duodécimo',
+      13: 'decimotercer',
+      14: 'decimocuarto',
+      15: 'decimoquinto',
+      16: 'decimosexto',
+      17: 'decimoséptimo',
+      18: 'decimoctavo',
+      19: 'decimonoveno',
+      20: 'vigésimo',
+    };
+    return map[n] || `${n}º`;
+  };
 
   // Frase motivacional aleatoria
   const motivationalPhrase = useMemo(() => {
@@ -84,6 +114,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
   const handleStartSet = () => {
     if (!exercise) return;
+    if (isCompleted) return; // No iniciar si ya terminó todos los sets
     
     // Vibración leve al iniciar
     Vibration.vibrate(50);
@@ -104,14 +135,15 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
       }
     } catch {}
 
-    // Marcar set completado en estado superior
+    // Calcular progreso siguiente
+    const nextCompleted = Math.min(completedSets + 1, exercise.Sets);
     onMarkSet(exercise.Id);
 
     // Persistir progreso (AsyncStorage nativo / localStorage web)
     const key = `exercise_${exercise.Id}_progress`;
     const payload = JSON.stringify({
       exerciseId: exercise.Id,
-      completedSets: Math.min(completedSets + 1, exercise.Sets),
+      completedSets: nextCompleted,
       lastCompleted: new Date().toISOString(),
     });
     (async () => {
@@ -125,6 +157,14 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
         // Silencioso: persistencia no crítica
       }
     })();
+
+    // Si se completó el último set, cerrar modal
+    if (nextCompleted >= exercise.Sets) {
+      // pequeño timeout para permitir que el estado padre se actualice antes de cerrar
+      setTimeout(() => {
+        onClose();
+      }, 250);
+    }
   };
 
   // Limpiar animaciones al cerrar
@@ -188,10 +228,15 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
           {/* Botones de acción */}
           <View style={styles.buttonContainer}>
-            {!isExecuting ? (
+            {isCompleted ? (
+              <>
+                <Text style={styles.completedText}>Ejercicio completado ✅</Text>
+                <Button title="Cerrar" onPress={onClose} variant="secondary" />
+              </>
+            ) : !isExecuting ? (
               <>
                 <Button
-                  title="Iniciar Set"
+                  title={`Iniciar ${getOrdinalEs(nextSetNumber)} set`}
                   onPress={handleStartSet}
                   style={styles.startButton}
                 />
@@ -301,6 +346,12 @@ const styles = StyleSheet.create({
   },
   halfButton: {
     flex: 1,
+  },
+  completedText: {
+    color: '#4CAF50',
+    textAlign: 'center',
+    fontWeight: '600',
+    marginBottom: 8,
   },
 });
 
