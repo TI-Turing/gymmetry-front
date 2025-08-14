@@ -17,6 +17,8 @@ import { routineTemplateService } from '@/services';
 import { authService } from '@/services/authService';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { dailyService } from '@/services';
+import { dailyExerciseService } from '@/services';
+import type { AddDailyExerciseRequest } from '@/dto/DailyExercise/Request/AddDailyExerciseRequest';
 import type { AddDailyRequest } from '@/dto/Daily/Request/AddDailyRequest';
 
 type ExerciseProgress = {
@@ -265,6 +267,83 @@ export default function RoutineDayScreen() {
         const req: AddDailyRequest = { StartDate, EndDate, Percentage, UserId: userId, RoutineDayId: routineDayId };
         const resp = await dailyService.addDaily(req);
         if (resp?.Success) {
+          // Extraer DailyId del response (puede venir como objeto o string)
+          const dailyId: string | null = (() => {
+            const d: any = resp.Data as any;
+            if (!d) return null;
+            if (typeof d === 'string') return d;
+            if (typeof d === 'object' && d.Id) return String(d.Id);
+            return null;
+          })();
+          // Registrar sets por ejercicio en DailyExercise (uno por set)
+          if (dailyId) {
+            try {
+              const bulk: AddDailyExerciseRequest[] = [];
+              for (const ex of exercises) {
+                const routineDayId = ex?.Id;
+                const exerciseId = (ex as any)?.ExerciseId || (ex as any)?.Exercise?.Id || null;
+                const setsCount = Number(ex?.Sets || 0);
+                if (!exerciseId || setsCount <= 0) continue;
+
+                // Leer reps realizadas por set si existen
+                let performed: number[] = [];
+                try {
+                  const repsKey = `exercise_${routineDayId}_reps`;
+                  if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+                    const raw = window.localStorage.getItem(repsKey);
+                    if (raw) {
+                      const parsed = JSON.parse(raw);
+                      if (Array.isArray(parsed?.sets)) performed = parsed.sets as number[];
+                    }
+                  } else {
+                    const raw = await AsyncStorage.getItem(repsKey);
+                    if (raw) {
+                      const parsed = JSON.parse(raw);
+                      if (Array.isArray(parsed?.sets)) performed = parsed.sets as number[];
+                    }
+                  }
+                } catch {}
+
+                const planned = String(ex?.Repetitions ?? '').trim();
+                const plannedNumeric = (planned.match(/\d+/)?.[0]) || '';
+
+                for (let i = 1; i <= setsCount; i++) {
+                  const idx = i - 1;
+                  const perf = performed && typeof performed[idx] === 'number' && !Number.isNaN(performed[idx])
+                    ? String(performed[idx])
+                    : (plannedNumeric || planned || '');
+                  bulk.push({
+                    Set: String(i),
+                    Repetitions: perf,
+                    DailyId: dailyId,
+                    ExerciseId: String(exerciseId),
+                  });
+                }
+              }
+
+              if (bulk.length > 0) {
+                try {
+                  await dailyExerciseService.addDailyExercises(bulk);
+                  // Limpieza best-effort de los reps locales para evitar duplicados futuros
+                  try {
+                    for (const ex of exercises) {
+                      const repsKey = `exercise_${ex.Id}_reps`;
+                      if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+                        window.localStorage.removeItem(repsKey);
+                      } else {
+                        await AsyncStorage.removeItem(repsKey);
+                      }
+                    }
+                  } catch {}
+                } catch {
+                  // Silencioso: ignorar errores de bulk según requerimiento (no bloquear flujo)
+                }
+              }
+            } catch {
+              // Silencioso
+            }
+          }
+
           // Limpiar StartDate cacheado para evitar duplicados
           try {
             if (activeTemplateId) {
