@@ -76,7 +76,7 @@ export default function RoutineTemplateDaysScreen() {
                   borderColor: active ? '#FF6B35' : '#333',
                 }}
               >
-                <Text style={{ color: active ? '#FFF' : '#AAA', fontSize: 13, fontWeight: '600', letterSpacing: 0.5 }}>{getWeekdayNameEs(d).slice(0,1)}</Text>
+                <Text style={{ color: active ? '#FFF' : '#AAA', fontSize: 13, fontWeight: '600', letterSpacing: 0.5 }}>{['L','M','X','J','V','S','D'][d-1]}</Text>
               </TouchableOpacity>
             );
           })}
@@ -92,10 +92,17 @@ export default function RoutineTemplateDaysScreen() {
           ) : (
             <RNView>
               {exercises.map(ex => (
-                <RNView key={ex.Id} style={{ backgroundColor: '#1D1D1D', borderRadius: 12, padding: 12, marginBottom: 12 }}>
+                <TouchableOpacity
+                  key={ex.Id}
+                  onPress={() => {
+                    const eid = (ex as any).ExerciseId || (ex as any).Exercise?.Id;
+                    if (eid) router.push({ pathname: '/exercise-detail', params: { exerciseId: String(eid) } });
+                  }}
+                  style={{ backgroundColor: '#1D1D1D', borderRadius: 12, padding: 12, marginBottom: 12 }}
+                >
                   <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '600' }}>{ex.Exercise?.Name || ex.Name}</Text>
                   <Text style={{ color: '#B0B0B0', marginTop: 6 }}>Reps: {ex.Repetitions} • Sets: {ex.Sets}</Text>
-                </RNView>
+                </TouchableOpacity>
               ))}
             </RNView>
           )}
@@ -105,7 +112,7 @@ export default function RoutineTemplateDaysScreen() {
           <Button
             title={`Ir a ${getWeekdayNameEs(selectedDay)} en Rutina de Hoy`}
             variant="secondary"
-            onPress={() => router.push('/routine-day')}
+            onPress={() => router.push({ pathname: '/routine-day', params: { day: String(selectedDay) } })}
           />
         </RNView>
       </ScrollView>

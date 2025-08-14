@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import motivationalPhrases from '@/utils/motivationalPhrases.json';
 import { View, Text } from '@/components/Themed';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
@@ -33,6 +33,7 @@ function getWeekdayNameEs(dayNum: number) {
 }
 
 export default function RoutineDayScreen() {
+  const params = useLocalSearchParams<{ day?: string }>();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +56,15 @@ export default function RoutineDayScreen() {
   const hasAnyProgress = useMemo(() => {
     return Object.values(progressById).some(p => p.completedSets > 0 || p.isCompleted);
   }, [progressById]);
+
+  // Si llega ?day=, ajustar el seleccionado al montar
+  useEffect(() => {
+    const d = Number(params?.day);
+    if (d >= 1 && d <= 7) {
+      setSelectedDayNumber(d);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const selectedExercise = useMemo(
     () => exercises.find(e => e.Id === selectedId) || null,
@@ -346,6 +356,13 @@ export default function RoutineDayScreen() {
     });
   };
 
+  const goToExerciseDetail = (item: RoutineDay) => {
+    const eid = (item as any)?.ExerciseId || (item as any)?.Exercise?.Id;
+    if (eid) {
+      router.push({ pathname: '/exercise-detail', params: { exerciseId: String(eid) } });
+    }
+  };
+
   // Persistir cada cambio de progreso (incluye deshacer y completar ejercicio) 
   useEffect(() => {
     if (!progressLoadedRef.current) return; // saltar hasta que la carga inicial termine
@@ -386,15 +403,21 @@ export default function RoutineDayScreen() {
     return (
       <TouchableOpacity
         onPress={() => setSelectedId(item.Id)}
+        onLongPress={() => goToExerciseDetail(item)}
         style={[styles.card, prog.isCompleted && styles.cardCompleted]}
       >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{item.Exercise?.Name || item.Name}</Text>
-          {prog.isCompleted ? (
-            <FontAwesome name="check-circle" size={20} color="#4CAF50" />
-          ) : (
-            <Text style={styles.cardMeta}>{prog.completedSets}/{item.Sets} sets</Text>
-          )}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            {prog.isCompleted ? (
+              <FontAwesome name="check-circle" size={20} color="#4CAF50" />
+            ) : (
+              <Text style={styles.cardMeta}>{prog.completedSets}/{item.Sets} sets</Text>
+            )}
+            <TouchableOpacity onPress={() => goToExerciseDetail(item)} accessibilityLabel="Ver detalle de ejercicio">
+              <FontAwesome name="info-circle" size={18} color="#FF6B35" />
+            </TouchableOpacity>
+          </View>
         </View>
   {/* Etiqueta de categoría temporal removida */}
         <Text style={styles.cardSub}>Reps: {item.Repetitions}</Text>

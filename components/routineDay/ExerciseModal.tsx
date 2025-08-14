@@ -8,6 +8,7 @@ import Button from '@/components/common/Button';
 import type { RoutineDay } from '@/models/RoutineDay';
 import motivationalPhrases from '@/utils/motivationalPhrases.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -193,8 +194,21 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           </View>
 
           <Text style={styles.modalSub}>
-            Sets: {exercise.Sets} • Reps: {exercise.Repetitions}
+            
           </Text>
+          <TouchableOpacity
+            onPress={() => {
+              const eid = (exercise as any).ExerciseId || (exercise as any).Exercise?.Id || null;
+              if (eid) {
+                router.push({ pathname: '/exercise-detail', params: { exerciseId: String(eid) } });
+              }
+            }}
+            disabled={!((exercise as any)?.ExerciseId || (exercise as any)?.Exercise?.Id)}
+          >
+            <Text style={[styles.modalSub, { textDecorationLine: 'underline', color: '#FF6B35' }]}>
+              Sets: {exercise.Sets} • Reps: {exercise.Repetitions}  · Ver detalle
+            </Text>
+          </TouchableOpacity>
 
           <Text style={styles.progressText}>
             Progreso: {completedSets}/{exercise.Sets} sets completados

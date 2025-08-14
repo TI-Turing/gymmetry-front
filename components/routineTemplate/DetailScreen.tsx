@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ScrollView, View as RNView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { ScrollView, View as RNView, ActivityIndicator, TouchableOpacity, TextInput } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { View, Text } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
@@ -19,6 +19,9 @@ export default function RoutineTemplateDetailScreen() {
   const [template, setTemplate] = useState<RoutineTemplate | null>(null);
   const [gymName, setGymName] = useState<string | null>(null);
   const [authorName, setAuthorName] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<RoutineTemplate[]>([]);
+  const [debounceId, setDebounceId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const loadTemplate = useCallback(async () => {
     if (!templateId) {
@@ -74,6 +77,30 @@ export default function RoutineTemplateDetailScreen() {
     loadTemplate();
   }, [loadTemplate]);
 
+  // Búsqueda en tiempo real (contains) por nombre de plantilla
+  useEffect(() => {
+    if (debounceId) clearTimeout(debounceId);
+    if (!search || search.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const res = await routineTemplateService.findRoutineTemplatesByFields({ Name: search.trim() } as any);
+        let arr: any[] = [];
+        if (res?.Success && res.Data) {
+          if (Array.isArray(res.Data)) arr = res.Data;
+          else if ((res.Data as any).$values) arr = (res.Data as any).$values;
+        }
+        setSearchResults(arr as RoutineTemplate[]);
+      } catch {
+        // silencioso
+      }
+    }, 350);
+    setDebounceId(t);
+    return () => clearTimeout(t);
+  }, [search]);
+
   const objectives = useMemo(() => {
     const raw = (template as any)?.TagsObjectives as string | null | undefined;
     if (!raw) return [] as Array<{ key: string; label: string; pct: number; score: number }>;
@@ -110,6 +137,36 @@ export default function RoutineTemplateDetailScreen() {
     >
       {loading ? (
         <ScrollView style={{ paddingHorizontal: 16 }} contentContainerStyle={{ paddingBottom: 24 }}>
+          {/* Búsqueda por nombre */}
+          <RNView style={{ marginTop: 12, marginBottom: 8 }}>
+            <Text style={{ color: '#B0B0B0', marginBottom: 6 }}>Buscar plantilla</Text>
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Nombre de la plantilla"
+              placeholderTextColor="#888"
+              style={{ backgroundColor: '#1E1E1E', color: '#FFF', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: '#333' }}
+            />
+          </RNView>
+
+          {searchResults.length > 0 && (
+            <RNView style={{ marginBottom: 12 }}>
+              <Text style={{ color: '#AAA', marginBottom: 8 }}>Resultados ({searchResults.length})</Text>
+              {searchResults.map(rt => (
+                <TouchableOpacity
+                  key={rt.Id}
+                  onPress={() => {
+                    router.replace({ pathname: '/routine-template-detail', params: { templateId: String(rt.Id) } });
+                    setSearch('');
+                    setSearchResults([]);
+                  }}
+                  style={{ paddingVertical: 8 }}
+                >
+                  <Text style={{ color: '#FF6B35' }}>{rt.Name}</Text>
+                </TouchableOpacity>
+              ))}
+            </RNView>
+          )}
           <RNView style={{ marginTop: 12 }}>
             {/* Título */}
             <Skeleton width="70%" height={22} borderRadius={6} />
