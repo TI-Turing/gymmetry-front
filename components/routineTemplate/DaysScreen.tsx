@@ -1,0 +1,114 @@
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View as RNView, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
+import { View, Text } from '@/components/Themed';
+import Button from '@/components/common/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import type { RoutineDay } from '@/models/RoutineDay';
+import { routineDayService } from '@/services';
+
+function getWeekdayNameEs(dayNum: number) {
+  const names = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  return names[(dayNum - 1) % 7];
+}
+
+export default function RoutineTemplateDaysScreen() {
+  const params = useLocalSearchParams<{ templateId?: string }>();
+  const templateId = params?.templateId ? String(params.templateId) : null;
+
+  const [selectedDay, setSelectedDay] = useState<number>(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [dataByDay, setDataByDay] = useState<Record<number, RoutineDay[]>>({});
+
+  React.useEffect(() => {
+    if (!templateId) return;
+    fetchDay(1);
+  }, [templateId]);
+
+  const fetchDay = async (dayNumber: number) => {
+    if (!templateId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const body = { RoutineTemplateId: templateId, DayNumber: dayNumber } as any;
+      const resp = await routineDayService.findRoutineDaysByFields(body);
+      let extracted: any[] = [];
+      if (resp?.Success && resp?.Data) {
+        if (Array.isArray(resp.Data)) extracted = resp.Data;
+        else if ((resp.Data as any).$values && Array.isArray((resp.Data as any).$values))
+          extracted = (resp.Data as any).$values;
+      }
+      const filtered = (extracted as RoutineDay[]).filter(d => Number((d as any).DayNumber) === dayNumber);
+      setDataByDay(prev => ({ ...prev, [dayNumber]: filtered }));
+    } catch (e) {
+      setError('No se pudo cargar los ejercicios del día');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const days = [1,2,3,4,5,6,7];
+  const exercises = dataByDay[selectedDay] || [];
+
+  return (
+    <ScreenWrapper
+      headerTitle="Días de la rutina"
+      showBackButton
+      onPressBack={() => router.back()}
+      backgroundColor="#1A1A1A"
+    >
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} style={{ paddingHorizontal: 16 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }} contentContainerStyle={{ gap: 8 }}>
+          {days.map(d => {
+            const active = d === selectedDay;
+            return (
+              <TouchableOpacity
+                key={d}
+                onPress={() => { setSelectedDay(d); if (!dataByDay[d]) fetchDay(d); }}
+                style={{
+                  paddingVertical: 6,
+                  paddingHorizontal: 10,
+                  borderRadius: 14,
+                  backgroundColor: active ? '#FF6B35' : '#1E1E1E',
+                  borderWidth: 1,
+                  borderColor: active ? '#FF6B35' : '#333',
+                }}
+              >
+                <Text style={{ color: active ? '#FFF' : '#AAA', fontSize: 13, fontWeight: '600', letterSpacing: 0.5 }}>{getWeekdayNameEs(d).slice(0,1)}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        <RNView style={{ marginTop: 16 }}>
+          {loading ? (
+            <LoadingSpinner />
+          ) : error ? (
+            <Text style={{ color: '#FF6B35' }}>{error}</Text>
+          ) : exercises.length === 0 ? (
+            <Text style={{ color: '#B0B0B0' }}>Sin ejercicios configurados para {getWeekdayNameEs(selectedDay)}.</Text>
+          ) : (
+            <RNView>
+              {exercises.map(ex => (
+                <RNView key={ex.Id} style={{ backgroundColor: '#1D1D1D', borderRadius: 12, padding: 12, marginBottom: 12 }}>
+                  <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '600' }}>{ex.Exercise?.Name || ex.Name}</Text>
+                  <Text style={{ color: '#B0B0B0', marginTop: 6 }}>Reps: {ex.Repetitions} • Sets: {ex.Sets}</Text>
+                </RNView>
+              ))}
+            </RNView>
+          )}
+        </RNView>
+
+        <RNView style={{ marginTop: 8 }}>
+          <Button
+            title={`Ir a ${getWeekdayNameEs(selectedDay)} en Rutina de Hoy`}
+            variant="secondary"
+            onPress={() => router.push('/routine-day')}
+          />
+        </RNView>
+      </ScrollView>
+    </ScreenWrapper>
+  );
+}

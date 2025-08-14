@@ -12,11 +12,13 @@ import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
 import { GymCompleteData } from './types';
 import { GymService } from '@/services/gymService';
+import { useLocalSearchParams } from 'expo-router';
 // Import direct views to avoid potential circular import via index barrel
 import NoGymView from './NoGymView';
 import GymConnectedView from './GymConnectedView';
 
 function GymScreen(): React.JSX.Element {
+  const { gymId: paramGymId } = useLocalSearchParams<{ gymId?: string }>();
   const { AlertComponent } = useCustomAlert();
   const { gymData, refreshGymData } = usePreload();
 
@@ -28,20 +30,20 @@ function GymScreen(): React.JSX.Element {
   const [cachedGym, setCachedGym] = useState<any>(null);
   // Owner ahora se infiere solo por tener gymId (roles manejados en authService)
 
-  // Obtiene user.gymId (ya incluye si es owner)
+  // Obtiene gymId desde params o del usuario (si no hay param)
   const updateUserData = async () => {
     const user = await authService.getUserData();
-    const currentUserGymId = (user?.gymId ?? null) as string | null;
+    const targetGymId: string | null = (paramGymId as string) ?? ((user?.gymId ?? null) as string | null);
 
     let currentCachedGym: any = null;
 
-    if (currentUserGymId) {
-      currentCachedGym = await GymService.getCachedGymById?.(currentUserGymId);
+    if (targetGymId) {
+      currentCachedGym = await GymService.getCachedGymById?.(targetGymId);
     }
 
-    setUserGymId(currentUserGymId);
+    setUserGymId(targetGymId);
     setCachedGym(currentCachedGym);
-    logger.debug('GymScreen.updateUserData', { currentUserGymId, hasCachedGym: !!currentCachedGym });
+    logger.debug('GymScreen.updateUserData', { targetGymId, hasCachedGym: !!currentCachedGym, fromParam: !!paramGymId });
   };
 
   // Mostrar GymInfo si tiene gymId y hay datos
@@ -85,7 +87,14 @@ function GymScreen(): React.JSX.Element {
   const handleRegistrationCancel = () => setShowRegistrationForm(false);
   const handleRefreshGym = async () => {
     await updateUserData();
-    await refreshGymData();
+    // Si es un gym por parámetro, usamos el servicio directo; si no, contexto
+    if (paramGymId) {
+      await GymService.updateCacheFromObserver(paramGymId as string);
+      const refreshed = await GymService.getCachedGymById(paramGymId as string);
+      setCachedGym(refreshed);
+    } else {
+      await refreshGymData();
+    }
   };
   const handleAddBranch = () => setShowAddBranchForm(true);
   const handleBranchFormComplete = (_branchId: string) => {

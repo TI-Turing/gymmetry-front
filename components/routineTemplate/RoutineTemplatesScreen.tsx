@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { ScrollView, RefreshControl, TouchableOpacity, Modal, View as RNView, TextInput, ActivityIndicator } from 'react-native';
+import { ScrollView, RefreshControl, TouchableOpacity, Modal, View as RNView, TextInput, ActivityIndicator, Platform, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { routineTemplateService, routineAssignedService } from '@/services';
 import { authService } from '@/services/authService';
@@ -14,6 +14,7 @@ import type { MenuOption } from '@/components/layout/MobileHeader';
 import RoutineFilters, { type FilterState } from './RoutineFilters';
 import { applyRoutineFilters, createEmptyFilters, getActiveFiltersCount } from './filterUtils';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+// import { gymService } from '@/services/gymService';
 
 function RoutineTemplatesScreen() {
   // Datos
@@ -38,6 +39,8 @@ function RoutineTemplatesScreen() {
   const [assignComment, setAssignComment] = useState('');
   const [assignLoading, setAssignLoading] = useState(false);
   const [assignError, setAssignError] = useState<string | null>(null);
+
+  // Detalle movido a pantalla aparte
 
   // Rutinas filtradas usando useMemo para optimizar performance
   const filteredTemplates = useMemo(() => {
@@ -125,6 +128,18 @@ function RoutineTemplatesScreen() {
     };
   }, [fetchTemplatesFirst]);
 
+  // Cerrar modal de asignación con tecla Escape en web
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const onKeyDown = (e: any) => {
+      if ((e?.key === 'Escape' || e?.key === 'Esc') && showAssignModal) {
+        closeAssignModal();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showAssignModal]);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchTemplatesFirst();
@@ -187,6 +202,10 @@ function RoutineTemplatesScreen() {
     setAssignComment('');
     setAssignError(null);
     setShowAssignModal(true);
+  };
+
+  const openDetailScreen = (template: RoutineTemplate) => {
+    router.push({ pathname: '/routine-template-detail', params: { templateId: String((template as any).Id) } });
   };
 
   const closeAssignModal = () => {
@@ -291,16 +310,16 @@ function RoutineTemplatesScreen() {
             <Text style={styles.text}>No hay rutinas disponibles.</Text>
           )}
           {filteredTemplates.map(t => (
-            <View key={t.Id} style={styles.card}>
+            <TouchableOpacity key={t.Id} style={styles.card} activeOpacity={0.8} onPress={() => openDetailScreen(t)}>
               <Text style={styles.cardTitle}>{t.Name}</Text>
               {t.Comments && <Text style={styles.text}>{t.Comments}</Text>}
               <TouchableOpacity
                 style={styles.assignButton}
                 onPress={() => openAssignModal(t)}
               >
-                <Text style={styles.assignLabel}>Configurar</Text>
+                <Text style={styles.assignLabel}>Establecer como mi rutina</Text>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           ))}
         </>
       )}
@@ -317,8 +336,11 @@ function RoutineTemplatesScreen() {
 
       {/* Modal asignar rutina */}
       <Modal visible={showAssignModal} transparent animationType="fade" onRequestClose={closeAssignModal}>
-        <RNView style={{ flex:1, backgroundColor:'rgba(0,0,0,0.6)', justifyContent:'center', padding:24 }}>
-          <RNView style={{ backgroundColor:'#1E1E1E', borderRadius:12, padding:20 }}>
+        <Pressable style={{ flex:1, backgroundColor:'rgba(0,0,0,0.6)', justifyContent:'center', padding:24 }} onPress={closeAssignModal}>
+          <RNView
+            style={{ backgroundColor:'#1E1E1E', borderRadius:12, padding:20 }}
+            onStartShouldSetResponder={() => true}
+          >
             <Text style={{ fontSize:18, fontWeight:'600', color:'#FFFFFF', marginBottom:8 }}>
               Establecer Rutina
             </Text>
@@ -367,8 +389,10 @@ function RoutineTemplatesScreen() {
               </TouchableOpacity>
             </RNView>
           </RNView>
-        </RNView>
+        </Pressable>
       </Modal>
+
+  {/* Detalle ahora se navega a pantalla dedicada */}
     </ScreenWrapper>
   );
 }
