@@ -42,7 +42,7 @@ export const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md
   },
   error: { 
-    color: '#ff6b6b', 
+    color: '#FF6B35', 
     marginBottom: SPACING.sm,
     fontSize: FONT_SIZES.md
   },
@@ -145,7 +145,7 @@ export const styles = StyleSheet.create({
     marginBottom: SPACING.md 
   },
   formError: { 
-    color: '#ff6b6b', 
+    color: '#FF6B35', 
     marginVertical: SPACING.sm,
     fontSize: FONT_SIZES.md
   },

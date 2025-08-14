@@ -73,10 +73,10 @@ const NotificationOptionList = React.memo(() => {
               {
                 color:
                   item.priority === 'high'
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.priority === 'medium'
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >

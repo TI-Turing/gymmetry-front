@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   startButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#ff6300',
   },
   finishButton: {
     backgroundColor: '#FF6B35',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   completedText: {
-    color: '#4CAF50',
+    color: '#ff6300',
     textAlign: 'center',
     fontWeight: '600',
     marginBottom: 8,

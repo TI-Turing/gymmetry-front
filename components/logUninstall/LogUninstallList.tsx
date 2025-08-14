@@ -108,10 +108,10 @@ const LogUninstallList = React.memo(() => {
               {
                 color:
                   item.rating >= 4
-                    ? '#4caf50'
+                    ? '#ff6300'
                     : item.rating >= 2
                       ? '#ffa726'
-                      : '#ff6b6b'
+                      : '#FF6B35'
   },
             ]}
           >

@@ -75,10 +75,10 @@ const PhysicalAssessmentList = React.memo(() => {
               {
                 color:
                   item.bmi > 25
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.bmi < 18.5
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >

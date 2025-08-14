@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.dark.tint,
   },
   bookedSlot: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6B35',
   },
   selectedSlot: {
     backgroundColor: '#10B981',

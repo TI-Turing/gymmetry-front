@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   startButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#ff6300',
   },
   finishButton: {
     backgroundColor: '#FF6B35',

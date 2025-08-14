@@ -94,10 +94,10 @@ const MachineList = React.memo(() => {
               {
                 color:
                   item.difficulty === 'hard'
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.difficulty === 'medium'
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >

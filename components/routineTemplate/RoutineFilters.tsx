@@ -60,9 +60,9 @@ const objectiveLabels: { [key: string]: string } = {
 };
 
 const levelColors = {
-  bajo: '#4CAF50',
+  bajo: '#ff6300',
   medio: '#FF9800',
-  alto: '#F44336',
+  alto: '#FF6B35',
 };
 
 export default function RoutineFilters({

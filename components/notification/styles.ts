@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   typeError: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6B35',
     color: '#FFFFFF',
   },
   typeSuccess: {
@@ -94,7 +94,7 @@ export const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   deleteButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6B35',
   },
   deleteButtonText: {
     color: '#FFFFFF',

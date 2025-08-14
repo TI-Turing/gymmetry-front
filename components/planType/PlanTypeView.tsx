@@ -221,7 +221,7 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <FontAwesome name='exclamation-triangle' size={48} color='#FF6B6B' />
+        <FontAwesome name='exclamation-triangle' size={48} color='#FF6B35' />
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadPlanTypes}>
           <Text style={styles.retryButtonText}>Reintentar</Text>
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   errorText: {
-    color: '#FF6B6B',
+    color: '#FF6B35',
     textAlign: 'center',
     marginVertical: 16,
     fontSize: 16,

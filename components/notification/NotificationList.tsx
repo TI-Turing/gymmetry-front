@@ -49,7 +49,7 @@ const NotificationList = React.memo(() => {
               {
                 color:
                   item.priority === 'high'
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.priority === 'medium'
                       ? '#ffa726'
                       : Colors.light.text
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: FONT_SIZES.sm,
-    color: '#ff6b6b',
+    color: '#FF6B35',
     fontWeight: '600',
     textAlign: 'center'
 

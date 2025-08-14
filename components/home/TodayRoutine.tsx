@@ -21,7 +21,7 @@ const TodayRoutine: React.FC<TodayRoutineProps> = ({
   };
 
   const getStatusColor = () => {
-    return hasAttended ? '#4CAF50' : '#FF9800';
+    return hasAttended ? '#ff6300' : '#FF9800';
   };
 
   const getStatusText = () => {
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   completedContainer: {
     backgroundColor: '#1E2E1E',
     borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    borderLeftColor: '#ff6300',
   },
   pendingContainer: {
     backgroundColor: '#2E2E1E',

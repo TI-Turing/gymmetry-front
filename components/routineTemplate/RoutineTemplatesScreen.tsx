@@ -345,7 +345,7 @@ function RoutineTemplatesScreen() {
               onChangeText={setAssignComment}
               editable={!assignLoading}
             />
-            {assignError && <Text style={{ color:'#ff6b6b', marginBottom:8 }}>{assignError}</Text>}
+            {assignError && <Text style={{ color:'#FF6B35', marginBottom:8 }}>{assignError}</Text>}
             <RNView style={{ flexDirection:'row', justifyContent:'flex-end', gap:12 }}>
               <TouchableOpacity disabled={assignLoading} onPress={closeAssignModal}>
                 <Text style={{ color:'#B0B0B0', fontSize:16 }}>Cancelar</Text>

@@ -62,11 +62,11 @@ const PermissionList = React.memo(() => {
               {
                 color:
                   item.level === 'admin'
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.level === 'manager'
                       ? '#ffa726'
                       : item.level === 'user'
-                        ? '#4caf50'
+                        ? '#ff6300'
                         : Colors.light.text
   },
             ]}

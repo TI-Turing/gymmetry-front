@@ -124,7 +124,7 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <FontAwesome name='exclamation-triangle' size={48} color='#FF6B6B' />
+        <FontAwesome name='exclamation-triangle' size={48} color='#FF6B35' />
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity
           style={styles.retryButton}
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   errorText: {
-    color: '#FF6B6B',
+    color: '#FF6B35',
     textAlign: 'center',
     marginVertical: 16,
     fontSize: 16,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     borderColor: '#333333',
   },
   expiredPlanCard: {
-    borderColor: '#FF6B6B',
+    borderColor: '#FF6B35',
     backgroundColor: '#2a1a1a',
   },
   expiringSoonPlanCard: {

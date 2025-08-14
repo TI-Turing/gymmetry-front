@@ -136,7 +136,7 @@ export const styles = StyleSheet.create({
     color: '#FFFFFF'
   },
   selectedButton: {
-    backgroundColor: '#4CAF50'
+    backgroundColor: '#ff6300'
   },
 
   // Plan Form styles
@@ -180,7 +180,7 @@ export const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md
   },
   error: {
-    color: '#ff6b6b',
+    color: '#FF6B35',
     marginVertical: SPACING.sm,
     fontSize: FONT_SIZES.md
   },

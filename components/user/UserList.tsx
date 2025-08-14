@@ -98,7 +98,7 @@ export function UserList() {
               style={[
                 styles.membershipStatus,
                 {
-                  color: item.membership.isActive ? '#4caf50' : '#ff6b6b',
+                  color: item.membership.isActive ? '#ff6300' : '#FF6B35',
                 },
               ]}
             >

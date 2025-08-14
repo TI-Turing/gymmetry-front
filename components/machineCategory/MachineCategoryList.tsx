@@ -61,10 +61,10 @@ const MachineCategoryList = React.memo(() => {
               {
                 color:
                   item.difficulty === 'advanced'
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.difficulty === 'intermediate'
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >

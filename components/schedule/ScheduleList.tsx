@@ -83,7 +83,7 @@ const ScheduleList = React.memo(() => {
               {
                 color:
                   item.currentParticipants >= item.maxCapacity
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : Colors.light.text
   },
             ]}

@@ -31,10 +31,10 @@ const CurrentOccupancyList = React.memo(() => {
               {
                 backgroundColor:
                   item.occupancyLevel === 'high'
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.occupancyLevel === 'medium'
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >
@@ -58,10 +58,10 @@ const CurrentOccupancyList = React.memo(() => {
               {
                 color:
                   item.currentOccupancy / item.maxCapacity > 0.8
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : item.currentOccupancy / item.maxCapacity > 0.6
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >
@@ -77,10 +77,10 @@ const CurrentOccupancyList = React.memo(() => {
               {
                 color:
                   (item.currentOccupancy / item.maxCapacity) * 100 > 80
-                    ? '#ff6b6b'
+                    ? '#FF6B35'
                     : (item.currentOccupancy / item.maxCapacity) * 100 > 60
                       ? '#ffa726'
-                      : '#4caf50'
+                      : '#ff6300'
   },
             ]}
           >
@@ -131,7 +131,7 @@ const CurrentOccupancyList = React.memo(() => {
             style={[
               styles.value,
               {
-                color: item.isOpen ? '#4caf50' : '#ff6b6b'
+                color: item.isOpen ? '#ff6300' : '#FF6B35'
   },
             ]}
           >
