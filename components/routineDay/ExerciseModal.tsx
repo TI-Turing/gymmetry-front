@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TouchableOpacity, Animated, Vibration, StyleSheet, Platform } from 'react-native';
+import { Modal, TouchableOpacity, Animated, Vibration, StyleSheet, Platform, Pressable } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -116,7 +116,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const handleStartSet = () => {
     if (!exercise) return;
     if (isCompleted) return; // No iniciar si ya terminó todos los sets
-    
+
     // Vibración leve al iniciar
     Vibration.vibrate(50);
     startPulseAnimation();
@@ -134,7 +134,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
       } else {
         Vibration.vibrate([0, 50, 100, 50]);
       }
-    } catch {}
+    } catch { }
 
     // Calcular progreso siguiente
     const nextCompleted = Math.min(completedSets + 1, exercise.Sets);
@@ -180,35 +180,41 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalBackdrop}>
+        {/* Área clickeable fuera del modal para cerrar */}
+        <Pressable
+          style={styles.backdropOverlay}
+          onPress={() => {
+            if (!isExecuting) onClose();
+          }}
+          disabled={isExecuting}
+        />
         <View style={styles.modalCard}>
           {/* Header */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{exercise.Name}</Text>
             <TouchableOpacity onPress={onClose} disabled={isExecuting}>
-              <FontAwesome 
-                name="times" 
-                size={22} 
-                color={isExecuting ? '#666' : Colors.light.text} 
+              <FontAwesome
+                name="times"
+                size={22}
+                color={isExecuting ? '#666' : Colors.light.text}
               />
             </TouchableOpacity>
           </View>
 
           <Text style={styles.modalSub}>
-            
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              const eid = (exercise as any).ExerciseId || (exercise as any).Exercise?.Id || null;
-              if (eid) {
-                router.push({ pathname: '/exercise-detail', params: { exerciseId: String(eid) } });
-              }
-            }}
-            disabled={!((exercise as any)?.ExerciseId || (exercise as any)?.Exercise?.Id)}
-          >
-            <Text style={[styles.modalSub, { textDecorationLine: 'underline', color: '#FF6B35' }]}>
-              Sets: {exercise.Sets} • Reps: {exercise.Repetitions}  · Ver detalle
+            Sets: {exercise.Sets} • Reps: {exercise.Repetitions} ·{' '}
+            <Text
+              style={{ textDecorationLine: 'underline', color: '#FF6B35' }}
+              onPress={() => {
+                const eid = (exercise as any).ExerciseId || (exercise as any).Exercise?.Id || null;
+                if (eid) {
+                  router.push({ pathname: '/exercise-detail', params: { exerciseId: String(eid) } });
+                }
+              }}
+            >
+              Ver detalle
             </Text>
-          </TouchableOpacity>
+          </Text>
 
           <Text style={styles.progressText}>
             Progreso: {completedSets}/{exercise.Sets} sets completados
@@ -289,6 +295,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
+  backdropOverlay: {
+    width: '100%',
+    flex: 1,
+  },
   modalCard: {
     width: '100%',
     backgroundColor: '#1D1D1D',
@@ -302,6 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    backgroundColor: '#1D1D1D',
   },
   modalTitle: {
     color: '#FFF',
@@ -325,6 +336,7 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 180,
     justifyContent: 'center',
+    backgroundColor: '#1D1D1D',
   },
   pulseCircle: {
     width: 100,

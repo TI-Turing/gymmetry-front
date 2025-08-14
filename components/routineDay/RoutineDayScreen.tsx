@@ -16,6 +16,8 @@ import { routineDayService } from '@/services';
 import { routineTemplateService } from '@/services';
 import { authService } from '@/services/authService';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
+import { dailyService } from '@/services';
+import type { AddDailyRequest } from '@/dto/Daily/Request/AddDailyRequest';
 
 type ExerciseProgress = {
   completedSets: number;
@@ -56,6 +58,9 @@ export default function RoutineDayScreen() {
   const hasAnyProgress = useMemo(() => {
     return Object.values(progressById).some(p => p.completedSets > 0 || p.isCompleted);
   }, [progressById]);
+  const [startDateISO, setStartDateISO] = useState<string | null>(null);
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+  const dailySubmittedRef = useRef(false);
 
   // Si llega ?day=, ajustar el seleccionado al montar
   useEffect(() => {
@@ -212,7 +217,16 @@ export default function RoutineDayScreen() {
           await AsyncStorage.removeItem(key);
         }
       }
+      if (activeTemplateId) {
+        const startKey = `@daily_start_${activeTemplateId}_${selectedDayNumber}`;
+        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+          window.localStorage.removeItem(startKey);
+        } else {
+          await AsyncStorage.removeItem(startKey);
+        }
+      }
     } catch {}
+    setStartDateISO(null);
   };
 
   const handleShare = async () => {
@@ -226,6 +240,54 @@ export default function RoutineDayScreen() {
   const handleShowSummary = () => {
     setSummaryVisible(true);
   };
+
+  // Crear Daily cuando se completa o se finaliza manualmente
+  useEffect(() => {
+    const shouldCreate = (overallProgress === 100) || (routineFinishedMode === 'partial') || (routineFinishedMode === 'full');
+    if (!shouldCreate) return;
+    if (dailySubmittedRef.current) return;
+    if (!exercises || exercises.length === 0) return;
+
+    const createDaily = async () => {
+      try {
+        dailySubmittedRef.current = true;
+        const user = await authService.getUserData();
+        const userId = user?.id;
+        const routineDayId = exercises[0]?.Id;
+        if (!userId || !routineDayId) {
+          dailySubmittedRef.current = false;
+          return;
+        }
+        const nowIso = new Date().toISOString();
+        const StartDate = startDateISO || nowIso;
+        const EndDate = nowIso;
+        const Percentage = (overallProgress === 100 || routineFinishedMode === 'full') ? 100 : overallProgress;
+        const req: AddDailyRequest = { StartDate, EndDate, Percentage, UserId: userId, RoutineDayId: routineDayId };
+        const resp = await dailyService.addDaily(req);
+        if (resp?.Success) {
+          // Limpiar StartDate cacheado para evitar duplicados
+          try {
+            if (activeTemplateId) {
+              const startKey = `@daily_start_${activeTemplateId}_${selectedDayNumber}`;
+              if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+                window.localStorage.removeItem(startKey);
+              } else {
+                await AsyncStorage.removeItem(startKey);
+              }
+            }
+          } catch {}
+          setStartDateISO(null);
+        } else {
+          dailySubmittedRef.current = false;
+        }
+      } catch {
+        dailySubmittedRef.current = false;
+      }
+    };
+
+    createDaily();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overallProgress, routineFinishedMode]);
 
   useEffect(() => {
     const fetchForDay = async (dayNum: number) => {
@@ -243,6 +305,22 @@ export default function RoutineDayScreen() {
           setExercises([]);
           setError('No tienes una rutina activa configurada.');
           return;
+        }
+
+        // Guardar templateId y cargar posible StartDate cacheado
+        setActiveTemplateId(templateId);
+        dailySubmittedRef.current = false;
+        try {
+          const startKey = `@daily_start_${templateId}_${dayNum}`;
+          let cachedStart: string | null = null;
+          if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+            cachedStart = window.localStorage.getItem(startKey);
+          } else {
+            cachedStart = await AsyncStorage.getItem(startKey);
+          }
+          setStartDateISO(cachedStart);
+        } catch {
+          setStartDateISO(null);
         }
 
   const body = { RoutineTemplateId: templateId, DayNumber: dayNum } as any;
@@ -317,6 +395,21 @@ export default function RoutineDayScreen() {
   }, [selectedDayNumber]);
 
   const onMarkSet = (exerciseId: string) => {
+    // Capturar StartDate si aún no existe
+    if (!startDateISO && activeTemplateId) {
+      const nowIso = new Date().toISOString();
+      setStartDateISO(nowIso);
+      (async () => {
+        try {
+          const startKey = `@daily_start_${activeTemplateId}_${selectedDayNumber}`;
+          if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+            window.localStorage.setItem(startKey, nowIso);
+          } else {
+            await AsyncStorage.setItem(startKey, nowIso);
+          }
+        } catch {}
+      })();
+    }
     setProgressById(prev => {
       const curr = prev[exerciseId] || { completedSets: 0, isCompleted: false };
       const maxSets = exercises.find(e => e.Id === exerciseId)?.Sets ?? 0;
@@ -408,7 +501,7 @@ export default function RoutineDayScreen() {
       >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{item.Exercise?.Name || item.Name}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#1D1D1D', }}>
             {prog.isCompleted ? (
               <FontAwesome name="check-circle" size={20} color="#4CAF50" />
             ) : (
@@ -612,20 +705,21 @@ export default function RoutineDayScreen() {
               <View style={styles.finishCard}>
                 <Text style={styles.finishTitle}>¿Cómo prefieres terminar esta rutina?</Text>
                 <Text style={styles.finishSubtitle}>Puedes cerrar con tu avance actual o marcar todo como completado.</Text>
-                <View style={{ height: 12 }} />
+                <View style={{ height: 12, backgroundColor: '#1D1D1D', }} />
                 <Button
                   title="Marcar todo y finalizar"
                   onPress={finalizeFull}
                 />
+                <View style={{ height: 12, backgroundColor: '#1D1D1D', }} />
                 <Button
                   title="Finalizar con avance actual"
                   onPress={finalizePartial}
                   variant="secondary"
-                  style={{ marginBottom: 10 }}
+                  style={{ marginBottom: 0 }}
                   disabled={overallProgress < 30}
                 />
                 {overallProgress < 30 && (
-                  <Text style={{ color: '#B05555', fontSize: 12, textAlign: 'center', marginTop: 8 }}>
+                  <Text style={{ color: '#B05555', fontSize: 12, textAlign: 'center', marginTop: 1 }}>
                     Necesitas al menos 30% de avance para esta opción.
                   </Text>
                 )}
@@ -739,7 +833,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.5,
   },
-  actionsRow: { flexDirection: 'row', gap: 12, marginTop: 16 },
+  actionsRow: { flexDirection: 'row', gap: 12, marginTop: 16, backgroundColor: '#1E2A1E' },
   actionButton: { flex: 1 },
   finishOverlay: {
     flex: 1,

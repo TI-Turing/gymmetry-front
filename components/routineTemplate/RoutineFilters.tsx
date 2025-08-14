@@ -74,10 +74,6 @@ export default function RoutineFilters({
 }: FilterProps) {
   const [filters, setFilters] = useState<FilterState>(currentFilters);
 
-  // Debug log
-  React.useEffect(() => {
-    console.log('RoutineFilters - totalResults:', totalResults);
-  }, [totalResults]);
 
   // Sincronizar con currentFilters cuando el modal se abre
   React.useEffect(() => {

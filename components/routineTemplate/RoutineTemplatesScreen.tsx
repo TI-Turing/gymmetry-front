@@ -49,14 +49,6 @@ function RoutineTemplatesScreen() {
 
   // Instrumentación helper
   const log = (label: string, start?: number) => {
-    if (start != null) {
-      const delta = (performance.now() - start).toFixed(1);
-      // eslint-disable-next-line no-console
-      console.log(`[RoutineTemplates] ${label} ${delta}ms`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(`[RoutineTemplates] ${label}`);
-    }
   };
 
   const fetchTemplatesFirst = useCallback(async () => {

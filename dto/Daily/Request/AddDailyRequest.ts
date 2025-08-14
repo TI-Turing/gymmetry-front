@@ -2,6 +2,7 @@
 export interface AddDailyRequest {
   StartDate: string;
   EndDate: string;
+  Percentage: number;
   UserId: string;
-  RoutineExerciseId: string;
+  RoutineDayId: string;
 }

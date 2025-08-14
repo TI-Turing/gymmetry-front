@@ -8,14 +8,16 @@ export interface Daily {
   Id: string;
   StartDate: string;
   EndDate: string;
+  Percentage: number;
   CreatedAt: string;
   UpdatedAt: string | null;
   DeletedAt: string | null;
   Ip: string | null;
   IsActive: boolean;
   UserId: string;
-  RoutineExerciseId: string;
-  Branches: Branch[];
+  RoutineDayId: string;
+  BranchId: string;
+  Branche: Branch;
   DailyExercises: DailyExercise[];
   RoutineExercise: RoutineExercise;
   User: User;
