@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderRadius: 12,
     padding: 14,
+  marginTop: 12,
   },
   exerciseName: { color: '#FFF', fontSize: 18, fontWeight: '700' },
   exerciseDesc: { color: '#B0B0B0', marginTop: 6 },
