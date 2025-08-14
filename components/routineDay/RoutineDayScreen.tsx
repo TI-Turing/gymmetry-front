@@ -243,9 +243,9 @@ export default function RoutineDayScreen() {
     setSummaryVisible(true);
   };
 
-  // Crear Daily cuando se completa o se finaliza manualmente
+  // Crear Daily SOLO cuando el usuario finaliza (parcial o total)
   useEffect(() => {
-    const shouldCreate = (overallProgress === 100) || (routineFinishedMode === 'partial') || (routineFinishedMode === 'full');
+    const shouldCreate = (routineFinishedMode === 'partial') || (routineFinishedMode === 'full');
     if (!shouldCreate) return;
     if (dailySubmittedRef.current) return;
     if (!exercises || exercises.length === 0) return;
@@ -366,7 +366,7 @@ export default function RoutineDayScreen() {
 
     createDaily();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overallProgress, routineFinishedMode]);
+  }, [routineFinishedMode]);
 
   useEffect(() => {
     const fetchForDay = async (dayNum: number) => {
@@ -655,7 +655,7 @@ export default function RoutineDayScreen() {
             <RNView style={[styles.progressFill, { width: `${overallProgress}%` }]} />
           </View>
           <Text style={styles.progressText}>{overallProgress}%</Text>
-      {(overallProgress === 100 || routineFinishedMode === 'full') && (
+  {(overallProgress === 100 || routineFinishedMode === 'full') && (
             <Animated.View
               style={{
                 marginTop: 12,
@@ -681,6 +681,13 @@ export default function RoutineDayScreen() {
                 <Text style={styles.finalPhrase}>“{finalPhrase}”</Text>
               )}
               <View style={styles.actionsRow}>
+                {overallProgress === 100 && !routineFinishedMode && (
+                  <Button
+                    title="Finalizar rutina"
+                    onPress={finalizeFull}
+                    style={styles.actionButton}
+                  />
+                )}
                 <Button
                   title="Ver resumen"
                   onPress={handleShowSummary}
