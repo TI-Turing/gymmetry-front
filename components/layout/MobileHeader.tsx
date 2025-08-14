@@ -59,7 +59,7 @@ export default function MobileHeader({
         // Handle theme change
         break;
       case 'settings':
-        // Navigate to settings
+  router.push('/settings');
         break;
       case 'support':
         // Open support contact

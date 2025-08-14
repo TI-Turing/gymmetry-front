@@ -54,7 +54,7 @@ export default function WebHeader({
         // TODO: Implementar cambio de tema
         break;
       case 'settings':
-        // TODO: Implementar navegación a configuración
+  router.push('/settings');
         break;
       case 'support':
         // TODO: Implementar contacto con soporte

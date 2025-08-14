@@ -232,7 +232,7 @@ export default function RoutineDayScreen() {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: 'Entrenamiento completado 💪 #Gymmetry',
+        message: 'Entrenamiento completado #Gymmetry',
       });
     } catch {}
   };
@@ -596,7 +596,7 @@ export default function RoutineDayScreen() {
                 opacity: celebrateAnim,
               }}
             >
-              <Text style={styles.congratsTitle}>¡Entrenamiento completado! 💪</Text>
+              <Text style={styles.congratsTitle}>¡Entrenamiento completado!</Text>
               <Text style={styles.congratsSubtitle}>Gran trabajo, mantén la constancia. Marca la diferencia cada día.</Text>
               {finalPhrase && (
                 <Text style={styles.finalPhrase}>“{finalPhrase}”</Text>

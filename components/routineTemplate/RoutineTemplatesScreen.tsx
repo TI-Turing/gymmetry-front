@@ -172,7 +172,7 @@ function RoutineTemplatesScreen() {
       icon: 'cog',
       label: 'Ajustes',
       action: () => {
-        // Navegación a ajustes
+  router.push('/settings');
       },
     },
     {

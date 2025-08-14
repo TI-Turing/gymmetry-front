@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TouchableOpacity, Animated, Vibration, StyleSheet, Platform, Pressable } from 'react-native';
+import { Modal, TouchableOpacity, Animated, Vibration, StyleSheet, Platform, Pressable, TextInput, Switch } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,6 +9,7 @@ import type { RoutineDay } from '@/models/RoutineDay';
 import motivationalPhrases from '@/utils/motivationalPhrases.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import { useRef } from 'react';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -35,6 +36,209 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const isCompleted = exercise ? completedSets >= exercise.Sets : false;
   // Próximo set a ejecutar
   const nextSetNumber = exercise ? Math.min(completedSets + 1, exercise.Sets) : 1;
+  const [showRepsPrompt, setShowRepsPrompt] = useState(false);
+  const [repsValue, setRepsValue] = useState<string>('');
+  // Timer para ejercicios de tiempo
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [timerRemaining, setTimerRemaining] = useState<number>(0);
+  const [timerPhase, setTimerPhase] = useState<'on' | 'off' | 'prep' | null>(null);
+  const timerPhaseRef = useRef<'on' | 'off' | 'prep' | null>(null);
+  const [wasStopped, setWasStopped] = useState<boolean>(false);
+  const [cyclesTotal, setCyclesTotal] = useState<number>(1);
+  const [cyclesLeft, setCyclesLeft] = useState<number>(1);
+  const cyclesLeftRef = useRef<number>(1);
+  const [soundCues, setSoundCues] = useState<boolean>(true);
+  const [prepSeconds, setPrepSeconds] = useState<number>(10);
+
+  // Cargar preferencia de sonido
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window
+          ? window.localStorage.getItem('@sound_cues_enabled')
+          : await AsyncStorage.getItem('@sound_cues_enabled');
+        if (raw != null) setSoundCues(raw === '1' || raw === 'true');
+      } catch {}
+    })();
+  }, []);
+
+  // Cargar segundos de preparación
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window
+          ? window.localStorage.getItem('@prep_seconds')
+          : await AsyncStorage.getItem('@prep_seconds');
+        const val = raw == null ? 10 : Math.max(0, parseInt(raw, 10) || 0);
+        setPrepSeconds(val);
+      } catch {}
+    })();
+  }, []);
+
+  const saveSoundPref = async (val: boolean) => {
+    try {
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+        window.localStorage.setItem('@sound_cues_enabled', val ? '1' : '0');
+      } else {
+        await AsyncStorage.setItem('@sound_cues_enabled', val ? '1' : '0');
+      }
+    } catch {}
+  };
+
+  // Parsear especificación de tiempo
+  const timeSpec = useMemo(() => {
+    const raw = String(exercise?.Repetitions || '').trim().toLowerCase();
+    if (!raw) return null as null | { mode: 'single' | 'interval'; on: number; off?: number; cycles?: number; perLabel?: string };
+    // Xs ON / Ys OFF x N (opcional multiplicador de ciclos)
+    const intervalMatch = raw.match(/^(\d+)\s*s\s*on\s*\/\s*(\d+)\s*s\s*off(?:\s*[x×]\s*(\d+))?$/i);
+    if (intervalMatch) {
+      const on = parseInt(intervalMatch[1], 10);
+      const off = parseInt(intervalMatch[2], 10);
+      const cyc = intervalMatch[3] ? parseInt(intervalMatch[3], 10) : 1;
+      const cycles = !isNaN(cyc) && cyc > 0 ? cyc : 1;
+      if (!isNaN(on) && !isNaN(off)) return { mode: 'interval', on, off, cycles };
+    }
+    // Xm o Xs exacto (con o sin espacios)
+    const singleExact = raw.match(/^(\d+)\s*([ms])$/i);
+    if (singleExact) {
+      const val = parseInt(singleExact[1], 10);
+      const unit = singleExact[2];
+      if (!isNaN(val)) {
+        const on = unit === 'm' ? val * 60 : val;
+        return { mode: 'single', on, cycles: 1 };
+      }
+    }
+    // Patrón general: encontrar número+unidad en cualquier parte y soportar "por ..." después del tiempo (ej: "30s por lado")
+    const generic = raw.match(/(\d+)\s*([ms])\b/i);
+    if (generic) {
+      const val = parseInt(generic[1], 10);
+      const unit = generic[2].toLowerCase();
+      if (!isNaN(val)) {
+        const on = unit === 'm' ? val * 60 : val;
+        // Si aparece "por" DESPUÉS del match, interpretamos que es por lado/pierna/brazo => 2 ciclos
+        const afterIdx = (generic.index ?? 0) + generic[0].length;
+        const rest = raw.slice(afterIdx);
+        const hasPorAfter = rest.indexOf('por') !== -1; // coincide con "por lado", "por pierna", etc.
+        let perLabel: string | undefined;
+        if (hasPorAfter) {
+          const m = rest.match(/\bpor\s+(lado|pierna|brazo)\b/);
+          perLabel = (m && m[1]) ? m[1] : 'lado';
+        }
+        const cycles = hasPorAfter ? 2 : 1;
+        return { mode: 'single', on, cycles, perLabel };
+      }
+    }
+    return null;
+  }, [exercise?.Repetitions]);
+
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current as any);
+      timerRef.current = null;
+    }
+  };
+
+  const startTimer = () => {
+    if (!timeSpec) return;
+    setWasStopped(false);
+    // Configurar fase inicial y tiempo restante
+    setTimerPhase('on');
+    timerPhaseRef.current = 'on';
+    setTimerRemaining(timeSpec.on);
+    // Configurar ciclos
+  const total = timeSpec.cycles || 1;
+    setCyclesTotal(total);
+    setCyclesLeft(total);
+    cyclesLeftRef.current = total;
+    setIsExecuting(true);
+    // Iniciar animación visual también
+    startPulseAnimation();
+    // Intervalo de 1s
+    clearTimer();
+  const PREP_SECONDS = Math.max(0, prepSeconds);
+    timerRef.current = setInterval(() => {
+      setTimerRemaining(prev => {
+        const next = Math.max(prev - 1, 0);
+        if (next > 0) return next;
+        // Fase terminó
+        if (timeSpec.mode === 'interval') {
+          const phase = timerPhaseRef.current;
+          if (phase === 'on') {
+            // Cambiar a OFF
+            setTimerPhase('off');
+            timerPhaseRef.current = 'off';
+            if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(30); else Vibration.vibrate([0, 40]); } catch {} }
+            return timeSpec.off || 0;
+          }
+          if (phase === 'off') {
+            // Terminó OFF: cerrar ciclo
+            const remaining = Math.max((cyclesLeftRef.current || 1) - 1, 0);
+            setCyclesLeft(remaining);
+            cyclesLeftRef.current = remaining;
+            if (remaining > 0) {
+              // Intervalo de preparación antes del siguiente ciclo
+              setTimerPhase('prep');
+              timerPhaseRef.current = 'prep';
+              if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(20); else Vibration.vibrate([0, 20]); } catch {} }
+              return PREP_SECONDS;
+            }
+          }
+          if (phase === 'prep') {
+            // Termina preparación, arrancar siguiente ON
+            setTimerPhase('on');
+            timerPhaseRef.current = 'on';
+            if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(30); else Vibration.vibrate([0, 40]); } catch {} }
+            return timeSpec.on;
+          }
+          // No quedan ciclos: finalizar
+        }
+        // Modo single con múltiples ciclos (p. ej. "30s por lado")
+        if (timeSpec.mode === 'single') {
+          const phase = timerPhaseRef.current;
+          if (phase === 'on') {
+            const remaining = Math.max((cyclesLeftRef.current || 1) - 1, 0);
+            setCyclesLeft(remaining);
+            cyclesLeftRef.current = remaining;
+            if (remaining > 0) {
+              // Preparación entre ciclos
+              setTimerPhase('prep');
+              timerPhaseRef.current = 'prep';
+              if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(20); else Vibration.vibrate([0, 20]); } catch {} }
+              return PREP_SECONDS;
+            }
+          } else if (phase === 'prep') {
+            // Termina preparación, arrancar siguiente ciclo
+            setTimerPhase('on');
+            timerPhaseRef.current = 'on';
+            if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(30); else Vibration.vibrate([0, 40]); } catch {} }
+            return timeSpec.on;
+          }
+        }
+        // Finalizó el conteo completo (single sin ciclos restantes o interval sin ciclos restantes)
+        clearTimer();
+        setTimerPhase(null);
+        timerPhaseRef.current = null;
+        stopPulseAnimation();
+    if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(80); else Vibration.vibrate([0,100,60,100]); } catch {} }
+        // Marcar set completado automáticamente sin prompt de reps
+        // Defer para evitar actualizar el padre durante el render de este componente
+        setTimeout(() => {
+          commitFinishSet(false);
+        }, 0);
+        return 0;
+      });
+    }, 1000) as any;
+  };
+
+  const stopTimer = () => {
+    clearTimer();
+    setWasStopped(true);
+    setTimerPhase(null);
+  timerPhaseRef.current = null;
+    setTimerRemaining(0);
+    stopPulseAnimation();
+    setIsExecuting(false);
+  };
 
   // Ordinales en español (forma apocopada donde aplica: primer, tercer) hasta 20
   const getOrdinalEs = (n: number) => {
@@ -73,10 +277,11 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   // Animación de pulso continuo
   const startPulseAnimation = () => {
     setIsExecuting(true);
+  const maxScale = timeSpec ? 1.15 : 1.3; // reducir escala cuando se muestra cronómetro
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
-          toValue: 1.3,
+      toValue: maxScale,
           duration: 800,
           useNativeDriver: true,
         }),
@@ -119,52 +324,77 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
     // Vibración leve al iniciar
     Vibration.vibrate(50);
-    startPulseAnimation();
+    if (timeSpec) {
+      startTimer();
+    } else {
+      startPulseAnimation();
+    }
   };
 
   const handleFinishSet = () => {
     if (!exercise) return;
-
     stopPulseAnimation();
-
-    // Doble vibración (algunos navegadores web no soportan patrón, fallback simple)
     try {
-      if (Platform.OS === 'web') {
-        Vibration.vibrate(50);
-      } else {
-        Vibration.vibrate([0, 50, 100, 50]);
-      }
-    } catch { }
+      if (Platform.OS === 'web') Vibration.vibrate(50); else Vibration.vibrate([0, 50, 100, 50]);
+    } catch {}
 
-    // Calcular progreso siguiente
+    // Preparar prompt de repeticiones con un valor sugerido
+    const planned = String(exercise.Repetitions || '').trim();
+    const match = planned.match(/\d+/);
+    const suggested = match ? match[0] : '';
+    setRepsValue(suggested);
+    setShowRepsPrompt(true);
+  };
+
+  const commitFinishSet = async (saveReps: boolean) => {
+    if (!exercise) return;
     const nextCompleted = Math.min(completedSets + 1, exercise.Sets);
-    onMarkSet(exercise.Id);
 
-    // Persistir progreso (AsyncStorage nativo / localStorage web)
-    const key = `exercise_${exercise.Id}_progress`;
-    const payload = JSON.stringify({
+    // Guardar reps realizadas por set (opcional)
+    if (saveReps) {
+      const repsKey = `exercise_${exercise.Id}_reps`;
+      try {
+        let stored: { sets: number[] } | null = null;
+        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+          const raw = window.localStorage.getItem(repsKey);
+          stored = raw ? JSON.parse(raw) : null;
+        } else {
+          const raw = await AsyncStorage.getItem(repsKey);
+          stored = raw ? JSON.parse(raw) : null;
+        }
+        const arr = Array.isArray(stored?.sets) ? [...stored!.sets] : [];
+        const idx = nextCompleted - 1; // índice del set recién completado
+        const val = Math.max(0, Number.parseInt(repsValue || '0', 10) || 0);
+        arr[idx] = val;
+        const payload = JSON.stringify({ sets: arr });
+        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+          window.localStorage.setItem(repsKey, payload);
+        } else {
+          await AsyncStorage.setItem(repsKey, payload);
+        }
+      } catch {}
+    }
+
+    // Actualizar progreso de sets
+  // Defer para evitar el warning de React sobre actualizar otro componente durante el render
+  setTimeout(() => onMarkSet(exercise.Id), 0);
+    const progKey = `exercise_${exercise.Id}_progress`;
+    const progPayload = JSON.stringify({
       exerciseId: exercise.Id,
       completedSets: nextCompleted,
       lastCompleted: new Date().toISOString(),
     });
-    (async () => {
-      try {
-        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-          window.localStorage.setItem(key, payload);
-        } else {
-          await AsyncStorage.setItem(key, payload);
-        }
-      } catch {
-        // Silencioso: persistencia no crítica
+    try {
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+        window.localStorage.setItem(progKey, progPayload);
+      } else {
+        await AsyncStorage.setItem(progKey, progPayload);
       }
-    })();
+    } catch {}
 
-    // Si se completó el último set, cerrar modal
+    // Cerrar si fue el último set
     if (nextCompleted >= exercise.Sets) {
-      // pequeño timeout para permitir que el estado padre se actualice antes de cerrar
-      setTimeout(() => {
-        onClose();
-      }, 250);
+      setTimeout(() => { onClose(); }, 250);
     }
   };
 
@@ -204,7 +434,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           <Text style={styles.modalSub}>
             Sets: {exercise.Sets} • Reps: {exercise.Repetitions} ·{' '}
             <Text
-              style={{ textDecorationLine: 'underline', color: '#FF6B35' }}
+              style={{ textDecorationLine: 'underline', color: Colors.dark.tint }}
               onPress={() => {
                 const eid = (exercise as any).ExerciseId || (exercise as any).Exercise?.Id || null;
                 if (eid) {
@@ -221,13 +451,14 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           </Text>
 
           {/* Área de animación y frase motivacional */}
-          <View style={styles.animationContainer}>
+    <View style={[styles.animationContainer, { height: timeSpec ? (((timeSpec.cycles || 1) > 1) ? 300 : 240) : 180 }] }>
             <Animated.View
               style={[
                 styles.pulseCircle,
+                timeSpec ? styles.pulseCircleAbsolute : null,
                 {
                   transform: [{ scale: pulseAnim }],
-                  backgroundColor: isExecuting ? '#FF6B35' : '#333',
+      backgroundColor: isExecuting ? Colors.dark.tint : '#333',
                 }
               ]}
             >
@@ -238,8 +469,42 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               />
             </Animated.View>
 
+            {/* Cronómetro para ejercicios de tiempo */}
+            {timeSpec && (
+              <View style={{ alignItems: 'center', backgroundColor: '#1D1D1D', zIndex: 2, marginTop: ((timeSpec.cycles || 1) > 1) ? 140 : 120 }}>
+                <Text style={{ color: '#B0B0B0', marginBottom: 6 }}>
+                  {timerPhase
+                    ? (timerPhase === 'on' ? 'ACTIVO' : timerPhase === 'off' ? 'DESCANSO' : 'PREPÁRATE')
+                    : wasStopped ? 'Detenido' : ''}
+                </Text>
+                <Text style={{ color: '#FFFFFF', fontSize: 42, fontWeight: '700', letterSpacing: 1 }}>
+                  {(() => {
+                    const t = timerRemaining;
+                    const mm = Math.floor(t / 60);
+                    const ss = t % 60;
+                    return mm > 0 ? `${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}` : `${String(ss).padStart(2,'0')}`;
+                  })()}
+                </Text>
+                {(timeSpec.cycles || 1) > 1 && (
+                  <Text style={{ color: '#B0B0B0', marginTop: 6 }}>
+                    Ciclo {Math.max((cyclesTotal - cyclesLeft) + (timerPhaseRef.current ? 0 : 0), 1)}/{cyclesTotal}
+                  </Text>
+                )}
+                {timeSpec.mode === 'single' && (timeSpec.cycles || 1) > 1 && (
+                  <Text style={{ color: '#B0B0B0', marginTop: 2 }}>
+                    {(() => {
+                      const base = (timeSpec as any).perLabel || 'lado';
+                      const label = String(base).charAt(0).toUpperCase() + String(base).slice(1);
+                      const curr = Math.max(cyclesTotal - cyclesLeft + 1, 1);
+                      return `${label} ${curr}/${cyclesTotal}`;
+                    })()}
+                  </Text>
+                )}
+              </View>
+            )}
+
             {/* Frase motivacional */}
-            <Animated.View style={[styles.phraseContainer, { opacity: fadeAnim }]}>
+            <Animated.View style={[styles.phraseContainer, { opacity: fadeAnim, zIndex: 2, marginTop: timeSpec ? 8 : 0 }]}>
               <Text style={styles.motivationalText}>
                 {motivationalPhrase.text}
               </Text>
@@ -248,15 +513,27 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
           {/* Botones de acción */}
           <View style={styles.buttonContainer}>
-            {isCompleted ? (
+            {/* Toggle sonido */}
+            {timeSpec && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 4, backgroundColor: '#1D1D1D' }}>
+                <Text style={{ color: '#B0B0B0', marginRight: 8 }}>Sonido</Text>
+                <Switch
+                  value={soundCues}
+                  onValueChange={(v) => { setSoundCues(v); saveSoundPref(v); }}
+          thumbColor={soundCues ? Colors.dark.tint : '#666'}
+                  ios_backgroundColor="#333"
+                />
+              </View>
+            )}
+    {isCompleted ? (
               <>
-                <Text style={styles.completedText}>Ejercicio completado ✅</Text>
+                <Text style={styles.completedText}>Ejercicio completado</Text>
                 <Button title="Cerrar" onPress={onClose} variant="secondary" />
               </>
-            ) : !isExecuting ? (
+    ) : !isExecuting ? (
               <>
                 <Button
-                  title={`Iniciar ${getOrdinalEs(nextSetNumber)} set`}
+      title={timeSpec && wasStopped ? 'Reiniciar tiempo' : `Iniciar ${getOrdinalEs(nextSetNumber)} set`}
                   onPress={handleStartSet}
                   style={styles.startButton}
                 />
@@ -275,15 +552,73 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 </View>
               </>
             ) : (
-              <Button
-                title="Terminar Set"
-                onPress={handleFinishSet}
-                style={styles.finishButton}
-              />
+              timeSpec ? (
+                <Button
+                  title="Detener"
+                  onPress={stopTimer}
+                  variant="secondary"
+                  style={styles.finishButton}
+                  textStyle={{ color: '#FFFFFF' }}
+                />
+              ) : (
+                <Button
+                  title="Terminar Set"
+                  onPress={handleFinishSet}
+                  style={styles.finishButton}
+                />
+              )
             )}
           </View>
         </View>
       </View>
+
+      {/* Prompt de repeticiones realizadas */}
+      {exercise && (
+        <Modal
+          visible={showRepsPrompt}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowRepsPrompt(false)}
+        >
+          <Pressable style={styles.promptOverlay} onPress={() => setShowRepsPrompt(false)}>
+            <Pressable style={styles.promptCard} onPress={() => {}}>
+              <Text style={styles.promptTitle}>Repeticiones realizadas</Text>
+              <Text style={styles.promptSubtitle}>
+                Set {Math.min(completedSets + 1, exercise.Sets)} de {exercise.Sets}
+              </Text>
+              <TextInput
+                style={styles.promptInput}
+                value={repsValue}
+                onChangeText={t => setRepsValue(t.replace(/[^0-9]/g, ''))}
+                placeholder="Ej. 8"
+                placeholderTextColor="#777"
+                keyboardType="number-pad"
+                maxLength={3}
+                inputMode="numeric"
+              />
+              <View style={styles.promptButtonsRow}>
+                <Button
+                  title="Omitir"
+                  variant="secondary"
+                  style={styles.promptButton}
+                  onPress={async () => {
+                    setShowRepsPrompt(false);
+                    await commitFinishSet(false);
+                  }}
+                />
+                <Button
+                  title="Guardar"
+                  style={styles.promptButton}
+                  onPress={async () => {
+                    setShowRepsPrompt(false);
+                    await commitFinishSet(true);
+                  }}
+                />
+              </View>
+            </Pressable>
+          </Pressable>
+        </Modal>
+      )}
     </Modal>
   );
 };
@@ -333,8 +668,8 @@ const styles = StyleSheet.create({
   },
   animationContainer: {
     alignItems: 'center',
-    marginVertical: 30,
-    height: 180,
+  marginVertical: 16,
+  height: 180,
     justifyContent: 'center',
     backgroundColor: '#1D1D1D',
   },
@@ -345,6 +680,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
+  },
+  pulseCircleAbsolute: {
+    position: 'absolute',
+    top: 0,
+    zIndex: 1,
   },
   phraseContainer: {
     paddingHorizontal: 20,
@@ -359,26 +699,75 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     gap: 12,
+    backgroundColor: '#1D1D1D'
   },
   startButton: {
-    backgroundColor: '#ff6300',
+  backgroundColor: Colors.dark.tint,
   },
   finishButton: {
-    backgroundColor: '#FF6B35',
+  backgroundColor: Colors.dark.tint,
+    color: '#FFF',
   },
   buttonRow: {
     flexDirection: 'row',
     gap: 12,
+    backgroundColor: '#1D1D1D'
   },
   halfButton: {
     flex: 1,
   },
   completedText: {
-    color: '#ff6300',
+  color: Colors.dark.tint,
     textAlign: 'center',
     fontWeight: '600',
     marginBottom: 8,
   },
+  // Prompt styles
+  promptOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  promptCard: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+    width: '100%',
+    maxWidth: 360,
+  },
+  promptTitle: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  promptSubtitle: {
+    color: '#B0B0B0',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  promptInput: {
+    backgroundColor: '#2A2A2A',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    color: '#FFF',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#3A3A3A',
+  },
+  promptButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 14,
+  },
+  promptButton: { flex: 1 },
 });
 
 export default ExerciseModal;
