@@ -66,6 +66,15 @@ export const authService = {
       if (response.Data.RefreshToken) {
         await AsyncStorage.setItem('refreshToken', response.Data.RefreshToken);
       }
+      // Persistir expiraciones (formato ISO esperado del backend)
+      try {
+        if (response.Data.TokenExpiration) {
+          await AsyncStorage.setItem('@token_expiration', response.Data.TokenExpiration);
+        }
+        if (response.Data.RefreshTokenExpiration) {
+          await AsyncStorage.setItem('@refresh_token_expiration', response.Data.RefreshTokenExpiration);
+        }
+      } catch {}
     }
     
     return response;
@@ -83,8 +92,30 @@ export const authService = {
     try {
       const userData = await this.getUserData();
       if (!userData) return false;
-      
-      // Lógica de validación del token
+      const token = await AsyncStorage.getItem('authToken');
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      if (!token || !refreshToken) return false;
+      const tokenExpIso = await AsyncStorage.getItem('@token_expiration');
+      const refreshExpIso = await AsyncStorage.getItem('@refresh_token_expiration');
+      if (!refreshExpIso) return true; // no info => asumimos válido hasta que falle
+      const now = Date.now();
+      let tokenExpired = false;
+      let refreshExpired = false;
+      const SAFETY_WINDOW_MS = 60_000; // refrescar si faltan <60s
+      if (tokenExpIso) {
+        const tokenExp = Date.parse(tokenExpIso);
+        if (!isNaN(tokenExp)) tokenExpired = tokenExp - now < SAFETY_WINDOW_MS;
+      }
+      const refreshExp = Date.parse(refreshExpIso);
+      if (!isNaN(refreshExp)) refreshExpired = refreshExp <= now;
+      if (refreshExpired) {
+        await this.logout();
+        return false;
+      }
+      if (tokenExpired) {
+        const refreshed = await this.refreshAuthToken();
+        return !!refreshed?.Success && !!refreshed.Data;
+      }
       return true;
     } catch {
       return false;
@@ -190,6 +221,8 @@ export const authService = {
       const response = await this.refreshToken({ Token: token, RefreshToken: refreshToken });
       if (response.Success && response.Data) {
         await AsyncStorage.setItem('authToken', response.Data.NewToken);
+  apiService.setAuthToken(response.Data.NewToken);
+  try { if (response.Data.TokenExpiration) await AsyncStorage.setItem('@token_expiration', response.Data.TokenExpiration);} catch {}
         return { Success: true, Data: true, Message: 'Token refreshed successfully', StatusCode: 200 };
       }
       return { Success: false, Data: false, Message: 'Failed to refresh token', StatusCode: 400 };

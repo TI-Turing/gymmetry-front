@@ -60,6 +60,29 @@ export const styles = StyleSheet.create({
     color: Colors.dark.text, 
     marginBottom: SPACING.xs 
   },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: SPACING.xs,
+    backgroundColor: '#1F1F1F'
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '600',
+    overflow: 'hidden'
+  },
+  badgePremium: {
+    backgroundColor: Colors.dark.tint,
+    color: '#FFFFFF'
+  },
+  badgeFree: {
+    backgroundColor: '#2E2E2E',
+    color: '#B0B0B0'
+  },
   assignButton: {
     marginTop: SPACING.sm,
     backgroundColor: Colors.dark.tint,
@@ -214,6 +237,27 @@ export const styles = StyleSheet.create({
   filterBadgeText: {
     color: '#FFFFFF',
     fontSize: 12,
+    fontWeight: '600',
+  },
+  fabCreate: {
+    position: 'absolute',
+  bottom: 64,
+    right: 24,
+    backgroundColor: Colors.dark.tint,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
+  },
+  fabIcon: {
+    color: '#FFFFFF',
+    fontSize: 24,
     fontWeight: '600',
   },
 });

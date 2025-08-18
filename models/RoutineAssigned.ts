@@ -11,6 +11,6 @@ export interface RoutineAssigned {
   Ip: string | null;
   IsActive: boolean;
   UserId: string;
-  RoutineTemplates: RoutineTemplate[];
+  RoutineTemplate: RoutineTemplate;
   User: User;
 }

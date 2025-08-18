@@ -10,6 +10,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Config multi‑entorno en `environment/` + `env-loader.js`; variables expuestas como `EXPO_PUBLIC_*`.
 - Patrón transversal: EntityList (listas CRUD homogéneas) en muchos dominios.
 - Estado global mínimo: Auth (`contexts/AuthContext.tsx`), preferencias ligeras vía AsyncStorage/localStorage.
+- Se maneja una carpeta de componentes, un servicio, una carpeta de Dto por cada modelo o entidad.
 
 ## 2. Flujos Clave de Desarrollo
 - Iniciar dev: `npm run start:local` (carga `.env.local` vía `env-loader.js`).

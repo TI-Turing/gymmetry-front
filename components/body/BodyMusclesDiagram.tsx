@@ -26,6 +26,7 @@ interface BodyMusclesDiagramProps {
   backgroundColor?: string;
   // Mapa opcional de opacidades por capa (key de overlay), para integrarse con API
   overlayOpacities?: Record<string, number>;
+  side?: 'front' | 'back' | 'both'; // controla qué vista renderizar
 }
 
 /**
@@ -44,6 +45,7 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
   palette = 'color',
   backgroundColor = 'transparent',
   overlayOpacities,
+  side = 'both',
 }) => {
   const [frontXml, setFrontXml] = useState<string | null>(null);
   const [backXml, setBackXml] = useState<string | null>(null);
@@ -168,28 +170,39 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
     );
   }
 
+  const renderFront = (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', position: 'relative', aspectRatio: 200/369 }}>
+      <SvgXml xml={frontXml} width="100%" height="100%" />
+      {overlayLayers.filter(l => l.side === 'front').map(layer => (
+        <View key={`front-${layer.key}`} pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: layer.opacity }}>
+          <SvgXml xml={layer.xml} width="100%" height="100%" />
+        </View>
+      ))}
+    </View>
+  );
+  const renderBack = (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', position: 'relative', aspectRatio: 200/369 }}>
+      <SvgXml xml={backXml} width="100%" height="100%" />
+      {overlayLayers.filter(l => l.side === 'back').map(layer => (
+        <View key={`back-${layer.key}`} pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: layer.opacity }}>
+          <SvgXml xml={layer.xml} width="100%" height="100%" />
+        </View>
+      ))}
+    </View>
+  );
+
+  if (side === 'front') {
+    return <View style={{ width: width as any, height: height as any, backgroundColor }}>{renderFront}</View>;
+  }
+  if (side === 'back') {
+    return <View style={{ width: width as any, height: height as any, backgroundColor }}>{renderBack}</View>;
+  }
+
   return (
     <View style={{ width: width as any, height: height as any, backgroundColor, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-      {/* SVG frontal con overlays */}
-      <View style={{ flex: 1, maxWidth: '50%', aspectRatio: 200 / 369, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        <SvgXml xml={frontXml} width="100%" height="100%" />
-        {overlayLayers.filter(l => l.side === 'front').map(layer => (
-          <View key={`front-${layer.key}`} pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: layer.opacity }}>
-            <SvgXml xml={layer.xml} width="100%" height="100%" />
-          </View>
-        ))}
-      </View>
-      {/* Separación mínima */}
+      <View style={{ flex: 1, maxWidth: '50%' }}>{renderFront}</View>
       <View style={{ width: 8 }} />
-      {/* SVG posterior con overlays */}
-      <View style={{ flex: 1, maxWidth: '50%', aspectRatio: 200 / 369, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        <SvgXml xml={backXml} width="100%" height="100%" />
-        {overlayLayers.filter(l => l.side === 'back').map(layer => (
-          <View key={`back-${layer.key}`} pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: layer.opacity }}>
-            <SvgXml xml={layer.xml} width="100%" height="100%" />
-          </View>
-        ))}
-      </View>
+      <View style={{ flex: 1, maxWidth: '50%' }}>{renderBack}</View>
     </View>
   );
 };

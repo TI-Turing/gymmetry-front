@@ -39,8 +39,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const isInitialized = await authService.initializeFromStorage();
       if (isInitialized) {
-        setIsAuthenticated(true);
-        setUserData(await authService.getUserData());
+  // Intentar refrescar token si está cerca de expirar
+  await authService.checkAndRefreshToken();
+  setIsAuthenticated(true);
+  setUserData(await authService.getUserData());
       }
     } catch (_error) {
       // Error al inicializar, mantenemos el estado sin autenticar

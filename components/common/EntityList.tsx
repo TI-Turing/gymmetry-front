@@ -20,6 +20,7 @@ interface EntityListProps<T> {
   extraContent?: ReactNode;
   skeletonComponent?: ReactNode;
   useSkeletonLoading?: boolean;
+  useFlatList?: boolean; // permite desactivar FlatList cuando está anidado en ScrollView
 }
 
 /**
@@ -40,6 +41,7 @@ export function EntityList<T>({
   extraContent,
   skeletonComponent,
   useSkeletonLoading = false,
+  useFlatList = true,
 }: EntityListProps<T>) {
   const { items, loading, error, refreshItems } = useEntityList<T>(
     loadFunction,
@@ -70,7 +72,7 @@ export function EntityList<T>({
         <View style={{ flex: 1 }}>
           {skeletonComponent}
         </View>
-      ) : (
+      ) : useFlatList ? (
         <FlatList
           data={items}
           keyExtractor={keyExtractor}
@@ -81,6 +83,18 @@ export function EntityList<T>({
           }
           showsVerticalScrollIndicator={false}
         />
+      ) : (
+        <View style={(!items || items.length === 0) ? styles.emptyContainer : undefined}>
+          {(!items || items.length === 0) && !loading ? (
+            renderEmptyState()
+          ) : items ? (
+            items.map((it, idx) => {
+              const element = (renderItem as any)({ item: it, index: idx, separators: { highlight() {}, unhighlight() {}, updateProps() {} } });
+              const key = keyExtractor(it as any, idx);
+              return <React.Fragment key={key}>{element}</React.Fragment>;
+            })
+          ) : null}
+        </View>
       )}
 
       {showRefreshButton && (

@@ -23,6 +23,29 @@ export const styles = StyleSheet.create({
     color: Colors.dark.tint,
     fontWeight: '500',
   },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: SPACING.xs,
+    backgroundColor: '#1A1A1A',
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '600',
+    overflow: 'hidden'
+  },
+  badgePremium: {
+    backgroundColor: Colors.dark.tint,
+    color: '#FFFFFF'
+  },
+  badgeFree: {
+    backgroundColor: '#2E2E2E',
+    color: '#B0B0B0'
+  },
 
   // RoutineAssignedDetail styles
   error: { 

@@ -133,7 +133,6 @@ export default function ExerciseDetailScreen() {
                 key={ex.Id}
                 onPress={() => {
                   setCurrent(ex);
-                  // preparar overlays al seleccionar desde sugerencias
                   try {
                     let tags: Record<string, number> = {};
                     const raw: any = (ex as any)?.TagsMuscle;
@@ -150,11 +149,6 @@ export default function ExerciseDetailScreen() {
                 style={styles.suggestionRow}
               >
                 <Text style={styles.suggestionTitle}>{ex.Name}</Text>
-                {Boolean((ex as any)?.CategoryExercise?.Name || ex.CategoryExerciseId) && (
-                  <Text style={styles.suggestionSub}>
-                    {(ex as any)?.CategoryExercise?.Name ?? ex.CategoryExerciseId}
-                  </Text>
-                )}
               </TouchableOpacity>
             ))}
           </RNView>

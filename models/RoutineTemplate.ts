@@ -14,6 +14,7 @@ export interface RoutineTemplate {
   DeletedAt: string | null;
   Ip: string | null;
   IsActive: boolean;
+  Premium: boolean;
   GymId: string | null;
   RoutineUserRoutineId: string | null;
   RoutineAssignedId: string | null;

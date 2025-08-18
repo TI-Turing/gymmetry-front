@@ -44,8 +44,15 @@ function RoutineTemplatesScreen() {
 
   // Rutinas filtradas usando useMemo para optimizar performance
   const filteredTemplates = useMemo(() => {
-    return applyRoutineFilters(templates, filters);
-  }, [templates, filters]);
+    // Excluir la rutina actualmente asignada (si se conoce su id) de la lista disponible
+    let base = applyRoutineFilters(templates, filters);
+  const aa: any = activeAssignment as any;
+  const activeTemplateId = aa?.RoutineTemplate?.Id || aa?.RoutineTemplateId || aa?.RoutineTemplates?.[0]?.Id;
+    if (activeTemplateId) {
+      base = base.filter(t => t.Id !== activeTemplateId);
+    }
+    return base;
+  }, [templates, filters, activeAssignment]);
 
   // Instrumentación helper
   const log = (label: string, start?: number) => {
@@ -95,7 +102,7 @@ function RoutineTemplatesScreen() {
             const active = assignedRes.Data[0];
             setActiveAssignment(active);
             // Persistir RoutineTemplateId activo
-            const rtid = (active as any)?.RoutineTemplateId || active?.RoutineTemplates?.[0]?.Id;
+            const rtid = (active as any)?.RoutineTemplateId || (active as any)?.RoutineTemplates?.[0]?.Id;
             if (rtid) authService.setActiveRoutineTemplateId(rtid);
           } else {
             setActiveAssignment(null);
@@ -227,11 +234,12 @@ function RoutineTemplatesScreen() {
         // Tomar la más reciente (asumimos primera) y añadir template seleccionado para mostrar nombre
         const newest = assignedRes.Data[0];
         // Asegurar que la plantilla esté disponible para la card
-        if (!newest.RoutineTemplates || newest.RoutineTemplates.length === 0) {
-          newest.RoutineTemplates = [selectedTemplate as any];
+  const newestAny: any = newest as any;
+  if (!newestAny.RoutineTemplates || newestAny.RoutineTemplates.length === 0) {
+    newestAny.RoutineTemplates = [selectedTemplate as any];
         }
         setActiveAssignment(newest as any);
-  const rtid = (newest as any)?.RoutineTemplateId || newest.RoutineTemplates?.[0]?.Id;
+  const rtid = (newest as any)?.RoutineTemplateId || (newest as any)?.RoutineTemplates?.[0]?.Id;
   if (rtid) await authService.setActiveRoutineTemplateId(rtid);
       }
       setShowAssignModal(false);
@@ -303,7 +311,17 @@ function RoutineTemplatesScreen() {
           )}
           {filteredTemplates.map(t => (
             <TouchableOpacity key={t.Id} style={styles.card} activeOpacity={0.8} onPress={() => openDetailScreen(t)}>
-              <Text style={styles.cardTitle}>{t.Name}</Text>
+              <View style={styles.badgeRow}>
+                <Text style={styles.cardTitle}>{t.Name}</Text>
+                <Text
+                  style={[
+                    styles.badge,
+                    t.Premium ? styles.badgePremium : styles.badgeFree,
+                  ]}
+                >
+                  {t.Premium ? 'Premium' : 'Gratis'}
+                </Text>
+              </View>
               {t.Comments && <Text style={styles.text}>{t.Comments}</Text>}
               <TouchableOpacity
                 style={styles.assignButton}
@@ -385,6 +403,14 @@ function RoutineTemplatesScreen() {
       </Modal>
 
   {/* Detalle ahora se navega a pantalla dedicada */}
+      <TouchableOpacity
+        style={styles.fabCreate}
+        accessibilityRole="button"
+        accessibilityLabel="Crear nueva rutina"
+        onPress={() => router.push('/create-routine')}
+      >
+        <Text style={styles.fabIcon}>＋</Text>
+      </TouchableOpacity>
     </ScreenWrapper>
   );
 }
