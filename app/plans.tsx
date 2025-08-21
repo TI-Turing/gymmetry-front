@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,12 +7,14 @@ import PlanTypeView from '@/components/planType/PlanTypeView';
 import PlanView from '@/components/plan/PlanView';
 import GymPlanView from '@/components/gym/GymPlanView';
 import { authService } from '@/services/authService';
+import { gymService, gymPlanSelectedService } from '@/services';
 import Colors from '@/constants/Colors';
 
 export default function PlansModal() {
   const [isOwner, setIsOwner] = useState<boolean | null>(null);
   const [gymId, setGymId] = useState<string | null>(null);
-  const [plan, setPlan] = useState<any | null>(null);
+  // Usado sólo para forzar refresh de vistas al crear/cambiar plan
+  const [refreshCounter, setRefreshCounter] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,12 +22,11 @@ export default function PlansModal() {
     checkUserRole();
   }, []);
 
-  const checkUserRole = async () => {
+  const checkUserRole = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Verificar y refrescar token si es necesario
       const tokenValid = await authService.checkAndRefreshToken();
       if (!tokenValid) {
         setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
@@ -34,34 +35,34 @@ export default function PlansModal() {
 
       const userId = authService.getUserId();
       const userGymId = authService.getGymId();
-
       if (!userId) {
         setError('Usuario no autenticado.');
         return;
       }
 
-      // Obtener datos del gimnasio para verificar si el usuario es el owner
-      const { GymService } = await import('@/services/gymService');
-      let gymData = GymService.getCachedGym();
-
-      if (!gymData && userGymId) {
-        // Si no hay datos en caché, intentar refrescarlos
-        gymData = await GymService.refreshGymData(userGymId);
+      // Determinar roles: owner o admin
+      let userIsOwner = false;
+      if (userGymId) {
+        try {
+          const gymData = await gymService.getCachedGymById(userGymId);
+          if (gymData && (gymData.Owner_UserId === userId || gymData.OwnerUserId === userId)) {
+            userIsOwner = true;
+          }
+        } catch {}
       }
-
-      if (gymData && gymData.Owner_UserId === userId) {
-        setIsOwner(true);
-        setGymId(userGymId);
-        setPlan(gymData.GymPlanSelecteds || null);
-      } else {
-        setIsOwner(false);
-        setGymId(userGymId);
-      }
+      const userIsAdmin = authService.hasRole?.('admin') ?? false;
+      const finalIsOwner = userIsOwner || userIsAdmin;
+      setIsOwner(finalIsOwner);
+      setGymId(userGymId);
     } catch {
       setError('Error al verificar el rol del usuario');
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  const handlePlanCreatedOrChanged = () => {
+    setRefreshCounter(c => c + 1);
   };
 
   if (isLoading) {
@@ -123,16 +124,15 @@ export default function PlansModal() {
         </TouchableOpacity>
       </View>
       {isOwner && gymId ? (
-        // Vista para propietarios del gimnasio
-        <GymPlanView gymId={gymId} onPlanSelected={plan} />
+        <GymPlanView
+          gymId={gymId}
+          onPlanSelected={handlePlanCreatedOrChanged}
+          refreshKey={refreshCounter}
+        />
       ) : (
-        // Vista para usuarios regulares
         <>
-          {/* Mostrar el plan actual del usuario */}
-          <PlanView showCurrentPlan={true} />
-
-          {/* Mostrar los tipos de planes disponibles para usuarios */}
-          <PlanTypeView />
+          <PlanView showCurrentPlan={true} refreshKey={refreshCounter} />
+          <PlanTypeView onPlanSelected={handlePlanCreatedOrChanged} />
         </>
       )}
     </View>

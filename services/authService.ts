@@ -90,34 +90,55 @@ export const authService = {
   // Métodos adicionales para compatibilidad
   async checkAndRefreshToken(): Promise<boolean> {
     try {
-      const userData = await this.getUserData();
-      if (!userData) return false;
+      // Verificar tokens básicos primero (sin dependencia de getUserData)
       const token = await AsyncStorage.getItem('authToken');
       const refreshToken = await AsyncStorage.getItem('refreshToken');
-      if (!token || !refreshToken) return false;
+      const userData = await AsyncStorage.getItem('@user_data');
+      
+      if (!token || !refreshToken || !userData) {
+        return false;
+      }
+
+      // Actualizar el token en apiService si no está configurado
+      apiService.setAuthToken(token);
+      
       const tokenExpIso = await AsyncStorage.getItem('@token_expiration');
       const refreshExpIso = await AsyncStorage.getItem('@refresh_token_expiration');
-      if (!refreshExpIso) return true; // no info => asumimos válido hasta que falle
+      
+      if (!refreshExpIso) {
+        return true; // no info => asumimos válido hasta que falle
+      }
+      
       const now = Date.now();
       let tokenExpired = false;
       let refreshExpired = false;
       const SAFETY_WINDOW_MS = 60_000; // refrescar si faltan <60s
+      
       if (tokenExpIso) {
         const tokenExp = Date.parse(tokenExpIso);
-        if (!isNaN(tokenExp)) tokenExpired = tokenExp - now < SAFETY_WINDOW_MS;
+        if (!isNaN(tokenExp)) {
+          tokenExpired = tokenExp - now < SAFETY_WINDOW_MS;
+        }
       }
+      
       const refreshExp = Date.parse(refreshExpIso);
-      if (!isNaN(refreshExp)) refreshExpired = refreshExp <= now;
+      if (!isNaN(refreshExp)) {
+        refreshExpired = refreshExp <= now;
+      }
+      
       if (refreshExpired) {
         await this.logout();
         return false;
       }
+      
       if (tokenExpired) {
         const refreshed = await this.refreshAuthToken();
         return !!refreshed?.Success && !!refreshed.Data;
       }
+      
       return true;
-    } catch {
+    } catch (error) {
+      console.error('Error in checkAndRefreshToken:', error);
       return false;
     }
   },
@@ -164,24 +185,30 @@ export const authService = {
 
   async initializeFromStorage(): Promise<boolean> {
     try {
-  const data = await AsyncStorage.getItem('@user_data');
-  this._rawUser = data ? JSON.parse(data) : null;
-  if (this._rawUser) {
-    // Asegurar que roles estén presentes (en caso de versiones anteriores guardadas sin ellos)
-    if (!Array.isArray(this._rawUser?.DerivedRoles)) {
-      this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
-      await AsyncStorage.setItem('@user_data', JSON.stringify(this._rawUser));
-    }
-    // Cargar RoutineTemplateId activo si existe
-    try {
-      const rid = await AsyncStorage.getItem('@active_routine_template_id');
-      this._activeRoutineTemplateId = rid || null;
-    } catch {}
-  }
-  const token = await AsyncStorage.getItem('authToken');
-  if (token) apiService.setAuthToken(token);
-  return this._rawUser !== null;
-    } catch {
+      const data = await AsyncStorage.getItem('@user_data');
+      this._rawUser = data ? JSON.parse(data) : null;
+      
+      if (this._rawUser) {
+        // Asegurar que roles estén presentes (en caso de versiones anteriores guardadas sin ellos)
+        if (!Array.isArray(this._rawUser?.DerivedRoles)) {
+          this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
+          await AsyncStorage.setItem('@user_data', JSON.stringify(this._rawUser));
+        }
+        // Cargar RoutineTemplateId activo si existe
+        try {
+          const rid = await AsyncStorage.getItem('@active_routine_template_id');
+          this._activeRoutineTemplateId = rid || null;
+        } catch {}
+      }
+      
+      const token = await AsyncStorage.getItem('authToken');
+      if (token) {
+        apiService.setAuthToken(token);
+      }
+      
+      return this._rawUser !== null;
+    } catch (error) {
+      console.error('Error in initializeFromStorage:', error);
       return false;
     }
   },

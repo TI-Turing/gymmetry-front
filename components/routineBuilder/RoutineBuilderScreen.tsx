@@ -142,7 +142,7 @@ const RoutineBuilderScreen: React.FC = () => {
 
         <View style={cardStyle}>
           <Text style={{ fontSize:18, fontWeight:'600', marginBottom:8 }}>Días de la Semana</Text>
-          <View style={{ flexDirection:'row', flexWrap:'wrap' }}>
+          <View style={{ flexDirection:'row', flexWrap:'wrap', backgroundColor: '#1F1F1F' }}>
             {Object.entries(DAY_LABELS).map(([num,label]) => {
               const n = Number(num);
               const active = selectedDays.includes(n);

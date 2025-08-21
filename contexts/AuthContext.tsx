@@ -38,14 +38,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeAuth = async () => {
     try {
       const isInitialized = await authService.initializeFromStorage();
+      
       if (isInitialized) {
-  // Intentar refrescar token si está cerca de expirar
-  await authService.checkAndRefreshToken();
-  setIsAuthenticated(true);
-  setUserData(await authService.getUserData());
+        // Intentar refrescar token si está cerca de expirar
+        const tokenValid = await authService.checkAndRefreshToken();
+        
+        if (tokenValid) {
+          const user = await authService.getUserData();
+          
+          if (user) {
+            setIsAuthenticated(true);
+            setUserData(user);
+          } else {
+            await authService.logout();
+            setIsAuthenticated(false);
+            setUserData(null);
+          }
+        } else {
+          await authService.logout();
+          setIsAuthenticated(false);
+          setUserData(null);
+        }
+      } else {
+        setIsAuthenticated(false);
+        setUserData(null);
       }
-    } catch (_error) {
-      // Error al inicializar, mantenemos el estado sin autenticar
+    } catch (error) {
+      console.error('Error initializing auth:', error);
+      setIsAuthenticated(false);
+      setUserData(null);
     } finally {
       setIsLoading(false);
     }

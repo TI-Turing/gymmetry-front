@@ -11,6 +11,7 @@ import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { gymPlanService } from '@/services/gymPlanService';
+import { gymPlanSelectedService } from '@/services/gymPlanSelectedService';
 import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
 import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
 import { authService } from '@/services/authService';
@@ -18,11 +19,13 @@ import { authService } from '@/services/authService';
 interface GymPlanViewProps {
   gymId: string;
   onPlanSelected?: (planId: string) => void;
+  refreshKey?: number; // fuerza recarga al cambiar
 }
 
 export default function GymPlanView({
   gymId,
   onPlanSelected,
+  refreshKey,
 }: GymPlanViewProps) {
   const [gymPlanTypes, setGymPlanTypes] = useState<GymPlanSelectedType[]>([]);
   const [currentGymPlan, setCurrentGymPlan] = useState<GymPlanSelected | null>(
@@ -43,10 +46,12 @@ export default function GymPlanView({
         setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
         return;
       }
-      // Cargar tipos de planes y plan actual en paralelo
-      const [planTypesResponse, currentPlanResponse] = await Promise.all([
+      // Cargar tipos de planes en paralelo con búsqueda de plan activo real
+      const [planTypesResponse, currentSelecteds] = await Promise.all([
         gymPlanService.getGymPlanTypes(),
-        gymPlanService.getCurrentGymPlan(gymId),
+        gymPlanSelectedService.findGymPlanSelectedsByFields({
+          fields: { GymId: gymId, IsActive: true },
+        } as any),
       ]);
       if (planTypesResponse.Success) {
         // Asegurar que siempre tenemos un array
@@ -58,8 +63,30 @@ export default function GymPlanView({
         return;
       }
 
-      if (currentPlanResponse.Success) {
-        setCurrentGymPlan(currentPlanResponse.Data);
+      if (currentSelecteds.Success && currentSelecteds.Data) {
+        const raw = Array.isArray(currentSelecteds.Data)
+          ? currentSelecteds.Data
+          : (currentSelecteds.Data as any)?.$values || [];
+        const active = raw.find((p: any) => p.isActive || p.IsActive);
+        if (active) {
+          setCurrentGymPlan({
+            id: active.id || active.Id,
+            gymId: active.gymId || active.GymId,
+            gymPlanSelectedTypeId:
+              active.gymPlanSelectedTypeId || active.GymPlanSelectedTypeId,
+            startDate: active.startDate || active.StartDate,
+            endDate: active.endDate || active.EndDate,
+            isActive: active.isActive || active.IsActive,
+            createdAt: active.createdAt || active.CreatedAt || new Date().toISOString(),
+            updatedAt: active.updatedAt || active.UpdatedAt || null,
+            gymPlanSelectedType:
+              active.gymPlanSelectedType || active.GymPlanSelectedType,
+          });
+        } else {
+          setCurrentGymPlan(null);
+        }
+      } else {
+        setCurrentGymPlan(null);
       }
     } catch {
       setError('Error al cargar los planes del gimnasio');
@@ -70,7 +97,8 @@ export default function GymPlanView({
 
   useEffect(() => {
     loadGymPlans();
-  }, [loadGymPlans]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadGymPlans, refreshKey]);
 
   const handleSelectPlan = async (planType: GymPlanSelectedType) => {
     try {

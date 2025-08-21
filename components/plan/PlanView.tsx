@@ -10,6 +10,7 @@ import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { authService } from '@/services/authService';
+import { planService } from '@/services/planService';
 
 interface UserPlan {
   id: string;
@@ -24,9 +25,10 @@ interface UserPlan {
 
 interface PlanViewProps {
   showCurrentPlan?: boolean;
+  refreshKey?: number; // fuerza recarga cuando cambia
 }
 
-export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
+export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanViewProps) {
   const [currentUserPlan, setCurrentUserPlan] = useState<UserPlan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,26 +51,38 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
         return;
       }
 
-      // Mock de plan actual del usuario (comentar cuando el backend esté listo)
-      const mockCurrentPlan: UserPlan = {
-        id: 'user-plan-1',
-        userId: userId,
-        planTypeId: '1',
-        planTypeName: 'Plan Gratuito',
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días
-        isActive: true,
-        price: 0,
-      };
-      setCurrentUserPlan(mockCurrentPlan);
-
-      // TODO: Descomentar cuando el backend esté listo
-      // const response = await planService.getCurrentUserPlan(userId);
-      // if (response.Success && response.Data) {
-      //   setCurrentUserPlan(response.Data);
-      // } else {
-      //   setCurrentUserPlan(null);
-      // }
+      // Buscar planes activos del usuario: patrón find<Entities>ByFields
+      // Según convención backend: campos en body Iniciando con Mayúscula
+      const response = await planService.findPlansByFields({
+        fields: { UserId: userId, IsActive: true },
+      } as any);
+      if (response.Success && response.Data) {
+        const raw = Array.isArray(response.Data)
+          ? response.Data
+          : (response.Data as any)?.$values || [];
+        const active = raw.find((p: any) => p.isActive || p.IsActive);
+        if (active) {
+          setCurrentUserPlan({
+            id: active.id || active.Id,
+            userId: active.userId || active.UserId,
+            planTypeId: active.planTypeId || active.PlanTypeId,
+            planTypeName:
+              active.planType?.name || active.PlanType?.Name || 'Plan',
+            startDate: active.startDate || active.StartDate,
+            endDate: active.endDate || active.EndDate,
+            isActive: active.isActive || active.IsActive,
+            price:
+              active.planType?.price ||
+              active.PlanType?.Price ||
+              active.price ||
+              0,
+          });
+        } else {
+          setCurrentUserPlan(null);
+        }
+      } else {
+        setCurrentUserPlan(null);
+      }
     } catch {
       setError('Error al cargar el plan actual');
     } finally {
@@ -82,7 +96,8 @@ export default function PlanView({ showCurrentPlan = true }: PlanViewProps) {
     } else {
       setIsLoading(false);
     }
-  }, [showCurrentPlan, loadCurrentUserPlan]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showCurrentPlan, loadCurrentUserPlan, refreshKey]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

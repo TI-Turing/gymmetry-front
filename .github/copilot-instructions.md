@@ -21,7 +21,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 
 ## 3. Patrones y Convenciones Específicas
 - Listas: centralizar lógica de carga/paginación/empty states siguiendo ejemplos en `components/*/*List.tsx` (e.g. `MachineList.tsx`). No reinventar layout.
-- Servicios: métodos CRUD nombrados `add<Entity>`, `update<Entity>`, `delete<Entity>`, `get<Entity>ById`, `find<Entities>ByFields`; POST de búsquedas usa `/plural/find`.
+- Servicios: métodos CRUD nombrados `add<Entity>`, `update<Entity>`, `delete<Entity>`, `get<Entity>ById`, `find<Entities>ByFields`; POST de búsquedas usa `/plural/find`. El metodo `find<Entities>ByFields` debe aceptar un objeto con los campos a buscar, se creo para poder filtrar por cualquier campo de esa entidad, en el body siempre debe ir el nombre del campo (iniciando con mayuscula) como llave y el valor de este como valor a filtrar, este siempre retornara un array de datos ya sea con uno o muchos valores.
 - Respuesta API unificada: interfaz `ApiResponse<T>` con campos `{ Success, Message, Data, StatusCode }`. Siempre verificar `resp?.Success` antes de acceder a `Data`.
 - Backends .NET pueden devolver arrays como objeto con `$values`; normalizar siempre si consumes colecciones.
 - Almacén local: usar claves con prefijo claro (`exercise_<Id>_progress`, `@daily_start_<templateId>_<dayNumber>`). Preferir `AsyncStorage` nativo; para web detectar `window.localStorage`.
