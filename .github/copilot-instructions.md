@@ -11,6 +11,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Patrón transversal: EntityList (listas CRUD homogéneas) en muchos dominios.
 - Estado global mínimo: Auth (`contexts/AuthContext.tsx`), preferencias ligeras vía AsyncStorage/localStorage.
 - Se maneja una carpeta de componentes, un servicio, una carpeta de Dto por cada modelo o entidad.
+- Siempre evitar usar el Alert nativo, ya se tiene un componente llamado CustomAlert para todo lo relacionado a las alertas.
 
 ## 2. Flujos Clave de Desarrollo
 - Iniciar dev: `npm run start:local` (carga `.env.local` vía `env-loader.js`).

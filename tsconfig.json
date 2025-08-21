@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
+  "resolveJsonModule": true,
     "paths": {
       "@/*": ["./*"],
       "@/components/*": ["./components/*"],
@@ -26,6 +26,6 @@
       "@/environment/*": ["./environment/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules", "dist", "build", ".expo", "web-build"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "types/test-globals.d.ts"],
+  "exclude": ["node_modules", "dist", "build", ".expo", "web-build", "__tests__", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
 }

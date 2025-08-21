@@ -1,16 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { getPaymentVisual } from '@/utils';
 import { gymPlanService } from '@/services/gymPlanService';
 import { gymPlanSelectedService } from '@/services/gymPlanSelectedService';
 import { paymentService } from '@/services/paymentService';
 import * as WebBrowser from 'expo-web-browser';
+import CardPaymentModal from '@/components/payments/CardPaymentModal';
+import { Environment } from '@/environment';
 import { normalizeCollection } from '@/utils';
 import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
 import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
 import { authService } from '@/services/authService';
+import { usePaymentStatus } from '@/hooks/usePaymentStatus';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface GymPlanViewProps {
   gymId: string;
@@ -31,6 +36,55 @@ export default function GymPlanView({
   const [isCreatingPlan, setIsCreatingPlan] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [lastAttemptedGymPlanTypeId, setLastAttemptedGymPlanTypeId] = useState<string | null>(null);
+  const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
+  const [retryMotivo, setRetryMotivo] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'PSE'>('CARD');
+  const [buyerEmail, setBuyerEmail] = useState<string>('');
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<number>(0);
+  const [showCardModal, setShowCardModal] = useState(false);
+  const cardTokenProcessedRef = useRef(false);
+  const { status: paymentStatus, rawStatus, start: startPolling, reset: resetPayment } = usePaymentStatus({
+    onUpdate: s => {
+      if (['approved', 'rejected', 'cancelled', 'expired'].includes(s)) {
+        loadGymPlans();
+      }
+    },
+  });
+
+  // Tomar expiresAt del estado crudo
+  useEffect(() => {
+    const exp = (rawStatus as any)?.expiresAt || (rawStatus as any)?.ExpiresAt || null;
+    if (exp) setExpiresAt(exp);
+  }, [rawStatus]);
+
+  // Prefill buyerEmail
+  useEffect(() => {
+    (async () => {
+      const u = await authService.getUserData();
+      if (u?.email) setBuyerEmail(u.email);
+    })();
+  }, []);
+  // Countdown expiración
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    if (expiresAt && (paymentStatus === 'pending' || paymentStatus === 'polling')) {
+      const tick = () => {
+        const diff = new Date(expiresAt).getTime() - Date.now();
+        setRemaining(diff > 0 ? Math.floor(diff / 1000) : 0);
+      };
+      tick();
+      timer = setInterval(tick, 1000) as any;
+    } else {
+      setRemaining(0);
+    }
+    return () => { if (timer) clearInterval(timer); };
+  }, [expiresAt, paymentStatus]);
+  const { showAlert, showError, showSuccess, hideAlert, AlertComponent } = useCustomAlert();
+
+  // Visuales dinámicos ahora centralizados en utils/paymentVisual
 
   const loadGymPlans = useCallback(async () => {
     try {
@@ -95,73 +149,82 @@ export default function GymPlanView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadGymPlans, refreshKey]);
 
-  const handleSelectPlan = async (planType: GymPlanSelectedType) => {
+  const assignGymPlan = async (planType: GymPlanSelectedType) => {
+    setIsCreatingPlan(true);
     try {
-      setIsCreatingPlan(true);
-
-      Alert.alert(
-        'Confirmar Selección',
-        `¿Estás seguro de que deseas seleccionar el plan "${planType.name}"?`,
-        [
-          {
-            text: 'Cancelar',
-            style: 'cancel',
-            onPress: () => setIsCreatingPlan(false),
-          },
-          {
-            text: 'Confirmar',
-            onPress: async () => {
-              try {
-                if ((planType.price || 0) === 0 && (planType.usdPrice || 0) === 0) {
-                  // Flujo plan gratuito gimnasio
-                  const { startDate, endDate } = gymPlanService.generatePlanDates();
-                  const createPlanRequest = {
-                    GymId: gymId,
-                    StartDate: startDate,
-                    EndDate: endDate,
-                    GymPlanSelectedTypeId: planType.id,
-                  };
-                  const response = await gymPlanService.createGymPlan(createPlanRequest);
-                  if (response.Success) {
-                    Alert.alert('Plan Creado', `El plan "${planType.name}" ha sido asignado exitosamente al gimnasio.`, [{
-                      text: 'OK',
-                      onPress: () => { loadGymPlans(); onPlanSelected?.(planType.id); }
-                    }]);
-                  } else {
-                    Alert.alert('Error', response.Message || 'No se pudo crear el plan');
-                  }
-                } else {
-                  // Plan de pago: Mercado Pago
-                  const successUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/success`;
-                  const failureUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/failure`;
-                  const prefResp = await paymentService.createGymPlanPreference({
-                    GymPlanSelectedTypeId: planType.id,
-                    GymId: gymId,
-                    SuccessUrl: successUrl,
-                    FailureUrl: failureUrl,
-                  });
-                  if (prefResp.Success && prefResp.Data?.InitPoint) {
-                    await WebBrowser.openBrowserAsync(prefResp.Data.InitPoint);
-                  } else {
-                    Alert.alert('Error', prefResp.Message || 'No se pudo iniciar el pago');
-                  }
-                }
-              } catch {
-                Alert.alert(
-                  'Error',
-                  'Ocurrió un error al crear el plan. Intenta nuevamente.'
-                );
-              } finally {
-                setIsCreatingPlan(false);
-              }
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      if ((planType.price || 0) === 0 && (planType.usdPrice || 0) === 0) {
+        const { startDate, endDate } = gymPlanService.generatePlanDates();
+        const createPlanRequest = { GymId: gymId, StartDate: startDate, EndDate: endDate, GymPlanSelectedTypeId: planType.id };
+        const response = await gymPlanService.createGymPlan(createPlanRequest);
+        if (response.Success) {
+          showSuccess(`El plan "${planType.name}" ha sido asignado exitosamente al gimnasio.`, {
+            onConfirm: () => { loadGymPlans(); onPlanSelected?.(planType.id); }
+          });
+        } else { showError(response.Message || 'No se pudo crear el plan'); }
+      } else {
+        const successUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/success`;
+        const failureUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/failure`;
+        const pendingUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/pending`;
+  // PSE no requiere selección de banco en la app; la pasarela lo gestiona
+        const user = await authService.getUserData();
+        if (!user?.id) { showError('No se pudo obtener el usuario autenticado. Inicia sesión nuevamente.'); return; }
+        const prefResp = await paymentService.createGymPlanPreference({
+          GymPlanSelectedTypeId: planType.id,
+          GymId: gymId,
+          UserId: user.id,
+          SuccessUrl: successUrl,
+          FailureUrl: failureUrl,
+          PendingUrl: pendingUrl,
+          PaymentMethod: paymentMethod,
+          BuyerEmail: buyerEmail || undefined,
+        });
+        if (prefResp.Success && prefResp.Data?.InitPoint) {
+          const prefId: string | null = (prefResp.Data.Id || prefResp.Data.preferenceId || null) as string | null;
+          if (prefId) setPreferenceId(prefId);
+          setLastAttemptedGymPlanTypeId(planType.id);
+          await WebBrowser.openBrowserAsync(prefResp.Data.InitPoint);
+          if (prefId) startPolling(prefId);
+        } else {
+          const msg = (prefResp as any)?.Message || '';
+          if (msg.toLowerCase().includes('pendiente') && preferenceId) {
+            startPolling(preferenceId);
+          } else {
+            showError(prefResp.Message || 'No se pudo iniciar el pago');
+          }
+        }
+      }
     } catch {
-      setIsCreatingPlan(false);
-      Alert.alert('Error', 'Ocurrió un error inesperado.');
+      showError('Ocurrió un error al crear el plan. Intenta nuevamente.');
+    } finally { setIsCreatingPlan(false); }
+  };
+
+  const handleSelectPlan = (planType: GymPlanSelectedType) => {
+    if (isCreatingPlan) return;
+    // Si es gratis, asignar directo
+    if ((planType.price || 0) === 0 && (planType.usdPrice || 0) === 0) {
+      assignGymPlan(planType);
+      return;
+    }
+    // Abrir panel de opciones de pago bajo el plan
+    setExpandedPlanId(curr => (curr === planType.id ? null : planType.id));
+    setRetryMotivo(null);
+    setLastAttemptedGymPlanTypeId(planType.id);
+  };
+
+  const handleSelectPlanWithMotivo = (planType: GymPlanSelectedType, motivo: string) => {
+    if (isCreatingPlan) return;
+    setRetryMotivo(motivo || null);
+    setExpandedPlanId(planType.id);
+    setLastAttemptedGymPlanTypeId(planType.id);
+  };
+
+  const continuePayment = async (planType: GymPlanSelectedType) => {
+    if (isCreatingPlan) return;
+    if (paymentMethod === 'CARD' && Environment.PAY_CARD_INAPP) {
+      setExpandedPlanId(planType.id);
+      setTimeout(() => setShowCardModal(true), 0);
+    } else {
+      await assignGymPlan(planType);
     }
   };
 
@@ -196,7 +259,30 @@ export default function GymPlanView({
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+  <>
+  <CardPaymentModal
+    visible={showCardModal}
+  onClose={() => { setTimeout(() => setShowCardModal(false), 0); cardTokenProcessedRef.current = false; }}
+    publicKey={Environment.MP_PUBLIC_KEY || null}
+    buyerEmail={buyerEmail}
+    amount={(() => { const p = gymPlanTypes.find(x=>x.id===expandedPlanId); return (p?.price || 0) + (p?.usdPrice || 0) ? (p?.price || 0) : p?.usdPrice || null; })()}
+    onToken={async (cardToken: string) => {
+      try {
+        setTimeout(() => setShowCardModal(false), 0);
+        cardTokenProcessedRef.current = true;
+        const user = await authService.getUserData();
+        if (!user?.id || !expandedPlanId) { showError('No se pudo continuar el pago.'); return; }
+        const resp = await paymentService.createGymPlanCardPayment({ GymPlanSelectedTypeId: expandedPlanId, GymId: gymId, UserId: user.id, CardToken: cardToken, BuyerEmail: buyerEmail || undefined, Amount: undefined });
+        if (resp.Success) {
+          const prefId: string | null = (resp.Data?.Id || resp.Data?.preferenceId || null) as string | null;
+          if (prefId) { setPreferenceId(prefId); startPolling(prefId); }
+        } else {
+          showError(resp.Message || 'No se pudo procesar el pago con tarjeta');
+        }
+      } catch { showError('Error al procesar el pago con tarjeta'); }
+    }}
+  />
+  <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {currentGymPlan && (
         <View style={styles.compactWrapper}>
           <TouchableOpacity
@@ -238,6 +324,37 @@ export default function GymPlanView({
       )}
 
       <View style={styles.availablePlansContainer}>
+        {preferenceId && paymentStatus !== 'approved' && (
+          (() => { const v = getPaymentVisual(paymentStatus); const pm = (rawStatus as any)?.paymentMethod || (rawStatus as any)?.PaymentMethod; const bank = (rawStatus as any)?.bankCode || (rawStatus as any)?.BankCode; return (
+          <View style={[styles.paymentStatusBanner, { borderColor: v.borderColor, backgroundColor: v.backgroundColor }] }>
+            <Text style={[styles.paymentStatusText, { color: v.color }] }>
+              {paymentStatus === 'polling' || paymentStatus === 'pending' ? 'Esperando confirmación de pago...' :
+                paymentStatus === 'cancelled' ? 'Pago cancelado. Puedes reintentar.' :
+                paymentStatus === 'expired' ? 'Tu intento de pago expiró. Genera uno nuevo.' :
+                paymentStatus === 'rejected' ? 'Pago rechazado. Puedes reintentar.' :
+                paymentStatus === 'error' ? 'Error consultando estado de pago' : ''}
+            </Text>
+            {(paymentStatus === 'polling' || paymentStatus === 'pending') && expiresAt && (
+              <Text style={[styles.paymentStatusText, { color: v.color, marginTop: 4 }]}>Expira en {Math.floor(remaining/60)}:{`${remaining%60}`.padStart(2,'0')} • {pm || paymentMethod}{bank?` • ${bank}`:''}</Text>
+            )}
+            {(paymentStatus === 'expired' || paymentStatus === 'rejected' || paymentStatus === 'cancelled') && (
+              <TouchableOpacity style={[styles.selectButton, { marginTop: 12 }]} onPress={() => {
+                let motivo = '';
+                if (paymentStatus === 'expired') motivo = 'El intento anterior expiró.';
+                else if (paymentStatus === 'rejected') motivo = 'El pago fue rechazado.';
+                else if (paymentStatus === 'cancelled') motivo = 'El pago fue cancelado.';
+                const failedPlan = gymPlanTypes.find(p => p.id === lastAttemptedGymPlanTypeId);
+                setPreferenceId(null);
+                resetPayment();
+                if (failedPlan) handleSelectPlanWithMotivo(failedPlan, motivo);
+              }}>
+                <Text style={styles.selectButtonText}>Reintentar pago</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          ); })()
+        )}
+  {/* La configuración de pago se mueve debajo de cada plan */}
         <Text style={styles.sectionTitle}>{currentGymPlan ? 'Cambiar Plan' : 'Seleccionar Plan para el Gimnasio'}</Text>
         {gymPlanTypes.length === 0 ? (
           <View style={styles.noPlansContainer}>
@@ -270,14 +387,56 @@ export default function GymPlanView({
                 {isCreatingPlan ? (
                   <ActivityIndicator size='small' color='#FFFFFF' />
                 ) : (
-                  <Text style={styles.selectButtonText}>{currentGymPlan ? 'Cambiar a este Plan' : 'Seleccionar Plan'}</Text>
+                  <Text style={styles.selectButtonText}>
+                    {((planType.price || 0) === 0 && (planType.usdPrice || 0) === 0)
+                      ? (currentGymPlan ? 'Cambiar a este Plan' : 'Seleccionar Plan')
+                      : (currentGymPlan ? 'Cambiar (ver opciones de pago)' : 'Ver opciones de pago')}
+                  </Text>
                 )}
               </TouchableOpacity>
+
+              {/* Opciones de pago por plan */}
+              {expandedPlanId === planType.id && ((planType.price || 0) > 0 || (planType.usdPrice || 0) > 0) && (
+                <View style={[styles.paymentConfig, { marginTop: 12 }]}>
+                  {!!retryMotivo && (
+                    <Text style={{ color: '#ccc', marginBottom: 8 }}>{retryMotivo}</Text>
+                  )}
+                  <Text style={styles.configTitle}>Método de pago</Text>
+                  <View style={styles.methodRow}>
+                    <TouchableOpacity onPress={() => setPaymentMethod('CARD')} style={[styles.methodPill, paymentMethod==='CARD' && styles.methodPillActive]}>
+                      <FontAwesome name='credit-card' color={paymentMethod==='CARD'?'#000':'#fff'} size={14} />
+                      <Text style={[styles.methodPillText, paymentMethod==='CARD' && styles.methodPillTextActive]}>Tarjeta (Mercado Pago)</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setPaymentMethod('PSE')} style={[styles.methodPill, paymentMethod==='PSE' && styles.methodPillActive]}>
+                      <FontAwesome name='university' color={paymentMethod==='PSE'?'#000':'#fff'} size={14} />
+                      <Text style={[styles.methodPillText, paymentMethod==='PSE' && styles.methodPillTextActive]}>PSE</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {/* PSE: sin selección de bancos; lo gestiona la pasarela */}
+                  <View style={{ marginTop: 10 }}>
+                    <Text style={styles.configLabel}>Correo del comprador</Text>
+                    <TextInput
+                      value={buyerEmail}
+                      onChangeText={setBuyerEmail}
+                      placeholder='correo@dominio.com'
+                      placeholderTextColor={'#888'}
+                      style={styles.emailInput}
+                      keyboardType='email-address'
+                      autoCapitalize='none'
+                    />
+                  </View>
+                  <TouchableOpacity style={[styles.selectButton, { marginTop: 12 }]} onPress={() => continuePayment(planType)}>
+                    <Text style={styles.selectButtonText}>Continuar al pago</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))
         )}
       </View>
-    </ScrollView>
+  </ScrollView>
+  <AlertComponent />
+  </>
   );
 }
 
@@ -488,5 +647,74 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 8,
+  },
+  paymentStatusBanner: {
+    backgroundColor: '#1a1a1a',
+    borderColor: Colors.light.tint,
+    borderWidth: 1,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  paymentStatusText: {
+    color: Colors.light.tint,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  // Config pago
+  paymentConfig: {
+    backgroundColor: '#111',
+    borderColor: '#333',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  configTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  methodRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  methodPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#555',
+    marginRight: 8,
+  },
+  methodPillActive: {
+    backgroundColor: Colors.light.tint,
+    borderColor: Colors.light.tint,
+  },
+  methodPillText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  methodPillTextActive: {
+    color: '#000',
+    fontWeight: '700',
+  },
+  configLabel: {
+    color: '#ccc',
+    fontSize: 12,
+    marginBottom: 6,
+  },
+  emailInput: {
+    backgroundColor: '#1a1a1a',
+    color: '#fff',
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 40,
   },
 });
