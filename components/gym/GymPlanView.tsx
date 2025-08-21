@@ -1,17 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { gymPlanService } from '@/services/gymPlanService';
 import { gymPlanSelectedService } from '@/services/gymPlanSelectedService';
+import { normalizeCollection } from '@/utils';
 import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
 import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
 import { authService } from '@/services/authService';
@@ -33,6 +27,7 @@ export default function GymPlanView({
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadGymPlans = useCallback(async () => {
@@ -64,9 +59,7 @@ export default function GymPlanView({
       }
 
       if (currentSelecteds.Success && currentSelecteds.Data) {
-        const raw = Array.isArray(currentSelecteds.Data)
-          ? currentSelecteds.Data
-          : (currentSelecteds.Data as any)?.$values || [];
+        const raw = normalizeCollection(currentSelecteds.Data as any);
         const active = raw.find((p: any) => p.isActive || p.IsActive);
         if (active) {
           setCurrentGymPlan({
@@ -204,60 +197,53 @@ export default function GymPlanView({
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Plan actual del gimnasio */}
       {currentGymPlan && (
-        <View style={styles.currentPlanContainer}>
-          <Text style={styles.sectionTitle}>Plan Actual del Gimnasio</Text>
-          <View style={styles.currentPlanCard}>
-            <View style={styles.planHeader}>
-              <Text style={styles.currentPlanName}>
-                {currentGymPlan.gymPlanSelectedType?.name || 'Plan Activo'}
-              </Text>
-              <View style={styles.activeBadge}>
-                <Text style={styles.activeText}>Activo</Text>
-              </View>
-            </View>
-            <View style={styles.planDetails}>
-              <View style={styles.detailRow}>
-                <FontAwesome name='calendar' size={16} color='#CCCCCC' />
-                <Text style={styles.detailLabel}>Inicio:</Text>
-                <Text style={styles.detailValue}>
-                  {formatDate(currentGymPlan.startDate)}
+        <View style={styles.compactWrapper}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => setCollapsed(c => !c)}
+            style={[styles.compactCard]}
+          >
+            <View style={styles.compactSummaryRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.compactTitle} numberOfLines={1}>
+                  {currentGymPlan.gymPlanSelectedType?.name || 'Plan Activo'}
+                </Text>
+                <Text style={styles.compactSubtitle} numberOfLines={1}>
+                  {formatDate(currentGymPlan.startDate)} • {formatDate(currentGymPlan.endDate)}
                 </Text>
               </View>
-              <View style={styles.detailRow}>
-                <FontAwesome
-                  name='calendar-check-o'
-                  size={16}
-                  color='#CCCCCC'
-                />
-                <Text style={styles.detailLabel}>Vencimiento:</Text>
-                <Text style={styles.detailValue}>
-                  {formatDate(currentGymPlan.endDate)}
-                </Text>
-              </View>
+              <FontAwesome
+                name={collapsed ? 'chevron-down' : 'chevron-up'}
+                size={14}
+                color={'#FFFFFF'}
+              />
             </View>
-          </View>
+            {!collapsed && (
+              <View style={styles.compactDetails}>
+                <View style={styles.detailRow}>
+                  <FontAwesome name='calendar' size={12} color='#CCCCCC' />
+                  <Text style={styles.detailLabel}>Inicio</Text>
+                  <Text style={styles.detailValue}>{formatDate(currentGymPlan.startDate)}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <FontAwesome name='calendar-check-o' size={12} color='#CCCCCC' />
+                  <Text style={styles.detailLabel}>Fin</Text>
+                  <Text style={styles.detailValue}>{formatDate(currentGymPlan.endDate)}</Text>
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       )}
 
-      {/* Planes disponibles */}
       <View style={styles.availablePlansContainer}>
-        <Text style={styles.sectionTitle}>
-          {currentGymPlan
-            ? 'Cambiar Plan'
-            : 'Seleccionar Plan para el Gimnasio'}
-        </Text>
-
+        <Text style={styles.sectionTitle}>{currentGymPlan ? 'Cambiar Plan' : 'Seleccionar Plan para el Gimnasio'}</Text>
         {gymPlanTypes.length === 0 ? (
           <View style={styles.noPlansContainer}>
             <FontAwesome name='info-circle' size={48} color='#FFB86C' />
-            <Text style={styles.noPlansText}>
-              No hay planes disponibles actualmente
-            </Text>
-            <Text style={styles.noPlansSubtext}>
-              Los planes del gimnasio no están disponibles en este momento.
-            </Text>
+            <Text style={styles.noPlansText}>No hay planes disponibles actualmente</Text>
+            <Text style={styles.noPlansSubtext}>Los planes del gimnasio no están disponibles en este momento.</Text>
           </View>
         ) : (
           gymPlanTypes.map(planType => (
@@ -265,13 +251,7 @@ export default function GymPlanView({
               <View style={styles.planHeader}>
                 <View style={styles.planInfo}>
                   <Text style={styles.planName}>{planType.name}</Text>
-                  <Text style={styles.planPrice}>
-                    {gymPlanService.formatPrice(
-                      planType.price,
-                      planType.usdPrice,
-                      planType.countryId
-                    )}
-                  </Text>
+                  <Text style={styles.planPrice}>{gymPlanService.formatPrice(planType.price, planType.usdPrice, planType.countryId)}</Text>
                 </View>
                 {planType.isActive && (
                   <View style={styles.availableBadge}>
@@ -279,30 +259,18 @@ export default function GymPlanView({
                   </View>
                 )}
               </View>
-
               {planType.description && (
-                <Text style={styles.planDescription}>
-                  {planType.description}
-                </Text>
+                <Text style={styles.planDescription}>{planType.description}</Text>
               )}
-
               <TouchableOpacity
-                style={[
-                  styles.selectButton,
-                  !planType.isActive && styles.selectButtonDisabled,
-                  isCreatingPlan && styles.selectButtonDisabled,
-                ]}
+                style={[styles.selectButton, !planType.isActive && styles.selectButtonDisabled, isCreatingPlan && styles.selectButtonDisabled]}
                 onPress={() => handleSelectPlan(planType)}
                 disabled={!planType.isActive || isCreatingPlan}
               >
                 {isCreatingPlan ? (
                   <ActivityIndicator size='small' color='#FFFFFF' />
                 ) : (
-                  <Text style={styles.selectButtonText}>
-                    {currentGymPlan
-                      ? 'Cambiar a este Plan'
-                      : 'Seleccionar Plan'}
-                  </Text>
+                  <Text style={styles.selectButtonText}>{currentGymPlan ? 'Cambiar a este Plan' : 'Seleccionar Plan'}</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -356,6 +324,34 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#333333',
+  },
+  compactWrapper: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  compactCard: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 10,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  compactSummaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  compactTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  compactSubtitle: {
+    color: '#CCCCCC',
+    fontSize: 12,
+  },
+  compactDetails: {
+    marginTop: 10,
   },
   sectionTitle: {
     fontSize: 24,

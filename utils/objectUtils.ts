@@ -42,3 +42,12 @@ export const hasValidValue = (value: any): boolean => {
   }
   return true;
 };
+
+// Normaliza colecciones que pueden venir de .NET con forma { $values: [...] }
+// Acepta: array directo, objeto con $values, null/undefined -> []
+export function normalizeCollection<T = any>(raw: any): T[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as T[];
+  if (Array.isArray(raw?.$values)) return raw.$values as T[];
+  return [];
+}

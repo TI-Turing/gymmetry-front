@@ -1,16 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { authService } from '@/services/authService';
 import { planService } from '@/services/planService';
+import { normalizeCollection } from '@/utils';
 
 interface UserPlan {
   id: string;
@@ -26,12 +21,15 @@ interface UserPlan {
 interface PlanViewProps {
   showCurrentPlan?: boolean;
   refreshKey?: number; // fuerza recarga cuando cambia
+  onActivePlanTypeResolved?: (planTypeId: string | null, isFallback: boolean) => void;
 }
 
-export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanViewProps) {
+export default function PlanView({ showCurrentPlan = true, refreshKey, onActivePlanTypeResolved }: PlanViewProps) {
   const [currentUserPlan, setCurrentUserPlan] = useState<UserPlan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState(true);
+  const [usingFallbackFreePlan, setUsingFallbackFreePlan] = useState(false);
 
   const loadCurrentUserPlan = useCallback(async () => {
     try {
@@ -56,18 +54,17 @@ export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanVie
       const response = await planService.findPlansByFields({
         fields: { UserId: userId, IsActive: true },
       } as any);
+      const FREE_PLAN_TYPE_ID = '4aa8380c-8479-4334-8236-3909be9c842b';
       if (response.Success && response.Data) {
-        const raw = Array.isArray(response.Data)
-          ? response.Data
-          : (response.Data as any)?.$values || [];
+        const raw = normalizeCollection(response.Data as any);
         const active = raw.find((p: any) => p.isActive || p.IsActive);
         if (active) {
-          setCurrentUserPlan({
+          setUsingFallbackFreePlan(false);
+          const mapped: UserPlan = {
             id: active.id || active.Id,
             userId: active.userId || active.UserId,
             planTypeId: active.planTypeId || active.PlanTypeId,
-            planTypeName:
-              active.planType?.name || active.PlanType?.Name || 'Plan',
+            planTypeName: active.planType?.name || active.PlanType?.Name || 'Plan',
             startDate: active.startDate || active.StartDate,
             endDate: active.endDate || active.EndDate,
             isActive: active.isActive || active.IsActive,
@@ -76,12 +73,39 @@ export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanVie
               active.PlanType?.Price ||
               active.price ||
               0,
-          });
+          };
+          setCurrentUserPlan(mapped);
         } else {
-          setCurrentUserPlan(null);
+          // Fallback plan gratis (virtual)
+          const now = new Date();
+          const fallback: UserPlan = {
+            id: 'free-fallback',
+            userId: userId,
+            planTypeId: FREE_PLAN_TYPE_ID,
+            planTypeName: 'Gratis',
+            startDate: now.toISOString(),
+            endDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            isActive: true,
+            price: 0,
+          };
+          setUsingFallbackFreePlan(true);
+          setCurrentUserPlan(fallback);
         }
       } else {
-        setCurrentUserPlan(null);
+        // También fallback en respuesta no exitosa
+        const now = new Date();
+        const fallback: UserPlan = {
+          id: 'free-fallback',
+          userId: userId,
+          planTypeId: FREE_PLAN_TYPE_ID,
+          planTypeName: 'Gratis',
+          startDate: now.toISOString(),
+            endDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          isActive: true,
+          price: 0,
+        };
+        setUsingFallbackFreePlan(true);
+        setCurrentUserPlan(fallback);
       }
     } catch {
       setError('Error al cargar el plan actual');
@@ -127,6 +151,25 @@ export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanVie
     return diffDays;
   };
 
+  // Derivados (no hooks) – se calculan siempre para mantener orden estable de hooks
+  const daysRemaining = currentUserPlan && !usingFallbackFreePlan ? getDaysRemaining(currentUserPlan.endDate) : 0;
+  const isExpiringSoon = !usingFallbackFreePlan && daysRemaining <= 7 && daysRemaining > 0;
+  const isExpired = !usingFallbackFreePlan && daysRemaining <= 0;
+
+  // Notificar planTypeId activo al padre (incluye fallback) — hook estable
+  useEffect(() => {
+    if (onActivePlanTypeResolved) {
+      onActivePlanTypeResolved(currentUserPlan?.planTypeId || null, usingFallbackFreePlan);
+    }
+  }, [currentUserPlan?.planTypeId, usingFallbackFreePlan, onActivePlanTypeResolved]);
+
+  // Auto expandir si expira pronto (solo planes reales)
+  useEffect(() => {
+    if (!usingFallbackFreePlan && isExpiringSoon && collapsed) {
+      setCollapsed(false);
+    }
+  }, [isExpiringSoon, usingFallbackFreePlan, collapsed]);
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -153,14 +196,14 @@ export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanVie
 
   if (!currentUserPlan && showCurrentPlan) {
     return (
-      <View style={styles.noPlanContainer}>
-        <FontAwesome name='info-circle' size={48} color='#FFB86C' />
-        <Text style={styles.noPlanText}>
-          No tienes un plan activo actualmente
-        </Text>
-        <Text style={styles.noPlanSubtext}>
-          Selecciona un plan para comenzar a disfrutar de todos los beneficios
-        </Text>
+      <View style={styles.noPlanBanner}>
+        <FontAwesome name='info-circle' size={18} color='#FFB86C' style={styles.noPlanIcon} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.noPlanBannerTitle}>Sin plan activo</Text>
+          <Text style={styles.noPlanBannerText} numberOfLines={2}>
+            Selecciona un plan para desbloquear funciones adicionales.
+          </Text>
+        </View>
       </View>
     );
   }
@@ -169,123 +212,87 @@ export default function PlanView({ showCurrentPlan = true, refreshKey }: PlanVie
     return null;
   }
 
-  const daysRemaining = currentUserPlan
-    ? getDaysRemaining(currentUserPlan.endDate)
-    : 0;
-  const isExpiringSoon = daysRemaining <= 7 && daysRemaining > 0;
-  const isExpired = daysRemaining <= 0;
+  // (Ya calculado arriba y hooks ejecutados)
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.currentPlanContainer}>
-        <Text style={styles.sectionTitle}>Mi Plan Actual</Text>
-
-        <View
+    <View style={styles.compactWrapper}>
+      {usingFallbackFreePlan ? (
+        <View style={[styles.planCard, styles.collapsibleCard]}>
+          <View style={styles.summaryRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.planName} numberOfLines={1}>
+                <Text style={styles.planLabel}>Plan actual: </Text>Gratis
+              </Text>
+            </View>
+          </View>
+          <View style={styles.detailSection}>
+            <Text style={styles.detailValue}>
+              Disfrutando del plan gratis. Selecciona otro plan para obtener más beneficios. Este plan no tiene fecha de término.
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setCollapsed(c => !c)}
           style={[
             styles.planCard,
             isExpired && styles.expiredPlanCard,
             isExpiringSoon && styles.expiringSoonPlanCard,
+            styles.collapsibleCard,
           ]}
         >
-          <View style={styles.planHeader}>
-            <View style={styles.planInfo}>
-              <Text style={styles.planName}>
-                {currentUserPlan?.planTypeName || 'Plan Desconocido'}
+          <View style={styles.summaryRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.planName} numberOfLines={1}>
+                <Text style={styles.planLabel}>Plan actual: </Text>{currentUserPlan?.planTypeName || '—'}
               </Text>
-              <Text style={styles.planPrice}>
-                {formatPrice(currentUserPlan?.price || 0)}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusBadge,
-                isExpired
-                  ? styles.expiredBadge
-                  : isExpiringSoon
-                    ? styles.expiringSoonBadge
-                    : styles.activeBadge,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.statusText,
-                  isExpired
-                    ? styles.expiredText
-                    : isExpiringSoon
-                      ? styles.expiringSoonText
-                      : styles.activeText,
-                ]}
-              >
-                {isExpired
+              <Text style={styles.planPrice} numberOfLines={1}>
+                {formatPrice(currentUserPlan?.price || 0)} • {isExpired
                   ? 'Expirado'
                   : isExpiringSoon
-                    ? 'Por vencer'
-                    : 'Activo'}
+                    ? `Por vencer (${daysRemaining}d)`
+                    : `${daysRemaining}d restantes`}
               </Text>
             </View>
+            <FontAwesome
+              name={collapsed ? 'chevron-down' : 'chevron-up'}
+              size={14}
+              color='#FFFFFF'
+            />
           </View>
-
-          <View style={styles.planDetails}>
-            <View style={styles.detailRow}>
-              <FontAwesome name='calendar' size={16} color='#CCCCCC' />
-              <Text style={styles.detailLabel}>Inicio:</Text>
-              <Text style={styles.detailValue}>
-                {formatDate(
-                  currentUserPlan?.startDate || new Date().toISOString()
-                )}
-              </Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <FontAwesome name='calendar-check-o' size={16} color='#CCCCCC' />
-              <Text style={styles.detailLabel}>Vencimiento:</Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  isExpired && styles.expiredText,
-                  isExpiringSoon && styles.expiringSoonText,
-                ]}
-              >
-                {formatDate(
-                  currentUserPlan?.endDate || new Date().toISOString()
-                )}
-              </Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <FontAwesome name='clock-o' size={16} color='#CCCCCC' />
-              <Text style={styles.detailLabel}>Días restantes:</Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  isExpired && styles.expiredText,
-                  isExpiringSoon && styles.expiringSoonText,
-                ]}
-              >
-                {isExpired
-                  ? '0 días (Expirado)'
-                  : daysRemaining === 1
-                    ? '1 día'
-                    : `${daysRemaining} días`}
-              </Text>
-            </View>
-          </View>
-
-          {(isExpired || isExpiringSoon) && (
-            <View style={styles.renewalContainer}>
-              <Text style={styles.renewalText}>
-                {isExpired
-                  ? 'Tu plan ha expirado. Renueva para seguir disfrutando de los beneficios.'
-                  : 'Tu plan vence pronto. ¡Renuévalo para no perder el acceso!'}
-              </Text>
-              <TouchableOpacity style={styles.renewButton}>
-                <Text style={styles.renewButtonText}>Renovar Plan</Text>
-              </TouchableOpacity>
+          {!collapsed && (
+            <View style={styles.detailSection}>
+              <View style={styles.detailRow}>
+                <FontAwesome name='calendar' size={12} color='#CCCCCC' />
+                <Text style={styles.detailLabel}>Inicio</Text>
+                <Text style={styles.detailValue}>
+                  {formatDate(currentUserPlan!.startDate)}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <FontAwesome name='calendar-check-o' size={12} color='#CCCCCC' />
+                <Text style={styles.detailLabel}>Fin</Text>
+                <Text
+                  style={[
+                    styles.detailValue,
+                    isExpired && styles.expiredText,
+                    isExpiringSoon && styles.expiringSoonText,
+                  ]}
+                >
+                  {formatDate(currentUserPlan!.endDate)}
+                </Text>
+              </View>
+              {(isExpired || isExpiringSoon) && (
+                <TouchableOpacity style={styles.renewButtonCompact}>
+                  <Text style={styles.renewButtonText}>Renovar</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
-        </View>
-      </View>
-    </ScrollView>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
@@ -328,41 +335,60 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
-  noPlanContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000000',
-    padding: 20,
+  noPlanBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#1a1a1a',
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#333',
   },
-  noPlanText: {
+  noPlanIcon: { marginRight: 12, marginTop: 2 },
+  noPlanBannerTitle: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 16,
-  },
-  noPlanSubtext: {
-    color: '#CCCCCC',
     fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  noPlanBannerText: {
+    color: '#CCCCCC',
+    fontSize: 12,
+    lineHeight: 16,
   },
   currentPlanContainer: {
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#FFFFFF',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   planCard: {
     backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 10,
+    padding: 14,
     borderWidth: 1,
     borderColor: '#333333',
+  },
+  collapsibleCard: {
+    marginHorizontal: 16,
+    marginTop: 10,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  detailSection: {
+    marginTop: 10,
+  },
+  compactWrapper: {
+    paddingBottom: 4,
   },
   expiredPlanCard: {
     borderColor: '#FF6B35',
@@ -382,13 +408,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   planName: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 2,
+  },
+  planLabel: {
+    color: Colors.light.tint,
   },
   planPrice: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.light.tint,
   },
@@ -420,48 +449,56 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   planDetails: {
-    marginBottom: 20,
+    marginBottom: 12,
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   detailLabel: {
     color: '#CCCCCC',
-    fontSize: 14,
-    marginLeft: 12,
-    marginRight: 8,
-    minWidth: 100,
+    fontSize: 12,
+    marginLeft: 8,
+    marginRight: 6,
+    minWidth: 80,
   },
   detailValue: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
     flex: 1,
   },
   renewalContainer: {
     backgroundColor: '#2a2a2a',
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 6,
+    padding: 10,
     borderWidth: 1,
     borderColor: '#FFB86C',
   },
   renewalText: {
     color: '#FFB86C',
-    fontSize: 14,
+    fontSize: 12,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   renewButton: {
     backgroundColor: '#FFB86C',
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 8,
+    borderRadius: 6,
     alignItems: 'center',
+  },
+  renewButtonCompact: {
+    backgroundColor: '#FFB86C',
+    paddingVertical: 6,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    marginTop: 4,
   },
   renewButtonText: {
     color: '#000000',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

@@ -17,6 +17,8 @@ export default function PlansModal() {
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeUserPlanTypeId, setActiveUserPlanTypeId] = useState<string | null>(null);
+  const [usingFallbackFreePlan, setUsingFallbackFreePlan] = useState(false);
 
   useEffect(() => {
     checkUserRole();
@@ -131,8 +133,19 @@ export default function PlansModal() {
         />
       ) : (
         <>
-          <PlanView showCurrentPlan={true} refreshKey={refreshCounter} />
-          <PlanTypeView onPlanSelected={handlePlanCreatedOrChanged} />
+          <PlanView
+            showCurrentPlan={true}
+            refreshKey={refreshCounter}
+            onActivePlanTypeResolved={(planTypeId, isFallback) => {
+              setActiveUserPlanTypeId(planTypeId);
+              setUsingFallbackFreePlan(isFallback);
+            }}
+          />
+          <PlanTypeView
+            onPlanSelected={handlePlanCreatedOrChanged}
+            activePlanTypeId={usingFallbackFreePlan ? activeUserPlanTypeId || '4aa8380c-8479-4334-8236-3909be9c842b' : activeUserPlanTypeId || undefined}
+            hideActive={true}
+          />
         </>
       )}
     </View>

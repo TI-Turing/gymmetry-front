@@ -12,7 +12,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { planTypeService } from '@/services/planTypeService';
 import type { PlanType } from '@/dto/planType/PlanType';
-import { userService } from '@/services/userService';
+import { planService } from '@/services/planService';
+import { normalizeCollection } from '@/utils';
 import { authService } from '@/services/authService';
 
 // Interface para la respuesta de la API (formato PascalCase)
@@ -32,9 +33,11 @@ interface ApiPlanType {
 
 interface PlanTypeViewProps {
   onPlanSelected?: (planType: PlanType) => void;
+  activePlanTypeId?: string | null; // para ocultar plan activo (ej. plan gratis)
+  hideActive?: boolean; // si true oculta el plan activo de la lista
 }
 
-export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
+export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideActive = true }: PlanTypeViewProps) {
   const [planTypes, setPlanTypes] = useState<PlanType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAssigningPlan, setIsAssigningPlan] = useState<string | null>(null);
@@ -82,10 +85,9 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
       const response = await planTypeService.getAllPlanTypes();
 
       if (response.Success && response.Data) {
+        const raw = normalizeCollection<ApiPlanType>(response.Data as any);
         // Mapear la respuesta de la API a la estructura esperada por el componente
-        const mappedPlanTypes: PlanType[] = (
-          response.Data as unknown as ApiPlanType[]
-        ).map(apiPlanType => ({
+        const mappedPlanTypes: PlanType[] = raw.map(apiPlanType => ({
           id: apiPlanType.Id,
           name: apiPlanType.Name,
           description: apiPlanType.Description,
@@ -108,7 +110,11 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
           return a.price - b.price;
         });
 
-        setPlanTypes(sortedPlans);
+        const FREE_PLAN_TYPE_ID = '4aa8380c-8479-4334-8236-3909be9c842b';
+        const filtered = hideActive
+          ? sortedPlans.filter(p => p.id !== activePlanTypeId && p.id !== FREE_PLAN_TYPE_ID)
+          : sortedPlans;
+        setPlanTypes(filtered);
       } else {
         setError(response.Message || 'Error al cargar tipos de planes');
       }
@@ -160,21 +166,18 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
   const assignPlanToUser = async (planType: PlanType, userId: string) => {
     try {
       setIsAssigningPlan(planType.id);
+      // Generar fechas para el plan (ej: 30 días). Podría ajustarse según metadata futura.
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      // TODO: Implementar flujo de pago con pasarela de pagos
-      // if (planType.price > 0) {
-      //   const paymentResult = await processPayment(planType);
-      //   if (!paymentResult.success) {
-      //     Alert.alert('Error', 'Error en el proceso de pago');
-      //     return;
-      //   }
-      // }
-
-      // Por ahora, asignar el plan directamente al usuario
-      const response = await userService.updateUserGym({
+      const addReq = {
+        StartDate: startDate.toISOString(),
+        EndDate: endDate.toISOString(),
+        PlanTypeId: planType.id,
         UserId: userId,
-        GymId: planType.id, // Usando el ID del plan como GymId temporalmente
-      });
+      };
+
+      const response = await planService.addPlan(addReq);
 
       if (response.Success) {
         Alert.alert('Éxito', `Plan "${planType.name}" asignado correctamente`, [
@@ -233,7 +236,7 @@ export default function PlanTypeView({ onPlanSelected }: PlanTypeViewProps) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.plansContainer}>
-        {planTypes.map(planType => (
+  {planTypes.map(planType => (
           <View key={planType.id} style={styles.planCard}>
             <View style={styles.planHeader}>
               <Text style={styles.planName}>{planType.name}</Text>
