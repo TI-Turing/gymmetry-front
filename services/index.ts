@@ -92,6 +92,7 @@ export { currentOccupancyService } from './currentOccupancyService';
 
 // Servicios de facturación y pagos
 export { billService } from './billService';
+export { paymentService } from './paymentService';
 
 // Servicios de OTP y validación
 export { otpService } from './otpService';

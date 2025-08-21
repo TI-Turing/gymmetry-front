@@ -5,6 +5,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { gymPlanService } from '@/services/gymPlanService';
 import { gymPlanSelectedService } from '@/services/gymPlanSelectedService';
+import { paymentService } from '@/services/paymentService';
+import * as WebBrowser from 'expo-web-browser';
 import { normalizeCollection } from '@/utils';
 import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
 import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
@@ -110,41 +112,39 @@ export default function GymPlanView({
             text: 'Confirmar',
             onPress: async () => {
               try {
-                // TODO: Integrar con pasarela de pagos
-                // Generar fechas del plan (1 mes)
-                const { startDate, endDate } =
-                  gymPlanService.generatePlanDates();
-
-                const createPlanRequest = {
-                  GymId: gymId,
-                  StartDate: startDate,
-                  EndDate: endDate,
-                  GymPlanSelectedTypeId: planType.id,
-                };
-
-                const response =
-                  await gymPlanService.createGymPlan(createPlanRequest);
-
-                if (response.Success) {
-                  Alert.alert(
-                    'Plan Creado',
-                    `El plan "${planType.name}" ha sido asignado exitosamente al gimnasio.`,
-                    [
-                      {
-                        text: 'OK',
-                        onPress: () => {
-                          // Recargar los datos para mostrar el nuevo plan
-                          loadGymPlans();
-                          onPlanSelected?.(planType.id);
-                        },
-                      },
-                    ]
-                  );
+                if ((planType.price || 0) === 0 && (planType.usdPrice || 0) === 0) {
+                  // Flujo plan gratuito gimnasio
+                  const { startDate, endDate } = gymPlanService.generatePlanDates();
+                  const createPlanRequest = {
+                    GymId: gymId,
+                    StartDate: startDate,
+                    EndDate: endDate,
+                    GymPlanSelectedTypeId: planType.id,
+                  };
+                  const response = await gymPlanService.createGymPlan(createPlanRequest);
+                  if (response.Success) {
+                    Alert.alert('Plan Creado', `El plan "${planType.name}" ha sido asignado exitosamente al gimnasio.`, [{
+                      text: 'OK',
+                      onPress: () => { loadGymPlans(); onPlanSelected?.(planType.id); }
+                    }]);
+                  } else {
+                    Alert.alert('Error', response.Message || 'No se pudo crear el plan');
+                  }
                 } else {
-                  Alert.alert(
-                    'Error',
-                    response.Message || 'No se pudo crear el plan'
-                  );
+                  // Plan de pago: Mercado Pago
+                  const successUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/success`;
+                  const failureUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/gym/failure`;
+                  const prefResp = await paymentService.createGymPlanPreference({
+                    GymPlanSelectedTypeId: planType.id,
+                    GymId: gymId,
+                    SuccessUrl: successUrl,
+                    FailureUrl: failureUrl,
+                  });
+                  if (prefResp.Success && prefResp.Data?.InitPoint) {
+                    await WebBrowser.openBrowserAsync(prefResp.Data.InitPoint);
+                  } else {
+                    Alert.alert('Error', prefResp.Message || 'No se pudo iniciar el pago');
+                  }
                 }
               } catch {
                 Alert.alert(

@@ -13,6 +13,8 @@ import Colors from '@/constants/Colors';
 import { planTypeService } from '@/services/planTypeService';
 import type { PlanType } from '@/dto/planType/PlanType';
 import { planService } from '@/services/planService';
+import { paymentService } from '@/services/paymentService';
+import * as WebBrowser from 'expo-web-browser';
 import { normalizeCollection } from '@/utils';
 import { authService } from '@/services/authService';
 
@@ -166,33 +168,44 @@ export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideAct
   const assignPlanToUser = async (planType: PlanType, userId: string) => {
     try {
       setIsAssigningPlan(planType.id);
-      // Generar fechas para el plan (ej: 30 días). Podría ajustarse según metadata futura.
-      const startDate = new Date();
-      const endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-      const addReq = {
-        StartDate: startDate.toISOString(),
-        EndDate: endDate.toISOString(),
-        PlanTypeId: planType.id,
-        UserId: userId,
-      };
-
-      const response = await planService.addPlan(addReq);
-
-      if (response.Success) {
-        Alert.alert('Éxito', `Plan "${planType.name}" asignado correctamente`, [
-          {
+      // Si el plan es gratis se mantiene lógica de asignación directa existente
+      if (planType.price === 0) {
+        const startDate = new Date();
+        const endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const addReq = {
+          StartDate: startDate.toISOString(),
+          EndDate: endDate.toISOString(),
+          PlanTypeId: planType.id,
+          UserId: userId,
+        };
+        const response = await planService.addPlan(addReq);
+        if (response.Success) {
+          Alert.alert('Éxito', `Plan "${planType.name}" asignado correctamente`, [{
             text: 'OK',
             onPress: () => {
-              // Notificar al componente padre si existe callback
               onPlanSelected?.(planType);
-              // Recargar los datos
               loadPlanTypes();
-            },
-          },
-        ]);
+            }
+          }]);
+        } else {
+          Alert.alert('Error', response.Message || 'No se pudo asignar el plan');
+        }
+        return;
+      }
+
+      // Plan de pago: crear preferencia y redirigir a Mercado Pago
+      const successUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/success`; // Ajustar deep link real
+      const failureUrl = `${process.env.EXPO_PUBLIC_APP_WEB_BASE_URL || 'https://example.com'}/payments/failure`;
+      const prefResp = await paymentService.createUserPlanPreference({
+        PlanTypeId: planType.id,
+        UserId: userId,
+        SuccessUrl: successUrl,
+        FailureUrl: failureUrl,
+      });
+      if (prefResp.Success && prefResp.Data?.InitPoint) {
+        await WebBrowser.openBrowserAsync(prefResp.Data.InitPoint);
       } else {
-        Alert.alert('Error', response.Message || 'Error al asignar el plan');
+        Alert.alert('Error', prefResp.Message || 'No se pudo iniciar el pago');
       }
     } catch {
       Alert.alert('Error', 'Error al asignar el plan');
