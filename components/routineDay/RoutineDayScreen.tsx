@@ -20,6 +20,8 @@ import { dailyService } from '@/services';
 import { dailyExerciseService } from '@/services';
 import type { AddDailyExerciseRequest } from '@/dto/DailyExercise/Request/AddDailyExerciseRequest';
 import type { AddDailyRequest } from '@/dto/Daily/Request/AddDailyRequest';
+import { useCustomAlert } from '@/components/common/CustomAlert';
+import { getItem as rsGetItem, setItem as rsSetItem, removeItem as rsRemoveItem, getJSON as rsGetJSON, keyDailyStart, keyExerciseProgress, keyExerciseReps } from '@/utils/routineStorage';
 
 type ExerciseProgress = {
   completedSets: number;
@@ -63,6 +65,7 @@ export default function RoutineDayScreen() {
   const [startDateISO, setStartDateISO] = useState<string | null>(null);
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const dailySubmittedRef = useRef(false);
+  const { showAlert, AlertComponent } = useCustomAlert();
 
   // Si llega ?day=, ajustar el seleccionado al montar
   useEffect(() => {
@@ -212,20 +215,12 @@ export default function RoutineDayScreen() {
     celebrateAnim.setValue(0);
     try {
       for (const ex of exercises) {
-        const key = `exercise_${ex.Id}_progress`;
-        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-          window.localStorage.removeItem(key);
-        } else {
-          await AsyncStorage.removeItem(key);
-        }
+        const key = keyExerciseProgress(ex.Id);
+        await rsRemoveItem(key);
       }
       if (activeTemplateId) {
-        const startKey = `@daily_start_${activeTemplateId}_${selectedDayNumber}`;
-        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-          window.localStorage.removeItem(startKey);
-        } else {
-          await AsyncStorage.removeItem(startKey);
-        }
+        const startKey = keyDailyStart(activeTemplateId, selectedDayNumber);
+        await rsRemoveItem(startKey);
       }
     } catch {}
     setStartDateISO(null);
@@ -288,20 +283,9 @@ export default function RoutineDayScreen() {
                 // Leer reps realizadas por set si existen
                 let performed: number[] = [];
                 try {
-                  const repsKey = `exercise_${routineDayId}_reps`;
-                  if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-                    const raw = window.localStorage.getItem(repsKey);
-                    if (raw) {
-                      const parsed = JSON.parse(raw);
-                      if (Array.isArray(parsed?.sets)) performed = parsed.sets as number[];
-                    }
-                  } else {
-                    const raw = await AsyncStorage.getItem(repsKey);
-                    if (raw) {
-                      const parsed = JSON.parse(raw);
-                      if (Array.isArray(parsed?.sets)) performed = parsed.sets as number[];
-                    }
-                  }
+                  const repsKey = keyExerciseReps(routineDayId);
+                  const parsed = await rsGetJSON<{ sets?: number[] }>(repsKey);
+                  if (parsed && Array.isArray(parsed.sets)) performed = parsed.sets as number[];
                 } catch {}
 
                 const planned = String(ex?.Repetitions ?? '').trim();
@@ -327,12 +311,8 @@ export default function RoutineDayScreen() {
                   // Limpieza best-effort de los reps locales para evitar duplicados futuros
                   try {
                     for (const ex of exercises) {
-                      const repsKey = `exercise_${ex.Id}_reps`;
-                      if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-                        window.localStorage.removeItem(repsKey);
-                      } else {
-                        await AsyncStorage.removeItem(repsKey);
-                      }
+                      const repsKey = keyExerciseReps(ex.Id);
+                      await rsRemoveItem(repsKey);
                     }
                   } catch {}
                 } catch {
@@ -347,12 +327,8 @@ export default function RoutineDayScreen() {
           // Limpiar StartDate cacheado para evitar duplicados
           try {
             if (activeTemplateId) {
-              const startKey = `@daily_start_${activeTemplateId}_${selectedDayNumber}`;
-              if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-                window.localStorage.removeItem(startKey);
-              } else {
-                await AsyncStorage.removeItem(startKey);
-              }
+              const startKey = keyDailyStart(activeTemplateId, selectedDayNumber);
+              await rsRemoveItem(startKey);
             }
           } catch {}
           setStartDateISO(null);
@@ -390,13 +366,8 @@ export default function RoutineDayScreen() {
         setActiveTemplateId(templateId);
         dailySubmittedRef.current = false;
         try {
-          const startKey = `@daily_start_${templateId}_${dayNum}`;
-          let cachedStart: string | null = null;
-          if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-            cachedStart = window.localStorage.getItem(startKey);
-          } else {
-            cachedStart = await AsyncStorage.getItem(startKey);
-          }
+          const startKey = keyDailyStart(templateId, dayNum);
+          const cachedStart = await rsGetItem(startKey);
           setStartDateISO(cachedStart);
         } catch {
           setStartDateISO(null);
@@ -441,17 +412,8 @@ export default function RoutineDayScreen() {
 
         const loadedProgress: Record<string, ExerciseProgress> = {};
         for (const d of data) {
-          const key = `exercise_${d.Id}_progress`;
-          let persisted: any = null;
-          try {
-            if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-              const raw = window.localStorage.getItem(key);
-              if (raw) persisted = JSON.parse(raw);
-            } else {
-              const raw = await AsyncStorage.getItem(key);
-              if (raw) persisted = JSON.parse(raw);
-            }
-          } catch {}
+          const key = keyExerciseProgress(d.Id);
+          const persisted: any = await rsGetJSON<any>(key);
           const completedSets = Math.min(
             typeof persisted?.completedSets === 'number' ? persisted.completedSets : 0,
             d.Sets || 0
@@ -473,6 +435,47 @@ export default function RoutineDayScreen() {
     fetchForDay(selectedDayNumber);
   }, [selectedDayNumber]);
 
+  // Solo un día activo a la vez: bloquear cambio si hay StartDate de otro día
+  const handleSelectDay = async (dayVal: number) => {
+    try {
+      // Resolver template ID activo
+      let templateId = activeTemplateId || authService.getActiveRoutineTemplateId() || null;
+      if (!templateId) {
+        try {
+          const stored = await AsyncStorage.getItem('@active_routine_template_id');
+          if (stored) templateId = stored;
+        } catch {}
+      }
+      if (!templateId) {
+        setSelectedDayNumber(dayVal);
+        return;
+      }
+
+      // Buscar si existe @daily_start para otro día distinto al solicitado
+      let activeOtherDay: number | null = null;
+      for (let d = 1; d <= 7; d++) {
+        const key = keyDailyStart(templateId, d);
+        const has = Boolean(await rsGetItem(key));
+        if (has) { activeOtherDay = d; break; }
+      }
+
+      if (activeOtherDay && activeOtherDay !== dayVal) {
+        const fromLbl = getWeekdayNameEs(activeOtherDay);
+        const toLbl = getWeekdayNameEs(dayVal);
+        showAlert(
+          'warning',
+          'Día en progreso',
+          `Ya iniciaste los ejercicios del día ${fromLbl}. Debes cancelar ese avance para poder continuar con el día ${toLbl}.`,
+        );
+        return;
+      }
+
+      setSelectedDayNumber(dayVal);
+    } catch {
+      setSelectedDayNumber(dayVal);
+    }
+  };
+
   const onMarkSet = (exerciseId: string) => {
     // Capturar StartDate si aún no existe
     if (!startDateISO && activeTemplateId) {
@@ -480,12 +483,8 @@ export default function RoutineDayScreen() {
       setStartDateISO(nowIso);
       (async () => {
         try {
-          const startKey = `@daily_start_${activeTemplateId}_${selectedDayNumber}`;
-          if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-            window.localStorage.setItem(startKey, nowIso);
-          } else {
-            await AsyncStorage.setItem(startKey, nowIso);
-          }
+          const startKey = keyDailyStart(activeTemplateId!, selectedDayNumber);
+          await rsSetItem(startKey, nowIso);
         } catch {}
       })();
     }
@@ -541,15 +540,10 @@ export default function RoutineDayScreen() {
     (async () => {
       for (const ex of exercises) {
         const prog = progressById[ex.Id];
-        const key = `exercise_${ex.Id}_progress`;
+        const key = keyExerciseProgress(ex.Id);
         try {
           if (!prog || prog.completedSets === 0) {
-            // Si no hay avance, limpiar (opcional)
-            if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-              window.localStorage.removeItem(key);
-            } else {
-              await AsyncStorage.removeItem(key);
-            }
+            await rsRemoveItem(key);
             continue;
           }
           const payload = JSON.stringify({
@@ -557,11 +551,7 @@ export default function RoutineDayScreen() {
             completedSets: prog.completedSets,
             lastCompleted: new Date().toISOString(),
           });
-          if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-            window.localStorage.setItem(key, payload);
-          } else {
-            await AsyncStorage.setItem(key, payload);
-          }
+          await rsSetItem(key, payload);
         } catch {
           // silencioso
         }
@@ -632,13 +622,13 @@ export default function RoutineDayScreen() {
           )}
           {/* Selector de día */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }} contentContainerStyle={{ gap: 8 }}>
-            {['L','M','X','J','V','S','D'].map((lbl, idx) => {
+    {['L','M','X','J','V','S','D'].map((lbl, idx) => {
               const dayVal = idx + 1; // 1-7
               const active = dayVal === selectedDayNumber;
               return (
                 <TouchableOpacity
                   key={dayVal}
-                  onPress={() => setSelectedDayNumber(dayVal)}
+      onPress={() => handleSelectDay(dayVal)}
                   style={[styles.dayChip, active && styles.dayChipActive]}
                   disabled={loading || dayVal === selectedDayNumber}
                 >
@@ -681,13 +671,6 @@ export default function RoutineDayScreen() {
                 <Text style={styles.finalPhrase}>“{finalPhrase}”</Text>
               )}
               <View style={styles.actionsRow}>
-                {overallProgress === 100 && !routineFinishedMode && (
-                  <Button
-                    title="Finalizar rutina"
-                    onPress={finalizeFull}
-                    style={styles.actionButton}
-                  />
-                )}
                 <Button
                   title="Ver resumen"
                   onPress={handleShowSummary}
@@ -873,6 +856,8 @@ export default function RoutineDayScreen() {
           </View>
         </View>
       )}
+      {/* Alertas */}
+      <AlertComponent />
     </ScreenWrapper>
   );
 }

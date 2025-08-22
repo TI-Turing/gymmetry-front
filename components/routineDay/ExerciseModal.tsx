@@ -10,6 +10,7 @@ import motivationalPhrases from '@/utils/motivationalPhrases.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useRef } from 'react';
+import { getItem as rsGetItem, setItem as rsSetItem, getJSON as rsGetJSON, setJSON as rsSetJSON, keyExerciseReps, keyExerciseProgress } from '@/utils/routineStorage';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -54,9 +55,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   useEffect(() => {
     (async () => {
       try {
-        const raw = Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window
-          ? window.localStorage.getItem('@sound_cues_enabled')
-          : await AsyncStorage.getItem('@sound_cues_enabled');
+        const raw = await rsGetItem('@sound_cues_enabled');
         if (raw != null) setSoundCues(raw === '1' || raw === 'true');
       } catch {}
     })();
@@ -66,9 +65,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   useEffect(() => {
     (async () => {
       try {
-        const raw = Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window
-          ? window.localStorage.getItem('@prep_seconds')
-          : await AsyncStorage.getItem('@prep_seconds');
+        const raw = await rsGetItem('@prep_seconds');
         const val = raw == null ? 10 : Math.max(0, parseInt(raw, 10) || 0);
         setPrepSeconds(val);
       } catch {}
@@ -76,13 +73,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   }, []);
 
   const saveSoundPref = async (val: boolean) => {
-    try {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-        window.localStorage.setItem('@sound_cues_enabled', val ? '1' : '0');
-      } else {
-        await AsyncStorage.setItem('@sound_cues_enabled', val ? '1' : '0');
-      }
-    } catch {}
+    try { await rsSetItem('@sound_cues_enabled', val ? '1' : '0'); } catch {}
   };
 
   // Parsear especificación de tiempo
@@ -352,45 +343,27 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
     // Guardar reps realizadas por set (opcional)
     if (saveReps) {
-      const repsKey = `exercise_${exercise.Id}_reps`;
+      const repsKey = keyExerciseReps(exercise.Id);
       try {
-        let stored: { sets: number[] } | null = null;
-        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-          const raw = window.localStorage.getItem(repsKey);
-          stored = raw ? JSON.parse(raw) : null;
-        } else {
-          const raw = await AsyncStorage.getItem(repsKey);
-          stored = raw ? JSON.parse(raw) : null;
-        }
+        const stored = await rsGetJSON<{ sets?: number[] }>(repsKey);
         const arr = Array.isArray(stored?.sets) ? [...stored!.sets] : [];
         const idx = nextCompleted - 1; // índice del set recién completado
         const val = Math.max(0, Number.parseInt(repsValue || '0', 10) || 0);
         arr[idx] = val;
-        const payload = JSON.stringify({ sets: arr });
-        if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-          window.localStorage.setItem(repsKey, payload);
-        } else {
-          await AsyncStorage.setItem(repsKey, payload);
-        }
+        await rsSetJSON(repsKey, { sets: arr });
       } catch {}
     }
 
     // Actualizar progreso de sets
   // Defer para evitar el warning de React sobre actualizar otro componente durante el render
   setTimeout(() => onMarkSet(exercise.Id), 0);
-    const progKey = `exercise_${exercise.Id}_progress`;
-    const progPayload = JSON.stringify({
+    const progKey = keyExerciseProgress(exercise.Id);
+    const progPayload = {
       exerciseId: exercise.Id,
       completedSets: nextCompleted,
       lastCompleted: new Date().toISOString(),
-    });
-    try {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
-        window.localStorage.setItem(progKey, progPayload);
-      } else {
-        await AsyncStorage.setItem(progKey, progPayload);
-      }
-    } catch {}
+    };
+    try { await rsSetJSON(progKey, progPayload); } catch {}
 
     // Cerrar si fue el último set
     if (nextCompleted >= exercise.Sets) {
