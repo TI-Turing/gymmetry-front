@@ -262,7 +262,15 @@ export default function GymPlanView({
   <>
   <CardPaymentModal
     visible={showCardModal}
-  onClose={() => { setTimeout(() => setShowCardModal(false), 0); cardTokenProcessedRef.current = false; }}
+    onClose={() => { setTimeout(() => setShowCardModal(false), 0); cardTokenProcessedRef.current = false; }}
+    onFallbackToExternal={async () => {
+      const planId = expandedPlanId;
+      const plan = gymPlanTypes.find(p => p.id === planId);
+      if (!plan) return;
+      const tokenValid = await authService.checkAndRefreshToken();
+      if (!tokenValid) { showError('Sesión expirada. Por favor, inicia sesión nuevamente.'); return; }
+      await assignGymPlan(plan);
+    }}
     publicKey={Environment.MP_PUBLIC_KEY || null}
     buyerEmail={buyerEmail}
     amount={(() => { const p = gymPlanTypes.find(x=>x.id===expandedPlanId); return (p?.price || 0) + (p?.usdPrice || 0) ? (p?.price || 0) : p?.usdPrice || null; })()}

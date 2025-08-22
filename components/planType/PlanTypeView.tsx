@@ -44,9 +44,9 @@ export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideAct
   const [error, setError] = useState<string | null>(null);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [lastAttemptedPlanTypeId, setLastAttemptedPlanTypeId] = useState<string | null>(null);
-  const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
-  const [retryMotivo, setRetryMotivo] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'PSE'>('CARD');
+  const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null); // selected plan id for modal
+  const [retryMotivo, setRetryMotivo] = useState<string | null>(null); // deprecated UI, kept for banner logic
+  const [paymentMethod] = useState<'CARD' | 'PSE'>('CARD'); // default; UI removed
   const [buyerEmail, setBuyerEmail] = useState<string>('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<number>(0);
@@ -200,10 +200,11 @@ export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideAct
   }, [expiresAt, paymentStatus]);
 
   const handleSelectPlanWithMotivo = async (planType: PlanType, motivo: string) => {
-    // Abrir panel de opciones de pago bajo el plan y mostrar motivo
+    // Abrir directamente el modal de pago y registrar motivo (solo informativo)
     setRetryMotivo(motivo || null);
     setExpandedPlanId(planType.id);
     setLastAttemptedPlanTypeId(planType.id);
+    setTimeout(() => setShowCardModal(true), 0);
   };
 
   const handleSelectPlan = async (planType: PlanType) => {
@@ -215,25 +216,14 @@ export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideAct
       if (!userId) { showError('Debes estar autenticado para seleccionar un plan'); return; }
       await assignPlanToUser(planType, userId);
       return;
-    }
-    // Plan de pago: abrir opciones de pago debajo del plan
-    setExpandedPlanId(curr => (curr === planType.id ? null : planType.id));
-    setRetryMotivo(null);
-    setLastAttemptedPlanTypeId(planType.id);
+  }
+  // Plan de pago: abrir modal de pago directamente
+  setExpandedPlanId(planType.id);
+  setRetryMotivo(null);
+  setLastAttemptedPlanTypeId(planType.id);
+  setTimeout(() => setShowCardModal(true), 0);
   };
 
-  const continuePayment = async (planType: PlanType) => {
-    const tokenValid = await authService.checkAndRefreshToken();
-    if (!tokenValid) { showError('Sesión expirada. Por favor, inicia sesión nuevamente.'); return; }
-    const userId = authService.getUserId();
-    if (!userId) { showError('Debes estar autenticado para seleccionar un plan'); return; }
-    if (paymentMethod === 'CARD' && Environment.PAY_CARD_INAPP) {
-      // Abrir modal in-app para tokenizar tarjeta (diferido para evitar warnings de insertion)
-      setTimeout(() => setShowCardModal(true), 0);
-    } else {
-      await assignPlanToUser(planType, userId);
-    }
-  };
 
   const assignPlanToUser = async (planType: PlanType, userId: string) => {
     try {
@@ -327,7 +317,17 @@ export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideAct
     <>
     <CardPaymentModal
       visible={showCardModal}
-  onClose={() => { setTimeout(() => setShowCardModal(false), 0); cardTokenProcessedRef.current = false; }}
+      onClose={() => { setTimeout(() => setShowCardModal(false), 0); cardTokenProcessedRef.current = false; }}
+      onFallbackToExternal={async () => {
+        const planId = expandedPlanId || lastAttemptedPlanTypeId;
+        const plan = planTypes.find(p => p.id === planId);
+        if (!plan) return;
+        const tokenValid = await authService.checkAndRefreshToken();
+        if (!tokenValid) { showError('Sesión expirada. Por favor, inicia sesión nuevamente.'); return; }
+        const userId = authService.getUserId();
+        if (!userId) { showError('Debes estar autenticado para continuar.'); return; }
+        await assignPlanToUser(plan, userId);
+      }}
       publicKey={Environment.MP_PUBLIC_KEY || null}
       buyerEmail={buyerEmail}
       amount={planTypes.find(p=>p.id===expandedPlanId)?.price || null}
@@ -424,46 +424,11 @@ export default function PlanTypeView({ onPlanSelected, activePlanTypeId, hideAct
               ) : (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <FontAwesome name={planType.price === 0 ? 'check' : 'credit-card'} size={14} color={'#fff'} />
-                  <Text style={styles.selectButtonText}>{planType.price === 0 ? 'Seleccionar Plan' : 'Ver opciones de pago'}</Text>
+                  <Text style={styles.selectButtonText}>{planType.price === 0 ? 'Seleccionar Plan' : 'Seleccionar'}</Text>
                 </View>
               )}
             </TouchableOpacity>
 
-            {/* Opciones de pago por plan (solo para planes de pago) */}
-            {expandedPlanId === planType.id && planType.price > 0 && (
-              <View style={[styles.paymentConfig, { marginTop: 12 }]}>
-                {!!retryMotivo && (
-                  <Text style={{ color: '#ccc', marginBottom: 8 }}>{retryMotivo}</Text>
-                )}
-                <Text style={styles.configTitle}>Método de pago</Text>
-                <View style={styles.methodRow}>
-                  <TouchableOpacity onPress={() => setPaymentMethod('CARD')} style={[styles.methodPill, paymentMethod==='CARD' && styles.methodPillActive]}>
-                    <FontAwesome name='credit-card' color={paymentMethod==='CARD'?'#000':'#fff'} size={14} />
-                    <Text style={[styles.methodPillText, paymentMethod==='CARD' && styles.methodPillTextActive]}>Tarjeta (Mercado Pago)</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setPaymentMethod('PSE')} style={[styles.methodPill, paymentMethod==='PSE' && styles.methodPillActive]}>
-                    <FontAwesome name='university' color={paymentMethod==='PSE'?'#000':'#fff'} size={14} />
-                    <Text style={[styles.methodPillText, paymentMethod==='PSE' && styles.methodPillTextActive]}>PSE</Text>
-                  </TouchableOpacity>
-                </View>
-                {/* PSE ya no requiere selección de banco manual: lo gestiona la pasarela */}
-                <View style={{ marginTop: 10 }}>
-                  <Text style={styles.configLabel}>Correo del comprador</Text>
-                  <TextInput
-                    value={buyerEmail}
-                    onChangeText={setBuyerEmail}
-                    placeholder='correo@dominio.com'
-                    placeholderTextColor={'#888'}
-                    style={styles.emailInput}
-                    keyboardType='email-address'
-                    autoCapitalize='none'
-                  />
-                </View>
-                <TouchableOpacity style={[styles.selectButton, { marginTop: 12 }]} onPress={() => continuePayment(planType)}>
-                  <Text style={styles.selectButtonText}>Continuar al pago</Text>
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
         ))}
       </View>
