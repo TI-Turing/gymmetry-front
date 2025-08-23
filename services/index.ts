@@ -108,6 +108,8 @@ export { signalRService } from './signalRService';
 // Servicios de utilidad y observadores
 export { gymDataWatcher } from './gymDataWatcher';
 export { asyncStorageObserver } from './asyncStorageObserver';
+// Analytics
+export { analyticsService } from './analyticsService';
 
 // Tipos exportados
 export type { CachedGymData } from '@/dto/gym/CachedGymData';

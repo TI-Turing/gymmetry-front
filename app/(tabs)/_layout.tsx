@@ -73,6 +73,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name='physical-assessment'
+        options={{
+          title: 'Estado físico',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name='heartbeat' color={color} />
+          ),
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tabs.Screen
         name='feed'
         options={{
           title: 'Feed',

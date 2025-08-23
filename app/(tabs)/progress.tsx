@@ -1,21 +1,18 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  SafeAreaView,
-  Platform,
-} from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import MobileHeader from '@/components/layout/MobileHeader';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
+import { analyticsService, authService } from '@/services';
+import type { AnalyticsSummaryResponse } from '@/dto';
 
 const { width } = Dimensions.get('window');
 
 function ProgressScreen() {
-  const [selectedPeriod, setSelectedPeriod] = useState('semana');
+  const [selectedPeriod, setSelectedPeriod] = useState<'semana' | 'mes' | 'year'>('semana');
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState<AnalyticsSummaryResponse | null>(null);
 
   const periods = [
     { key: 'semana', label: 'Esta Semana' },
@@ -23,52 +20,86 @@ function ProgressScreen() {
     { key: 'year', label: 'Este Año' },
   ];
 
-  const progressData = {
-    semana: {
-      workouts: 4,
-      targetWorkouts: 5,
-      calories: 1200,
-      targetCalories: 1500,
-      weight: 75.2,
-      weightChange: -0.5,
-    },
-    mes: {
-      workouts: 18,
-      targetWorkouts: 20,
-      calories: 5400,
-      targetCalories: 6000,
-      weight: 75.2,
-      weightChange: -2.1,
-    },
-    year: {
-      workouts: 156,
-      targetWorkouts: 200,
-      calories: 48600,
-      targetCalories: 60000,
-      weight: 75.2,
-      weightChange: -8.3,
-    },
-  };
+  const dateRange = useMemo(() => {
+    const today = new Date();
+    const end = today.toISOString().slice(0, 10);
+    const getMonday = (d: Date) => {
+      const date = new Date(d);
+      const day = date.getDay();
+      const diff = (day === 0 ? -6 : 1) - day; // lunes como inicio
+      date.setDate(date.getDate() + diff);
+      return date;
+    };
+    if (selectedPeriod === 'semana') {
+      const start = getMonday(today).toISOString().slice(0, 10);
+      return { start, end };
+    }
+    if (selectedPeriod === 'mes') {
+      const first = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+      return { start: first, end };
+    }
+    const firstY = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
+    return { start: firstY, end };
+  }, [selectedPeriod]);
 
-  const currentData = progressData[selectedPeriod as keyof typeof progressData];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const user = await authService.getUserData();
+        // 1) Llamar al backend primero
+        const resp = await analyticsService.getSummary({
+          UserId: user?.id ?? '',
+          StartDate: dateRange.start,
+          EndDate: dateRange.end,
+        });
+        if (resp?.Success && resp.Data) {
+          if (!cancelled) setSummary(resp.Data);
+        } else {
+          // 2) Fallback: agregación local con Daily
+          const local = await analyticsService.getSummaryFromDaily({
+            UserId: user?.id ?? '',
+            StartDate: dateRange.start,
+            EndDate: dateRange.end,
+          });
+          if (local?.Success && local.Data) {
+            if (!cancelled) setSummary(local.Data);
+          } else {
+            // 3) Mock como último recurso
+            const mock = await analyticsService.getSummaryMock({
+              UserId: user?.id ?? '',
+              StartDate: dateRange.start,
+              EndDate: dateRange.end,
+            });
+            if (!cancelled) setSummary(mock.Data!);
+          }
+        }
+      } catch {
+        const mock = await analyticsService.getSummaryMock({
+          UserId: '',
+          StartDate: dateRange.start,
+          EndDate: dateRange.end,
+        });
+        if (!cancelled) setSummary(mock.Data!);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [dateRange.start, dateRange.end]);
 
   const renderPeriodSelector = () => (
     <View style={styles.periodContainer}>
       {periods.map(period => (
         <TouchableOpacity
           key={period.key}
-          style={[
-            styles.periodButton,
-            selectedPeriod === period.key && styles.periodButtonActive,
-          ]}
-          onPress={() => setSelectedPeriod(period.key)}
+          style={[styles.periodButton, selectedPeriod === period.key && styles.periodButtonActive]}
+          onPress={() => setSelectedPeriod(period.key as 'semana' | 'mes' | 'year')}
         >
-          <Text
-            style={[
-              styles.periodText,
-              selectedPeriod === period.key && styles.periodTextActive,
-            ]}
-          >
+          <Text style={[styles.periodText, selectedPeriod === period.key && styles.periodTextActive]}>
             {period.label}
           </Text>
         </TouchableOpacity>
@@ -85,19 +116,18 @@ function ProgressScreen() {
   ) => (
     <View style={styles.statCard}>
       <View style={styles.statHeader}>
-        {icon && (
-          <FontAwesome
-            name={icon as any}
-            size={20}
-            color='#FFFFFF'
-            style={styles.statIcon}
-          />
+        {icon != null && icon !== '' && (
+          <FontAwesome name={icon as any} size={20} color='#FFFFFF' style={styles.statIcon} />
         )}
         <Text style={styles.statTitle}>{title}</Text>
       </View>
       <Text style={styles.statValue}>{value}</Text>
-      {target && <Text style={styles.statTarget}>Meta: {target}</Text>}
-      {subtitle && <Text style={styles.statSubtitle}>{subtitle}</Text>}
+      {(target !== undefined && target !== null) && (
+        <Text style={styles.statTarget}>Meta: {target}</Text>
+      )}
+      {(subtitle != null && subtitle !== '') && (
+        <Text style={styles.statSubtitle}>{subtitle}</Text>
+      )}
     </View>
   );
 
@@ -110,13 +140,13 @@ function ProgressScreen() {
             style={[
               styles.chartProgress,
               {
-                width: `${(currentData.workouts / currentData.targetWorkouts) * 100}%`,
+                width: `${summary ? Math.min(100, (summary.DaysAdvanced / Math.max(1, (summary.DaysExpected ?? 1))) * 100) : 0}%`,
               },
             ]}
           />
         </View>
         <Text style={styles.chartLabel}>
-          {currentData.workouts} / {currentData.targetWorkouts} entrenamientos
+          {(summary?.DaysAdvanced ?? 0)} / {(summary?.DaysExpected ?? 0)} días avanzados
         </Text>
       </View>
 
@@ -126,14 +156,12 @@ function ProgressScreen() {
           <View
             style={[
               styles.chartProgress,
-              {
-                width: `${(currentData.calories / currentData.targetCalories) * 100}%`,
-              },
+              { width: `${summary ? Math.min(100, (summary.TotalCalories / Math.max(1, 6000)) * 100) : 0}%` },
             ]}
           />
         </View>
         <Text style={styles.chartLabel}>
-          {currentData.calories} / {currentData.targetCalories} calorías
+          {(summary?.TotalCalories ?? 0)} / 6000 calorías
         </Text>
       </View>
     </View>
@@ -145,20 +173,17 @@ function ProgressScreen() {
         <FontAwesome name='balance-scale' size={24} color='#FFFFFF' />
         <Text style={styles.weightTitle}>Peso Actual</Text>
       </View>
-      <Text style={styles.weightValue}>{currentData.weight} kg</Text>
+      <Text style={styles.weightValue}>{summary?.CurrentWeightKg ?? 0} kg</Text>
       <View style={styles.weightChange}>
         <FontAwesome
-          name={currentData.weightChange < 0 ? 'arrow-down' : 'arrow-up'}
+          name={(summary?.WeightChangeKg ?? 0) < 0 ? 'arrow-down' : 'arrow-up'}
           size={16}
-          color={currentData.weightChange < 0 ? '#4CAF50' : '#F44336'}
+          color={(summary?.WeightChangeKg ?? 0) < 0 ? '#4CAF50' : '#F44336'}
         />
         <Text
-          style={[
-            styles.weightChangeText,
-            { color: currentData.weightChange < 0 ? '#4CAF50' : '#F44336' },
-          ]}
+          style={[styles.weightChangeText, { color: (summary?.WeightChangeKg ?? 0) < 0 ? '#4CAF50' : '#F44336' }]}
         >
-          {Math.abs(currentData.weightChange)} kg
+          {Math.abs(summary?.WeightChangeKg ?? 0)} kg
         </Text>
       </View>
     </View>
@@ -184,13 +209,96 @@ function ProgressScreen() {
     </View>
   );
 
+  const renderStreaksAndAvg = () => (
+    <View style={styles.statsGrid}>
+      {renderStatCard('Racha actual', `${summary?.CurrentStreakDays ?? 0} días`, undefined, 'bolt')}
+      {renderStatCard('Racha más larga', `${summary?.LongestStreakDays ?? 0} días`, undefined, 'trophy')}
+    </View>
+  );
+
+  const renderAverages = () => (
+    <View style={styles.statsGrid}>
+      {renderStatCard('Promedio sesión', `${summary?.AvgDurationMinutes ?? 0} min`, undefined, 'clock-o')}
+      {renderStatCard('Tiempo total', `${summary?.TotalDurationMinutes ?? 0} min`, undefined, 'hourglass-2')}
+    </View>
+  );
+
+  const renderRoutineUsage = () => (
+    <View style={styles.chartCard}>
+      <Text style={styles.chartTitle}>Uso de Rutinas</Text>
+      {summary?.RoutineUsage?.length ? (
+        summary.RoutineUsage.sort((a, b) => b.UsagePercent - a.UsagePercent)
+          .slice(0, 5)
+          .map(item => (
+            <View key={item.RoutineTemplateId} style={{ marginBottom: 12 }}>
+              <Text style={{ color: '#FFFFFF', marginBottom: 6 }} numberOfLines={1}>
+                {item.RoutineTemplateName}
+              </Text>
+              <View style={styles.chartBar}>
+                <View style={[styles.chartProgress, { width: `${Math.min(100, item.UsagePercent)}%` }]} />
+              </View>
+              <Text style={styles.chartLabel}>{item.UsagePercent.toFixed(0)}%</Text>
+            </View>
+          ))
+      ) : (
+        <Text style={styles.chartLabel}>Sin datos</Text>
+      )}
+    </View>
+  );
+
+  const weekdayLabel = (d: number) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][d] || '';
+
+  const renderWeekdayDiscipline = () => {
+    const items = summary?.WeekdayDiscipline || [];
+    const max = items.reduce((m, it) => Math.max(m, it.DaysTrained), 1);
+    return (
+      <View style={styles.chartCard}>
+        <Text style={styles.chartTitle}>Días con más disciplina</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          {[0, 1, 2, 3, 4, 5, 6].map(wd => {
+            const it = items.find(x => x.Weekday === (wd as any));
+            const v = it?.DaysTrained ?? 0;
+            const h = max ? Math.max(4, (v / max) * 80) : 4;
+            return (
+              <View key={wd} style={{ alignItems: 'center' }}>
+                <View
+                  style={{ width: 10, height: 80, backgroundColor: '#333333', borderRadius: 6, overflow: 'hidden', justifyContent: 'flex-end' }}
+                >
+                  <View style={{ width: '100%', height: h, backgroundColor: '#4CAF50' }} />
+                </View>
+                <Text style={{ color: '#B0B0B0', marginTop: 6, fontSize: 12 }}>{weekdayLabel(wd)}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const renderBranchAttendance = () => (
+    <View style={styles.chartCard}>
+      <Text style={styles.chartTitle}>Sedes más visitadas</Text>
+      {summary?.BranchAttendance?.length ? (
+        summary.BranchAttendance.map(b => (
+          <View key={b.BranchId} style={{ marginBottom: 12 }}>
+            <Text style={{ color: '#FFFFFF', marginBottom: 6 }} numberOfLines={1}>
+              {b.BranchName}
+            </Text>
+            <View style={styles.chartBar}>
+              <View style={[styles.chartProgress, { width: `${Math.min(100, b.Percent)}%` }]} />
+            </View>
+            <Text style={styles.chartLabel}>{b.Percent.toFixed(0)}%</Text>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.chartLabel}>Sin registros</Text>
+      )}
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      {Platform.OS !== 'web' && <MobileHeader />}
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+    <ScreenWrapper headerTitle="Mi Progreso" showBackButton={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Mi Progreso</Text>
           <Text style={styles.subtitle}>Seguimiento de tu evolución</Text>
@@ -199,27 +307,22 @@ function ProgressScreen() {
         {renderPeriodSelector()}
 
         <View style={styles.statsGrid}>
-          {renderStatCard(
-            'Entrenamientos',
-            currentData.workouts,
-            currentData.targetWorkouts,
-            'dumbbell'
-          )}
-          {renderStatCard(
-            'Calorías',
-            currentData.calories,
-            currentData.targetCalories,
-            'fire'
-          )}
+          {renderStatCard('Días avanzados', summary?.DaysAdvanced ?? 0, summary?.DaysExpected ?? 0, 'dumbbell')}
+          {renderStatCard('Calorías', summary?.TotalCalories ?? 0, 6000, 'fire')}
         </View>
 
         {renderProgressChart()}
         {renderWeightProgress()}
+        {renderStreaksAndAvg()}
+        {renderAverages()}
+        {renderRoutineUsage()}
+        {renderWeekdayDiscipline()}
+        {renderBranchAttendance()}
         {renderAchievements()}
 
         <View style={styles.footer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 }
 
@@ -276,6 +379,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 24,
+    backgroundColor: '#1E1E1E',
   },
   statCard: {
     backgroundColor: '#1E1E1E',
@@ -287,6 +391,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
+    backgroundColor: '#1E1E1E',
   },
   statIcon: {
     marginRight: 8,
@@ -325,6 +430,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     marginBottom: 20,
+    backgroundColor: '#1E1E1E',
   },
   chartBar: {
     height: 8,
@@ -340,6 +446,7 @@ const styles = StyleSheet.create({
   chartLabel: {
     fontSize: 14,
     color: '#B0B0B0',
+    backgroundColor: '#1E1E1E',
   },
   weightCard: {
     backgroundColor: '#1E1E1E',

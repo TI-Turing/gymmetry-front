@@ -115,3 +115,6 @@ export * from './UserType/Request/UpdateUserTypeRequest';
 export * from './common/ApiRequest';
 export * from './common/ApiResponse';
 export * from './common/ApplicationResponse';
+// Analytics
+export * from './Analytics/Request/AnalyticsSummaryRequest';
+export * from './Analytics/Response/AnalyticsSummaryResponse';

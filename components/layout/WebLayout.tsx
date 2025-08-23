@@ -39,6 +39,12 @@ const menuItems = [
     iconType: 'FontAwesome' as const,
   },
   {
+    key: 'physical-assessment',
+    icon: 'heartbeat' as const,
+    label: 'Estado físico',
+    iconType: 'FontAwesome' as const,
+  },
+  {
     key: 'feed',
     icon: 'users' as const,
     label: 'Feed',
