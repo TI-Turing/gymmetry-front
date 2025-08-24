@@ -17,10 +17,32 @@ const ScheduleList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
+
+  type ScheduleItem = {
+    id?: string;
+    scheduleId?: string;
+    title?: string;
+    name?: string;
+    isActive?: boolean;
+    description?: string;
+    dayOfWeek?: string;
+    startTime?: string;
+    endTime?: string;
+    duration?: number;
+    activity?: string;
+    className?: string;
+    instructor?: string;
+    trainerName?: string;
+    room?: string;
+    currentParticipants?: number;
+    maxCapacity?: number;
+    gymName?: string;
+    requirements?: string;
+  };
 
   const renderScheduleItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: ScheduleItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -83,7 +105,7 @@ const ScheduleList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.currentParticipants >= item.maxCapacity
+                  (item.currentParticipants ?? 0) >= (item.maxCapacity ?? 0)
                     ? '#FF6B35'
                     : Colors.light.text,
               },
@@ -110,7 +132,7 @@ const ScheduleList = React.memo(() => {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.id || item.scheduleId || String(Math.random()),
+    (item: ScheduleItem) => item.id || item.scheduleId || String(Math.random()),
     []
   );
 

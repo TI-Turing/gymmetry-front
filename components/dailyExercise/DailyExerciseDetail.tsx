@@ -9,14 +9,15 @@ import { dailyExerciseService } from '@/services';
 
 export function DailyExerciseDetail() {
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
-  const [debounceId, setDebounceId] = useState<ReturnType<
-    typeof setTimeout
-  > | null>(null);
+  type SearchItem = {
+    Id?: string | number;
+    Name?: string;
+  } & Record<string, unknown>;
+  const [results, setResults] = useState<SearchItem[]>([]);
 
   const fetchOne = async () => {
     setLoading(true);
@@ -33,7 +34,6 @@ export function DailyExerciseDetail() {
 
   // Búsqueda en tiempo real (ejemplo por campo Name)
   useEffect(() => {
-    if (debounceId) clearTimeout(debounceId);
     if (!query || query.trim().length < 2) {
       setResults([]);
       return;
@@ -44,20 +44,21 @@ export function DailyExerciseDetail() {
       try {
         const res = await dailyExerciseService.findDailyExercisesByFields({
           Name: query.trim(),
-        } as any);
-        let arr: any[] = [];
+        } as Record<string, unknown>);
+        let arr: unknown[] = [];
         if (res?.Success && res.Data) {
-          if (Array.isArray(res.Data)) arr = res.Data;
-          else if ((res.Data as any).$values) arr = (res.Data as any).$values;
+          if (Array.isArray(res.Data)) arr = res.Data as unknown[];
+          else if ((res.Data as unknown as { $values?: unknown[] }).$values)
+            arr =
+              (res.Data as unknown as { $values?: unknown[] }).$values || [];
         }
-        setResults(arr);
+        setResults((arr as SearchItem[]) || []);
       } catch {
         setError('Error en la búsqueda');
       } finally {
         setLoading(false);
       }
     }, 350);
-    setDebounceId(t);
     return () => clearTimeout(t);
   }, [query]);
 
@@ -90,7 +91,7 @@ export function DailyExerciseDetail() {
           {results.map((r) => (
             <Button
               key={r.Id}
-              title={r.Name || r.Id}
+              title={String(r.Name ?? r.Id ?? '')}
               variant="secondary"
               onPress={() => {
                 setItem(r);

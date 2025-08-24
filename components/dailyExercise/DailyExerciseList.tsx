@@ -13,24 +13,31 @@ const DailyExerciseList = React.memo(() => {
     }
   }, []);
 
-  const renderDailyExerciseItem = useCallback(
-    ({ item }: { item: any }) => (
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
+  const renderDailyExerciseItem = useCallback(({ item }: { item: unknown }) => {
+    const o = isRecord(item) ? item : ({} as Record<string, unknown>);
+    const id = o.id != null ? String(o.id as unknown as string) : '';
+    const name = (typeof o.name === 'string' && o.name) || 'DailyExercise name';
+    return (
       <View style={styles.itemContainer}>
-        <Text style={styles.itemTitle}>DailyExercise: {item.id}</Text>
-        <Text style={styles.itemSubtitle}>
-          {item.name || 'DailyExercise name'}
-        </Text>
+        <Text style={styles.itemTitle}>DailyExercise: {id}</Text>
+        <Text style={styles.itemSubtitle}>{name}</Text>
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
   return (
     <EntityList
       title="Daily Exercises"
       loadFunction={loadDailyExercises}
       renderItem={renderDailyExerciseItem}
-      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      keyExtractor={(item) =>
+        isRecord(item) && item.id != null
+          ? String(item.id as unknown as string)
+          : Math.random().toString()
+      }
       emptyMessage="No daily exercises found"
     />
   );

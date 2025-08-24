@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddResponse } from '@/dto/user/Response/AddResponse';
 import type { AddRequest } from '@/dto/user/Request/AddRequest';
 import type { User } from '@/models/User';
@@ -15,8 +16,8 @@ export const userService = {
     const response = await apiService.post<AddResponse>(`/user/add`, request);
     return response;
   },
-  async deleteUser(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/user/${id}`);
+  async deleteUser(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/user/${id}`);
     return response;
   },
   async getUserById(id: string): Promise<ApiResponse<User>> {
@@ -41,12 +42,16 @@ export const userService = {
     );
     return response;
   },
-  async phoneExists(): Promise<ApiResponse<any>> {
-    const response = await apiService.get<any>(`/user/phone-exists/{phone}`);
+  async phoneExists(): Promise<ApiResponse<unknown>> {
+    const response = await apiService.get<unknown>(
+      `/user/phone-exists/{phone}`
+    );
     return response;
   },
-  async passwordUser(request: PasswordUserRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  async passwordUser(
+    request: PasswordUserRequest
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/user/password/update`,
       request
     );
@@ -54,26 +59,32 @@ export const userService = {
   },
   async generatePaymentUrl(
     request: PaymentRequestDto
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/user/payment-url`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/user/payment-url`,
+      request
+    );
     return response;
   },
-  async paymentWebhook(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/webhook/payment`, request);
+  async paymentWebhook(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/webhook/payment`,
+      request
+    );
     return response;
   },
-  async updateUser(request: UpdateRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/user/update`, request);
+  async updateUser(request: UpdateRequest): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(`/user/update`, request);
     return response;
   },
   async updateUserGym(
     request: UpdateUserGymRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/user/update-gym`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(`/user/update-gym`, request);
     return response;
   },
-  async uploadProfileImage(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  async uploadProfileImage(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/user/upload-profile-image`,
       request
     );
@@ -95,12 +106,15 @@ export const userService = {
     return response;
   },
 
-  async requestOtp(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/user/request-otp`, request);
+  async requestOtp(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/user/request-otp`,
+      request
+    );
     return response;
   },
 
-  async validateOtp(request: any): Promise<ApiResponse<boolean>> {
+  async validateOtp(request: unknown): Promise<ApiResponse<boolean>> {
     const response = await apiService.post<boolean>(
       `/user/validate-otp`,
       request

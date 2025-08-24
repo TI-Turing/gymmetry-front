@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddRoutineTemplateRequest } from '@/dto/RoutineTemplate/Request/AddRoutineTemplateRequest';
 import type { DuplicateRoutineTemplateRequest } from '@/dto/RoutineTemplate/Request/DuplicateRoutineTemplateRequest';
 import type { RoutineTemplate } from '@/models/RoutineTemplate';
@@ -8,8 +9,8 @@ import type { UpdateRoutineTemplateRequest } from '@/dto/RoutineTemplate/Request
 export const routineTemplateService = {
   async addRoutineTemplate(
     request: AddRoutineTemplateRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/routinetemplate/add`,
       request
     );
@@ -17,15 +18,15 @@ export const routineTemplateService = {
   },
   async duplicateRoutineTemplate(
     request: DuplicateRoutineTemplateRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/routinetemplate/duplicate`,
       request
     );
     return response;
   },
-  async deleteRoutineTemplate(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/routinetemplate/${id}`);
+  async deleteRoutineTemplate(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/routinetemplate/${id}`);
     return response;
   },
   async getRoutineTemplate(id: string): Promise<ApiResponse<RoutineTemplate>> {
@@ -40,7 +41,7 @@ export const routineTemplateService = {
     return response;
   },
   async findRoutineTemplatesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<RoutineTemplate[]>> {
     const response = await apiService.post<RoutineTemplate[]>(
       `/routinetemplates/find`,
@@ -50,8 +51,8 @@ export const routineTemplateService = {
   },
   async updateRoutineTemplate(
     request: UpdateRoutineTemplateRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/routinetemplate/update`,
       request
     );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from '../Themed';
 import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
+import RegisterForm, { RegisterData } from './RegisterForm';
 import { User } from './types';
 import { authService } from '@/services/authService';
 import { CustomAlert } from '@/components/common/CustomAlert';
@@ -15,7 +15,7 @@ interface AuthContainerProps {
 
 export default function AuthContainer({
   onAuthSuccess,
-  onBack,
+  onBack: _onBack,
 }: AuthContainerProps) {
   const auth = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -91,23 +91,27 @@ export default function AuthContainer({
       const errorMessage = 'Credenciales incorrectas';
       showAlert(errorMessage);
       return { Success: false, error: errorMessage };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Determinar el tipo de error
       let errorMessage =
         'Error de conexión. Verifica tu conexión a internet e intenta nuevamente.';
-
-      if (error?.response) {
+      const err = error as {
+        response?: { status?: number; data?: { Message?: string } };
+        message?: string;
+        code?: string;
+      };
+      if (err?.response) {
         // Error del servidor
-        if (error.response.status === 401) {
+        if (err.response.status === 401) {
           errorMessage = 'Credenciales incorrectas';
-        } else if (error.response.status === 500) {
+        } else if (err.response.status === 500) {
           errorMessage = 'Error del servidor. Intenta más tarde.';
-        } else if (error.response.data?.Message) {
-          errorMessage = error.response.data.Message;
+        } else if (err.response.data?.Message) {
+          errorMessage = err.response.data.Message;
         }
-      } else if (error?.message?.includes('Network')) {
+      } else if (err?.message?.includes('Network')) {
         errorMessage = 'Sin conexión a internet. Verifica tu conexión.';
-      } else if (error?.code === 'TIMEOUT') {
+      } else if (err?.code === 'TIMEOUT') {
         errorMessage = 'Tiempo de espera agotado. Intenta nuevamente.';
       }
 
@@ -118,12 +122,7 @@ export default function AuthContainer({
     }
   };
 
-  const handleRegister = async (userData: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-  }) => {
+  const handleRegister = async (userData: RegisterData) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 

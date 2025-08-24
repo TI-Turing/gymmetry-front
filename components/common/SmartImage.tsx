@@ -33,7 +33,7 @@ export function SmartImage({
   );
 
   if (!uri) {
-    return <View style={[styles.placeholder, style as any]} />;
+    return <View style={[styles.placeholder, style as ImageStyle]} />;
   }
 
   if (!shouldLoad) {
@@ -42,7 +42,7 @@ export function SmartImage({
         accessibilityRole="button"
         accessibilityLabel={label || 'Cargar imagen'}
         onPress={() => setShouldLoad(true)}
-        style={[styles.deferredButton, style as any]}
+        style={[styles.deferredButton, style as ImageStyle]}
       >
         <Text style={styles.deferredText}>
           Tocar para cargar imagen (Ahorro de datos)

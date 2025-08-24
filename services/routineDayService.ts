@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddRoutineDayRequest } from '@/dto/RoutineDay/Request/AddRoutineDayRequest';
 import type { AddRoutineDaysRequest } from '@/dto/RoutineDay/Request/AddRoutineDaysRequest';
 import type { RoutineDay } from '@/models/RoutineDay';
@@ -8,21 +9,21 @@ import type { UpdateRoutineDayRequest } from '@/dto/RoutineDay/Request/UpdateRou
 export const routineDayService = {
   async addRoutineDay(
     request: AddRoutineDayRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/routineday/add`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(`/routineday/add`, request);
     return response;
   },
   async addRoutineDays(
     request: AddRoutineDaysRequest
-  ): Promise<ApiResponse<any[]>> {
-    const response = await apiService.post<any[]>(
+  ): Promise<ApiResponse<RoutineDay[]>> {
+    const response = await apiService.post<RoutineDay[]>(
       `/routineday/addmany`,
       request
     );
     return response;
   },
-  async deleteRoutineDay(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/routineday/${id}`);
+  async deleteRoutineDay(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/routineday/${id}`);
     return response;
   },
   async getRoutineDay(id: string): Promise<ApiResponse<RoutineDay>> {
@@ -34,7 +35,7 @@ export const routineDayService = {
     return response;
   },
   async findRoutineDaysByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<RoutineDay[]>> {
     const response = await apiService.post<RoutineDay[]>(
       `/routinedays/find`,
@@ -44,8 +45,11 @@ export const routineDayService = {
   },
   async updateRoutineDay(
     request: UpdateRoutineDayRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/routineday/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/routineday/update`,
+      request
+    );
     return response;
   },
 };

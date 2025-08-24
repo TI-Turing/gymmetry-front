@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddDailyHistoryRequest } from '@/dto/DailyHistory/Request/AddDailyHistoryRequest';
 import type { DailyHistory } from '@/models/DailyHistory';
 import type { UpdateDailyHistoryRequest } from '@/dto/DailyHistory/Request/UpdateDailyHistoryRequest';
@@ -7,12 +8,15 @@ import type { UpdateDailyHistoryRequest } from '@/dto/DailyHistory/Request/Updat
 export const dailyHistoryService = {
   async addDailyHistory(
     request: AddDailyHistoryRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/dailyhistory/add`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/dailyhistory/add`,
+      request
+    );
     return response;
   },
-  async deleteDailyHistory(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/dailyhistory/${id}`);
+  async deleteDailyHistory(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/dailyhistory/${id}`);
     return response;
   },
   async getDailyHistoryById(id: string): Promise<ApiResponse<DailyHistory>> {
@@ -24,7 +28,7 @@ export const dailyHistoryService = {
     return response;
   },
   async findDailyHistoriesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<DailyHistory[]>> {
     const response = await apiService.post<DailyHistory[]>(
       `/dailyhistories/find`,
@@ -34,8 +38,11 @@ export const dailyHistoryService = {
   },
   async updateDailyHistory(
     request: UpdateDailyHistoryRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/dailyhistory/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/dailyhistory/update`,
+      request
+    );
     return response;
   },
 };

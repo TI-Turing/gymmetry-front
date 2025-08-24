@@ -1,11 +1,18 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  Easing,
+  StyleSheet,
+  View,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 
 interface SkeletonProps {
   width?: number | string;
   height?: number;
   borderRadius?: number;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const Skeleton: React.FC<SkeletonProps> = ({
@@ -35,7 +42,15 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   });
 
   return (
-    <View style={[styles.container, { width, height, borderRadius }, style]}>
+    <View
+      style={
+        [
+          styles.container,
+          { width, height, borderRadius },
+          style,
+        ] as StyleProp<ViewStyle>
+      }
+    >
       <Animated.View
         style={[
           styles.shimmer,

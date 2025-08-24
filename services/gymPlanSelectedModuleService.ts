@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddGymPlanSelectedModuleRequest } from '@/dto/GymPlanSelectedModule/Request/AddGymPlanSelectedModuleRequest';
 import type { GymPlanSelectedModule } from '@/models/GymPlanSelectedModule';
 import type { UpdateGymPlanSelectedModuleRequest } from '@/dto/GymPlanSelectedModule/Request/UpdateGymPlanSelectedModuleRequest';
@@ -7,15 +8,15 @@ import type { UpdateGymPlanSelectedModuleRequest } from '@/dto/GymPlanSelectedMo
 export const gymPlanSelectedModuleService = {
   async addGymPlanSelectedModule(
     request: AddGymPlanSelectedModuleRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/gymplanselectedmodule/add`,
       request
     );
     return response;
   },
-  async deleteGymPlanSelectedModule(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(
+  async deleteGymPlanSelectedModule(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(
       `/gymplanselectedmodule/${id}`
     );
     return response;
@@ -37,7 +38,7 @@ export const gymPlanSelectedModuleService = {
     return response;
   },
   async findGymPlanSelectedModulesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<GymPlanSelectedModule[]>> {
     const response = await apiService.post<GymPlanSelectedModule[]>(
       `/gymplanselectedmodules/find`,
@@ -47,8 +48,8 @@ export const gymPlanSelectedModuleService = {
   },
   async updateGymPlanSelectedModule(
     request: UpdateGymPlanSelectedModuleRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/gymplanselectedmodule/update`,
       request
     );

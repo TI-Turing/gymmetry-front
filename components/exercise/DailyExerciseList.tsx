@@ -5,22 +5,60 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
+type DailyExerciseItem = {
+  id?: string;
+  exerciseId?: string;
+  dailyExerciseId?: string;
+  exerciseName?: string;
+  name?: string;
+  isCompleted?: boolean;
+  isInProgress?: boolean;
+  description?: string;
+  instructions?: string;
+  order?: number;
+  position?: number;
+  targetSets?: number;
+  sets?: number;
+  targetReps?: number;
+  reps?: number;
+  recommendedWeight?: number;
+  weight?: number;
+  restTime?: number; // seconds
+  estimatedDuration?: number; // seconds
+  currentSets?: number;
+  muscleGroup?: string;
+  targetMuscle?: string;
+  difficulty?: 'hard' | 'medium' | 'easy' | string;
+  equipment?: string;
+  requiredEquipment?: string;
+  estimatedCalories?: number;
+  calories?: number;
+  startTime?: string | number | Date;
+  endTime?: string | number | Date;
+  exerciseType?: 'cardio' | 'strength' | 'flexibility' | 'endurance' | string;
+  previousRecord?: { weight?: number; reps?: number; time?: string };
+  tips?: string[];
+  notes?: string;
+};
+
 const DailyExerciseList = React.memo(() => {
   const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
-  const loadDailyExercises = useCallback(async () => {
-    try {
-      // Placeholder for actual service call
-
-      const result = await servicePlaceholder();
-
-      return result || [];
-    } catch (_error) {
-      return [];
-    }
-  }, []);
+  const loadDailyExercises: () => Promise<DailyExerciseItem[]> =
+    useCallback(async () => {
+      try {
+        // Placeholder for actual service call
+        const result = (await servicePlaceholder()) as unknown;
+        const items = Array.isArray(result)
+          ? (result as DailyExerciseItem[])
+          : [];
+        return items;
+      } catch (_error) {
+        return [];
+      }
+    }, [servicePlaceholder]);
 
   const renderDailyExerciseItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: DailyExerciseItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -243,7 +281,7 @@ const DailyExerciseList = React.memo(() => {
   );
 
   const keyExtractor = useCallback(
-    (item: any) =>
+    (item: DailyExerciseItem) =>
       item.id ||
       item.exerciseId ||
       item.dailyExerciseId ||

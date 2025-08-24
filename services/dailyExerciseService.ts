@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddDailyExerciseRequest } from '@/dto/DailyExercise/Request/AddDailyExerciseRequest';
 import type { DailyExercise } from '@/models/DailyExercise';
 import type { UpdateDailyExerciseRequest } from '@/dto/DailyExercise/Request/UpdateDailyExerciseRequest';
@@ -7,21 +8,24 @@ import type { UpdateDailyExerciseRequest } from '@/dto/DailyExercise/Request/Upd
 export const dailyExerciseService = {
   async addDailyExercise(
     request: AddDailyExerciseRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/dailyexercise/add`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/dailyexercise/add`,
+      request
+    );
     return response;
   },
   async addDailyExercises(
     request: AddDailyExerciseRequest[]
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/dailyexercises/addbulk`,
       request
     );
     return response;
   },
-  async deleteDailyExercise(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/dailyexercise/${id}`);
+  async deleteDailyExercise(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/dailyexercise/${id}`);
     return response;
   },
   async getDailyExerciseById(id: string): Promise<ApiResponse<DailyExercise>> {
@@ -35,7 +39,7 @@ export const dailyExerciseService = {
     return response;
   },
   async findDailyExercisesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<DailyExercise[]>> {
     const response = await apiService.post<DailyExercise[]>(
       `/dailyexercises/find`,
@@ -45,8 +49,8 @@ export const dailyExerciseService = {
   },
   async updateDailyExercise(
     request: UpdateDailyExerciseRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/dailyexercise/update`,
       request
     );

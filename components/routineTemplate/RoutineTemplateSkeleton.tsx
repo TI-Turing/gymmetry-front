@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Animated, Easing } from 'react-native';
+import {
+  View,
+  Animated,
+  Easing,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { SPACING } from '@/constants/Theme';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeRoutineTemplateStyles } from './styles.themed';
@@ -8,7 +14,7 @@ interface SkeletonProps {
   width?: number | string;
   height?: number;
   borderRadius?: number;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }
 
 const Skeleton: React.FC<SkeletonProps> = ({
@@ -52,12 +58,12 @@ const Skeleton: React.FC<SkeletonProps> = ({
     <Animated.View
       style={[
         {
-          width,
+          width: width as ViewStyle['width'],
           height,
           borderRadius,
           backgroundColor: styles.colors.skeleton,
           opacity,
-        },
+        } as ViewStyle,
         style,
       ]}
     />

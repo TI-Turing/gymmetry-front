@@ -34,7 +34,7 @@ interface ApiPlanType {
   UpdatedAt: string | null;
   DeletedAt: string | null;
   Ip: string | null;
-  Plans: any[];
+  Plans: unknown[];
 }
 
 interface PlanTypeViewProps {

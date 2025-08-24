@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Step4Data } from '../types';
 import { userService } from '@/services/userService';
 import { handleApiError } from '../utils/api';
+import type { UpdateRequest } from '@/dto/user/Request/UpdateRequest';
 
 interface UseStep4FormProps {
   userId: string;
@@ -32,7 +33,7 @@ export const useStep4Form = ({
   initialData,
   onNext,
   showError,
-  showSuccess,
+  showSuccess: _showSuccess,
 }: UseStep4FormProps): UseStep4FormReturn => {
   const [fitnessGoal, setFitnessGoal] = useState(
     initialData?.fitnessGoal || ''
@@ -57,11 +58,11 @@ export const useStep4Form = ({
     };
 
     try {
-      const updateData: any = {
+      const updateData: UpdateRequest = {
         Id: userId,
-        Name: 'Usuario', // Valor temporal
-        LastName: 'Usuario', // Valor temporal
-        UserName: 'Usuario Usuario', // Valor temporal
+        Name: 'Usuario', // temporal
+        LastName: 'Usuario', // temporal
+        UserName: 'Usuario Usuario', // temporal
         IdEps: null,
         IdGender: null,
         BirthDate: null,
@@ -89,14 +90,22 @@ export const useStep4Form = ({
       }
 
       onNext(stepData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage = handleApiError(error);
       showError(errorMessage);
       // NO avanzar en caso de error
     } finally {
       setIsLoading(false);
     }
-  }, [fitnessGoal, healthRestrictions, additionalInfo, rh, userId, onNext]);
+  }, [
+    fitnessGoal,
+    healthRestrictions,
+    additionalInfo,
+    rh,
+    userId,
+    onNext,
+    showError,
+  ]);
 
   return {
     fitnessGoal,

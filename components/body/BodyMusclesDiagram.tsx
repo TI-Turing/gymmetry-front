@@ -193,8 +193,9 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
           setOverlayLayers(initialLayers);
           setError(null);
         }
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || 'Error cargando SVG');
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Error cargando SVG';
+        if (!cancelled) setError(msg);
       } finally {
         if (!cancelled) setLoading(false);
       }

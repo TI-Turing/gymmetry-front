@@ -29,9 +29,9 @@ interface UseStep2FormReturn {
   isLoading: boolean;
 
   // Estado de género
-  genders: any[];
+  genders: unknown[];
   gendersLoading: boolean;
-  gendersError: any;
+  gendersError: unknown;
   showGenderModal: boolean;
 
   // Estado de fecha
@@ -60,7 +60,7 @@ interface UseStep2FormReturn {
   setShowGenderModal: (show: boolean) => void;
   setShowDatePicker: (show: boolean) => void;
   setOtpCode: (code: string) => void;
-  handleDateChange: (event: any, selectedDate?: Date) => void;
+  handleDateChange: (event: unknown, selectedDate?: Date) => void;
   handleVerifyPhone: () => void;
   handleSendVerification: (method: 'whatsapp' | 'sms') => Promise<void>;
   handleValidateOTP: () => Promise<void>;
@@ -232,7 +232,7 @@ export const useStep2Form = ({
               'Error al enviar verificación'
           );
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorMessage = handleApiError(error);
         showAlert('error', 'Error', errorMessage);
       } finally {
@@ -278,7 +278,7 @@ export const useStep2Form = ({
       } else {
         showAlert('error', 'Error', response.Message || 'Código incorrecto');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage = handleApiError(error);
       showAlert('error', 'Error', errorMessage);
     } finally {
@@ -304,12 +304,15 @@ export const useStep2Form = ({
     setPhoneExists(false);
   }, []);
 
-  const handleDateChange = useCallback((event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setBirthDate(formatDateToDisplay(selectedDate));
-    }
-  }, []);
+  const handleDateChange = useCallback(
+    (event: unknown, selectedDate?: Date) => {
+      setShowDatePicker(false);
+      if (selectedDate) {
+        setBirthDate(formatDateToDisplay(selectedDate));
+      }
+    },
+    []
+  );
 
   const handleNext = useCallback(async () => {
     setIsLoading(true);

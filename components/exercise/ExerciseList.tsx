@@ -4,6 +4,8 @@ import {
   TouchableOpacity,
   TextInput,
   View as RNView,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
@@ -11,22 +13,65 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { exerciseService } from '@/services';
 
+type ExerciseRaw = {
+  Id?: number | string;
+  ID?: number | string;
+  id?: number | string;
+  exerciseId?: number | string;
+  Name?: string;
+  name?: string;
+  Description?: string;
+  description?: string;
+  Difficulty?: string;
+  difficulty?: string;
+  Category?: string;
+  CategoryName?: string;
+  category?: string;
+  CategoryExercise?: { Name?: string } | null;
+  TargetMuscles?: string;
+  targetMuscles?: string;
+  Muscles?: string;
+  Equipment?: string;
+  equipment?: string;
+  Duration?: string | number;
+  duration?: string | number;
+  CaloriesBurned?: number;
+  caloriesBurned?: number;
+  RoutineCount?: number;
+  routineCount?: number;
+  [k: string]: unknown;
+};
+
+type ExerciseItem = {
+  _original: ExerciseRaw;
+  id?: number | string;
+  name: string;
+  description: string;
+  difficulty: string;
+  category: string;
+  targetMuscles: string;
+  equipment: string;
+  duration: string | number;
+  caloriesBurned: number;
+  routineCount: number;
+};
+
 interface ExerciseListProps {
-  onSelect?: (exercise: any) => void;
+  onSelect?: (exercise: ExerciseRaw) => void;
   enableSearch?: boolean;
   debounceMs?: number;
-  containerStyle?: any;
+  containerStyle?: StyleProp<ViewStyle>;
   dark?: boolean;
   limit?: number;
   staticRender?: boolean;
   remoteSearch?: boolean; // si true, no carga inicial, busca al escribir
   remoteMinChars?: number;
-  findFunction?: (query: string) => Promise<any[]>; // alternativa personalizada
+  findFunction?: (query: string) => Promise<ExerciseRaw[]>; // alternativa personalizada
   suggestionStyle?: boolean; // si true muestra resultados estilo sugerencias bajo el input (como ExerciseDetailScreen)
 }
 
-const normalizeExercises = (list: any[]) => {
-  return list.map((e: any) => {
+const normalizeExercises = (list: ExerciseRaw[]): ExerciseItem[] => {
+  return list.map((e) => {
     const category =
       e.category || e.Category || e.CategoryName || e.CategoryExercise?.Name;
     return {
@@ -62,7 +107,7 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
 
   const [query, setQuery] = useState('');
   const [internalQuery, setInternalQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<ExerciseItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,16 +130,28 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
     setLoading(true);
     const run = async () => {
       try {
-        let rawList: any[] = [];
+        let rawList: ExerciseRaw[] = [];
         if (findFunction) {
           rawList = await findFunction(term);
-        } else if ((exerciseService as any).findExercisesByFields) {
-          const res: any = await (exerciseService as any).findExercisesByFields(
-            { Name: term }
-          );
-          if (res?.Success && res.Data) {
-            const data: any = res.Data as any;
-            rawList = Array.isArray(data) ? data : data?.$values || [];
+        } else {
+          type FindExercisesByFields = (b: {
+            Name: string;
+          }) => Promise<unknown>;
+          const svc = exerciseService as unknown as {
+            findExercisesByFields?: FindExercisesByFields;
+          };
+          if (svc.findExercisesByFields) {
+            const res = await svc.findExercisesByFields({ Name: term });
+            const anyRes = res as
+              | { Success?: boolean; Data?: unknown }
+              | undefined;
+            if (anyRes?.Success && anyRes.Data) {
+              const data = anyRes.Data as unknown;
+              const arr = Array.isArray(data)
+                ? data
+                : (data as { $values?: ExerciseRaw[] })?.$values || [];
+              rawList = arr as ExerciseRaw[];
+            }
           }
         }
         let normalized = normalizeExercises(rawList || []);
@@ -127,26 +184,42 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
       const term = internalQuery.trim();
       if (term.length < remoteMinChars) return [];
       try {
-        let rawList: any[] = [];
+        let rawList: ExerciseRaw[] = [];
         if (findFunction) {
           rawList = await findFunction(term);
-        } else if ((exerciseService as any).findExercisesByFields) {
-          const res: any = await (exerciseService as any).findExercisesByFields(
-            { Name: term }
-          );
-          if (res?.Success && res.Data) {
-            const data: any = res.Data as any;
-            rawList = Array.isArray(data) ? data : data?.$values || [];
-          }
         } else {
+          type FindExercisesByFields = (b: {
+            Name: string;
+          }) => Promise<unknown>;
+          const svc = exerciseService as unknown as {
+            findExercisesByFields?: FindExercisesByFields;
+          };
+          if (svc.findExercisesByFields) {
+            const res = await svc.findExercisesByFields({ Name: term });
+            const anyRes = res as
+              | { Success?: boolean; Data?: unknown }
+              | undefined;
+            if (anyRes?.Success && anyRes.Data) {
+              const data = anyRes.Data as unknown;
+              const arr = Array.isArray(data)
+                ? data
+                : (data as { $values?: ExerciseRaw[] })?.$values || [];
+              rawList = arr as ExerciseRaw[];
+            }
+          }
           const res = await exerciseService.getAllExercises();
           if (res?.Success) {
-            const raw = res.Data;
-            const anyRaw: any = raw as any;
-            rawList = Array.isArray(anyRaw) ? anyRaw : anyRaw?.$values || [];
+            const raw = res.Data as unknown;
+            const maybe = Array.isArray(raw)
+              ? raw
+              : (raw as { $values?: ExerciseRaw[] })?.$values || [];
+            rawList = (maybe || []) as ExerciseRaw[];
           }
-          rawList = rawList.filter((e: any) =>
-            (e.Name || e.name || '').toLowerCase().includes(term.toLowerCase())
+          rawList = rawList.filter((e) =>
+            (e.Name || e.name || '')
+              .toString()
+              .toLowerCase()
+              .includes(term.toLowerCase())
           );
         }
         let normalized = normalizeExercises(rawList || []);
@@ -160,8 +233,12 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
 
     // Modo local (eager): cargar todos y filtrar
     const response = await exerciseService.getAllExercises();
-    const raw: any = response.Success ? response.Data : [];
-    let list: any[] = Array.isArray(raw) ? raw : raw?.$values || [];
+    const raw = response.Success ? (response.Data as unknown) : [];
+    let list: ExerciseRaw[] = Array.isArray(raw)
+      ? (raw as ExerciseRaw[])
+      : ((raw as { $values?: ExerciseRaw[] })?.$values as
+          | ExerciseRaw[]
+          | undefined) || [];
     if (!Array.isArray(list)) list = [];
     let normalized = normalizeExercises(list);
     if (internalQuery.trim()) {
@@ -174,14 +251,50 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
   }, [remoteSearch, internalQuery, remoteMinChars, findFunction, limit]);
 
   const renderExerciseItem = useCallback(
-    ({ item }: { item: any }) => {
-      const data = item._original ? item : { _original: item, ...item };
-      const Wrapper: any = onSelect ? TouchableOpacity : View;
+    ({ item }: { item: ExerciseItem }) => {
+      const data = item;
+      if (onSelect) {
+        return (
+          <TouchableOpacity
+            style={[styles.card, dark && styles.cardDark]}
+            onPress={() => onSelect(data._original)}
+          >
+            <View style={styles.header}>
+              <Text style={styles.title}>{data.name}</Text>
+              <Text style={styles.statusText}>{data.difficulty}</Text>
+            </View>
+            <Text style={[styles.description, dark && styles.descriptionDark]}>
+              {data.description || 'Sin descripción disponible'}
+            </Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Categoría:</Text>
+              <Text style={styles.value}>{data.category}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Músculos:</Text>
+              <Text style={styles.value}>{data.targetMuscles}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Equipamiento:</Text>
+              <Text style={styles.value}>{data.equipment}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Duración:</Text>
+              <Text style={styles.value}>{data.duration}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Calorías:</Text>
+              <Text style={styles.value}>{data.caloriesBurned} kcal/min</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Usado en:</Text>
+              <Text style={styles.value}>{data.routineCount} rutinas</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      }
       return (
-        <Wrapper
-          style={[styles.card, dark && styles.cardDark]}
-          onPress={onSelect ? () => onSelect(data._original) : undefined}
-        >
+        <View style={[styles.card, dark && styles.cardDark]}>
           <View style={styles.header}>
             <Text style={styles.title}>{data.name}</Text>
             <Text style={styles.statusText}>{data.difficulty}</Text>
@@ -213,18 +326,15 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
             <Text style={styles.label}>Usado en:</Text>
             <Text style={styles.value}>{data.routineCount} rutinas</Text>
           </View>
-        </Wrapper>
+        </View>
       );
     },
     [onSelect, dark]
   );
 
-  const keyExtractor = useCallback((item: any, index?: number) => {
+  const keyExtractor = useCallback((item: ExerciseItem, index?: number) => {
     const id =
-      item.id ||
-      item.Id ||
-      item.ID ||
-      (item._original && (item._original.Id || item._original.id));
+      item.id || (item._original && (item._original.Id || item._original.id));
     return id ? String(id) : `idx_${index}`;
   }, []);
 

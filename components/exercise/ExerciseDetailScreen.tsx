@@ -20,7 +20,7 @@ export default function ExerciseDetailScreen() {
   const initialId = params?.exerciseId ? String(params.exerciseId) : '';
 
   const [query, setQuery] = useState('');
-  const [exerciseId, setExerciseId] = useState(initialId);
+  const [_exerciseId, _setExerciseId] = useState(initialId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [current, setCurrent] = useState<Exercise | null>(null);
@@ -44,10 +44,11 @@ export default function ExerciseDetailScreen() {
       // Parsear TagsMuscle y preparar overlays
       let tags: Record<string, number> = {};
       try {
-        const raw: any = (ex as any)?.TagsMuscle;
+        const raw = (ex as unknown as { TagsMuscle?: unknown })?.TagsMuscle;
         if (raw) {
           if (typeof raw === 'string') tags = JSON.parse(raw);
-          else if (typeof raw === 'object') tags = raw as any;
+          else if (typeof raw === 'object')
+            tags = raw as Record<string, number>;
         }
       } catch {}
       setMuscleTags01(tags);
@@ -77,14 +78,16 @@ export default function ExerciseDetailScreen() {
       setLoading(true);
       setError(null);
       try {
-        const body = { Name: query.trim() } as any; // contains-match según contrato
+        const body = { Name: query.trim() } as Record<string, unknown>; // contains-match según contrato
         const res = await exerciseService.findExercisesByFields(body);
-        let arr: any[] = [];
+        let arr: unknown[] = [];
         if (res?.Success && res.Data) {
-          if (Array.isArray(res.Data)) arr = res.Data;
-          else if ((res.Data as any).$values) arr = (res.Data as any).$values;
+          if (Array.isArray(res.Data)) arr = res.Data as unknown[];
+          else if ((res.Data as unknown as { $values?: unknown[] }).$values)
+            arr =
+              (res.Data as unknown as { $values?: unknown[] }).$values || [];
         }
-        setResults(arr as Exercise[]);
+        setResults((arr as Exercise[]) || []);
       } catch {
         setError('Error en la búsqueda');
       } finally {
@@ -93,12 +96,12 @@ export default function ExerciseDetailScreen() {
     }, 350);
     setDebounceTimer(t);
     return () => clearTimeout(t);
-  }, [query]);
+  }, [query, debounceTimer]);
 
   // Derivar datos del gráfico (ordenado desc, valores 0..10)
   const muscleChartData = useMemo(() => {
     const entries = Object.entries(muscleTags01 || {});
-    const normalize01 = (v: any) => {
+    const normalize01 = (v: unknown) => {
       const n = Number(v);
       if (!isFinite(n)) return 0;
       if (n > 1 && n <= 10) return Math.max(0, Math.min(1, n / 10));
@@ -147,10 +150,12 @@ export default function ExerciseDetailScreen() {
                   setCurrent(ex);
                   try {
                     let tags: Record<string, number> = {};
-                    const raw: any = (ex as any)?.TagsMuscle;
+                    const raw = (ex as unknown as { TagsMuscle?: unknown })
+                      ?.TagsMuscle;
                     if (raw) {
                       if (typeof raw === 'string') tags = JSON.parse(raw);
-                      else if (typeof raw === 'object') tags = raw as any;
+                      else if (typeof raw === 'object')
+                        tags = raw as Record<string, number>;
                     }
                     setMuscleTags01(tags);
                     setOverlayOpacities(mapTagsToOverlayOpacities(tags));
@@ -178,17 +183,28 @@ export default function ExerciseDetailScreen() {
               {current.Description && (
                 <Text style={styles.exerciseDesc}>{current.Description}</Text>
               )}
-              {(current as any)?.CategoryExercise?.Name ||
-              current.CategoryExerciseId ? (
+              {(() => {
+                const catName = (
+                  current as unknown as { CategoryExercise?: { Name?: string } }
+                )?.CategoryExercise?.Name;
+                if (catName || current.CategoryExerciseId) {
+                  return (
+                    <Text style={styles.metaText}>
+                      Categoría: {catName ?? current.CategoryExerciseId}
+                    </Text>
+                  );
+                }
+                return null;
+              })()}
+              {Boolean(
+                (current as unknown as { MuscleGroup?: string })?.MuscleGroup
+              ) && (
                 <Text style={styles.metaText}>
-                  Categoría:{' '}
-                  {(current as any)?.CategoryExercise?.Name ??
-                    current.CategoryExerciseId}
-                </Text>
-              ) : null}
-              {Boolean((current as any).MuscleGroup) && (
-                <Text style={styles.metaText}>
-                  Grupo muscular: {(current as any).MuscleGroup}
+                  {'Grupo muscular: '}
+                  {
+                    (current as unknown as { MuscleGroup?: string })
+                      ?.MuscleGroup
+                  }
                 </Text>
               )}
             </RNView>

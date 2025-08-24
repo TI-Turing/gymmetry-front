@@ -71,8 +71,11 @@ export default function GymPlanView({
 
   // Tomar expiresAt del estado crudo
   useEffect(() => {
+    const rs = (rawStatus as Record<string, unknown> | null) || null;
     const exp =
-      (rawStatus as any)?.expiresAt || (rawStatus as any)?.ExpiresAt || null;
+      (rs?.expiresAt as string | undefined) ||
+      (rs?.ExpiresAt as string | undefined) ||
+      null;
     if (exp) setExpiresAt(exp);
   }, [rawStatus]);
 
@@ -85,7 +88,7 @@ export default function GymPlanView({
   }, []);
   // Countdown expiración
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
     if (
       expiresAt &&
       (paymentStatus === 'pending' || paymentStatus === 'polling')
@@ -95,7 +98,7 @@ export default function GymPlanView({
         setRemaining(diff > 0 ? Math.floor(diff / 1000) : 0);
       };
       tick();
-      timer = setInterval(tick, 1000) as any;
+      timer = setInterval(tick, 1000);
     } else {
       setRemaining(0);
     }
@@ -103,8 +106,7 @@ export default function GymPlanView({
       if (timer) clearInterval(timer);
     };
   }, [expiresAt, paymentStatus]);
-  const { showAlert, showError, showSuccess, hideAlert, AlertComponent } =
-    useCustomAlert();
+  const { showError, showSuccess, AlertComponent } = useCustomAlert();
 
   // Visuales dinámicos ahora centralizados en utils/paymentVisual
 
@@ -124,7 +126,7 @@ export default function GymPlanView({
         gymPlanService.getGymPlanTypes(),
         gymPlanSelectedService.findGymPlanSelectedsByFields({
           fields: { GymId: gymId, IsActive: true },
-        } as any),
+        } as { fields: { GymId: string; IsActive: boolean } }),
       ]);
       if (planTypesResponse.Success) {
         // Asegurar que siempre tenemos un array
@@ -137,8 +139,15 @@ export default function GymPlanView({
       }
 
       if (currentSelecteds.Success && currentSelecteds.Data) {
-        const raw = normalizeCollection(currentSelecteds.Data as any);
-        const active = raw.find((p: any) => p?.isActive || p?.IsActive);
+        const raw = normalizeCollection(currentSelecteds.Data as unknown);
+        const active = raw.find((p: unknown) => {
+          if (!p || typeof p !== 'object') return false;
+          const o = p as Record<string, unknown>;
+          return Boolean(
+            (o.isActive as boolean | undefined) ||
+              (o.IsActive as boolean | undefined)
+          );
+        });
         if (active) {
           const pick = <T,>(obj: unknown, a: string, b: string, fb?: T): T => {
             const o = obj as Record<string, unknown>;
@@ -164,11 +173,35 @@ export default function GymPlanView({
               'UpdatedAt',
               null
             ),
-            gymPlanSelectedType: pick<any>(
-              active,
-              'gymPlanSelectedType',
-              'GymPlanSelectedType'
-            ),
+            gymPlanSelectedType: ((): GymPlanSelectedType | undefined => {
+              const maybe = pick<unknown>(
+                active,
+                'gymPlanSelectedType',
+                'GymPlanSelectedType'
+              );
+              if (maybe && typeof maybe === 'object') {
+                const o = maybe as Partial<GymPlanSelectedType>;
+                if (typeof o.id === 'string' && typeof o.name === 'string') {
+                  return {
+                    id: o.id,
+                    name: o.name,
+                    createdAt: String(o.createdAt || new Date().toISOString()),
+                    updatedAt: (o.updatedAt as string) ?? null,
+                    deletedAt: (o.deletedAt as string) ?? null,
+                    ip: (o.ip as string) ?? null,
+                    isActive: Boolean(o.isActive),
+                    countryId: String(o.countryId || ''),
+                    price: (o.price as number) ?? null,
+                    usdPrice: (o.usdPrice as number) ?? null,
+                    description: String(o.description || ''),
+                    gymPlanSelecteds: Array.isArray(o.gymPlanSelecteds)
+                      ? (o.gymPlanSelecteds as unknown[])
+                      : [],
+                  } as GymPlanSelectedType;
+                }
+              }
+              return undefined;
+            })(),
           });
         } else {
           setCurrentGymPlan(null);
@@ -244,7 +277,11 @@ export default function GymPlanView({
           await WebBrowser.openBrowserAsync(prefResp.Data.InitPoint);
           if (prefId) startPolling(prefId);
         } else {
-          const msg = (prefResp as any)?.Message || '';
+          const msg =
+            (prefResp && typeof prefResp === 'object'
+              ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (prefResp as { Message?: string }).Message
+              : '') || '';
           if (msg.toLowerCase().includes('pendiente') && preferenceId) {
             startPolling(preferenceId);
           } else {
@@ -447,11 +484,19 @@ export default function GymPlanView({
             paymentStatus !== 'approved' &&
             (() => {
               const v = getPaymentVisual(paymentStatus);
-              const pm =
-                (rawStatus as any)?.paymentMethod ||
-                (rawStatus as any)?.PaymentMethod;
-              const bank =
-                (rawStatus as any)?.bankCode || (rawStatus as any)?.BankCode;
+              const rs = rawStatus as
+                | (Record<string, unknown> & {
+                    paymentMethod?: string;
+                    PaymentMethod?: string;
+                    bankCode?: string;
+                    BankCode?: string;
+                  })
+                | null
+                | undefined;
+              const pm = (rs?.paymentMethod || rs?.PaymentMethod) as
+                | string
+                | undefined;
+              const bank = (rs?.bankCode || rs?.BankCode) as string | undefined;
               return (
                 <View
                   style={[

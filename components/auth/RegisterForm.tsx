@@ -21,9 +21,17 @@ import { useColorScheme } from '../useColorScheme';
 import { useRegisterForm } from './hooks/useRegisterForm';
 import { SkipButton } from './SkipButton';
 import { useCustomAlert } from '@/components/common/CustomAlert';
+import type { Step2Data, Step3Data, Step4Data, Step5Data } from './types';
+
+export type RegisterData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
 
 interface RegisterFormProps {
-  onRegister: (userData: any) => void;
+  onRegister: (userData: RegisterData) => void;
   onSwitchToLogin: () => void;
 }
 
@@ -38,10 +46,18 @@ const stepTitles = [
 const RegisterForm = memo<RegisterFormProps>(
   ({ onRegister, onSwitchToLogin }) => {
     // Refs para snapshots de cada paso
-    const step2Ref = useRef<any>(null);
-    const step3Ref = useRef<any>(null);
-    const step4Ref = useRef<any>(null);
-    const step5Ref = useRef<any>(null);
+    const step2Ref = useRef<{ snapshot: () => Partial<Step2Data> } | null>(
+      null
+    );
+    const step3Ref = useRef<{ snapshot: () => Partial<Step3Data> } | null>(
+      null
+    );
+    const step4Ref = useRef<{ snapshot: () => Partial<Step4Data> } | null>(
+      null
+    );
+    const step5Ref = useRef<{ snapshot: () => Partial<Step5Data> } | null>(
+      null
+    );
 
     const colorScheme = useColorScheme();
     const rStyles = makeRegisterFormStyles(colorScheme);
@@ -106,15 +122,21 @@ const RegisterForm = memo<RegisterFormProps>(
 
     // Atrás con preservación de estado
     const handleBackPreservingState = useCallback(() => {
+      type Snapper<T> = { snapshot: () => Partial<T> };
+      const hasSnapshot = <T,>(ref: unknown): ref is Snapper<T> => {
+        if (!ref || typeof ref !== 'object') return false;
+        const maybe = ref as { snapshot?: unknown };
+        return typeof maybe.snapshot === 'function';
+      };
       try {
-        if (currentStep === 1 && step2Ref.current?.snapshot) {
-          patchRegistrationData(step2Ref.current.snapshot());
-        } else if (currentStep === 2 && step3Ref.current?.snapshot) {
-          patchRegistrationData(step3Ref.current.snapshot());
-        } else if (currentStep === 3 && step4Ref.current?.snapshot) {
-          patchRegistrationData(step4Ref.current.snapshot());
-        } else if (currentStep === 4 && step5Ref.current?.snapshot) {
-          patchRegistrationData(step5Ref.current.snapshot());
+        if (currentStep === 1 && hasSnapshot(step2Ref.current)) {
+          patchRegistrationData(step2Ref.current!.snapshot());
+        } else if (currentStep === 2 && hasSnapshot(step3Ref.current)) {
+          patchRegistrationData(step3Ref.current!.snapshot());
+        } else if (currentStep === 3 && hasSnapshot(step4Ref.current)) {
+          patchRegistrationData(step4Ref.current!.snapshot());
+        } else if (currentStep === 4 && hasSnapshot(step5Ref.current)) {
+          patchRegistrationData(step5Ref.current!.snapshot());
         }
       } catch {}
       handleGoBack();

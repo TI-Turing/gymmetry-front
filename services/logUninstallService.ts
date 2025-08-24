@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddLogUninstallRequest } from '@/dto/LogUninstall/Request/AddLogUninstallRequest';
 import type { LogUninstall } from '@/models/LogUninstall';
 import type { UpdateLogUninstallRequest } from '@/dto/LogUninstall/Request/UpdateLogUninstallRequest';
@@ -7,12 +8,15 @@ import type { UpdateLogUninstallRequest } from '@/dto/LogUninstall/Request/Updat
 export const logUninstallService = {
   async addLogUninstall(
     request: AddLogUninstallRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/loguninstall/add`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/loguninstall/add`,
+      request
+    );
     return response;
   },
-  async deleteLogUninstall(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/loguninstall/${id}`);
+  async deleteLogUninstall(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/loguninstall/${id}`);
     return response;
   },
   async getLogUninstallById(id: string): Promise<ApiResponse<LogUninstall>> {
@@ -24,7 +28,7 @@ export const logUninstallService = {
     return response;
   },
   async findLogUninstallsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<LogUninstall[]>> {
     const response = await apiService.post<LogUninstall[]>(
       `/loguninstalls/find`,
@@ -34,8 +38,11 @@ export const logUninstallService = {
   },
   async updateLogUninstall(
     request: UpdateLogUninstallRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/loguninstall/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/loguninstall/update`,
+      request
+    );
     return response;
   },
 };

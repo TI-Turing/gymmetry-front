@@ -17,155 +17,168 @@ const GymPlanSelectedTypeList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderGymPlanSelectedTypeItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.typeName || item.name || 'Tipo de plan seleccionado'}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const typeName =
+        (r['typeName'] as string) ||
+        (r['name'] as string) ||
+        'Tipo de plan seleccionado';
+      const isActive = (r['isActive'] as boolean) ?? false;
+      const description =
+        (r['description'] as string) || 'Tipo de plan de gimnasio seleccionado';
+      const planName = (r['planName'] as string) ?? 'N/A';
+      const category = (r['category'] as string) ?? 'General';
+      const duration = (r['duration'] as number) ?? null;
+      const durationType = (r['durationType'] as string) ?? 'días';
+      const additionalPrice = (r['additionalPrice'] as number) ?? null;
+      const accessLevel = (r['accessLevel'] as string) ?? 'restricted';
+      const startDate = (r['startDate'] as string) ?? null;
+      const endDate = (r['endDate'] as string) ?? null;
+      const selectedBy = (r['selectedBy'] as string) ?? 'Usuario';
+      const isPaid = (r['isPaid'] as boolean) ?? false;
+      const benefits = Array.isArray(r['benefits'])
+        ? (r['benefits'] as string[])
+        : [];
 
-        <Text style={styles.description}>
-          {item.description || 'Tipo de plan de gimnasio seleccionado'}
-        </Text>
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{typeName}</Text>
+            <Text style={styles.statusText}>
+              {isActive ? 'Activo' : 'Inactivo'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Plan:</Text>
-          <Text style={styles.value}>{item.planName || 'N/A'}</Text>
-        </View>
+          <Text style={styles.description}>{description}</Text>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Tipo:</Text>
-          <Text style={styles.value}>{item.typeName || 'N/A'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Plan:</Text>
+            <Text style={styles.value}>{planName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>
-            {item.category === 'premium'
-              ? '⭐ Premium'
-              : item.category === 'standard'
-                ? '🏃 Estándar'
-                : item.category === 'basic'
-                  ? '💪 Básico'
-                  : 'General'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Tipo:</Text>
+            <Text style={styles.value}>{typeName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration
-              ? `${item.duration} ${item.durationType || 'días'}`
-              : 'Indefinida'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Categoría:</Text>
+            <Text style={styles.value}>
+              {category === 'premium'
+                ? '⭐ Premium'
+                : category === 'standard'
+                  ? '🏃 Estándar'
+                  : category === 'basic'
+                    ? '💪 Básico'
+                    : 'General'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Precio adicional:</Text>
-          <Text style={styles.value}>
-            {item.additionalPrice
-              ? `$${item.additionalPrice.toFixed(2)}`
-              : 'Incluido'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Duración:</Text>
+            <Text style={styles.value}>
+              {duration != null ? `${duration} ${durationType}` : 'Indefinida'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Acceso nivel:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color:
-                  item.accessLevel === 'full'
-                    ? '#4caf50'
-                    : item.accessLevel === 'limited'
-                      ? '#ffa726'
-                      : '#ff6b6b',
-              },
-            ]}
-          >
-            {item.accessLevel === 'full'
-              ? '✅ Completo'
-              : item.accessLevel === 'limited'
-                ? '⚠️ Limitado'
-                : '❌ Restringido'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Precio adicional:</Text>
+            <Text style={styles.value}>
+              {additionalPrice != null
+                ? `$${additionalPrice.toFixed(2)}`
+                : 'Incluido'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Fecha inicio:</Text>
-          <Text style={styles.value}>
-            {item.startDate
-              ? new Date(item.startDate).toLocaleDateString()
-              : 'N/A'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Acceso nivel:</Text>
+            <Text
+              style={[
+                styles.value,
+                {
+                  color:
+                    accessLevel === 'full'
+                      ? '#4caf50'
+                      : accessLevel === 'limited'
+                        ? '#ffa726'
+                        : '#ff6b6b',
+                },
+              ]}
+            >
+              {accessLevel === 'full'
+                ? '✅ Completo'
+                : accessLevel === 'limited'
+                  ? '⚠️ Limitado'
+                  : '❌ Restringido'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Fecha fin:</Text>
-          <Text style={styles.value}>
-            {item.endDate ? new Date(item.endDate).toLocaleDateString() : 'N/A'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Fecha inicio:</Text>
+            <Text style={styles.value}>
+              {startDate ? new Date(startDate).toLocaleDateString() : 'N/A'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Seleccionado por:</Text>
-          <Text style={styles.value}>{item.selectedBy || 'Usuario'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Fecha fin:</Text>
+            <Text style={styles.value}>
+              {endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Estado pago:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color: item.isPaid ? '#4caf50' : '#ff6b6b',
-              },
-            ]}
-          >
-            {item.isPaid ? '✅ Pagado' : '❌ Pendiente'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Seleccionado por:</Text>
+            <Text style={styles.value}>{selectedBy}</Text>
+          </View>
 
-        {item.benefits && Array.isArray(item.benefits) && (
-          <View style={styles.benefitsSection}>
-            <Text style={styles.benefitsLabel}>Beneficios incluidos:</Text>
-            <View style={styles.benefitsList}>
-              {item.benefits
-                .slice(0, 4)
-                .map((benefit: string, index: number) => (
+          <View style={styles.row}>
+            <Text style={styles.label}>Estado pago:</Text>
+            <Text
+              style={[styles.value, { color: isPaid ? '#4caf50' : '#ff6b6b' }]}
+            >
+              {isPaid ? '✅ Pagado' : '❌ Pendiente'}
+            </Text>
+          </View>
+
+          {!!benefits.length && (
+            <View style={styles.benefitsSection}>
+              <Text style={styles.benefitsLabel}>Beneficios incluidos:</Text>
+              <View style={styles.benefitsList}>
+                {benefits.slice(0, 4).map((benefit: string, index: number) => (
                   <Text key={index} style={styles.benefit}>
                     🎁 {benefit}
                   </Text>
                 ))}
-              {item.benefits.length > 4 && (
-                <Text style={styles.moreBenefits}>
-                  +{item.benefits.length - 4} más...
-                </Text>
-              )}
+                {benefits.length > 4 && (
+                  <Text style={styles.moreBenefits}>
+                    +{benefits.length - 4} más...
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
-        )}
-      </View>
-    ),
+          )}
+        </View>
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) =>
-      item.id ||
-      item.selectionId ||
-      `${item.planId}-${item.typeId}` ||
-      String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['SelectionId'] as string) ||
+      (r['selectionId'] as string) ||
+      (typeof r['planId'] === 'string' && typeof r['typeId'] === 'string'
+        ? `${r['planId']}-${r['typeId']}`
+        : null);
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

@@ -13,24 +13,31 @@ const DailyHistoryList = React.memo(() => {
     }
   }, []);
 
-  const renderDailyHistoryItem = useCallback(
-    ({ item }: { item: any }) => (
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
+  const renderDailyHistoryItem = useCallback(({ item }: { item: unknown }) => {
+    const o = isRecord(item) ? item : ({} as Record<string, unknown>);
+    const id = o.id != null ? String(o.id as unknown as string) : '';
+    const name = (typeof o.name === 'string' && o.name) || 'DailyHistory name';
+    return (
       <View style={styles.itemContainer}>
-        <Text style={styles.itemTitle}>DailyHistory: {item.id}</Text>
-        <Text style={styles.itemSubtitle}>
-          {item.name || 'DailyHistory name'}
-        </Text>
+        <Text style={styles.itemTitle}>DailyHistory: {id}</Text>
+        <Text style={styles.itemSubtitle}>{name}</Text>
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
   return (
     <EntityList
       title="Daily History"
       loadFunction={loadDailyHistories}
       renderItem={renderDailyHistoryItem}
-      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      keyExtractor={(item) =>
+        isRecord(item) && item.id != null
+          ? String(item.id as unknown as string)
+          : Math.random().toString()
+      }
       emptyMessage="No daily history found"
     />
   );

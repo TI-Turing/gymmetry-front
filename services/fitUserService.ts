@@ -1,16 +1,17 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddFitUserRequest } from '@/dto/FitUser/Request/AddFitUserRequest';
 import type { FitUser } from '@/models/FitUser';
 import type { UpdateFitUserRequest } from '@/dto/FitUser/Request/UpdateFitUserRequest';
 
 // Auto-generated service for FitUser Azure Functions
 export const fitUserService = {
-  async addFitUser(request: AddFitUserRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/fituser/add`, request);
+  async addFitUser(request: AddFitUserRequest): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(`/fituser/add`, request);
     return response;
   },
-  async deleteFitUser(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/fituser/${id}`);
+  async deleteFitUser(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/fituser/${id}`);
     return response;
   },
   async getFitUserById(id: string): Promise<ApiResponse<FitUser>> {
@@ -22,7 +23,7 @@ export const fitUserService = {
     return response;
   },
   async findFitUsersByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<FitUser[]>> {
     const response = await apiService.post<FitUser[]>(
       `/fitusers/find`,
@@ -32,8 +33,8 @@ export const fitUserService = {
   },
   async updateFitUser(
     request: UpdateFitUserRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/fituser/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(`/fituser/update`, request);
     return response;
   },
 

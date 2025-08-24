@@ -45,7 +45,7 @@ export default function RoutineTemplateDaysScreen() {
         DayNumber: dayNumber,
       } as any;
       const resp = await routineDayService.findRoutineDaysByFields(body);
-      let extracted: any[] = [];
+      let extracted: unknown[] = [];
       if (resp?.Success && resp?.Data) {
         if (Array.isArray(resp.Data)) extracted = resp.Data;
         else if (

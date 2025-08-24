@@ -1,16 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, View as RNView, TextInput, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import Button from '@/components/common/Button';
 import { physicalAssessmentService, authService } from '@/services';
+import type { AddPhysicalAssessmentRequest } from '@/dto/PhysicalAssessment/Request/AddPhysicalAssessmentRequest';
 import type { PhysicalAssessment } from '@/models/PhysicalAssessment';
 import { useColorScheme } from '@/components/useColorScheme';
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makePhysicalAssessmentStyles } from './styles/physicalAssessment';
 
-function daysBetween(a: Date, b: Date) {
+function _daysBetween(a: Date, b: Date) {
   const ms = Math.abs(b.getTime() - a.getTime());
   return Math.floor(ms / 86400000);
 }
@@ -98,7 +99,7 @@ function TrendChart({
 }
 
 function PhysicalAssessmentScreen() {
-  const colorScheme = useColorScheme();
+  const _colorScheme = useColorScheme();
   const styles = useThemedStyles(makePhysicalAssessmentStyles);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<PhysicalAssessment[]>([]);
@@ -144,11 +145,11 @@ function PhysicalAssessmentScreen() {
     return !isFinite(n) || n === 0;
   };
   const displayNum = (s?: string | null) => (isZeroOrEmpty(s) ? '—' : s);
-  const getYearLabel = (iso?: string | null): string => {
+  const getYearLabel = useCallback((iso?: string | null): string => {
     const t = getTimeSafe(iso);
     if (!t) return 'Sin fecha';
     return String(new Date(t).getFullYear());
-  };
+  }, []);
 
   // Sanitizador de entrada numérica: reemplaza coma por punto, solo dígitos y un punto
   const sanitizeNumericInput = (input: string) => {
@@ -256,14 +257,14 @@ function PhysicalAssessmentScreen() {
     );
     if (years.length === 0) return;
     const mostRecent = years[0]; // sortedItems ya viene descendente, el primero es el más reciente
-    setCollapsedYears((prev) => {
+    setCollapsedYears(() => {
       const next: Record<string, boolean> = {};
       years.forEach((y) => {
         next[y] = y !== mostRecent; // abrir más reciente, colapsar otros
       });
       return next;
     });
-  }, [sortedItems]);
+  }, [sortedItems, getYearLabel]);
 
   const loadData = async () => {
     setLoading(true);
@@ -271,7 +272,7 @@ function PhysicalAssessmentScreen() {
     try {
       const user = await authService.getUserData();
       // Armar body para filtrar desde backend
-      const body: Record<string, any> = { UserId: user?.id || '' };
+      const body: Record<string, unknown> = { UserId: user?.id || '' };
       const now = new Date();
       if (filter === 'last6Months') {
         const start = new Date(now);
@@ -297,12 +298,25 @@ function PhysicalAssessmentScreen() {
       }
       const resp =
         await physicalAssessmentService.findPhysicalAssessmentsByFields(
-          body as any
+          body as Record<string, unknown>
         );
-      let arr: any[] = [];
+      let arr: unknown[] = [];
       if (resp?.Success && resp.Data) {
-        const raw: any = resp.Data as any;
-        arr = Array.isArray(raw) ? raw : raw?.$values || [];
+        const raw: unknown = resp.Data as unknown;
+        const isRecord = (v: unknown): v is Record<string, unknown> =>
+          v !== null && typeof v === 'object';
+        if (Array.isArray(raw)) {
+          arr = raw;
+        } else if (isRecord(raw)) {
+          const vals = (raw as Record<string, unknown>)['$values'];
+          if (Array.isArray(vals)) {
+            arr = vals as unknown[];
+          } else {
+            arr = [];
+          }
+        } else {
+          arr = [];
+        }
       }
       setItems(arr as PhysicalAssessment[]);
     } catch {
@@ -379,7 +393,7 @@ function PhysicalAssessmentScreen() {
       const bmiRaw = computeBmi(weight, height);
       const bmi = isZeroOrEmpty(bmiRaw) ? '0' : bmiRaw;
       const orZero = (v: string) => (v?.trim().length ? v : '0');
-      const req: any = {
+      const req: AddPhysicalAssessmentRequest = {
         Height: orZero(height),
         Weight: orZero(weight),
         BodyFatPercentage: orZero(bodyFat),

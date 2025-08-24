@@ -7,6 +7,8 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { branchMediaService } from '@/services';
 
 const BranchMediaList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
   const loadBranchMedia = useCallback(async () => {
     const response = await branchMediaService.getAllBranchMedias();
     return response.Data || [];
@@ -15,20 +17,41 @@ const BranchMediaList = React.memo(() => {
   BranchMediaList.displayName = 'BranchMediaList';
 
   const renderBranchMediaItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: unknown }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.title || `Media ${item.id?.slice(0, 8)}`}
+            {(() => {
+              if (!isRecord(item)) return 'Media';
+              const title = item.title;
+              const id = item.id;
+              const idStr = typeof id === 'string' ? id.slice(0, 8) : 'N/A';
+              return typeof title === 'string' && title
+                ? title
+                : `Media ${idStr}`;
+            })()}
           </Text>
-          <Text style={styles.statusText}>{item.type || 'Imagen'}</Text>
+          <Text style={styles.statusText}>
+            {isRecord(item) && typeof item.type === 'string'
+              ? item.type
+              : 'Imagen'}
+          </Text>
         </View>
 
         <Text style={styles.branch}>
-          Sucursal: {item.branchName || item.branchId || 'N/A'}
+          {(() => {
+            if (!isRecord(item)) return 'Sucursal: N/A';
+            const name = item.branchName;
+            const bid = item.branchId;
+            const value =
+              (typeof name === 'string' && name) ||
+              (typeof bid === 'string' && bid) ||
+              'N/A';
+            return `Sucursal: ${value}`;
+          })()}
         </Text>
 
-        {item.description && (
+        {isRecord(item) && typeof item.description === 'string' && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
@@ -37,16 +60,28 @@ const BranchMediaList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Tamaño:</Text>
           <Text style={styles.value}>
-            {item.size ? `${(item.size / 1024).toFixed(2)} KB` : 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const size = item.size;
+              const n = typeof size === 'number' ? size : NaN;
+              return Number.isFinite(n) ? `${(n / 1024).toFixed(2)} KB` : 'N/A';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Subido:</Text>
           <Text style={styles.value}>
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString()
-              : 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const d = item.createdAt;
+              const iso = typeof d === 'string' || d instanceof Date ? d : '';
+              try {
+                return iso ? new Date(iso).toLocaleDateString() : 'N/A';
+              } catch {
+                return 'N/A';
+              }
+            })()}
           </Text>
         </View>
       </View>
@@ -54,10 +89,13 @@ const BranchMediaList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = item.id;
+      if (typeof id === 'string' && id) return id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

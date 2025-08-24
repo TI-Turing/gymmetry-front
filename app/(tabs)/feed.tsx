@@ -25,7 +25,23 @@ import { makeFeedStyles } from './styles/feed';
 
 function FeedScreen() {
   const styles = useThemedStyles(makeFeedStyles);
-  const [posts, setPosts] = useState<any[]>(() => {
+  type MinimalUser = {
+    Name?: string | null;
+    UserName?: string | null;
+    ProfileImageUrl?: string | null;
+    Id?: string | null;
+  };
+
+  type LocalPost = {
+    Id: string;
+    Content?: string | null;
+    MediaUrl?: string | null;
+    User?: User | MinimalUser | null;
+    Likes?: Record<string, unknown>[];
+    Comments?: Comment[];
+  } & Record<string, unknown>;
+
+  const [posts, setPosts] = useState<LocalPost[]>(() => {
     const now = new Date().toISOString();
     const userA: User = {
       Id: 'u1',
@@ -108,7 +124,7 @@ function FeedScreen() {
       ProfileImageUrl: 'https://via.placeholder.com/40?text=M',
     };
 
-    const p1: Post = {
+  const p1: LocalPost = {
       Id: 'p1',
       UserId: 'u1',
       Content: '¡Nuevo PR en peso muerto! 180kg 💪',
@@ -124,7 +140,7 @@ function FeedScreen() {
       Comments: [],
       Likes: [],
     };
-    const p2: Post = {
+  const p2: LocalPost = {
       Id: 'p2',
       UserId: 'u2',
       Content:
@@ -148,12 +164,11 @@ function FeedScreen() {
           DeletedAt: null,
           IsActive: true,
           IsDeleted: false,
-          Post: {} as any,
-          User: userA,
-        },
+          User: userA as unknown,
+        } as Record<string, unknown>,
       ],
     };
-    const p3: Post = {
+  const p3: LocalPost = {
       Id: 'p3',
       UserId: 'u3',
       Content: 'Día de piernas intenso. Mañana no podré caminar 😅',
@@ -165,9 +180,9 @@ function FeedScreen() {
       Ip: null,
       IsActive: true,
       IsDeleted: false,
-      User: userC,
-      Comments: [],
-      Likes: [],
+  User: userC,
+  Comments: [],
+  Likes: [],
     };
 
     return [p1, p2, p3];
@@ -178,7 +193,7 @@ function FeedScreen() {
   const [page, setPage] = useState<number>(1);
   const pageSize = 10;
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [allCache, setAllCache] = useState<any[] | null>(null);
+  const [allCache, setAllCache] = useState<LocalPost[] | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const endReachedAt = useRef<number>(0);
   const END_REACHED_DEBOUNCE_MS = 800;
@@ -209,8 +224,8 @@ function FeedScreen() {
         return;
       }
     } catch {}
-    const me = posts[0]?.User; // mock fallback
-    const newPost = {
+  const me = posts[0]?.User; // mock fallback
+  const newPost: LocalPost = {
       Id: 'p' + (Math.random() * 100000).toFixed(0),
       UserId: me?.Id || 'me',
       Content: content,
@@ -222,7 +237,7 @@ function FeedScreen() {
       Ip: null,
       IsActive: true,
       IsDeleted: false,
-      User: me as User,
+  User: me as User,
       Comments: [],
       Likes: [],
     };
@@ -230,17 +245,30 @@ function FeedScreen() {
   };
 
   const toggleLike = (postId: string) => {
+    const isRecord = (v: unknown): v is Record<string, unknown> =>
+      v !== null && typeof v === 'object';
     // mock: sólo ajusta la lista de Likes localmente
     setPosts((prev) =>
       prev.map((p) => {
         if (p.Id !== postId) return p;
         const meId = 'me';
-        const hasLike = p.Likes?.some((l: any) => l.UserId === meId);
+        const hasLike = (p.Likes || []).some((l: unknown) => {
+          if (!isRecord(l)) return false;
+          const uid = (l as Record<string, unknown>)['UserId'] as unknown;
+          return typeof uid === 'string' && uid === meId;
+        });
         if (hasLike) {
-          return { ...p, Likes: p.Likes.filter((l: any) => l.UserId !== meId) };
+          return {
+            ...p,
+            Likes: (p.Likes || []).filter((l: unknown) => {
+              if (!isRecord(l)) return true;
+              const uid = (l as Record<string, unknown>)['UserId'] as unknown;
+              return !(typeof uid === 'string' && uid === meId);
+            }),
+          };
         }
-        const now = new Date().toISOString();
-        const like = {
+  const now = new Date().toISOString();
+  const like = {
           Id: 'l' + Math.random(),
           PostId: p.Id,
           UserId: meId,
@@ -248,7 +276,7 @@ function FeedScreen() {
           DeletedAt: null,
           IsActive: true,
           IsDeleted: false,
-          Post: p as any,
+          Post: p as unknown,
           User: p.User,
         };
         return { ...p, Likes: [...(p.Likes || []), like] };
@@ -272,8 +300,8 @@ function FeedScreen() {
       Ip: null,
       IsActive: true,
       IsDeleted: false,
-      Post: p as any,
-      User: me as any,
+      Post: p as unknown as Post,
+      User: me as unknown as User,
     };
     setPosts((prev) =>
       prev.map((pp) =>
@@ -284,7 +312,7 @@ function FeedScreen() {
     );
   };
 
-  const mapFeedToPostCard = (feed: FeedResponseDto): any => {
+  const mapFeedToPostCard = (feed: FeedResponseDto): LocalPost => {
     return {
       Id: feed.Id,
       Content: feed.Description || feed.Title,
@@ -293,7 +321,7 @@ function FeedScreen() {
         UserName: 'Usuario',
         Name: feed.Title,
         ProfileImageUrl: 'https://via.placeholder.com/40',
-      },
+      } as MinimalUser,
       Likes: [],
       Comments: [],
     };
@@ -354,8 +382,10 @@ function FeedScreen() {
     }
   };
 
+  // Carga inicial del feed (omitimos dependencias intencionalmente)
   useEffect(() => {
     loadFeeds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const renderActiveUsers = () => (

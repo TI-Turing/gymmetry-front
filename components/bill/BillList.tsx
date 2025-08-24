@@ -7,33 +7,59 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { billService } from '@/services';
 
 export function BillList() {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
+
   const loadBills = useCallback(async () => {
     const response = await billService.getAllBills();
     return response.Data || [];
   }, []);
 
   const renderBillItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: unknown }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            Factura {item.id?.slice(0, 8) || 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'Factura N/A';
+              const id = item.id;
+              const idStr = typeof id === 'string' ? id : undefined;
+              return `Factura ${idStr?.slice(0, 8) || 'N/A'}`;
+            })()}
           </Text>
-          <Text style={styles.statusText}>{item.status || 'Pendiente'}</Text>
+          <Text style={styles.statusText}>
+            {isRecord(item) && typeof item.status === 'string'
+              ? item.status
+              : 'Pendiente'}
+          </Text>
         </View>
 
-        <Text style={styles.amount}>Monto: ${item.amount || '0.00'}</Text>
+        <Text style={styles.amount}>
+          {(() => {
+            if (!isRecord(item)) return 'Monto: $0.00';
+            const amount = item.amount;
+            const n = typeof amount === 'number' ? amount : NaN;
+            return `Monto: $${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`;
+          })()}
+        </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString()
-              : 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const d = item.createdAt;
+              const iso = typeof d === 'string' || d instanceof Date ? d : '';
+              try {
+                return iso ? new Date(iso).toLocaleDateString() : 'N/A';
+              } catch {
+                return 'N/A';
+              }
+            })()}
           </Text>
         </View>
 
-        {item.description && (
+        {isRecord(item) && typeof item.description === 'string' && (
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
@@ -43,10 +69,13 @@ export function BillList() {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = item.id;
+      if (typeof id === 'string' && id) return id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

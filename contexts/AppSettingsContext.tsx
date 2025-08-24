@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useCallback,
 } from 'react';
 import { Platform, useColorScheme as rnUseColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -123,15 +124,19 @@ export function AppSettingsProvider({
     }
   };
 
-  const setSettings: Ctx['setSettings'] = async (next) => {
+  const setSettings = useCallback<Ctx['setSettings']>(async (next) => {
     setSettingsState((prev) => {
       const merged =
-        typeof next === 'function' ? (next as any)(prev) : { ...prev, ...next };
+        typeof next === 'function'
+          ? (next as (p: AppSettings) => AppSettings)(prev)
+          : { ...prev, ...next };
       // best-effort persist
-      persist(merged).catch(() => {});
+      persist(merged).catch(() => {
+        // ignore
+      });
       return merged;
     });
-  };
+  }, []);
 
   const resolvedColorScheme: 'light' | 'dark' = useMemo(() => {
     if (settings.theme === 'system')
@@ -141,7 +146,7 @@ export function AppSettingsProvider({
 
   const value = useMemo<Ctx>(
     () => ({ settings, setSettings, resolvedColorScheme }),
-    [settings, resolvedColorScheme]
+    [settings, setSettings, resolvedColorScheme]
   );
 
   return (

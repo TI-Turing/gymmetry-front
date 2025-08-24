@@ -67,7 +67,10 @@ export default function PlanView({
       const FREE_PLAN_TYPE_ID = '4aa8380c-8479-4334-8236-3909be9c842b';
       if (response.Success && response.Data) {
         const raw = normalizeCollection(response.Data as any);
-        const active = raw.find((p: any) => p?.isActive || p?.IsActive);
+        const active = raw.find((p: unknown) => {
+          const r = (p || {}) as Record<string, unknown>;
+          return Boolean((r?.isActive as boolean) ?? (r?.IsActive as boolean));
+        });
         if (active) {
           setUsingFallbackFreePlan(false);
           const pick = <T,>(obj: unknown, a: string, b: string, fb?: T): T => {
@@ -78,16 +81,27 @@ export default function PlanView({
             id: pick<string>(active, 'id', 'Id'),
             userId: pick<string>(active, 'userId', 'UserId'),
             planTypeId: pick<string>(active, 'planTypeId', 'PlanTypeId'),
-            planTypeName:
-              (pick<any>(active, 'planType', 'PlanType')?.Name as string) ||
-              'Plan',
+            planTypeName: (() => {
+              const anyPt = pick<unknown>(active, 'planType', 'PlanType');
+              if (anyPt && typeof anyPt === 'object') {
+                const o = anyPt as { Name?: string; name?: string };
+                return o.Name || o.name || 'Plan';
+              }
+              return 'Plan';
+            })(),
             startDate: pick<string>(active, 'startDate', 'StartDate'),
             endDate: pick<string>(active, 'endDate', 'EndDate'),
             isActive: pick<boolean>(active, 'isActive', 'IsActive'),
-            price:
-              (pick<any>(active, 'planType', 'PlanType')?.Price as number) ||
-              (active as any)?.price ||
-              0,
+            price: (() => {
+              const anyPt = pick<unknown>(active, 'planType', 'PlanType');
+              if (anyPt && typeof anyPt === 'object') {
+                const o = anyPt as { Price?: number; price?: number };
+                return o.Price ?? o.price ?? 0;
+              }
+              const a = active as Record<string, unknown>;
+              const p = (a?.price as number) ?? 0;
+              return p;
+            })(),
           };
           setCurrentUserPlan(mapped);
         } else {

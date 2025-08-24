@@ -29,12 +29,15 @@ export function GymAwareComponent() {
     return <div>No hay datos de gimnasio disponibles</div>;
   }
 
+  const gd = gymData as
+    | { gym?: { Name?: string; Email?: string }; lastFetched?: string }
+    | undefined;
   return (
     <div>
       <h2>Información del Gimnasio</h2>
-      <p>Nombre: {gymData.gym?.Name}</p>
-      <p>Email: {gymData.gym?.Email}</p>
-      <p>Última actualización: {gymData.lastFetched}</p>
+      <p>Nombre: {gd?.gym?.Name}</p>
+      <p>Email: {gd?.gym?.Email}</p>
+      <p>Última actualización: {gd?.lastFetched}</p>
     </div>
   );
 }

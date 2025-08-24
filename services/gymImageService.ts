@@ -1,29 +1,33 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 
 // Auto-generated service for GymImage Azure Functions
 export const gymImageService = {
-  async addGymImage(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/gymimage/add`, request);
+  async addGymImage(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(`/gymimage/add`, request);
     return response;
   },
-  async deleteGymImage(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/gymimage/${id}`);
+  async deleteGymImage(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/gymimage/${id}`);
     return response;
   },
-  async getGymImageById(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.get<any>(`/gymimage/${id}`);
+  async getGymImageById(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.get<unknown>(`/gymimage/${id}`);
     return response;
   },
   async getAllGymImages(): Promise<ApiResponse<any[]>> {
     const response = await apiService.get<any[]>(`/gymimages`);
     return response;
   },
-  async updateGymImage(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/gymimage/update`, request);
+  async updateGymImage(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(`/gymimage/update`, request);
     return response;
   },
-  async uploadGymImage(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/gymimage/upload`, request);
+  async uploadGymImage(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/gymimage/upload`,
+      request
+    );
     return response;
   },
 };

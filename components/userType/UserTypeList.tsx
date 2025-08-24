@@ -6,14 +6,37 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { userTypeService } from '@/services';
 
+type UserTypeItem = {
+  id?: string;
+  name?: string;
+  isActive?: boolean;
+  description?: string;
+  permissions?: unknown[];
+  userCount?: number;
+};
+
 const UserTypeList = React.memo(() => {
-  const loadUserTypes = useCallback(async () => {
+  const loadUserTypes = useCallback(async (): Promise<UserTypeItem[]> => {
     const response = await userTypeService.getAllUserTypes();
-    return response.Data || [];
+    const raw = (response.Data || []) as unknown[];
+    return raw.map((r) => {
+      const o = r as Record<string, unknown>;
+      return {
+        id: (o.id as string) ?? (o.Id as string),
+        name: (o.name as string) ?? (o.Name as string),
+        isActive: (o.isActive as boolean) ?? (o.IsActive as boolean),
+        description:
+          (o.description as string) ?? (o.Description as string) ?? undefined,
+        permissions: Array.isArray(o.permissions)
+          ? (o.permissions as unknown[])
+          : [],
+        userCount: (o.userCount as number) ?? (o.UserCount as number) ?? 0,
+      };
+    });
   }, []);
 
   const renderUserTypeItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: UserTypeItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -45,12 +68,12 @@ const UserTypeList = React.memo(() => {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
+    (item: UserTypeItem) => item.id || String(Math.random()),
     []
   );
 
   return (
-    <EntityList
+    <EntityList<UserTypeItem>
       title="Tipos de Usuario"
       loadFunction={loadUserTypes}
       renderItem={renderUserTypeItem}

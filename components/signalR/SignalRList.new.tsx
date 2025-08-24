@@ -6,13 +6,20 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export function SignalRList() {
+  type SignalRItem = {
+    id?: string;
+    status?: string;
+    connectionId?: string;
+    userId?: string;
+    connectedAt?: string | number | Date;
+  };
   const loadSignalRItems = useCallback(async () => {
     // SignalR es un servicio de comunicación en tiempo real, no tiene listado
     return [];
   }, []);
 
   const renderSignalRItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: SignalRItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -44,7 +51,7 @@ export function SignalRList() {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.connectionId || String(Math.random()),
+    (item: SignalRItem) => item.connectionId || String(Math.random()),
     []
   );
 

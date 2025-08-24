@@ -114,7 +114,7 @@ export interface UsernameCheckRequest {
 export interface UsernameCheckResponse {
   Success: boolean;
   Message: string;
-  Data: any[];
+  Data: unknown[];
   StatusCode: number;
 }
 

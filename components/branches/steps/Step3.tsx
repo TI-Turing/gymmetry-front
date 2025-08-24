@@ -7,7 +7,7 @@ import { UI_CONSTANTS } from '@/constants/AppConstants';
 
 interface Step3Props {
   branchId: string;
-  onMediaUpload?: (mediaFiles: any[]) => void;
+  onMediaUpload?: (mediaFiles: unknown[]) => void;
 }
 
 export default function Step3({ branchId, onMediaUpload }: Step3Props) {

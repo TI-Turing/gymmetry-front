@@ -17,72 +17,93 @@ const MachineList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
-  const renderMachineItem = useCallback(
-    ({ item }: { item: any }) => (
+  type MachineItem = {
+    id?: string;
+    machineId?: string;
+    name?: string;
+    machineName?: string;
+    status?: 'available' | 'occupied' | 'maintenance' | string;
+    description?: string;
+    category?: string;
+    brand?: string;
+    model?: string;
+    targetMuscle?: string;
+    muscleGroup?: string;
+    location?: string;
+    zone?: string;
+    currentUser?: string;
+    sessionTime?: number;
+    difficulty?: 'hard' | 'medium' | 'easy' | string;
+    maxWeight?: number;
+    lastMaintenance?: string | number | Date;
+    nextMaintenance?: string | number | Date;
+    dailyUsage?: string | number;
+    features?: string[];
+  };
+  const renderMachineItem = useCallback(({ item }: { item: unknown }) => {
+    const it = (item || {}) as MachineItem;
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.name || item.machineName || 'Máquina'}
+            {it.name || it.machineName || 'Máquina'}
           </Text>
           <Text style={styles.statusText}>
-            {item.status === 'available'
+            {it.status === 'available'
               ? 'Disponible'
-              : item.status === 'occupied'
+              : it.status === 'occupied'
                 ? 'Ocupada'
-                : item.status === 'maintenance'
+                : it.status === 'maintenance'
                   ? 'Mantenimiento'
                   : 'Fuera de servicio'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.description || 'Máquina de gimnasio'}
+          {it.description || 'Máquina de gimnasio'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>{item.category || 'General'}</Text>
+          <Text style={styles.value}>{it.category || 'General'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Marca:</Text>
-          <Text style={styles.value}>{item.brand || 'N/A'}</Text>
+          <Text style={styles.value}>{it.brand || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Modelo:</Text>
-          <Text style={styles.value}>{item.model || 'N/A'}</Text>
+          <Text style={styles.value}>{it.model || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Área objetivo:</Text>
           <Text style={styles.value}>
-            {item.targetMuscle || item.muscleGroup || 'Múltiples'}
+            {it.targetMuscle || it.muscleGroup || 'Múltiples'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Ubicación:</Text>
-          <Text style={styles.value}>
-            {item.location || item.zone || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{it.location || it.zone || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Usuario actual:</Text>
           <Text style={styles.value}>
-            {item.currentUser ||
-              (item.status === 'available' ? 'Libre' : 'N/A')}
+            {it.currentUser || (it.status === 'available' ? 'Libre' : 'N/A')}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Tiempo uso:</Text>
           <Text style={styles.value}>
-            {item.sessionTime
-              ? `${Math.floor(item.sessionTime / 60)}:${String(item.sessionTime % 60).padStart(2, '0')}`
+            {typeof it.sessionTime === 'number'
+              ? `${Math.floor(it.sessionTime / 60)}:${String(it.sessionTime % 60).padStart(2, '0')}`
               : 'N/A'}
           </Text>
         </View>
@@ -94,17 +115,17 @@ const MachineList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.difficulty === 'hard'
+                  it.difficulty === 'hard'
                     ? '#FF6B35'
-                    : item.difficulty === 'medium'
+                    : it.difficulty === 'medium'
                       ? '#ffa726'
                       : '#ff6300',
               },
             ]}
           >
-            {item.difficulty === 'hard'
+            {it.difficulty === 'hard'
               ? '🔴 Difícil'
-              : item.difficulty === 'medium'
+              : it.difficulty === 'medium'
                 ? '🟡 Medio'
                 : '🟢 Fácil'}
           </Text>
@@ -113,15 +134,15 @@ const MachineList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Peso máximo:</Text>
           <Text style={styles.value}>
-            {item.maxWeight ? `${item.maxWeight} kg` : 'N/A'}
+            {typeof it.maxWeight === 'number' ? `${it.maxWeight} kg` : 'N/A'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Último mantenim.:</Text>
           <Text style={styles.value}>
-            {item.lastMaintenance
-              ? new Date(item.lastMaintenance).toLocaleDateString()
+            {it.lastMaintenance
+              ? new Date(it.lastMaintenance).toLocaleDateString()
               : 'N/A'}
           </Text>
         </View>
@@ -133,53 +154,50 @@ const MachineList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.nextMaintenance &&
-                  new Date(item.nextMaintenance) <=
+                  it.nextMaintenance &&
+                  new Date(it.nextMaintenance) <=
                     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
                     ? '#ffa726'
                     : Colors.light.text,
               },
             ]}
           >
-            {item.nextMaintenance
-              ? new Date(item.nextMaintenance).toLocaleDateString()
+            {it.nextMaintenance
+              ? new Date(it.nextMaintenance).toLocaleDateString()
               : 'No programado'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Usos hoy:</Text>
-          <Text style={styles.value}>{item.dailyUsage || '0'}</Text>
+          <Text style={styles.value}>{it.dailyUsage || '0'}</Text>
         </View>
 
-        {item.features && Array.isArray(item.features) && (
+        {it.features && Array.isArray(it.features) && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características:</Text>
             <View style={styles.featuresList}>
-              {item.features
-                .slice(0, 3)
-                .map((feature: string, index: number) => (
-                  <Text key={index} style={styles.feature}>
-                    ⚙️ {feature}
-                  </Text>
-                ))}
-              {item.features.length > 3 && (
+              {it.features.slice(0, 3).map((feature: string, index: number) => (
+                <Text key={index} style={styles.feature}>
+                  ⚙️ {feature}
+                </Text>
+              ))}
+              {it.features.length > 3 && (
                 <Text style={styles.moreFeatures}>
-                  +{item.features.length - 3} más...
+                  +{it.features.length - 3} más...
                 </Text>
               )}
             </View>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.machineId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const it = (item || {}) as MachineItem;
+    return it.id || it.machineId || String(Math.random());
+  }, []);
 
   return (
     <EntityList

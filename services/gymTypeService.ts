@@ -1,16 +1,17 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddGymTypeRequest } from '@/dto/GymType/Request/AddGymTypeRequest';
 import type { GymType } from '@/dto/gym/GymType';
 import type { UpdateGymTypeRequest } from '@/dto/GymType/Request/UpdateGymTypeRequest';
 
 // Auto-generated service for GymType Azure Functions
 export const gymTypeService = {
-  async addGymType(request: AddGymTypeRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/gymtype/add`, request);
+  async addGymType(request: AddGymTypeRequest): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(`/gymtype/add`, request);
     return response;
   },
-  async deleteGymType(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/gymtype/${id}`);
+  async deleteGymType(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/gymtype/${id}`);
     return response;
   },
   async getGymTypeById(id: string): Promise<ApiResponse<GymType>> {
@@ -22,7 +23,7 @@ export const gymTypeService = {
     return response;
   },
   async findGymTypesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<GymType[]>> {
     const response = await apiService.post<GymType[]>(
       `/gymtypes/find`,
@@ -32,8 +33,8 @@ export const gymTypeService = {
   },
   async updateGymType(
     request: UpdateGymTypeRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/gymtype/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(`/gymtype/update`, request);
     return response;
   },
 };

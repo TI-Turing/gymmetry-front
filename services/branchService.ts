@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddBranchRequest } from '@/dto/branch/AddBranchRequest';
 import type { Branch } from '@/models/Branch';
 import type { UpdateBranchRequest } from '@/dto/branch/UpdateBranchRequest';

@@ -4,9 +4,26 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
+type PostItem = Record<string, unknown> & {
+  id?: string;
+  postId?: string;
+  title?: string;
+  postTitle?: string;
+  isActive?: boolean;
+  content?: string;
+  description?: string;
+  author?: string;
+  date?: string;
+  likes?: number;
+  comments?: number;
+};
+
 const PostList = React.memo(() => {
-  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
-  const loadPosts = useCallback(async () => {
+  const servicePlaceholder = useCallback(
+    () => Promise.resolve([] as PostItem[]),
+    []
+  );
+  const loadPosts = useCallback(async (): Promise<PostItem[]> => {
     try {
       // Placeholder for actual service call
       const result = await servicePlaceholder();
@@ -14,10 +31,10 @@ const PostList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderPostItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: PostItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -56,10 +73,11 @@ const PostList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.postId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: PostItem) => {
+    return (
+      (item.id as string) || (item.postId as string) || String(Math.random())
+    );
+  }, []);
 
   return (
     <EntityList

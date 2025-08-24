@@ -17,45 +17,62 @@ const LikeList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
-  const renderLikeItem = useCallback(
-    ({ item }: { item: any }) => (
+  type LikeItem = {
+    id?: string;
+    likeId?: string;
+    userName?: string;
+    isActive?: boolean;
+    contentType?: 'post' | 'comment' | 'routine' | 'exercise' | string;
+    contentTitle?: string;
+    postTitle?: string;
+    contentAuthor?: string;
+    createdAt?: string | number | Date;
+    platform?: 'mobile' | 'web' | string;
+    totalLikes?: number | string;
+    contentLikes?: number | string;
+    gymName?: string;
+    reaction?: 'love' | 'laugh' | 'wow' | 'sad' | 'angry' | 'like' | string;
+  };
+  const renderLikeItem = useCallback(({ item }: { item: unknown }) => {
+    const it = (item || {}) as LikeItem;
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            ❤️ Like de: {item.userName || 'Usuario'}
+            ❤️ Like de: {it.userName || 'Usuario'}
           </Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Eliminado'}
+            {it.isActive ? 'Activo' : 'Eliminado'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.contentType === 'post'
+          {it.contentType === 'post'
             ? 'Me gusta en publicación'
-            : item.contentType === 'comment'
+            : it.contentType === 'comment'
               ? 'Me gusta en comentario'
-              : item.contentType === 'routine'
+              : it.contentType === 'routine'
                 ? 'Me gusta en rutina'
                 : 'Me gusta'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
-          <Text style={styles.value}>{item.userName || 'N/A'}</Text>
+          <Text style={styles.value}>{it.userName || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Contenido:</Text>
           <Text style={styles.value}>
-            {item.contentType === 'post'
+            {it.contentType === 'post'
               ? '📝 Publicación'
-              : item.contentType === 'comment'
+              : it.contentType === 'comment'
                 ? '💬 Comentario'
-                : item.contentType === 'routine'
+                : it.contentType === 'routine'
                   ? '🏋️ Rutina'
-                  : item.contentType === 'exercise'
+                  : it.contentType === 'exercise'
                     ? '💪 Ejercicio'
                     : 'Otro'}
           </Text>
@@ -64,28 +81,28 @@ const LikeList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Título contenido:</Text>
           <Text style={styles.value} numberOfLines={2}>
-            {item.contentTitle || item.postTitle || 'Sin título'}
+            {it.contentTitle || it.postTitle || 'Sin título'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Autor contenido:</Text>
-          <Text style={styles.value}>{item.contentAuthor || 'N/A'}</Text>
+          <Text style={styles.value}>{it.contentAuthor || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Fecha like:</Text>
           <Text style={styles.value}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'}
+            {it.createdAt ? new Date(it.createdAt).toLocaleString() : 'N/A'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Desde app:</Text>
           <Text style={styles.value}>
-            {item.platform === 'mobile'
+            {it.platform === 'mobile'
               ? '📱 Móvil'
-              : item.platform === 'web'
+              : it.platform === 'web'
                 ? '💻 Web'
                 : 'Desconocido'}
           </Text>
@@ -94,42 +111,41 @@ const LikeList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Total likes:</Text>
           <Text style={styles.value}>
-            {item.totalLikes || item.contentLikes || '0'}
+            {it.totalLikes || it.contentLikes || '0'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasio:</Text>
-          <Text style={styles.value}>{item.gymName || 'General'}</Text>
+          <Text style={styles.value}>{it.gymName || 'General'}</Text>
         </View>
 
-        {item.reaction && item.reaction !== 'like' && (
+        {it.reaction && it.reaction !== 'like' && (
           <View style={styles.reactionSection}>
             <Text style={styles.reactionLabel}>Reacción específica:</Text>
             <Text style={styles.reaction}>
-              {item.reaction === 'love'
+              {it.reaction === 'love'
                 ? '😍 Me encanta'
-                : item.reaction === 'laugh'
+                : it.reaction === 'laugh'
                   ? '😂 Me divierte'
-                  : item.reaction === 'wow'
+                  : it.reaction === 'wow'
                     ? '😮 Me asombra'
-                    : item.reaction === 'sad'
+                    : it.reaction === 'sad'
                       ? '😢 Me entristece'
-                      : item.reaction === 'angry'
+                      : it.reaction === 'angry'
                         ? '😠 Me molesta'
-                        : item.reaction}
+                        : it.reaction}
             </Text>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.likeId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const it = (item || {}) as LikeItem;
+    return it.id || it.likeId || String(Math.random());
+  }, []);
 
   return (
     <EntityList

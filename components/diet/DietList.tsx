@@ -7,57 +7,106 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { dietService } from '@/services';
 
 const DietList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
   const loadDiets = useCallback(async () => {
     const response = await dietService.getAllDiets();
     return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderDietItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: unknown }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.name || item.dietName || 'Dieta sin nombre'}
+            {(() => {
+              if (!isRecord(item)) return 'Dieta sin nombre';
+              const n1 = item.name;
+              const n2 = item.dietName;
+              return (typeof n1 === 'string' && n1) ||
+                (typeof n2 === 'string' && n2)
+                ? (n1 as string) || (n2 as string)
+                : 'Dieta sin nombre';
+            })()}
           </Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activa' : 'Inactiva'}
+            {isRecord(item) && item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.description || 'Sin descripción disponible'}
+          {isRecord(item) && typeof item.description === 'string'
+            ? item.description
+            : 'Sin descripción disponible'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
           <Text style={styles.value}>
-            {item.type || item.dietType || 'General'}
+            {(() => {
+              if (!isRecord(item)) return 'General';
+              const t1 = item.type;
+              const t2 = item.dietType;
+              return (typeof t1 === 'string' && t1) ||
+                (typeof t2 === 'string' && t2)
+                ? (t1 as string) || (t2 as string)
+                : 'General';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Calorías:</Text>
           <Text style={styles.value}>
-            {item.calories || item.totalCalories || 0} kcal
+            {(() => {
+              if (!isRecord(item)) return '0 kcal';
+              const c1 = item.calories;
+              const c2 = item.totalCalories;
+              const n =
+                (typeof c1 === 'number' && c1) ||
+                (typeof c2 === 'number' && c2) ||
+                0;
+              return `${n} kcal`;
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>{item.duration || 'N/A'} días</Text>
+          <Text style={styles.value}>
+            {(() => {
+              if (!isRecord(item)) return 'N/A días';
+              const d = item.duration;
+              const v =
+                typeof d === 'number' || typeof d === 'string' ? d : 'N/A';
+              return `${v} días`;
+            })()}
+          </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Usuarios:</Text>
-          <Text style={styles.value}>{item.userCount || 0} siguiendo</Text>
+          <Text style={styles.value}>
+            {(() => {
+              if (!isRecord(item)) return '0 siguiendo';
+              const n = typeof item.userCount === 'number' ? item.userCount : 0;
+              return `${n} siguiendo`;
+            })()}
+          </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Comidas:</Text>
-          <Text style={styles.value}>{item.mealCount || 0} configuradas</Text>
+          <Text style={styles.value}>
+            {(() => {
+              if (!isRecord(item)) return '0 configuradas';
+              const n = typeof item.mealCount === 'number' ? item.mealCount : 0;
+              return `${n} configuradas`;
+            })()}
+          </Text>
         </View>
 
-        {item.nutritionist && (
+        {isRecord(item) && typeof item.nutritionist === 'string' && (
           <View style={styles.row}>
             <Text style={styles.label}>Nutricionista:</Text>
             <Text style={styles.value}>{item.nutritionist}</Text>
@@ -68,10 +117,13 @@ const DietList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.dietId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = (item.id ?? item.dietId) as unknown;
+      if (typeof id === 'string' && id) return id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

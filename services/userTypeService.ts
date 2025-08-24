@@ -1,16 +1,19 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddUserTypeRequest } from '@/dto/UserType/Request/AddUserTypeRequest';
 import type { UserType } from '@/models/UserType';
 import type { UpdateUserTypeRequest } from '@/dto/UserType/Request/UpdateUserTypeRequest';
 
 // Auto-generated service for UserType Azure Functions
 export const userTypeService = {
-  async addUserType(request: AddUserTypeRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/usertype/add`, request);
+  async addUserType(
+    request: AddUserTypeRequest
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(`/usertype/add`, request);
     return response;
   },
-  async deleteUserType(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/usertype/${id}`);
+  async deleteUserType(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/usertype/${id}`);
     return response;
   },
   async getUserType(id: string): Promise<ApiResponse<UserType>> {
@@ -22,7 +25,7 @@ export const userTypeService = {
     return response;
   },
   async findUserTypesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<UserType[]>> {
     const response = await apiService.post<UserType[]>(
       `/usertypes/find`,
@@ -32,8 +35,8 @@ export const userTypeService = {
   },
   async updateUserType(
     request: UpdateUserTypeRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/usertype/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(`/usertype/update`, request);
     return response;
   },
 };

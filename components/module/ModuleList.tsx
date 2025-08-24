@@ -17,108 +17,124 @@ const ModuleList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
-  const renderModuleItem = useCallback(
-    ({ item }: { item: any }) => (
+  type ModuleItem = {
+    id?: string;
+    moduleId?: string;
+    name?: string;
+    moduleName?: string;
+    isActive?: boolean;
+    description?: string;
+    category?: string;
+    version?: string;
+    price?: number;
+    installations?: number;
+    installCount?: number;
+    subModules?: unknown[];
+    subModuleCount?: number;
+    developer?: string;
+    author?: string;
+    createdAt?: string | number | Date;
+    updatedAt?: string | number | Date;
+    features?: string[];
+  };
+  const renderModuleItem = useCallback(({ item }: { item: unknown }) => {
+    const it = (item || {}) as ModuleItem;
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.name || item.moduleName || 'Módulo'}
+            {it.name || it.moduleName || 'Módulo'}
           </Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
+            {it.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.description || 'Sin descripción disponible'}
+          {it.description || 'Sin descripción disponible'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>{item.category || 'General'}</Text>
+          <Text style={styles.value}>{it.category || 'General'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Versión:</Text>
-          <Text style={styles.value}>{item.version || '1.0.0'}</Text>
+          <Text style={styles.value}>{it.version || '1.0.0'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
           <Text style={styles.value}>
-            {item.price ? `$${item.price.toFixed(2)}` : 'Gratis'}
+            {typeof it.price === 'number'
+              ? `$${it.price.toFixed(2)}`
+              : 'Gratis'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Instalaciones:</Text>
           <Text style={styles.value}>
-            {item.installations || item.installCount || '0'}
+            {it.installations || it.installCount || '0'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Submódulos:</Text>
           <Text style={styles.value}>
-            {item.subModules?.length || item.subModuleCount || '0'}
+            {(Array.isArray(it.subModules) ? it.subModules.length : 0) ||
+              it.subModuleCount ||
+              '0'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Desarrollador:</Text>
-          <Text style={styles.value}>
-            {item.developer || item.author || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{it.developer || it.author || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Fecha creación:</Text>
           <Text style={styles.value}>
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString()
-              : 'N/A'}
+            {it.createdAt ? new Date(it.createdAt).toLocaleDateString() : 'N/A'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Última actualización:</Text>
           <Text style={styles.value}>
-            {item.updatedAt
-              ? new Date(item.updatedAt).toLocaleDateString()
-              : 'N/A'}
+            {it.updatedAt ? new Date(it.updatedAt).toLocaleDateString() : 'N/A'}
           </Text>
         </View>
 
-        {item.features && Array.isArray(item.features) && (
+        {it.features && Array.isArray(it.features) && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características:</Text>
             <View style={styles.featuresList}>
-              {item.features
-                .slice(0, 3)
-                .map((feature: string, index: number) => (
-                  <Text key={index} style={styles.feature}>
-                    • {feature}
-                  </Text>
-                ))}
-              {item.features.length > 3 && (
+              {it.features.slice(0, 3).map((feature: string, index: number) => (
+                <Text key={index} style={styles.feature}>
+                  • {feature}
+                </Text>
+              ))}
+              {it.features.length > 3 && (
                 <Text style={styles.moreFeatures}>
-                  +{item.features.length - 3} más...
+                  +{it.features.length - 3} más...
                 </Text>
               )}
             </View>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.moduleId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const it = (item || {}) as ModuleItem;
+    return it.id || it.moduleId || String(Math.random());
+  }, []);
 
   return (
     <EntityList

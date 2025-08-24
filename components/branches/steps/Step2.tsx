@@ -7,8 +7,8 @@ import { UI_CONSTANTS } from '@/constants/AppConstants';
 
 interface Step2Props {
   branchId: string;
-  formData: any;
-  onFormDataChange: (field: string, value: any) => void;
+  formData: unknown;
+  onFormDataChange: (field: string, value: unknown) => void;
 }
 
 export default function Step2({

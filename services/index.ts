@@ -1,6 +1,7 @@
 // Exportar el servicio principal de API
 export { apiService, default as ApiService } from './apiService';
-export type { ApiResponse, RequestOptions, HttpMethod } from './apiService';
+export type { RequestOptions, HttpMethod } from './apiService';
+export type { ApiResponse } from '@/dto/common/ApiResponse';
 
 // Servicios de autenticación y sesión
 export { authService } from './authService';

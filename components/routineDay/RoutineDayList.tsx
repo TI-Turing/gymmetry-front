@@ -6,55 +6,92 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { routineDayService } from '@/services';
 
+// Type guard util
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === 'object' && !Array.isArray(v);
+
 const RoutineDayList = React.memo(() => {
   const loadRoutineDays = useCallback(async () => {
     const response = await routineDayService.getAllRoutineDays();
-    return response.Data || [];
+    const raw = (response?.Data ?? []) as unknown;
+    let items: unknown[] = [];
+    if (Array.isArray(raw)) {
+      items = raw as unknown[];
+    } else if (
+      isRecord(raw) &&
+      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
+    ) {
+      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
+      items = (values ?? []) as unknown[];
+    }
+    return items;
   }, []);
 
-  const renderRoutineDayItem = useCallback(
-    ({ item }: { item: any }) => (
+  const renderRoutineDayItem = useCallback(({ item }: { item: unknown }) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const dayName =
+      (r['dayName'] as string) ?? (r['DayName'] as string) ?? null;
+    const dayNumber =
+      (r['dayNumber'] as number) ?? (r['DayNumber'] as number) ?? null;
+    const isCompleted =
+      (r['isCompleted'] as boolean) ?? (r['IsCompleted'] as boolean) ?? false;
+    const routineName =
+      (r['routineName'] as string) ?? (r['RoutineName'] as string) ?? null;
+    const routineId =
+      (r['routineId'] as string) ?? (r['RoutineId'] as string) ?? null;
+    const exerciseCount =
+      (r['exerciseCount'] as number) ?? (r['ExerciseCount'] as number) ?? 0;
+    const duration =
+      (r['duration'] as number) ?? (r['Duration'] as number) ?? null;
+    const completedAtStr =
+      (r['completedAt'] as string) ?? (r['CompletedAt'] as string) ?? null;
+    const completedAt = completedAtStr ? new Date(completedAtStr) : null;
+
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.dayName || `Día ${item.dayNumber}`}
+            {dayName || (dayNumber ? `Día ${dayNumber}` : 'Día')}
           </Text>
           <Text style={styles.statusText}>
-            {item.isCompleted ? 'Completado' : 'Pendiente'}
+            {isCompleted ? 'Completado' : 'Pendiente'}
           </Text>
         </View>
 
         <Text style={styles.routine}>
-          Rutina: {item.routineName || item.routineId || 'N/A'}
+          Rutina: {routineName || routineId || 'N/A'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>{item.exerciseCount || 0}</Text>
+          <Text style={styles.value}>{exerciseCount ?? 0}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>{item.duration || 'N/A'} min</Text>
+          <Text style={styles.value}>{duration ?? 'N/A'} min</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Completado:</Text>
           <Text style={styles.value}>
-            {item.completedAt
-              ? new Date(item.completedAt).toLocaleDateString()
-              : 'Pendiente'}
+            {completedAt ? completedAt.toLocaleDateString() : 'Pendiente'}
           </Text>
         </View>
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['RoutineDayId'] as string) ||
+      (r['routineDayId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

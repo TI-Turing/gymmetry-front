@@ -561,5 +561,4 @@ export const apiService = new ApiService();
 // Exportar la clase para casos específicos donde se necesite múltiples instancias
 export default ApiService;
 
-// Re-export del tipo para mantener compatibilidad con importaciones existentes en servicios
-export type ApiResponse<T = unknown> = BackendApiResponse<T>;
+// Use ApiResponse de dto/common si se requiere en servicios específicos

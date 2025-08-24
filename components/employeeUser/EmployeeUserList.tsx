@@ -7,66 +7,117 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { employeeUserService } from '@/services';
 
 const EmployeeUserList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
   const loadEmployeeUsers = useCallback(async () => {
     const response = await employeeUserService.getAllEmployeeUsers();
     return response.Success ? response.Data || [] : [];
   }, []);
 
   const renderEmployeeUserItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: unknown }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.fullName || item.name || 'Empleado sin nombre'}
+            {(() => {
+              if (!isRecord(item)) return 'Empleado sin nombre';
+              const n1 = item.fullName;
+              const n2 = item.name;
+              return (typeof n1 === 'string' && n1) ||
+                (typeof n2 === 'string' && n2)
+                ? (n1 as string) || (n2 as string)
+                : 'Empleado sin nombre';
+            })()}
           </Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
+            {isRecord(item) && item.isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
 
         <Text style={styles.email}>
-          {item.email || 'Sin email configurado'}
+          {isRecord(item) && typeof item.email === 'string'
+            ? item.email
+            : 'Sin email configurado'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Código:</Text>
           <Text style={styles.value}>
-            {item.employeeCode || item.code || 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const a = item.employeeCode;
+              const b = item.code;
+              return (typeof a === 'string' && a) ||
+                (typeof b === 'string' && b)
+                ? (a as string) || (b as string)
+                : 'N/A';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Posición:</Text>
           <Text style={styles.value}>
-            {item.position || item.jobTitle || 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const a = item.position;
+              const b = item.jobTitle;
+              return (typeof a === 'string' && a) ||
+                (typeof b === 'string' && b)
+                ? (a as string) || (b as string)
+                : 'N/A';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Departamento:</Text>
-          <Text style={styles.value}>{item.department || 'No asignado'}</Text>
+          <Text style={styles.value}>
+            {isRecord(item) && typeof item.department === 'string'
+              ? item.department
+              : 'No asignado'}
+          </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Teléfono:</Text>
           <Text style={styles.value}>
-            {item.phone || item.phoneNumber || 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const a = item.phone;
+              const b = item.phoneNumber;
+              return (typeof a === 'string' && a) ||
+                (typeof b === 'string' && b)
+                ? (a as string) || (b as string)
+                : 'N/A';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Fecha ingreso:</Text>
           <Text style={styles.value}>
-            {item.hireDate
-              ? new Date(item.hireDate).toLocaleDateString()
-              : 'N/A'}
+            {(() => {
+              if (!isRecord(item)) return 'N/A';
+              const d = item.hireDate;
+              const iso = typeof d === 'string' || d instanceof Date ? d : '';
+              try {
+                return iso ? new Date(iso).toLocaleDateString() : 'N/A';
+              } catch {
+                return 'N/A';
+              }
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Salario:</Text>
           <Text style={styles.value}>
-            {item.salary ? `$${item.salary}` : 'No especificado'}
+            {(() => {
+              if (!isRecord(item)) return 'No especificado';
+              const s = item.salary;
+              return typeof s === 'number' ? `$${s}` : 'No especificado';
+            })()}
           </Text>
         </View>
       </View>
@@ -74,10 +125,13 @@ const EmployeeUserList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.employeeId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = (item.id ?? item.employeeId) as unknown;
+      if (typeof id === 'string' && id) return id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

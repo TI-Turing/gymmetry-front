@@ -1,5 +1,6 @@
 // Servicio específico para Branch (Azure Function: Branch_AddBranchFunction)
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 
 // Interfaces DTO (basadas en el cuerpo de la Azure Function)
 export interface CreateBranchRequest {
@@ -33,21 +34,21 @@ export const BranchApiService = {
     return response;
   },
 
-  async getBranchById(id: string): Promise<ApiResponse<any>> {
+  async getBranchById(id: string): Promise<ApiResponse<unknown>> {
     // GET /branch/{id}
-    const response = await apiService.get<any>(`/branch/${id}`);
+    const response = await apiService.get<unknown>(`/branch/${id}`);
     return response;
   },
 
-  async updateBranch(request: any): Promise<ApiResponse<any>> {
+  async updateBranch(request: unknown): Promise<ApiResponse<unknown>> {
     // PUT /branch/update
-    const response = await apiService.put<any>('/branch/update', request);
+    const response = await apiService.put<unknown>('/branch/update', request);
     return response;
   },
 
-  async deleteBranch(id: string): Promise<ApiResponse<any>> {
+  async deleteBranch(id: string): Promise<ApiResponse<unknown>> {
     // DELETE /branch/{id}
-    const response = await apiService.delete<any>(`/branch/${id}`);
+    const response = await apiService.delete<unknown>(`/branch/${id}`);
     return response;
   },
 

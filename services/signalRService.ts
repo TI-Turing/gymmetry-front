@@ -1,13 +1,17 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 
 // Auto-generated service for SignalR Azure Functions
 export const signalRService = {
-  async negotiate(): Promise<ApiResponse<any>> {
-    const response = await apiService.get<any>(`/negotiate`);
+  async negotiate(): Promise<ApiResponse<unknown>> {
+    const response = await apiService.get<unknown>(`/negotiate`);
     return response;
   },
-  async sendNotification(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/send-notification`, request);
+  async sendNotification(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/send-notification`,
+      request
+    );
     return response;
   },
 };

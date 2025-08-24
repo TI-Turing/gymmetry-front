@@ -8,56 +8,89 @@ import { makeRoutineTemplateStyles } from './styles.themed';
 
 const RoutineTemplateList = React.memo(() => {
   const styles = useThemedStyles(makeRoutineTemplateStyles);
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadRoutineTemplates = useCallback(async () => {
     const response = await routineTemplateService.getAllRoutineTemplates();
-    return response.Data || [];
+    const raw = (response?.Data ?? []) as unknown;
+    let items: unknown[] = [];
+    if (Array.isArray(raw)) items = raw as unknown[];
+    else if (
+      isRecord(raw) &&
+      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
+    ) {
+      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
+      items = (values ?? []) as unknown[];
+    }
+    return items;
   }, []);
 
   const renderRoutineTemplateItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.listCard}>
-        <View style={styles.listHeader}>
-          <Text style={styles.listTitle}>
-            {item.name || `Template ${item.id?.slice(0, 8)}`}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Activa' : 'Inactiva'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const id = (r['Id'] as string) || (r['id'] as string) || '';
+      const name = (r['name'] as string) || (r['Name'] as string) || null;
+      const isActive =
+        (r['isActive'] as boolean) ?? (r['IsActive'] as boolean) ?? false;
+      const description =
+        (r['description'] as string) ?? (r['Description'] as string) ?? null;
+      const exerciseCount =
+        (r['exerciseCount'] as number) ?? (r['ExerciseCount'] as number) ?? 0;
+      const duration =
+        (r['duration'] as number) ?? (r['Duration'] as number) ?? null;
+      const createdAtStr =
+        (r['createdAt'] as string) ?? (r['CreatedAt'] as string) ?? null;
+      const createdAt = createdAtStr ? new Date(createdAtStr) : null;
 
-        {item.description && (
-          <Text style={styles.description} numberOfLines={3}>
-            {item.description}
-          </Text>
-        )}
+      return (
+        <View style={styles.listCard}>
+          <View style={styles.listHeader}>
+            <Text style={styles.listTitle}>
+              {name || `Template ${id ? id.slice(0, 8) : ''}`}
+            </Text>
+            <Text style={styles.statusText}>
+              {isActive ? 'Activa' : 'Inactiva'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>{item.exerciseCount || '0'}</Text>
-        </View>
+          {!!description && (
+            <Text style={styles.description} numberOfLines={3}>
+              {description}
+            </Text>
+          )}
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>{item.duration || 'N/A'} min</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Ejercicios:</Text>
+            <Text style={styles.value}>{String(exerciseCount)}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Creada:</Text>
-          <Text style={styles.value}>
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString()
-              : 'N/A'}
-          </Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>Duración:</Text>
+            <Text style={styles.value}>{duration ?? 'N/A'} min</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Creada:</Text>
+            <Text style={styles.value}>
+              {createdAt ? createdAt.toLocaleDateString() : 'N/A'}
+            </Text>
+          </View>
         </View>
-      </View>
-    ),
-    []
+      );
+    },
+    [styles]
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['RoutineTemplateId'] as string) ||
+      (r['routineTemplateId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

@@ -5,9 +5,34 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
+type NotificationItem = Record<string, unknown> & {
+  id?: string;
+  notificationId?: string;
+  title?: string;
+  subject?: string;
+  isRead?: boolean;
+  message?: string;
+  body?: string;
+  type?: string;
+  category?: string;
+  priority?: 'high' | 'medium' | 'low' | string;
+  sender?: string;
+  from?: string;
+  recipient?: string;
+  to?: string;
+  createdAt?: string;
+  channel?: string;
+  actionRequired?: boolean;
+};
+
 const NotificationList = React.memo(() => {
-  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
-  const loadNotifications = useCallback(async () => {
+  const servicePlaceholder = useCallback(
+    () => Promise.resolve([] as NotificationItem[]),
+    []
+  );
+  const loadNotifications = useCallback(async (): Promise<
+    NotificationItem[]
+  > => {
     try {
       // Placeholder for actual service call
 
@@ -17,10 +42,10 @@ const NotificationList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderNotificationItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: NotificationItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -99,10 +124,13 @@ const NotificationList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.notificationId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: NotificationItem) => {
+    return (
+      (item.id as string) ||
+      (item.notificationId as string) ||
+      String(Math.random())
+    );
+  }, []);
 
   return (
     <EntityList

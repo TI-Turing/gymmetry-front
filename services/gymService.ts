@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddGymRequest } from '@/dto/gym/Request/AddGymRequest';
 import type { FindGymsByFieldsRequest } from '@/dto/gym/FindGymsByFieldsRequest';
 import type { UpdateGymRequest } from '@/dto/gym/Request/UpdateGymRequest';

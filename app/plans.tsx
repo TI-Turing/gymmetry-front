@@ -24,10 +24,6 @@ export default function PlansModal() {
   >(null);
   const [usingFallbackFreePlan, setUsingFallbackFreePlan] = useState(false);
 
-  useEffect(() => {
-    checkUserRole();
-  }, []);
-
   const checkUserRole = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -74,6 +70,10 @@ export default function PlansModal() {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    checkUserRole();
+  }, [checkUserRole]);
 
   const handlePlanCreatedOrChanged = () => {
     setRefreshCounter((c) => c + 1);

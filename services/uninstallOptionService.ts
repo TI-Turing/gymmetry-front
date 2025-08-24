@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddUninstallOptionRequest } from '@/dto/UninstallOption/Request/AddUninstallOptionRequest';
 import type { UninstallOption } from '@/models/UninstallOption';
 import type { UpdateUninstallOptionRequest } from '@/dto/UninstallOption/Request/UpdateUninstallOptionRequest';
@@ -7,15 +8,15 @@ import type { UpdateUninstallOptionRequest } from '@/dto/UninstallOption/Request
 export const uninstallOptionService = {
   async addUninstallOption(
     request: AddUninstallOptionRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/uninstalloption/add`,
       request
     );
     return response;
   },
-  async deleteUninstallOption(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/uninstalloption/${id}`);
+  async deleteUninstallOption(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/uninstalloption/${id}`);
     return response;
   },
   async getUninstallOption(id: string): Promise<ApiResponse<UninstallOption>> {
@@ -30,7 +31,7 @@ export const uninstallOptionService = {
     return response;
   },
   async findUninstallOptionsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<UninstallOption[]>> {
     const response = await apiService.post<UninstallOption[]>(
       `/uninstalloptions/find`,
@@ -40,8 +41,8 @@ export const uninstallOptionService = {
   },
   async updateUninstallOption(
     request: UpdateUninstallOptionRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/uninstalloption/update`,
       request
     );

@@ -1,11 +1,12 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 
 export interface PaymentPreferenceResponse {
   Id: string; // preference id
   InitPoint?: string; // URL checkout producción (puede no venir en plan gratis)
   SandboxInitPoint?: string; // URL sandbox
   Status?: string; // pending | approved (gratis) etc.
-  AdditionalData?: any;
+  AdditionalData?: unknown;
   // Alias de conveniencia
   preferenceId?: string;
 }
@@ -84,7 +85,7 @@ class PaymentService {
     intervalMs = 5000,
     timeoutMs = 180000,
     shouldStop?: () => boolean
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<unknown>> {
     const start = Date.now();
     while (true) {
       if (shouldStop?.()) throw new Error('Polling cancelled');

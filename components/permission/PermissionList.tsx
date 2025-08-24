@@ -5,9 +5,34 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
+type PermissionItem = Record<string, unknown> & {
+  id?: string;
+  permissionId?: string;
+  name?: string;
+  permissionName?: string;
+  isActive?: boolean;
+  description?: string;
+  module?: string;
+  action?: string;
+  level?: 'admin' | 'manager' | 'user' | string;
+  resource?: string;
+  code?: string;
+  permissionCode?: string;
+  usersCount?: number;
+  assignedUsers?: unknown[];
+  rolesCount?: number;
+  assignedRoles?: unknown[];
+  createdAt?: string;
+  requiresTwoFactor?: boolean;
+  constraints?: string[];
+};
+
 const PermissionList = React.memo(() => {
-  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
-  const loadPermissions = useCallback(async () => {
+  const servicePlaceholder = useCallback(
+    () => Promise.resolve([] as PermissionItem[]),
+    []
+  );
+  const loadPermissions = useCallback(async (): Promise<PermissionItem[]> => {
     try {
       // Placeholder for actual service call
 
@@ -17,10 +42,10 @@ const PermissionList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderPermissionItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: PermissionItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -155,10 +180,13 @@ const PermissionList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.permissionId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: PermissionItem) => {
+    return (
+      (item.id as string) ||
+      (item.permissionId as string) ||
+      String(Math.random())
+    );
+  }, []);
 
   return (
     <EntityList

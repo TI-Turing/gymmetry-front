@@ -8,7 +8,7 @@ import Colors from '@/constants/Colors';
 
 export function UserTypeDetail() {
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

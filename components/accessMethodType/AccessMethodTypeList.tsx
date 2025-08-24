@@ -7,47 +7,69 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { accessMethodTypeService } from '@/services';
 
 export function AccessMethodTypeList() {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
   const loadAccessMethodTypes = useCallback(async () => {
     const response = await accessMethodTypeService.getAllAccessMethodTypes();
     return response.Data || [];
   }, []);
 
   const renderAccessMethodTypeItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || `Método ${item.id?.slice(0, 8)}`}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const rec = isRecord(item) ? (item as Record<string, unknown>) : null;
+      const name =
+        rec && typeof rec['name'] === 'string' ? (rec['name'] as string) : '';
+      const id =
+        rec && typeof rec['id'] === 'string' ? (rec['id'] as string) : '';
+      const isActive = rec ? Boolean(rec['isActive']) : false;
+      const description =
+        rec && typeof rec['description'] === 'string'
+          ? (rec['description'] as string)
+          : '';
+      const type =
+        rec && typeof rec['type'] === 'string' ? (rec['type'] as string) : '';
+      const securityLevel =
+        rec && typeof rec['securityLevel'] === 'string'
+          ? (rec['securityLevel'] as string)
+          : '';
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              {name || (id ? `Método ${id.slice(0, 8)}` : 'Método sin nombre')}
+            </Text>
+            <Text style={styles.statusText}>
+              {isActive ? 'Activo' : 'Inactivo'}
+            </Text>
+          </View>
 
-        {item.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {item.description}
-          </Text>
-        )}
+          {description ? (
+            <Text style={styles.description} numberOfLines={2}>
+              {description}
+            </Text>
+          ) : null}
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Tipo:</Text>
-          <Text style={styles.value}>{item.type || 'Estándar'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Tipo:</Text>
+            <Text style={styles.value}>{type || 'Estándar'}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Seguridad:</Text>
-          <Text style={styles.value}>{item.securityLevel || 'Media'}</Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>Seguridad:</Text>
+            <Text style={styles.value}>{securityLevel || 'Media'}</Text>
+          </View>
         </View>
-      </View>
-    ),
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item) && typeof item.id === 'string' && item.id) {
+      return item.id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

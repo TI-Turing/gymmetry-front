@@ -7,107 +7,130 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { gymTypeService } from '@/services/gymTypeService';
 
 const GymTypeList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadGymTypes = useCallback(async () => {
     try {
       const response = await gymTypeService.getAllGymTypes();
-      return response.Data || [];
+      const raw = (response?.Data ?? []) as unknown;
+      if (Array.isArray(raw)) return raw as unknown[];
+      if (isRecord(raw) && Array.isArray((raw['$values'] as unknown[]) ?? [])) {
+        return ((raw['$values'] as unknown[]) ?? []) as unknown[];
+      }
+      return [];
     } catch (_error) {
       // Fallback to mock data if service doesn't exist
       return [];
     }
   }, []);
 
-  const renderGymTypeItem = useCallback(
-    ({ item }: { item: any }) => (
+  const renderGymTypeItem = useCallback(({ item }: { item: unknown }) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const name =
+      (r['name'] as string) || (r['typeName'] as string) || 'Tipo sin nombre';
+    const isActive = (r['isActive'] as boolean) ?? false;
+    const description =
+      (r['description'] as string) ?? 'Sin descripción disponible';
+    const category = (r['category'] as string) ?? 'Comercial';
+    const typicalCapacity =
+      (r['typicalCapacity'] as number) ?? (r['capacity'] as number) ?? null;
+    const suggestedArea = (r['suggestedArea'] as number) ?? null;
+    const equipment =
+      (r['equipment'] as string) ||
+      (r['requiredEquipment'] as string) ||
+      'Estándar';
+    const services =
+      (r['services'] as string) ||
+      (r['includedServices'] as string) ||
+      'Básicos';
+    const basePrice = (r['basePrice'] as number) ?? null;
+    const gymCount =
+      (r['gymCount'] as number) ?? (r['totalGyms'] as number) ?? null;
+    const features = Array.isArray(r['features'])
+      ? (r['features'] as string[])
+      : [];
+
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || item.typeName || 'Tipo sin nombre'}
-          </Text>
+          <Text style={styles.title}>{name}</Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
+            {isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
 
-        <Text style={styles.description}>
-          {item.description || 'Sin descripción disponible'}
-        </Text>
+        <Text style={styles.description}>{description}</Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>{item.category || 'Comercial'}</Text>
+          <Text style={styles.value}>{category}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad típica:</Text>
-          <Text style={styles.value}>
-            {item.typicalCapacity || item.capacity || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{typicalCapacity ?? 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Área sugerida:</Text>
           <Text style={styles.value}>
-            {item.suggestedArea ? `${item.suggestedArea} m²` : 'N/A'}
+            {suggestedArea != null ? `${suggestedArea} m²` : 'N/A'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Equipamiento:</Text>
-          <Text style={styles.value}>
-            {item.equipment || item.requiredEquipment || 'Estándar'}
-          </Text>
+          <Text style={styles.value}>{equipment}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Servicios:</Text>
-          <Text style={styles.value}>
-            {item.services || item.includedServices || 'Básicos'}
-          </Text>
+          <Text style={styles.value}>{services}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Precio base:</Text>
           <Text style={styles.value}>
-            {item.basePrice ? `$${item.basePrice.toFixed(2)}` : 'Consultar'}
+            {basePrice != null ? `$${basePrice.toFixed(2)}` : 'Consultar'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Gimnasios:</Text>
-          <Text style={styles.value}>
-            {item.gymCount || item.totalGyms || '0'}
-          </Text>
+          <Text style={styles.value}>{gymCount ?? '0'}</Text>
         </View>
 
-        {item.features && Array.isArray(item.features) && (
+        {!!features.length && (
           <View style={styles.featuresSection}>
             <Text style={styles.featuresLabel}>Características:</Text>
             <View style={styles.featuresList}>
-              {item.features
-                .slice(0, 3)
-                .map((feature: string, index: number) => (
-                  <Text key={index} style={styles.feature}>
-                    • {feature}
-                  </Text>
-                ))}
-              {item.features.length > 3 && (
+              {features.slice(0, 3).map((feature: string, index: number) => (
+                <Text key={index} style={styles.feature}>
+                  • {feature}
+                </Text>
+              ))}
+              {features.length > 3 && (
                 <Text style={styles.moreFeatures}>
-                  +{item.features.length - 3} más...
+                  +{features.length - 3} más...
                 </Text>
               )}
             </View>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.typeId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['TypeId'] as string) ||
+      (r['typeId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

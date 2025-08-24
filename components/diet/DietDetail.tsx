@@ -9,7 +9,7 @@ import { dietService } from '@/services';
 
 export function DietDetail() {
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

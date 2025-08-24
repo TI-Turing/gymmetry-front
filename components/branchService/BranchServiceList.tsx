@@ -19,111 +19,137 @@ const BranchServiceList = React.memo(() => {
     }
   }, [servicePlaceholder]);
 
-  const renderBranchServiceItem = useCallback(
-    ({ item }: { item: any }) => (
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
+  const renderBranchServiceItem = useCallback(({ item }: { item: unknown }) => {
+    const o = isRecord(item) ? item : ({} as Record<string, unknown>);
+    const title =
+      (typeof o.serviceName === 'string' && o.serviceName) ||
+      (typeof o.name === 'string' && o.name) ||
+      'Servicio';
+    const isActive = Boolean((o as any).isActive);
+    const description =
+      (typeof o.description === 'string' && o.description) ||
+      'Servicio de la sucursal';
+    const branchName =
+      (typeof o.branchName === 'string' && o.branchName) || 'N/A';
+    const category =
+      (typeof o.category === 'string' && o.category) || 'General';
+    const priceRaw = (o as any).price;
+    const priceText =
+      typeof priceRaw === 'number' ? `$${priceRaw.toFixed(2)}` : 'Incluido';
+    const durationRaw = (o as any).duration;
+    const durationText =
+      typeof durationRaw === 'number' ? `${durationRaw} min` : 'Variable';
+    const availability =
+      (typeof o.availability === 'string' && o.availability) || 'Por horario';
+    const maxCapacityRaw = (o as any).maxCapacity;
+    const maxCapacityText =
+      typeof maxCapacityRaw === 'number'
+        ? `${maxCapacityRaw} personas`
+        : 'Ilimitada';
+    const requiresInstructor = Boolean((o as any).requiresInstructor);
+    const requiresReservation = Boolean((o as any).requiresReservation);
+    const rating = (o as any).rating ?? '0.0';
+    const reviewCount = (o as any).reviewCount ?? 0;
+    const equipmentArr = Array.isArray((o as any).equipment)
+      ? ((o as any).equipment as unknown[]).filter((e) => typeof e === 'string')
+      : [];
+
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.serviceName || item.name || 'Servicio'}
-          </Text>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
+            {isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
 
-        <Text style={styles.description}>
-          {item.description || 'Servicio de la sucursal'}
-        </Text>
+        <Text style={styles.description}>{description}</Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Sucursal:</Text>
-          <Text style={styles.value}>{item.branchName || 'N/A'}</Text>
+          <Text style={styles.value}>{branchName}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>{item.category || 'General'}</Text>
+          <Text style={styles.value}>{category}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Precio:</Text>
-          <Text style={styles.value}>
-            {item.price ? `$${item.price.toFixed(2)}` : 'Incluido'}
-          </Text>
+          <Text style={styles.value}>{priceText}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration ? `${item.duration} min` : 'Variable'}
-          </Text>
+          <Text style={styles.value}>{durationText}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Disponibilidad:</Text>
-          <Text style={styles.value}>{item.availability || 'Por horario'}</Text>
+          <Text style={styles.value}>{availability}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad:</Text>
-          <Text style={styles.value}>
-            {item.maxCapacity ? `${item.maxCapacity} personas` : 'Ilimitada'}
-          </Text>
+          <Text style={styles.value}>{maxCapacityText}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Instructor:</Text>
           <Text style={styles.value}>
-            {item.requiresInstructor ? 'Requerido' : 'No requerido'}
+            {requiresInstructor ? 'Requerido' : 'No requerido'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Reserva:</Text>
           <Text style={styles.value}>
-            {item.requiresReservation ? 'Con reserva' : 'Sin reserva'}
+            {requiresReservation ? 'Con reserva' : 'Sin reserva'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Popularidad:</Text>
           <Text style={styles.value}>
-            ⭐ {item.rating || '0.0'} ({item.reviewCount || 0} reseñas)
+            ⭐ {String(rating)} ({String(reviewCount)} reseñas)
           </Text>
         </View>
 
-        {item.equipment && Array.isArray(item.equipment) && (
+        {equipmentArr.length > 0 && (
           <View style={styles.equipmentSection}>
             <Text style={styles.equipmentLabel}>Equipamiento:</Text>
             <View style={styles.equipmentList}>
-              {item.equipment
-                .slice(0, 3)
-                .map((equip: string, index: number) => (
-                  <Text key={index} style={styles.equipmentItem}>
-                    • {equip}
-                  </Text>
-                ))}
-              {item.equipment.length > 3 && (
+              {equipmentArr.slice(0, 3).map((equip: unknown, index: number) => (
+                <Text key={index} style={styles.equipmentItem}>
+                  • {String(equip)}
+                </Text>
+              ))}
+              {equipmentArr.length > 3 && (
                 <Text style={styles.moreEquipment}>
-                  +{item.equipment.length - 3} más...
+                  +{equipmentArr.length - 3} más...
                 </Text>
               )}
             </View>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) =>
-      item.id ||
-      item.serviceId ||
-      `${item.branchId}-${item.serviceId}` ||
-      String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = (item.id as any) ?? (item.serviceId as any);
+      if (id != null) return String(id);
+      const b = (item.branchId as any) ?? (item.BranchId as any);
+      const s = (item.serviceId as any) ?? (item.ServiceId as any);
+      if (b != null && s != null) return `${String(b)}-${String(s)}`;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

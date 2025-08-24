@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddDailyExerciseHistoryRequest } from '@/dto/DailyExerciseHistory/Request/AddDailyExerciseHistoryRequest';
 import type { DailyExerciseHistory } from '@/models/DailyExerciseHistory';
 import type { UpdateDailyExerciseHistoryRequest } from '@/dto/DailyExerciseHistory/Request/UpdateDailyExerciseHistoryRequest';
@@ -7,15 +8,15 @@ import type { UpdateDailyExerciseHistoryRequest } from '@/dto/DailyExerciseHisto
 export const dailyExerciseHistoryService = {
   async addDailyExerciseHistory(
     request: AddDailyExerciseHistoryRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/dailyexercisehistory/add`,
       request
     );
     return response;
   },
-  async deleteDailyExerciseHistory(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(
+  async deleteDailyExerciseHistory(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(
       `/dailyexercisehistory/${id}`
     );
     return response;
@@ -37,7 +38,7 @@ export const dailyExerciseHistoryService = {
     return response;
   },
   async findDailyExerciseHistoriesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<DailyExerciseHistory[]>> {
     const response = await apiService.post<DailyExerciseHistory[]>(
       `/dailyexercisehistories/find`,
@@ -47,8 +48,8 @@ export const dailyExerciseHistoryService = {
   },
   async updateDailyExerciseHistory(
     request: UpdateDailyExerciseHistoryRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/dailyexercisehistory/update`,
       request
     );

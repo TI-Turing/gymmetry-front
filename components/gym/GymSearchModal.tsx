@@ -101,7 +101,7 @@ export default function GymSearchModal({
     setShowGymInfo(true);
   };
 
-  const handleConnectToGym = async (gymId: string) => {
+  const handleConnectToGym = async (_gymId: string) => {
     try {
       // TODO: Implementar conexión del usuario al gym
       // Esto debería actualizar el UserGym y el cache del usuario

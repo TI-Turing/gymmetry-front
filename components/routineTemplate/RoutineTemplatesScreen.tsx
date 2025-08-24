@@ -70,7 +70,11 @@ function RoutineTemplatesScreen() {
   const filteredTemplates = useMemo(() => {
     // Excluir la rutina actualmente asignada (si se conoce su id) de la lista disponible
     let base = applyRoutineFilters(templates, filters);
-    const aa: any = activeAssignment as any;
+    const aa = activeAssignment as unknown as {
+      RoutineTemplate?: { Id?: string };
+      RoutineTemplateId?: string;
+      RoutineTemplates?: { Id?: string }[];
+    } | null;
     const activeTemplateId =
       aa?.RoutineTemplate?.Id ||
       aa?.RoutineTemplateId ||
@@ -82,7 +86,9 @@ function RoutineTemplatesScreen() {
   }, [templates, filters, activeAssignment]);
 
   // Instrumentación helper
-  const log = (label: string, start?: number) => {};
+  const log = (_label: string, _start?: number) => {
+    // no-op
+  };
 
   const fetchTemplatesFirst = useCallback(async () => {
     loadCountRef.current += 1;
@@ -123,7 +129,9 @@ function RoutineTemplatesScreen() {
       // 2. Cargar asignación en paralelo (sin bloquear la UI principal)
       const tAssignedStart = performance.now();
       routineAssignedService
-        .findRoutineAssignedsByFields({ field: 'UserId', value: userId } as any)
+        .findRoutineAssignedsByFields({
+          UserId: userId,
+        } as Record<string, unknown>)
         .then((assignedRes) => {
           log('assigned fetch', tAssignedStart);
           if (
@@ -134,9 +142,11 @@ function RoutineTemplatesScreen() {
             const active = assignedRes.Data[0];
             setActiveAssignment(active);
             // Persistir RoutineTemplateId activo
-            const rtid =
-              (active as any)?.RoutineTemplateId ||
-              (active as any)?.RoutineTemplates?.[0]?.Id;
+            const a = active as unknown as {
+              RoutineTemplateId?: string;
+              RoutineTemplates?: { Id?: string }[];
+            };
+            const rtid = a?.RoutineTemplateId || a?.RoutineTemplates?.[0]?.Id;
             if (rtid) authService.setActiveRoutineTemplateId(rtid);
           } else {
             setActiveAssignment(null);
@@ -144,8 +154,9 @@ function RoutineTemplatesScreen() {
         })
         .catch(() => setActiveAssignment(null))
         .finally(() => setLoadingAssignment(false));
-    } catch (e: any) {
-      setError(e.message || 'Error al cargar rutinas');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Error al cargar rutinas';
+      setError(msg);
       setLoadingTemplates(false);
       setLoadingAssignment(false);
       if (skeletonTimerRef.current) clearTimeout(skeletonTimerRef.current);
@@ -162,16 +173,21 @@ function RoutineTemplatesScreen() {
   }, [fetchTemplatesFirst]);
 
   // Cerrar modal de asignación con tecla Escape en web
+  const closeAssignModal = useCallback(() => {
+    if (assignLoading) return;
+    setShowAssignModal(false);
+  }, [assignLoading]);
+
   useEffect(() => {
     if (Platform.OS !== 'web') return;
-    const onKeyDown = (e: any) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if ((e?.key === 'Escape' || e?.key === 'Esc') && showAssignModal) {
         closeAssignModal();
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [showAssignModal]);
+  }, [showAssignModal, closeAssignModal]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -240,13 +256,8 @@ function RoutineTemplatesScreen() {
   const openDetailScreen = (template: RoutineTemplate) => {
     router.push({
       pathname: '/routine-template-detail',
-      params: { templateId: String((template as any).Id) },
+      params: { templateId: String(template.Id) },
     });
-  };
-
-  const closeAssignModal = () => {
-    if (assignLoading) return;
-    setShowAssignModal(false);
   };
 
   const handleAssignRoutine = async () => {
@@ -269,33 +280,31 @@ function RoutineTemplatesScreen() {
       // Refrescar asignaciones para obtener la activa reciente
       const assignedRes =
         await routineAssignedService.findRoutineAssignedsByFields({
-          field: 'UserId',
-          value: user.id,
-        } as any);
+          UserId: user.id,
+        } as Record<string, unknown>);
       if (
         assignedRes?.Success &&
         Array.isArray(assignedRes.Data) &&
         assignedRes.Data.length > 0
       ) {
         // Tomar la más reciente (asumimos primera) y añadir template seleccionado para mostrar nombre
-        const newest = assignedRes.Data[0];
+        const newest = assignedRes.Data[0] as unknown as {
+          RoutineTemplateId?: string;
+          RoutineTemplates?: { Id?: string }[];
+        };
         // Asegurar que la plantilla esté disponible para la card
-        const newestAny: any = newest as any;
-        if (
-          !newestAny.RoutineTemplates ||
-          newestAny.RoutineTemplates.length === 0
-        ) {
-          newestAny.RoutineTemplates = [selectedTemplate as any];
+        if (!newest.RoutineTemplates || newest.RoutineTemplates.length === 0) {
+          newest.RoutineTemplates = [{ Id: selectedTemplate.Id }];
         }
-        setActiveAssignment(newest as any);
+        setActiveAssignment(newest as unknown as RoutineAssigned);
         const rtid =
-          (newest as any)?.RoutineTemplateId ||
-          (newest as any)?.RoutineTemplates?.[0]?.Id;
+          newest?.RoutineTemplateId || newest?.RoutineTemplates?.[0]?.Id;
         if (rtid) await authService.setActiveRoutineTemplateId(rtid);
       }
       setShowAssignModal(false);
-    } catch (e: any) {
-      setAssignError(e.message || 'Error desconocido');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Error desconocido';
+      setAssignError(msg);
     } finally {
       setAssignLoading(false);
     }

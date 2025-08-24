@@ -374,10 +374,13 @@ export default function RoutineDayScreen() {
         if (resp?.Success) {
           // Extraer DailyId del response (puede venir como objeto o string)
           const dailyId: string | null = (() => {
-            const d: any = resp.Data as any;
+            const d: unknown = resp.Data as unknown;
             if (!d) return null;
             if (typeof d === 'string') return d;
-            if (typeof d === 'object' && d.Id) return String(d.Id);
+            if (typeof d === 'object' && d !== null && 'Id' in d) {
+              const v = (d as Record<string, unknown>).Id;
+              if (v != null) return String(v as unknown as string);
+            }
             return null;
           })();
           // Registrar sets por ejercicio en DailyExercise (uno por set)
@@ -502,7 +505,7 @@ export default function RoutineDayScreen() {
         try {
           const resp = await routineDayService.findRoutineDaysByFields(body);
           // Normalizar posibles formas .NET ($values)
-          let extracted: any[] = [];
+          let extracted: unknown[] = [];
           if (resp?.Success && resp?.Data) {
             if (Array.isArray(resp.Data)) {
               extracted = resp.Data;
@@ -542,16 +545,19 @@ export default function RoutineDayScreen() {
         const loadedProgress: Record<string, ExerciseProgress> = {};
         for (const d of data) {
           const key = keyExerciseProgress(d.Id);
-          const persisted: any = await rsGetJSON<any>(key);
-          const completedSets = Math.min(
-            typeof persisted?.completedSets === 'number'
-              ? persisted.completedSets
-              : 0,
-            d.Sets || 0
-          );
+          const persisted: unknown = await rsGetJSON<unknown>(key);
+          const isRec = (v: unknown): v is Record<string, unknown> =>
+            !!v && typeof v === 'object';
+          const completedSetsRaw = isRec(persisted)
+            ? (persisted as Record<string, unknown>).completedSets
+            : undefined;
+          const completedSetsNum =
+            typeof completedSetsRaw === 'number' ? completedSetsRaw : 0;
+          const maxSets = Number(d.Sets || 0);
+          const completedSets = Math.min(completedSetsNum, maxSets);
           loadedProgress[d.Id] = {
             completedSets,
-            isCompleted: completedSets >= (d.Sets || 0),
+            isCompleted: completedSets >= maxSets,
           };
         }
         setProgressById(loadedProgress);

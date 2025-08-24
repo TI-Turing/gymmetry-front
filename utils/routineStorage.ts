@@ -58,7 +58,7 @@ export async function removeItem(key: string): Promise<void> {
 }
 
 // JSON helpers
-export async function getJSON<T = any>(key: string): Promise<T | null> {
+export async function getJSON<T = unknown>(key: string): Promise<T | null> {
   const raw = await getItem(key);
   if (!raw) return null;
   try {
@@ -68,7 +68,10 @@ export async function getJSON<T = any>(key: string): Promise<T | null> {
   }
 }
 
-export async function setJSON(key: string, value: any): Promise<void> {
+export async function setJSON<T = unknown>(
+  key: string,
+  value: T
+): Promise<void> {
   try {
     await setItem(key, JSON.stringify(value));
   } catch {

@@ -13,90 +13,111 @@ export function GymPlanSelectedList() {
 
       const result = await servicePlaceholder();
 
-      return result || [];
+      const raw = (result ?? []) as unknown;
+      return Array.isArray(raw) ? (raw as unknown[]) : [];
     } catch (error) {
       return [];
     }
   }, []);
 
   const renderGymPlanSelectedItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.planName || item.name || 'Plan seleccionado'}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const planName =
+        (r['planName'] as string) ||
+        (r['name'] as string) ||
+        'Plan seleccionado';
+      const isActive =
+        (r['isActive'] as boolean) ?? (r['IsActive'] as boolean) ?? false;
+      const description =
+        (r['description'] as string) ?? 'Plan de gimnasio seleccionado';
+      const gymName = (r['gymName'] as string) ?? 'N/A';
+      const userName = (r['userName'] as string) ?? 'N/A';
+      const startDate = (r['startDate'] as string) ?? null;
+      const endDate = (r['endDate'] as string) ?? null;
+      const price = (r['price'] as number) ?? null;
+      const isPaid = (r['isPaid'] as boolean) ?? false;
+      const moduleCount = (r['moduleCount'] as number) ?? null;
+      const modules = Array.isArray(r['modules'])
+        ? (r['modules'] as unknown[])
+        : null;
 
-        <Text style={styles.description}>
-          {item.description || 'Plan de gimnasio seleccionado'}
-        </Text>
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{planName}</Text>
+            <Text style={styles.statusText}>
+              {isActive ? 'Activo' : 'Inactivo'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Gimnasio:</Text>
-          <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
-        </View>
+          <Text style={styles.description}>{description}</Text>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Usuario:</Text>
-          <Text style={styles.value}>{item.userName || 'N/A'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Gimnasio:</Text>
+            <Text style={styles.value}>{gymName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Fecha inicio:</Text>
-          <Text style={styles.value}>
-            {item.startDate
-              ? new Date(item.startDate).toLocaleDateString()
-              : 'N/A'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Usuario:</Text>
+            <Text style={styles.value}>{userName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Fecha fin:</Text>
-          <Text style={styles.value}>
-            {item.endDate ? new Date(item.endDate).toLocaleDateString() : 'N/A'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Fecha inicio:</Text>
+            <Text style={styles.value}>
+              {startDate ? new Date(startDate).toLocaleDateString() : 'N/A'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Precio:</Text>
-          <Text style={styles.value}>
-            {item.price ? `$${item.price.toFixed(2)}` : 'N/A'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Fecha fin:</Text>
+            <Text style={styles.value}>
+              {endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Estado pago:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color: item.isPaid ? Colors.light.tabIconSelected : '#ff6b6b',
-              },
-            ]}
-          >
-            {item.isPaid ? 'Pagado' : 'Pendiente'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Precio:</Text>
+            <Text style={styles.value}>
+              {price != null ? `$${price.toFixed(2)}` : 'N/A'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Módulos:</Text>
-          <Text style={styles.value}>
-            {item.moduleCount || item.modules?.length || '0'}
-          </Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>Estado pago:</Text>
+            <Text
+              style={[
+                styles.value,
+                { color: isPaid ? Colors.light.tabIconSelected : '#ff6b6b' },
+              ]}
+            >
+              {isPaid ? 'Pagado' : 'Pendiente'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Módulos:</Text>
+            <Text style={styles.value}>
+              {moduleCount ?? modules?.length ?? '0'}
+            </Text>
+          </View>
         </View>
-      </View>
-    ),
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.selectionId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['SelectionId'] as string) ||
+      (r['selectionId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

@@ -6,9 +6,26 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 
+type OtpItem = {
+  id?: string;
+  code?: string;
+  purpose?: string;
+  userEmail?: string;
+  phone?: string;
+  type?: 'email' | 'sms' | 'call' | string;
+  createdAt?: string;
+  expiresAt?: string;
+  isUsed?: boolean;
+  usedAt?: string;
+  isExpired?: boolean;
+  attempts?: number;
+  maxAttempts?: number;
+  originIp?: string;
+};
+
 export function OtpDetail() {
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, _setItem] = useState<OtpItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

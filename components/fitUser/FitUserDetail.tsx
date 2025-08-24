@@ -9,7 +9,7 @@ import { fitUserService } from '@/services';
 
 export function FitUserDetail() {
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

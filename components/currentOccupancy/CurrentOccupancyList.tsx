@@ -13,15 +13,22 @@ const CurrentOccupancyList = React.memo(() => {
     }
   }, []);
 
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
   const renderCurrentOccupancyItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.itemContainer}>
-        <Text style={styles.itemTitle}>CurrentOccupancy: {item.id}</Text>
-        <Text style={styles.itemSubtitle}>
-          {item.name || 'CurrentOccupancy name'}
-        </Text>
-      </View>
-    ),
+    ({ item }: { item: unknown }) => {
+      const obj = isRecord(item) ? item : ({} as Record<string, unknown>);
+      const id = obj.id != null ? String(obj.id as unknown as string) : '';
+      const name =
+        (typeof obj.name === 'string' && obj.name) || 'CurrentOccupancy name';
+      return (
+        <View style={styles.itemContainer}>
+          <Text style={styles.itemTitle}>CurrentOccupancy: {id}</Text>
+          <Text style={styles.itemSubtitle}>{name}</Text>
+        </View>
+      );
+    },
     []
   );
 
@@ -30,7 +37,11 @@ const CurrentOccupancyList = React.memo(() => {
       title="Current Occupancy"
       loadFunction={loadCurrentOccupancies}
       renderItem={renderCurrentOccupancyItem}
-      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      keyExtractor={(item) =>
+        isRecord(item) && item.id != null
+          ? String(item.id as unknown as string)
+          : Math.random().toString()
+      }
       emptyMessage="No current occupancies found"
     />
   );

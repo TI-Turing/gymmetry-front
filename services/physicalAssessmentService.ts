@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddPhysicalAssessmentRequest } from '@/dto/PhysicalAssessment/Request/AddPhysicalAssessmentRequest';
 import type { PhysicalAssessment } from '@/models/PhysicalAssessment';
 import type { UpdatePhysicalAssessmentRequest } from '@/dto/PhysicalAssessment/Request/UpdatePhysicalAssessmentRequest';
@@ -7,15 +8,17 @@ import type { UpdatePhysicalAssessmentRequest } from '@/dto/PhysicalAssessment/R
 export const physicalAssessmentService = {
   async addPhysicalAssessment(
     request: AddPhysicalAssessmentRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/physicalassessment/add`,
       request
     );
     return response;
   },
-  async deletePhysicalAssessment(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/physicalassessment/${id}`);
+  async deletePhysicalAssessment(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(
+      `/physicalassessment/${id}`
+    );
     return response;
   },
   async getPhysicalAssessmentById(
@@ -34,7 +37,7 @@ export const physicalAssessmentService = {
     return response;
   },
   async findPhysicalAssessmentsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<PhysicalAssessment[]>> {
     const response = await apiService.post<PhysicalAssessment[]>(
       `/physicalassessments/find`,
@@ -44,8 +47,8 @@ export const physicalAssessmentService = {
   },
   async updatePhysicalAssessment(
     request: UpdatePhysicalAssessmentRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/physicalassessment/update`,
       request
     );

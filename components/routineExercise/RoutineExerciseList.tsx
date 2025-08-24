@@ -6,58 +6,95 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { routineexerciseService } from '@/services';
 
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === 'object' && !Array.isArray(v);
+
 const RoutineExerciseList = React.memo(() => {
   const loadRoutineExercises = useCallback(async () => {
     const response = await routineexerciseService.getAllRoutineExercises();
-    return response.Data || [];
+    const raw = (response?.Data ?? []) as unknown;
+    let items: unknown[] = [];
+    if (Array.isArray(raw)) items = raw as unknown[];
+    else if (
+      isRecord(raw) &&
+      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
+    ) {
+      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
+      items = (values ?? []) as unknown[];
+    }
+    return items;
   }, []);
 
   const renderRoutineExerciseItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.exerciseName || item.name || 'Ejercicio sin nombre'}
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const exerciseName =
+        (r['exerciseName'] as string) || (r['name'] as string) || null;
+      const isCompleted =
+        (r['isCompleted'] as boolean) ?? (r['IsCompleted'] as boolean) ?? false;
+      const routineName =
+        (r['routineName'] as string) ?? (r['RoutineName'] as string) ?? null;
+      const routineId =
+        (r['routineId'] as string) ?? (r['RoutineId'] as string) ?? null;
+      const sets = (r['sets'] as number) ?? (r['Sets'] as number) ?? 0;
+      const reps = (r['reps'] as number) ?? (r['Reps'] as number) ?? 0;
+      const weight = (r['weight'] as number) ?? (r['Weight'] as number) ?? null;
+      const restTime =
+        (r['restTime'] as number) ?? (r['RestTime'] as number) ?? null;
+      const notes = (r['notes'] as string) ?? (r['Notes'] as string) ?? null;
+
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              {exerciseName || 'Ejercicio sin nombre'}
+            </Text>
+            <Text style={styles.statusText}>
+              {isCompleted ? 'Realizado' : 'Pendiente'}
+            </Text>
+          </View>
+
+          <Text style={styles.routine}>
+            Rutina: {routineName || routineId || 'N/A'}
           </Text>
-          <Text style={styles.statusText}>
-            {item.isCompleted ? 'Realizado' : 'Pendiente'}
-          </Text>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Series:</Text>
+            <Text style={styles.value}>{sets}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Repeticiones:</Text>
+            <Text style={styles.value}>{reps}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Peso:</Text>
+            <Text style={styles.value}>{weight ?? 'N/A'} kg</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Descanso:</Text>
+            <Text style={styles.value}>{restTime ?? 'N/A'} seg</Text>
+          </View>
+
+          {!!notes && <Text style={styles.notes}>Notas: {notes}</Text>}
         </View>
-
-        <Text style={styles.routine}>
-          Rutina: {item.routineName || item.routineId || 'N/A'}
-        </Text>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Series:</Text>
-          <Text style={styles.value}>{item.sets || 0}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Repeticiones:</Text>
-          <Text style={styles.value}>{item.reps || 0}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Peso:</Text>
-          <Text style={styles.value}>{item.weight || 'N/A'} kg</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Descanso:</Text>
-          <Text style={styles.value}>{item.restTime || 'N/A'} seg</Text>
-        </View>
-
-        {item.notes && <Text style={styles.notes}>Notas: {item.notes}</Text>}
-      </View>
-    ),
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['RoutineExerciseId'] as string) ||
+      (r['routineExerciseId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

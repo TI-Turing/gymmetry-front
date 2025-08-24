@@ -12,18 +12,19 @@ interface Props {
 const RoutineAssignedCard: React.FC<Props> = ({ assignment, onPress }) => {
   // Backend a veces devuelve la plantilla como "RoutineTemplate" (objeto) o como
   // colección "RoutineTemplates" (array). Fallback al primer elemento si existe.
-  const template: any =
-    assignment.RoutineTemplate ||
-    (assignment as any)?.RoutineTemplates?.[0] ||
-    null;
+  type ShortTpl = { Name: string; Premium?: boolean };
+  const templateObj = (assignment as unknown as {
+    RoutineTemplate?: ShortTpl;
+    RoutineTemplates?: ShortTpl[];
+  }) || { RoutineTemplate: undefined, RoutineTemplates: undefined };
+  const template: Partial<ShortTpl> | null =
+    templateObj.RoutineTemplate || templateObj.RoutineTemplates?.[0] || null;
   const createdAtDate = assignment?.CreatedAt
     ? new Date(assignment.CreatedAt)
     : null;
-  const Wrapper: React.ComponentType<any> = onPress ? TouchableOpacity : View;
-  return (
-    <Wrapper
+  const content = (
+    <View
       style={styles.container}
-      {...(onPress ? { onPress, activeOpacity: 0.8 } : {})}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={onPress ? 'Ver rutina de hoy' : undefined}
     >
@@ -55,8 +56,16 @@ const RoutineAssignedCard: React.FC<Props> = ({ assignment, onPress }) => {
           Tocar para ver rutina de hoy
         </Text>
       )}
-    </Wrapper>
+    </View>
   );
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+        {content}
+      </TouchableOpacity>
+    );
+  }
+  return content;
 };
 
 export default RoutineAssignedCard;

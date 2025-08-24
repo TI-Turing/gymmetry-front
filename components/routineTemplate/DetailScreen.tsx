@@ -76,8 +76,9 @@ export default function RoutineTemplateDetailScreen() {
       } else {
         setAuthorName(null);
       }
-    } catch (e: any) {
-      setError(e?.message || 'Error al cargar el detalle');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : null;
+      setError(msg || 'Error al cargar el detalle');
     } finally {
       setLoading(false);
     }
@@ -99,7 +100,7 @@ export default function RoutineTemplateDetailScreen() {
         const res = await routineTemplateService.findRoutineTemplatesByFields({
           Name: search.trim(),
         } as any);
-        let arr: any[] = [];
+        let arr: unknown[] = [];
         if (res?.Success && res.Data) {
           if (Array.isArray(res.Data)) arr = res.Data;
           else if ((res.Data as any).$values) arr = (res.Data as any).$values;

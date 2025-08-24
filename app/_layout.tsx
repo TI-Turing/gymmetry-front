@@ -180,7 +180,9 @@ function RootLayoutNav() {
         },
         { seconds: secs },
         { settings }
-      ).catch(() => {});
+      ).catch((err) => {
+        if (__DEV__) console.debug('Notif hydration schedule failed', err);
+      });
     }
     // Pausas activas
     if (settings.activeBreaksEnabled) {
@@ -196,8 +198,11 @@ function RootLayoutNav() {
         },
         { seconds: secs },
         { settings }
-      ).catch(() => {});
+      ).catch((err) => {
+        if (__DEV__) console.debug('Notif activeBreak schedule failed', err);
+      });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     settings.notificationsEnabled,
     settings.hydrationRemindersEnabled,
@@ -211,11 +216,38 @@ function RootLayoutNav() {
     let sub: { remove: () => void } | null = null;
     let subResp: { remove: () => void } | null = null;
     (async () => {
-      sub = await addNotificationReceivedListener(async (event: any) => {
+      sub = await addNotificationReceivedListener(async (event: unknown) => {
         try {
-          const type =
-            event?.request?.content?.data?.type ||
-            event?.request?.content?.data?.kind;
+          const rec = (v: unknown): v is Record<string, unknown> =>
+            v !== null && typeof v === 'object';
+          let type: string | undefined;
+          if (rec(event)) {
+            const req = (event as Record<string, unknown>)[
+              'request'
+            ] as unknown;
+            if (rec(req)) {
+              const content = (req as Record<string, unknown>)[
+                'content'
+              ] as unknown;
+              if (rec(content)) {
+                const data = (content as Record<string, unknown>)[
+                  'data'
+                ] as unknown;
+                if (rec(data)) {
+                  const t = (data as Record<string, unknown>)[
+                    'type'
+                  ] as unknown;
+                  const k = (data as Record<string, unknown>)[
+                    'kind'
+                  ] as unknown;
+                  type =
+                    (typeof t === 'string' && t) ||
+                    (typeof k === 'string' && k) ||
+                    undefined;
+                }
+              }
+            }
+          }
           if (!type) return;
           if (!settings.notificationsEnabled) return;
           if (
@@ -256,11 +288,43 @@ function RootLayoutNav() {
 
       // Tap/response listener (cuando la app está en background)
       subResp = await addNotificationResponseReceivedListener(
-        async (response: any) => {
+        async (response: unknown) => {
           try {
-            const type =
-              response?.notification?.request?.content?.data?.type ||
-              response?.notification?.request?.content?.data?.kind;
+            const rec = (v: unknown): v is Record<string, unknown> =>
+              v !== null && typeof v === 'object';
+            let type: string | undefined;
+            if (rec(response)) {
+              const noti = (response as Record<string, unknown>)[
+                'notification'
+              ] as unknown;
+              if (rec(noti)) {
+                const req = (noti as Record<string, unknown>)[
+                  'request'
+                ] as unknown;
+                if (rec(req)) {
+                  const content = (req as Record<string, unknown>)[
+                    'content'
+                  ] as unknown;
+                  if (rec(content)) {
+                    const data = (content as Record<string, unknown>)[
+                      'data'
+                    ] as unknown;
+                    if (rec(data)) {
+                      const t = (data as Record<string, unknown>)[
+                        'type'
+                      ] as unknown;
+                      const k = (data as Record<string, unknown>)[
+                        'kind'
+                      ] as unknown;
+                      type =
+                        (typeof t === 'string' && t) ||
+                        (typeof k === 'string' && k) ||
+                        undefined;
+                    }
+                  }
+                }
+              }
+            }
             if (!type) return;
             if (!settings.notificationsEnabled) return;
             if (
@@ -311,6 +375,7 @@ function RootLayoutNav() {
         subResp?.remove?.();
       } catch {}
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     settings.notificationsEnabled,
     settings.hydrationRemindersEnabled,
@@ -401,6 +466,7 @@ function BiometricGate() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const tryBiometric = useCallbackAsync(async () => {
@@ -408,12 +474,21 @@ function BiometricGate() {
     setError(null);
     try {
       // Dynamic import without static analysis to avoid type errors when module is not installed
-      const dynamicImport: any = Function('return import')() as any;
-      const LocalAuthentication =
-        (await dynamicImport('expo-local-authentication')).default ||
-        (await dynamicImport('expo-local-authentication'));
-      const hasHardware = await LocalAuthentication.hasHardwareAsync?.();
-      const supported = await LocalAuthentication.isEnrolledAsync?.();
+      const dynamicImport = Function('return import')() as unknown as (
+        m: string
+      ) => Promise<unknown>;
+      const mod = (await dynamicImport('expo-local-authentication')) as unknown;
+      const LocalAuthentication = (mod || {}) as Record<string, unknown>;
+      const hasHardware = await (
+        LocalAuthentication['hasHardwareAsync'] as
+          | (() => Promise<boolean>)
+          | undefined
+      )?.();
+      const supported = await (
+        LocalAuthentication['isEnrolledAsync'] as
+          | (() => Promise<boolean>)
+          | undefined
+      )?.();
       if (!hasHardware || !supported) {
         setError(
           'Biometría no disponible en este dispositivo. Usa contraseña.'
@@ -421,13 +496,17 @@ function BiometricGate() {
         setMode('choice');
         return;
       }
-      const res = await LocalAuthentication.authenticateAsync?.({
+      const res = await (
+        LocalAuthentication['authenticateAsync'] as
+          | ((opts: Record<string, unknown>) => Promise<{ success?: boolean }>)
+          | undefined
+      )?.({
         promptMessage: 'Autenticación requerida',
         fallbackEnabled: true,
         cancelLabel: Platform.OS === 'ios' ? 'Cancelar' : 'Cerrar sesión',
         disableDeviceFallback: false,
       });
-      if (res?.success) {
+      if ((res as Record<string, unknown>)?.['success']) {
         setVisible(false);
       } else {
         setError('No se pudo verificar con huella.');
@@ -450,14 +529,16 @@ function BiometricGate() {
     setError(null);
     try {
       const { authService } = await import('@/services/authService');
-      const res: any = await authService.login({
+      const resUnknown = (await authService.login({
         UserNameOrEmail: identifier,
         Password: password,
-      } as any);
-      if (res?.Success) {
+      })) as unknown;
+      const res = (resUnknown || {}) as Record<string, unknown>;
+      if (res && (res['Success'] as boolean)) {
         setVisible(false);
       } else {
-        setError(res?.Message || 'Contraseña incorrecta.');
+        const msg = res['Message'] as unknown;
+        setError((typeof msg === 'string' && msg) || 'Contraseña incorrecta.');
         setMode('password');
       }
     } catch {
@@ -544,8 +625,10 @@ function BiometricGate() {
 }
 
 // Utilidad para envolver funciones async como callbacks sin re-crear en cada render
-function useCallbackAsync<T extends (...args: any[]) => Promise<any>>(fn: T) {
+function useCallbackAsync<T extends (...args: unknown[]) => Promise<unknown>>(
+  fn: T
+) {
   const ref = useRef(fn);
   ref.current = fn;
-  return useMemo(() => ((...args: any[]) => ref.current(...args)) as T, []);
+  return useMemo(() => ((...args: unknown[]) => ref.current(...args)) as T, []);
 }

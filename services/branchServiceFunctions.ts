@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 
 // Servicio específico para funciones de branch que se usaban con el alias branchServiceFunctionsService
 export const branchServiceFunctions = {

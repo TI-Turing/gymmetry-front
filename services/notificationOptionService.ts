@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddNotificationOptionRequest } from '@/dto/NotificationOption/Request/AddNotificationOptionRequest';
 import type { NotificationOption } from '@/models/NotificationOption';
 import type { UpdateNotificationOptionRequest } from '@/dto/NotificationOption/Request/UpdateNotificationOptionRequest';
@@ -7,15 +8,17 @@ import type { UpdateNotificationOptionRequest } from '@/dto/NotificationOption/R
 export const notificationOptionService = {
   async addNotificationOption(
     request: AddNotificationOptionRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/notificationoption/add`,
       request
     );
     return response;
   },
-  async deleteNotificationOption(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/notificationoption/${id}`);
+  async deleteNotificationOption(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(
+      `/notificationoption/${id}`
+    );
     return response;
   },
   async getNotificationOptionById(
@@ -34,7 +37,7 @@ export const notificationOptionService = {
     return response;
   },
   async findNotificationOptionsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<NotificationOption[]>> {
     const response = await apiService.post<NotificationOption[]>(
       `/notificationoptions/find`,
@@ -44,8 +47,8 @@ export const notificationOptionService = {
   },
   async updateNotificationOption(
     request: UpdateNotificationOptionRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/notificationoption/update`,
       request
     );

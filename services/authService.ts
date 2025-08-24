@@ -1,9 +1,13 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { LoginResponse } from '@/dto/auth/Response/LoginResponse';
 import type { LoginRequest } from '@/dto/auth/Request/LoginRequest';
 import type { RefreshTokenResponse } from '@/dto/auth/Response/RefreshTokenResponse';
 import type { RefreshTokenRequest } from '@/dto/auth/Request/RefreshTokenRequest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === 'object' && !Array.isArray(v);
 
 export interface UserData {
   id: string;
@@ -17,7 +21,7 @@ export interface UserData {
 // Auto-generated service for Auth Azure Functions
 export const authService = {
   // Caché en memoria de la última data de usuario cruda (tal cual viene del backend)
-  _rawUser: null as any | null,
+  _rawUser: null as unknown | null,
   _activeRoutineTemplateId: null as string | null,
 
   async login(request: LoginRequest): Promise<ApiResponse<LoginResponse>> {
@@ -29,14 +33,18 @@ export const authService = {
     // Guardar datos del usuario en AsyncStorage si el login es exitoso
     if (response.Success && response.Data) {
       // Guardar base y luego enriquecer con GymId del perfil completo
-      let raw: any = response.Data as any;
+      let raw: unknown = response.Data as unknown;
       try {
         const { userService } = await import('./userService');
-        const userId = raw.UserId ?? raw.Id;
+        const r = (raw ?? {}) as Record<string, unknown>;
+        const userId = (r['UserId'] as string) ?? (r['Id'] as string);
         if (userId) {
           const profile = await userService.getUserById(userId);
           if (profile?.Success && profile.Data) {
-            raw = { ...raw, GymId: (profile.Data as any).GymId ?? null };
+            const p = profile.Data as unknown;
+            const prec = (p ?? {}) as Record<string, unknown>;
+            const gymId = (prec['GymId'] as string) ?? null;
+            raw = { ...(r as object), GymId: gymId } as Record<string, unknown>;
           }
         }
       } catch {}
@@ -45,20 +53,28 @@ export const authService = {
       raw = await this._deriveAndAttachRoles(raw);
       this._rawUser = raw;
       await AsyncStorage.setItem('@user_data', JSON.stringify(raw));
-      await AsyncStorage.setItem(
-        '@user_id',
-        (raw as any).UserId ?? (raw as any).Id ?? ''
-      );
+      try {
+        const rr = (raw ?? {}) as Record<string, unknown>;
+        const uid = (rr['UserId'] as string) ?? (rr['Id'] as string) ?? '';
+        await AsyncStorage.setItem('@user_id', uid);
+      } catch {}
       // Detectar RoutineTemplateId activo (primer RoutineAssigneds si existe)
       try {
-        const routineAssigneds =
-          (raw as any)?.RoutineAssigneds?.$values ||
-          (raw as any)?.RoutineAssigneds ||
-          [];
+        const rr = (raw ?? {}) as Record<string, unknown>;
+        const maybe = rr['RoutineAssigneds'] as unknown;
+        const routineAssigneds = Array.isArray(maybe)
+          ? maybe
+          : (isRecord(maybe) &&
+            Array.isArray((maybe as Record<string, unknown>)['$values'])
+              ? ((maybe as Record<string, unknown>)['$values'] as unknown[])
+              : []) || [];
         if (Array.isArray(routineAssigneds) && routineAssigneds.length > 0) {
           const active = routineAssigneds[0];
+          const ar = (active ?? {}) as Record<string, unknown>;
           const rtid =
-            active?.RoutineTemplateId || active?.routineTemplateId || null;
+            (ar['RoutineTemplateId'] as string) ||
+            (ar['routineTemplateId'] as string) ||
+            null;
           if (rtid) {
             this._activeRoutineTemplateId = rtid;
             await AsyncStorage.setItem('@active_routine_template_id', rtid);
@@ -163,17 +179,26 @@ export const authService = {
   async getUserData(): Promise<UserData | null> {
     try {
       // Preferir cache en memoria si existe
-      const raw =
+      const cached =
         this._rawUser ??
         JSON.parse((await AsyncStorage.getItem('@user_data')) || 'null');
-      if (!raw) return null;
-      // Normalizar nombres comunes
-      const id = raw.Id ?? raw.UserId ?? raw.id ?? null;
-      const email = raw.Email ?? raw.email ?? null;
-      const gymId = raw.GymId ?? raw.gymId ?? null;
-      const userName = raw.UserName ?? raw.userName ?? null;
-      const roles: string[] = Array.isArray(raw.DerivedRoles)
-        ? raw.DerivedRoles
+      if (!cached) return null;
+      const raw = (cached ?? {}) as Record<string, unknown>;
+      // Normalizar nombres comunes de forma segura
+      const id =
+        (raw['Id'] as string) ??
+        (raw['UserId'] as string) ??
+        (raw['id'] as string) ??
+        null;
+      const email =
+        (raw['Email'] as string) ?? (raw['email'] as string) ?? null;
+      const gymId =
+        (raw['GymId'] as string) ?? (raw['gymId'] as string) ?? null;
+      const userName =
+        (raw['UserName'] as string) ?? (raw['userName'] as string) ?? null;
+      const rolesVal = (raw['DerivedRoles'] as unknown) ?? null;
+      const roles: string[] = Array.isArray(rolesVal)
+        ? (rolesVal as string[])
         : ['user'];
       return id && email
         ? {
@@ -191,13 +216,16 @@ export const authService = {
   },
 
   getUserId(): string | null {
-    const raw = this._rawUser;
-    return (raw?.Id ?? raw?.UserId ?? null) as string | null;
+    const r = (this._rawUser ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ?? (r['UserId'] as string) ?? (r['id'] as string);
+    return id ?? null;
   },
 
   getGymId(): string | null {
-    const raw = this._rawUser;
-    return (raw?.GymId ?? raw?.gymId ?? null) as string | null;
+    const r = (this._rawUser ?? {}) as Record<string, unknown>;
+    const gid = (r['GymId'] as string) ?? (r['gymId'] as string) ?? null;
+    return gid ?? null;
   },
 
   isAuthenticated(): boolean {
@@ -211,7 +239,9 @@ export const authService = {
 
       if (this._rawUser) {
         // Asegurar que roles estén presentes (en caso de versiones anteriores guardadas sin ellos)
-        if (!Array.isArray(this._rawUser?.DerivedRoles)) {
+        const rec = (this._rawUser ?? {}) as Record<string, unknown>;
+        const dr = rec['DerivedRoles'];
+        if (!Array.isArray(dr)) {
           this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
           await AsyncStorage.setItem(
             '@user_data',
@@ -321,21 +351,31 @@ export const authService = {
     return this.getUserData();
   },
 
-  async _deriveAndAttachRoles(raw: any): Promise<any> {
+  async _deriveAndAttachRoles(raw: unknown): Promise<unknown> {
     try {
-      const gymId = raw?.GymId ?? null;
+      const r = (raw ?? {}) as Record<string, unknown>;
+      const gymId = (r['GymId'] as string) ?? null;
       const roles: string[] = gymId ? ['user', 'owner'] : ['user'];
-      return { ...raw, DerivedRoles: roles };
+      return {
+        ...(r as object),
+        DerivedRoles: roles,
+      } as Record<string, unknown>;
     } catch {
-      return { ...raw, DerivedRoles: ['user'] };
+      const r = (raw ?? {}) as Record<string, unknown>;
+      return {
+        ...(r as object),
+        DerivedRoles: ['user'],
+      } as Record<string, unknown>;
     }
   },
 
   hasRole(role: string): boolean {
-    const raw = this._rawUser;
+    const raw = this._rawUser as unknown;
     if (!raw) return false;
-    const roles: string[] = Array.isArray(raw?.DerivedRoles)
-      ? raw.DerivedRoles
+    const r = (raw ?? {}) as Record<string, unknown>;
+    const rolesVal = r['DerivedRoles'];
+    const roles: string[] = Array.isArray(rolesVal)
+      ? (rolesVal as string[])
       : ['user'];
     return roles.includes(role.toLowerCase());
   },

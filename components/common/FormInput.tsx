@@ -5,6 +5,11 @@ import {
   View,
   Text,
   StyleSheet,
+  NativeSyntheticEvent,
+  TextInputContentSizeChangeEventData,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
 } from 'react-native';
 
 import { useColorScheme } from '../useColorScheme';
@@ -16,10 +21,10 @@ interface FormInputProps extends Omit<TextInputProps, 'style'> {
   icon?: React.ReactNode;
   error?: string;
   required?: boolean;
-  containerStyle?: any;
-  inputStyle?: any;
-  labelStyle?: any;
-  errorStyle?: any;
+  containerStyle?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  errorStyle?: StyleProp<TextStyle>;
   maxLines?: number;
 }
 
@@ -41,42 +46,48 @@ const FormInput: React.FC<FormInputProps> = ({
 
   const { multiline } = textInputProps;
 
-  const handleContentSizeChange = (event: any) => {
+  const handleContentSizeChange = (
+    event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>
+  ) => {
     if (multiline && maxLines) {
       const newHeight = event.nativeEvent.contentSize.height;
       setHeight(newHeight);
     }
   };
 
-  const inputStyles: any[] = [
+  const inputStyles: TextStyle[] = [
     styles.input,
     {
       backgroundColor: Colors[colorScheme].background,
       color: Colors[colorScheme].text,
       borderColor: hasError ? Colors[colorScheme].tint + '80' : '#666',
     },
-    hasError && styles.inputError,
   ];
+  if (hasError) inputStyles.push(styles.inputError);
 
   if (multiline) {
     inputStyles.push(styles.multilineInput);
     if (height !== undefined) {
       const maxHeight =
         (styles.multilineInput.lineHeight || 20) * (maxLines || 1);
-      inputStyles.push({ height: Math.min(height, maxHeight) } as any);
+      inputStyles.push({ height: Math.min(height, maxHeight) } as TextStyle);
     }
   }
 
-  inputStyles.push(inputStyle);
+  if (inputStyle) {
+    inputStyles.push(inputStyle as TextStyle);
+  }
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View
+      style={[styles.container, (containerStyle || undefined) as ViewStyle]}
+    >
       {label && (
         <Text
           style={[
             styles.label,
             { color: Colors[colorScheme].text },
-            labelStyle,
+            labelStyle as TextStyle,
           ]}
         >
           {label}
@@ -87,7 +98,7 @@ const FormInput: React.FC<FormInputProps> = ({
       <View style={styles.inputRow}>
         {icon && <View style={styles.iconContainer}>{icon}</View>}
         <TextInput
-          style={inputStyles}
+          style={inputStyles as unknown as StyleProp<TextStyle>}
           placeholderTextColor={`${Colors[colorScheme].text}60`}
           onContentSizeChange={handleContentSizeChange}
           {...textInputProps}
@@ -99,7 +110,7 @@ const FormInput: React.FC<FormInputProps> = ({
           style={[
             styles.errorText,
             { color: Colors[colorScheme].tint },
-            errorStyle,
+            errorStyle as TextStyle,
           ]}
         >
           {error}

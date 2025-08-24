@@ -9,7 +9,7 @@ import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makePlanTypeFormStyles } from './styles.form';
 
 export function PlanTypeForm() {
-  const { styles, colors } = useThemedStyles(makePlanTypeFormStyles);
+  const { styles } = useThemedStyles(makePlanTypeFormStyles);
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
   const [loading, setLoading] = useState(false);

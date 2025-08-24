@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddGymPlanSelectedRequest } from '@/dto/GymPlanSelected/Request/AddGymPlanSelectedRequest';
 import type { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';
 import type { UpdateGymPlanSelectedRequest } from '@/dto/GymPlanSelected/Request/UpdateGymPlanSelectedRequest';
@@ -7,19 +8,19 @@ import type { UpdateGymPlanSelectedRequest } from '@/dto/GymPlanSelected/Request
 export const gymPlanSelectedService = {
   async addGymPlanSelected(
     request: AddGymPlanSelectedRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/gymplanselected/add`,
       request
     );
     return response;
   },
-  async deleteGymPlanSelected(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/gymplanselected/${id}`);
+  async deleteGymPlanSelected(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/gymplanselected/${id}`);
     return response;
   },
-  async getGymPlanSelectedById(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.get<any>(`/gymplanselected/${id}`);
+  async getGymPlanSelectedById(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.get<unknown>(`/gymplanselected/${id}`);
     return response;
   },
   async getAllGymPlanSelecteds(): Promise<ApiResponse<GymPlanSelected[]>> {
@@ -28,7 +29,7 @@ export const gymPlanSelectedService = {
     return response;
   },
   async findGymPlanSelectedsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<GymPlanSelected[]>> {
     const response = await apiService.post<GymPlanSelected[]>(
       `/gymplanselecteds/find`,
@@ -38,8 +39,8 @@ export const gymPlanSelectedService = {
   },
   async updateGymPlanSelected(
     request: UpdateGymPlanSelectedRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/gymplanselected/update`,
       request
     );

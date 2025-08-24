@@ -38,524 +38,538 @@ interface Step5Props {
   initialData?: Step5Data;
 }
 
-export default forwardRef(function Step5(
-  { userId, onNext, onBack, initialData }: Step5Props,
-  ref
-) {
-  const colorScheme = useColorScheme();
-  const styles = useThemedStyles(makeStep5Styles);
-  const { showError, showSuccess, AlertComponent } = useCustomAlert();
-  const [username, setUsername] = useState(initialData?.username || '');
-  const [profileImage, setProfileImage] = useState<string | null>(
-    initialData?.profileImage || null
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
-  const [usernameStatus, setUsernameStatus] = useState<
-    'idle' | 'available' | 'taken' | 'invalid'
-  >('idle');
-  const [usernameError, setUsernameError] = useState<string>('');
-  const [imageError, setImageError] = useState<boolean>(false);
-  const [imageLoading, setImageLoading] = useState<boolean>(false);
-  const [showImageModal, setShowImageModal] = useState(false);
+export default forwardRef<{ snapshot: () => Partial<Step5Data> }, Step5Props>(
+  function Step5({ userId, onNext, onBack, initialData }: Step5Props, ref) {
+    const colorScheme = useColorScheme();
+    const styles = useThemedStyles(makeStep5Styles);
+    const { showError, showSuccess, AlertComponent } = useCustomAlert();
+    const [username, setUsername] = useState(initialData?.username || '');
+    const [profileImage, setProfileImage] = useState<string | null>(
+      initialData?.profileImage || null
+    );
+    const [isLoading, setIsLoading] = useState(false);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+    const [usernameStatus, setUsernameStatus] = useState<
+      'idle' | 'available' | 'taken' | 'invalid'
+    >('idle');
+    const [usernameError, setUsernameError] = useState<string>('');
+    const [imageError, setImageError] = useState<boolean>(false);
+    const [imageLoading, setImageLoading] = useState<boolean>(false);
+    const [showImageModal, setShowImageModal] = useState(false);
 
-  // Ref para el debounce
-  const debounceRef = useRef<number>(0);
+    // Ref para el debounce
+    const debounceRef = useRef<number>(0);
 
-  // Ref para el TextInput del username
-  const usernameInputRef = useRef<TextInput>(null);
+    // Ref para el TextInput del username
+    const usernameInputRef = useRef<TextInput>(null);
 
-  // Ref para prevenir que se cierre el teclado
-  const preventKeyboardClose = useRef<boolean>(false);
+    // Ref para prevenir que se cierre el teclado
+    const preventKeyboardClose = useRef<boolean>(false);
 
-  // Cache temporal para usernames ya validados
-  const usernameCache = useRef<
-    Map<string, { status: 'available' | 'taken'; timestamp: number }>
-  >(new Map());
+    // Cache temporal para usernames ya validados
+    const usernameCache = useRef<
+      Map<string, { status: 'available' | 'taken'; timestamp: number }>
+    >(new Map());
 
-  // Función para validar formato del nombre de usuario
-  const validateUsernameFormat = (value: string): boolean => {
-    // Solo permite letras inglesas, números y caracteres especiales básicos
-    // No permite espacios
-    const englishAlphabetRegex =
-      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-    return englishAlphabetRegex.test(value) && !value.includes(' ');
-  };
+    // Función para validar formato del nombre de usuario
+    const validateUsernameFormat = (value: string): boolean => {
+      // Solo permite letras inglesas, números y caracteres especiales básicos
+      // No permite espacios
+      const englishAlphabetRegex =
+        /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+      return englishAlphabetRegex.test(value) && !value.includes(' ');
+    };
 
-  // Función para verificar disponibilidad del nombre de usuario
-  const checkUsernameAvailability = async (usernameToCheck: string) => {
-    if (!usernameToCheck.trim()) {
-      setUsernameStatus('idle');
-      setUsernameError('');
-      return;
-    }
-
-    // Validar mínimo de caracteres
-    if (usernameToCheck.length < 4) {
-      setUsernameStatus('invalid');
-      setUsernameError('El nombre de usuario debe tener al menos 4 caracteres');
-      return;
-    }
-
-    // Validar formato
-    if (!validateUsernameFormat(usernameToCheck)) {
-      setUsernameStatus('invalid');
-      setUsernameError(
-        'Solo se permiten letras, números y caracteres especiales. No se permiten espacios.'
-      );
-      return;
-    }
-
-    // Verificar cache primero (válido por 5 minutos)
-    const cached = usernameCache.current.get(usernameToCheck);
-    const cacheValidTime = 5 * 60 * 1000; // 5 minutos en millisegundos
-
-    if (cached && Date.now() - cached.timestamp < cacheValidTime) {
-      if (cached.status === 'available') {
-        setUsernameStatus('available');
+    // Función para verificar disponibilidad del nombre de usuario
+    const checkUsernameAvailability = async (usernameToCheck: string) => {
+      if (!usernameToCheck.trim()) {
+        setUsernameStatus('idle');
         setUsernameError('');
-      } else {
-        setUsernameStatus('taken');
-        setUsernameError('Este nombre de usuario ya está en uso');
-      }
-      return;
-    }
-
-    // Mantener el foco antes de hacer el request
-    const wasInputFocused = usernameInputRef.current?.isFocused();
-
-    try {
-      setIsCheckingUsername(true);
-      setUsernameError('');
-
-      // Marcar que estamos validando para prevenir cierre del teclado
-      preventKeyboardClose.current = true;
-
-      const requestData: UsernameCheckRequest = {
-        UserName: usernameToCheck,
-      };
-
-      // Usar apiService para incluir el token automáticamente
-      const response = await apiService.post<any[]>('/users/find', requestData);
-
-      // Restaurar el foco inmediatamente después del request
-      if (wasInputFocused && usernameInputRef.current) {
-        requestAnimationFrame(() => {
-          if (
-            usernameInputRef.current &&
-            !usernameInputRef.current.isFocused()
-          ) {
-            usernameInputRef.current.focus();
-          }
-        });
+        return;
       }
 
-      if (response.Success) {
-        // Si Data está vacío, el nombre de usuario está disponible
-        if (!response.Data || response.Data.length === 0) {
-          setUsernameStatus('available');
-          setUsernameError('');
-          // Guardar en cache
-          usernameCache.current.set(usernameToCheck, {
-            status: 'available',
-            timestamp: Date.now(),
-          });
-        } else {
-          // Si hay datos, el nombre de usuario ya está tomado
-          setUsernameStatus('taken');
-          setUsernameError('Este nombre de usuario ya está en uso');
-          // Guardar en cache
-          usernameCache.current.set(usernameToCheck, {
-            status: 'taken',
-            timestamp: Date.now(),
-          });
-        }
-      } else {
+      // Validar mínimo de caracteres
+      if (usernameToCheck.length < 4) {
         setUsernameStatus('invalid');
         setUsernameError(
-          response.Message || 'Error al verificar el nombre de usuario'
+          'El nombre de usuario debe tener al menos 4 caracteres'
         );
+        return;
       }
-    } catch {
-      setUsernameStatus('invalid');
-      setUsernameError(
-        'Error al verificar la disponibilidad del nombre de usuario'
-      );
 
-      // Restaurar el foco en caso de error también
-      if (wasInputFocused && usernameInputRef.current) {
-        requestAnimationFrame(() => {
-          if (
-            usernameInputRef.current &&
-            !usernameInputRef.current.isFocused()
-          ) {
-            usernameInputRef.current.focus();
+      // Validar formato
+      if (!validateUsernameFormat(usernameToCheck)) {
+        setUsernameStatus('invalid');
+        setUsernameError(
+          'Solo se permiten letras, números y caracteres especiales. No se permiten espacios.'
+        );
+        return;
+      }
+
+      // Verificar cache primero (válido por 5 minutos)
+      const cached = usernameCache.current.get(usernameToCheck);
+      const cacheValidTime = 5 * 60 * 1000; // 5 minutos en millisegundos
+
+      if (cached && Date.now() - cached.timestamp < cacheValidTime) {
+        if (cached.status === 'available') {
+          setUsernameStatus('available');
+          setUsernameError('');
+        } else {
+          setUsernameStatus('taken');
+          setUsernameError('Este nombre de usuario ya está en uso');
+        }
+        return;
+      }
+
+      // Mantener el foco antes de hacer el request
+      const wasInputFocused = usernameInputRef.current?.isFocused();
+
+      try {
+        setIsCheckingUsername(true);
+        setUsernameError('');
+
+        // Marcar que estamos validando para prevenir cierre del teclado
+        preventKeyboardClose.current = true;
+
+        const requestData: UsernameCheckRequest = {
+          UserName: usernameToCheck,
+        };
+
+        // Usar apiService para incluir el token automáticamente
+        const response = await apiService.post<any[]>(
+          '/users/find',
+          requestData
+        );
+
+        // Restaurar el foco inmediatamente después del request
+        if (wasInputFocused && usernameInputRef.current) {
+          requestAnimationFrame(() => {
+            if (
+              usernameInputRef.current &&
+              !usernameInputRef.current.isFocused()
+            ) {
+              usernameInputRef.current.focus();
+            }
+          });
+        }
+
+        if (response.Success) {
+          // Si Data está vacío, el nombre de usuario está disponible
+          if (!response.Data || response.Data.length === 0) {
+            setUsernameStatus('available');
+            setUsernameError('');
+            // Guardar en cache
+            usernameCache.current.set(usernameToCheck, {
+              status: 'available',
+              timestamp: Date.now(),
+            });
+          } else {
+            // Si hay datos, el nombre de usuario ya está tomado
+            setUsernameStatus('taken');
+            setUsernameError('Este nombre de usuario ya está en uso');
+            // Guardar en cache
+            usernameCache.current.set(usernameToCheck, {
+              status: 'taken',
+              timestamp: Date.now(),
+            });
           }
-        });
+        } else {
+          setUsernameStatus('invalid');
+          setUsernameError(
+            response.Message || 'Error al verificar el nombre de usuario'
+          );
+        }
+      } catch {
+        setUsernameStatus('invalid');
+        setUsernameError(
+          'Error al verificar la disponibilidad del nombre de usuario'
+        );
+
+        // Restaurar el foco en caso de error también
+        if (wasInputFocused && usernameInputRef.current) {
+          requestAnimationFrame(() => {
+            if (
+              usernameInputRef.current &&
+              !usernameInputRef.current.isFocused()
+            ) {
+              usernameInputRef.current.focus();
+            }
+          });
+        }
+      } finally {
+        setIsCheckingUsername(false);
+        // Permitir que el teclado se pueda cerrar nuevamente
+        preventKeyboardClose.current = false;
       }
-    } finally {
-      setIsCheckingUsername(false);
-      // Permitir que el teclado se pueda cerrar nuevamente
-      preventKeyboardClose.current = false;
-    }
-  };
+    };
 
-  // Hook para manejar el debounce del nombre de usuario
-  useEffect(() => {
-    // Limpiar timeout anterior
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    // Si el username está vacío, no hacer nada
-    if (!username.trim()) {
-      setUsernameStatus('idle');
-      setUsernameError('');
-      return;
-    }
-
-    // Validar mínimo de caracteres antes de hacer cualquier verificación
-    if (username.length < 4) {
-      setUsernameStatus('invalid');
-      setUsernameError('El nombre de usuario debe tener al menos 4 caracteres');
-      return;
-    }
-
-    // Crear nuevo timeout para el debounce (750ms)
-    debounceRef.current = setTimeout(() => {
-      checkUsernameAvailability(username);
-    }, 750) as unknown as number;
-
-    // Cleanup
-    return () => {
+    // Hook para manejar el debounce del nombre de usuario
+    useEffect(() => {
+      // Limpiar timeout anterior
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
-    };
-  }, [username]);
 
-  // Hook para manejar eventos del teclado
-  useEffect(() => {
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        // Si estamos validando, reabrir el teclado
-        if (preventKeyboardClose.current && usernameInputRef.current) {
-          setTimeout(() => {
-            if (usernameInputRef.current && preventKeyboardClose.current) {
-              usernameInputRef.current.focus();
-            }
-          }, 100);
-        }
+      // Si el username está vacío, no hacer nada
+      if (!username.trim()) {
+        setUsernameStatus('idle');
+        setUsernameError('');
+        return;
       }
-    );
 
-    return () => {
-      keyboardDidHideListener.remove();
-    };
-  }, []);
+      // Validar mínimo de caracteres antes de hacer cualquier verificación
+      if (username.length < 4) {
+        setUsernameStatus('invalid');
+        setUsernameError(
+          'El nombre de usuario debe tener al menos 4 caracteres'
+        );
+        return;
+      }
 
-  // Función para manejar cambios en el input del nombre de usuario
-  const handleUsernameChange = (text: string) => {
-    // Filtrar espacios y caracteres no permitidos en tiempo real
-    const filteredText = text.replace(/\s/g, ''); // Quitar espacios
+      // Crear nuevo timeout para el debounce (750ms)
+      debounceRef.current = setTimeout(() => {
+        checkUsernameAvailability(username);
+      }, 750) as unknown as number;
 
-    if (validateUsernameFormat(filteredText)) {
-      setUsername(filteredText);
-      setUsernameStatus('idle'); // Reset status mientras escribe
-      setUsernameError('');
-    }
-  };
-
-  // Función para manejar cuando el input pierde el foco
-  const handleUsernameBlur = () => {
-    // Solo permitir que se cierre el teclado si no estamos validando
-    if (preventKeyboardClose.current) {
-      // Inmediatamente restaurar el foco si estamos validando
-      setTimeout(() => {
-        if (usernameInputRef.current && preventKeyboardClose.current) {
-          usernameInputRef.current.focus();
+      // Cleanup
+      return () => {
+        if (debounceRef.current) {
+          clearTimeout(debounceRef.current);
         }
-      }, 10);
-    }
-  };
+      };
+    }, [username]);
 
-  // Función para manejar cuando el input obtiene foco
-  const handleUsernameFocus = () => {
-    // Asegurar que el input esté visible cuando se enfoque
-    if (usernameInputRef.current) {
-      preventKeyboardClose.current = false;
-    }
-  };
-
-  useImperativeHandle(ref, () => ({
-    snapshot: () => ({
-      username: username.trim() || undefined,
-      profileImage: profileImage || undefined,
-    }),
-  }));
-
-  const { settings } = useAppSettings();
-  // Función para redimensionar imagen y validar tamaño máximo de 2MB
-  const resizeImageTo2MB = async (uri: string): Promise<string> => {
-    let quality = settings.dataSaver ? 0.6 : 0.9; // Calidad inicial según ahorro de datos
-    let result;
-
-    do {
-      // Intentar obtener dimensiones originales con Image.getSize si fuera RN; como fallback usar 1000x1000
-      const targetW =
-        settings.imageQuality === 'low'
-          ? 800
-          : settings.imageQuality === 'medium'
-            ? 1280
-            : 1000;
-      const targetH =
-        settings.imageQuality === 'low'
-          ? 600
-          : settings.imageQuality === 'medium'
-            ? 720
-            : 1000;
-      result = await ImageManipulator.manipulateAsync(
-        uri,
-        [
-          {
-            resize: {
-              width: targetW,
-              height: targetH,
-            },
-          },
-        ],
-        {
-          compress: quality,
-          // usar JPG para mejor compresión cuando no se requiere transparencia
-          format: ImageManipulator.SaveFormat.JPEG,
+    // Hook para manejar eventos del teclado
+    useEffect(() => {
+      const keyboardDidHideListener = Keyboard.addListener(
+        'keyboardDidHide',
+        () => {
+          // Si estamos validando, reabrir el teclado
+          if (preventKeyboardClose.current && usernameInputRef.current) {
+            setTimeout(() => {
+              if (usernameInputRef.current && preventKeyboardClose.current) {
+                usernameInputRef.current.focus();
+              }
+            }, 100);
+          }
         }
       );
 
-      // Verificar tamaño del archivo
-      const response = await fetch(result.uri);
-      const blob = await response.blob();
-      const sizeInMB = blob.size / (1024 * 1024);
+      return () => {
+        keyboardDidHideListener.remove();
+      };
+    }, []);
 
-      if (sizeInMB <= 2) {
-        break; // La imagen ya está dentro del límite
+    // Función para manejar cambios en el input del nombre de usuario
+    const handleUsernameChange = (text: string) => {
+      // Filtrar espacios y caracteres no permitidos en tiempo real
+      const filteredText = text.replace(/\s/g, ''); // Quitar espacios
+
+      if (validateUsernameFormat(filteredText)) {
+        setUsername(filteredText);
+        setUsernameStatus('idle'); // Reset status mientras escribe
+        setUsernameError('');
       }
+    };
 
-      // Reducir calidad para el siguiente intento
-      quality -= 0.1;
+    // Función para manejar cuando el input pierde el foco
+    const handleUsernameBlur = () => {
+      // Solo permitir que se cierre el teclado si no estamos validando
+      if (preventKeyboardClose.current) {
+        // Inmediatamente restaurar el foco si estamos validando
+        setTimeout(() => {
+          if (usernameInputRef.current && preventKeyboardClose.current) {
+            usernameInputRef.current.focus();
+          }
+        }, 10);
+      }
+    };
 
-      // Si la calidad es muy baja, reducir también las dimensiones
-      if (quality < 0.3) {
+    // Función para manejar cuando el input obtiene foco
+    const handleUsernameFocus = () => {
+      // Asegurar que el input esté visible cuando se enfoque
+      if (usernameInputRef.current) {
+        preventKeyboardClose.current = false;
+      }
+    };
+
+    useImperativeHandle(ref, () => ({
+      snapshot: () => ({
+        username: username.trim() || undefined,
+        profileImage: profileImage || undefined,
+      }),
+    }));
+
+    const { settings } = useAppSettings();
+    // Función para redimensionar imagen y validar tamaño máximo de 2MB
+    const resizeImageTo2MB = async (uri: string): Promise<string> => {
+      let quality = settings.dataSaver ? 0.6 : 0.9; // Calidad inicial según ahorro de datos
+      let result;
+
+      do {
+        // Intentar obtener dimensiones originales con Image.getSize si fuera RN; como fallback usar 1000x1000
+        const targetW =
+          settings.imageQuality === 'low'
+            ? 800
+            : settings.imageQuality === 'medium'
+              ? 1280
+              : 1000;
+        const targetH =
+          settings.imageQuality === 'low'
+            ? 600
+            : settings.imageQuality === 'medium'
+              ? 720
+              : 1000;
         result = await ImageManipulator.manipulateAsync(
           uri,
           [
             {
               resize: {
-                width: 800,
-                height: 800,
+                width: targetW,
+                height: targetH,
               },
             },
           ],
           {
-            compress: 0.3,
+            compress: quality,
+            // usar JPG para mejor compresión cuando no se requiere transparencia
             format: ImageManipulator.SaveFormat.JPEG,
           }
         );
-        break;
-      }
-    } while (quality > 0.1);
 
-    return result.uri;
-  };
+        // Verificar tamaño del archivo
+        const response = await fetch(result.uri);
+        const blob = await response.blob();
+        const sizeInMB = blob.size / (1024 * 1024);
 
-  // Función para subir imagen al servidor
-  const uploadProfileImage = async (
-    imageUri: string
-  ): Promise<string | null> => {
-    try {
-      setIsUploadingImage(true);
-
-      // Crear FormData para enviar la imagen
-      const formData = new FormData();
-      formData.append('UserId', userId);
-
-      // Preparar el archivo de imagen
-      const filename = `profile_${userId}_${Date.now()}.png`;
-      formData.append('ProfileImage', {
-        uri: imageUri,
-        type: 'image/png',
-        name: filename,
-      } as any);
-
-      // Hacer el request usando apiService para incluir el token automáticamente
-      const response = await apiService.post<string>(
-        '/user/upload-profile-image',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        if (sizeInMB <= 2) {
+          break; // La imagen ya está dentro del límite
         }
-      );
 
-      if (response.Success) {
-        showSuccess('La imagen de perfil se subió correctamente');
-        return response.Data; // Retornar la URL de la imagen
-      } else {
-        showError(response.Message || 'Error al subir la imagen');
-        return null;
-      }
-    } catch {
-      showError('No se pudo subir la imagen. Intenta de nuevo.');
-      return null;
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
+        // Reducir calidad para el siguiente intento
+        quality -= 0.1;
 
-  const pickImage = async () => {
-    try {
-      // Solicitar permisos
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        showError('Necesitamos permisos para acceder a tus fotos');
-        return;
-      }
-
-      setIsUploadingImage(true);
-
-      // Abrir galería
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1], // Imagen cuadrada
-        quality: settings.dataSaver ? 0.6 : 1,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        const selectedImage = result.assets[0];
-        // Redimensionar imagen y validar tamaño
-        const resizedUri = await resizeImageTo2MB(selectedImage.uri);
-        // Subir imagen al servidor
-        const uploadedImageUrl = await uploadProfileImage(resizedUri);
-
-        if (uploadedImageUrl) {
-          setImageError(false);
-          setImageLoading(false);
-          setProfileImage(uploadedImageUrl); // Usar la URL del servidor
-        } else {
-          setImageError(false);
-          setImageLoading(false);
-          setProfileImage(resizedUri); // Usar imagen local si falla el upload
+        // Si la calidad es muy baja, reducir también las dimensiones
+        if (quality < 0.3) {
+          result = await ImageManipulator.manipulateAsync(
+            uri,
+            [
+              {
+                resize: {
+                  width: 800,
+                  height: 800,
+                },
+              },
+            ],
+            {
+              compress: 0.3,
+              format: ImageManipulator.SaveFormat.JPEG,
+            }
+          );
+          break;
         }
-      }
-    } catch (error) {
-      showError('No se pudo seleccionar la imagen');
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
+      } while (quality > 0.1);
 
-  const takePhoto = async () => {
-    try {
-      // Solicitar permisos
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        showError('Necesitamos permisos de cámara para tomar fotos');
-        return;
-      }
-
-      setImageLoading(true);
-      setImageError(false);
-
-      // Abrir cámara
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [1, 1], // Imagen cuadrada
-        quality: settings.dataSaver ? 0.6 : 0.9,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        const takenPhoto = result.assets[0];
-        // Redimensionar imagen y validar tamaño
-        const resizedUri = await resizeImageTo2MB(takenPhoto.uri);
-        // Subir imagen al servidor
-        const uploadedImageUrl = await uploadProfileImage(resizedUri);
-
-        if (uploadedImageUrl) {
-          setImageError(false);
-          setImageLoading(false);
-          setProfileImage(uploadedImageUrl); // Usar la URL del servidor
-        } else {
-          setImageError(false);
-          setImageLoading(false);
-          setProfileImage(resizedUri); // Usar imagen local si falla el upload
-        }
-      } else {
-        setImageLoading(false);
-      }
-
-      setShowImageModal(false);
-    } catch (error) {
-      setImageLoading(false);
-      setImageError(true);
-      showError('No se pudo tomar la foto. Intenta nuevamente.');
-      setShowImageModal(false);
-    }
-  };
-
-  const showImageOptions = () => {
-    // Reset error state when user tries again
-    setImageError(false);
-    setShowImageModal(true);
-  };
-
-  const handleNext = async () => {
-    // Validar que si hay username, esté disponible
-    if (username.trim() && usernameStatus !== 'available') {
-      if (usernameStatus === 'taken') {
-        showError('El nombre de usuario no está disponible');
-        return;
-      }
-      if (usernameStatus === 'invalid') {
-        showError(usernameError || 'El nombre de usuario no es válido');
-        return;
-      }
-      if (usernameStatus === 'idle' || isCheckingUsername) {
-        showError(
-          'Se está verificando la disponibilidad del nombre de usuario'
-        );
-        return;
-      }
-    }
-
-    setIsLoading(true);
-
-    const stepData: Step5Data = {
-      username: username.trim() || undefined,
-      profileImage: profileImage || undefined,
+      return result.uri;
     };
 
-    try {
-      // Si hay datos para actualizar, validar que la API responda correctamente
-      if (stepData.username || stepData.profileImage) {
-        const updateData: any = {};
+    // Función para subir imagen al servidor
+    const uploadProfileImage = async (
+      imageUri: string
+    ): Promise<string | null> => {
+      try {
+        setIsUploadingImage(true);
 
-        if (stepData.username) {
-          updateData.username = stepData.username;
+        // Crear FormData para enviar la imagen
+        const formData = new FormData();
+        formData.append('UserId', userId);
+
+        // Preparar el archivo de imagen
+        const filename = `profile_${userId}_${Date.now()}.png`;
+        formData.append('ProfileImage', {
+          uri: imageUri,
+          type: 'image/png',
+          name: filename,
+        } as any);
+
+        // Hacer el request usando apiService para incluir el token automáticamente
+        const response = await apiService.post<string>(
+          '/user/upload-profile-image',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+
+        if (response.Success) {
+          showSuccess('La imagen de perfil se subió correctamente');
+          return response.Data; // Retornar la URL de la imagen
+        } else {
+          showError(response.Message || 'Error al subir la imagen');
+          return null;
+        }
+      } catch {
+        showError('No se pudo subir la imagen. Intenta de nuevo.');
+        return null;
+      } finally {
+        setIsUploadingImage(false);
+      }
+    };
+
+    const pickImage = async () => {
+      try {
+        // Solicitar permisos
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          showError('Necesitamos permisos para acceder a tus fotos');
+          return;
         }
 
-        // Para la imagen, ya se subió anteriormente en uploadProfileImage
-        // Solo necesitamos validar que se guardó correctamente
+        setIsUploadingImage(true);
 
-        // Solo llamar al API si hay datos que actualizar (username por ahora)
-        if (stepData.username) {
-          const response = await userService.updateUser({
-            id: userId,
-            ...updateData,
-          });
+        // Abrir galería
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1], // Imagen cuadrada
+          quality: settings.dataSaver ? 0.6 : 1,
+        });
+
+        if (!result.canceled && result.assets[0]) {
+          const selectedImage = result.assets[0];
+          // Redimensionar imagen y validar tamaño
+          const resizedUri = await resizeImageTo2MB(selectedImage.uri);
+          // Subir imagen al servidor
+          const uploadedImageUrl = await uploadProfileImage(resizedUri);
+
+          if (uploadedImageUrl) {
+            setImageError(false);
+            setImageLoading(false);
+            setProfileImage(uploadedImageUrl); // Usar la URL del servidor
+          } else {
+            setImageError(false);
+            setImageLoading(false);
+            setProfileImage(resizedUri); // Usar imagen local si falla el upload
+          }
+        }
+      } catch (error) {
+        showError('No se pudo seleccionar la imagen');
+      } finally {
+        setIsUploadingImage(false);
+      }
+    };
+
+    const takePhoto = async () => {
+      try {
+        // Solicitar permisos
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          showError('Necesitamos permisos de cámara para tomar fotos');
+          return;
+        }
+
+        setImageLoading(true);
+        setImageError(false);
+
+        // Abrir cámara
+        const result = await ImagePicker.launchCameraAsync({
+          allowsEditing: true,
+          aspect: [1, 1], // Imagen cuadrada
+          quality: settings.dataSaver ? 0.6 : 0.9,
+        });
+
+        if (!result.canceled && result.assets[0]) {
+          const takenPhoto = result.assets[0];
+          // Redimensionar imagen y validar tamaño
+          const resizedUri = await resizeImageTo2MB(takenPhoto.uri);
+          // Subir imagen al servidor
+          const uploadedImageUrl = await uploadProfileImage(resizedUri);
+
+          if (uploadedImageUrl) {
+            setImageError(false);
+            setImageLoading(false);
+            setProfileImage(uploadedImageUrl); // Usar la URL del servidor
+          } else {
+            setImageError(false);
+            setImageLoading(false);
+            setProfileImage(resizedUri); // Usar imagen local si falla el upload
+          }
+        } else {
+          setImageLoading(false);
+        }
+
+        setShowImageModal(false);
+      } catch (error) {
+        setImageLoading(false);
+        setImageError(true);
+        showError('No se pudo tomar la foto. Intenta nuevamente.');
+        setShowImageModal(false);
+      }
+    };
+
+    const showImageOptions = () => {
+      // Reset error state when user tries again
+      setImageError(false);
+      setShowImageModal(true);
+    };
+
+    const handleNext = async () => {
+      // Validar que si hay username, esté disponible
+      if (username.trim() && usernameStatus !== 'available') {
+        if (usernameStatus === 'taken') {
+          showError('El nombre de usuario no está disponible');
+          return;
+        }
+        if (usernameStatus === 'invalid') {
+          showError(usernameError || 'El nombre de usuario no es válido');
+          return;
+        }
+        if (usernameStatus === 'idle' || isCheckingUsername) {
+          showError(
+            'Se está verificando la disponibilidad del nombre de usuario'
+          );
+          return;
+        }
+      }
+
+      setIsLoading(true);
+
+      const stepData: Step5Data = {
+        username: username.trim() || undefined,
+        profileImage: profileImage || undefined,
+      };
+
+      try {
+        // Si hay datos para actualizar, validar que la API responda correctamente
+        if (stepData.username || stepData.profileImage) {
+          // Construir un UpdateRequest completo con placeholders seguros
+          const updateData = {
+            Id: userId,
+            IdEps: null,
+            Name: 'Usuario',
+            LastName: 'Usuario',
+            UserName: stepData.username || 'Usuario Usuario',
+            IdGender: null,
+            BirthDate: null,
+            DocumentTypeId: null,
+            Phone: null,
+            CountryId: null,
+            Address: null,
+            CityId: null,
+            RegionId: null,
+            Rh: null,
+            EmergencyName: null,
+            EmergencyPhone: null,
+            PhysicalExceptions: null,
+            UserTypeId: null,
+            PhysicalExceptionsNotes: null,
+          };
+
+          const response = await userService.updateUser(updateData);
 
           if (!response.Success) {
             showError(
@@ -564,381 +578,389 @@ export default forwardRef(function Step5(
             return; // NO permitir avanzar si la API falla
           }
         }
+
+        // Solo avanzar si todo fue exitoso
+        onNext(stepData);
+      } catch (error: unknown) {
+        handleApiError(error);
+        showError('No se pudo completar el registro. Intenta de nuevo.');
+        // NO avanzar en caso de error
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // Solo avanzar si todo fue exitoso
-      onNext(stepData);
-    } catch (error: any) {
-      const errorMessage = handleApiError(error);
-      showError('No se pudo completar el registro. Intenta de nuevo.');
-      // NO avanzar en caso de error
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <ScrollView contentContainerStyle={commonStyles.container}>
-      <View style={commonStyles.header}>
-        <Text style={[commonStyles.title, { color: styles.colors.text }]}>
-          Perfil de usuario
-        </Text>
-        <Text style={[commonStyles.subtitle, { color: styles.colors.text }]}>
-          Personaliza tu perfil (opcional)
-        </Text>
-      </View>
-
-      <View style={commonStyles.form}>
-        <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
-            Nombre de usuario
+    return (
+      <ScrollView contentContainerStyle={commonStyles.container}>
+        <View style={commonStyles.header}>
+          <Text style={[commonStyles.title, { color: styles.colors.text }]}>
+            Perfil de usuario
           </Text>
-          <View style={{ position: 'relative' }}>
-            <TextInput
-              ref={usernameInputRef}
-              style={[
-                commonStyles.input,
-                styles.input,
-                usernameStatus === 'available'
-                  ? styles.inputSuccess
-                  : usernameStatus === 'taken' || usernameStatus === 'invalid'
-                    ? styles.inputError
-                    : null,
-                { paddingRight: 45 },
-              ]}
-              value={username}
-              onChangeText={handleUsernameChange}
-              onBlur={handleUsernameBlur}
-              onFocus={handleUsernameFocus}
-              placeholderTextColor={styles.colors.placeholder}
-              autoCapitalize="none"
-              autoCorrect={false}
-              blurOnSubmit={false}
-              returnKeyType="done"
-              keyboardType="default"
-              textContentType="username"
-            />
-
-            {/* Icono de estado */}
-            <View
-              style={{
-                position: 'absolute',
-                right: 15,
-                top: '50%',
-                transform: [{ translateY: -10 }],
-              }}
-            >
-              {isCheckingUsername ? (
-                <LoadingAnimation size={20} />
-              ) : usernameStatus === 'available' ? (
-                <FontAwesome
-                  name="check-circle"
-                  size={20}
-                  color={styles.colors.success}
-                />
-              ) : usernameStatus === 'taken' || usernameStatus === 'invalid' ? (
-                <FontAwesome
-                  name="times-circle"
-                  size={20}
-                  color={styles.colors.error}
-                />
-              ) : null}
-            </View>
-          </View>
-
-          {/* Mensaje de error o estado */}
-          {usernameError ? (
-            <Text
-              style={{
-                color: styles.colors.error,
-                fontSize: 12,
-                marginTop: 5,
-                marginLeft: 5,
-              }}
-            >
-              {usernameError}
-            </Text>
-          ) : usernameStatus === 'available' && username.trim() ? (
-            <Text
-              style={{
-                color: styles.colors.success,
-                fontSize: 12,
-                marginTop: 5,
-                marginLeft: 5,
-              }}
-            >
-              ✓ Nombre de usuario disponible
-            </Text>
-          ) : null}
+          <Text style={[commonStyles.subtitle, { color: styles.colors.text }]}>
+            Personaliza tu perfil (opcional)
+          </Text>
         </View>
 
-        <View style={commonStyles.inputContainer}>
-          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
-            Foto de perfil
-          </Text>
+        <View style={commonStyles.form}>
+          <View style={commonStyles.inputContainer}>
+            <Text style={[commonStyles.label, { color: styles.colors.text }]}>
+              Nombre de usuario
+            </Text>
+            <View style={{ position: 'relative' }}>
+              <TextInput
+                ref={usernameInputRef}
+                style={[
+                  commonStyles.input,
+                  styles.input,
+                  usernameStatus === 'available'
+                    ? styles.inputSuccess
+                    : usernameStatus === 'taken' || usernameStatus === 'invalid'
+                      ? styles.inputError
+                      : null,
+                  { paddingRight: 45 },
+                ]}
+                value={username}
+                onChangeText={handleUsernameChange}
+                onBlur={handleUsernameBlur}
+                onFocus={handleUsernameFocus}
+                placeholderTextColor={styles.colors.placeholder}
+                autoCapitalize="none"
+                autoCorrect={false}
+                blurOnSubmit={false}
+                returnKeyType="done"
+                keyboardType="default"
+                textContentType="username"
+              />
+
+              {/* Icono de estado */}
+              <View
+                style={{
+                  position: 'absolute',
+                  right: 15,
+                  top: '50%',
+                  transform: [{ translateY: -10 }],
+                }}
+              >
+                {isCheckingUsername ? (
+                  <LoadingAnimation size={20} />
+                ) : usernameStatus === 'available' ? (
+                  <FontAwesome
+                    name="check-circle"
+                    size={20}
+                    color={styles.colors.success}
+                  />
+                ) : usernameStatus === 'taken' ||
+                  usernameStatus === 'invalid' ? (
+                  <FontAwesome
+                    name="times-circle"
+                    size={20}
+                    color={styles.colors.error}
+                  />
+                ) : null}
+              </View>
+            </View>
+
+            {/* Mensaje de error o estado */}
+            {usernameError ? (
+              <Text
+                style={{
+                  color: styles.colors.error,
+                  fontSize: 12,
+                  marginTop: 5,
+                  marginLeft: 5,
+                }}
+              >
+                {usernameError}
+              </Text>
+            ) : usernameStatus === 'available' && username.trim() ? (
+              <Text
+                style={{
+                  color: styles.colors.success,
+                  fontSize: 12,
+                  marginTop: 5,
+                  marginLeft: 5,
+                }}
+              >
+                ✓ Nombre de usuario disponible
+              </Text>
+            ) : null}
+          </View>
+
+          <View style={commonStyles.inputContainer}>
+            <Text style={[commonStyles.label, { color: styles.colors.text }]}>
+              Foto de perfil
+            </Text>
+
+            <TouchableOpacity
+              style={[
+                commonStyles.imagePickerContainer,
+                styles.imagePicker,
+                { opacity: isUploadingImage ? 0.7 : 1 },
+              ]}
+              onPress={showImageOptions}
+              disabled={isUploadingImage}
+            >
+              {isUploadingImage ? (
+                <View style={commonStyles.imagePlaceholder}>
+                  <LoadingAnimation size={50} />
+                  <Text
+                    style={[
+                      commonStyles.imageText,
+                      { color: styles.colors.text, marginTop: 12 },
+                    ]}
+                  >
+                    Procesando imagen...
+                  </Text>
+                </View>
+              ) : profileImage && !imageError ? (
+                <View style={commonStyles.imagePreviewContainer}>
+                  {imageLoading && (
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.3)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <LoadingAnimation size={30} />
+                    </View>
+                  )}
+                  <Image
+                    source={{ uri: profileImage }}
+                    style={[
+                      commonStyles.imagePreview,
+                      imageLoading && { opacity: 0.7 },
+                    ]}
+                    onError={(_error) => {
+                      setImageError(true);
+                      setImageLoading(false);
+                    }}
+                    onLoad={() => {
+                      setImageError(false);
+                      setImageLoading(false);
+                    }}
+                    onLoadStart={() => {
+                      setImageLoading(true);
+                      setImageError(false);
+                    }}
+                  />
+                  <Text
+                    style={[
+                      commonStyles.imageText,
+                      { color: styles.colors.text },
+                    ]}
+                  >
+                    Tocar para cambiar
+                  </Text>
+                </View>
+              ) : (
+                <View style={commonStyles.imagePlaceholder}>
+                  {imageError && profileImage ? (
+                    <>
+                      <FontAwesome
+                        name="exclamation-triangle"
+                        size={40}
+                        color={styles.colors.error}
+                      />
+                      <Text
+                        style={[
+                          commonStyles.imageText,
+                          { color: styles.colors.error, marginTop: 8 },
+                        ]}
+                      >
+                        Error al cargar imagen
+                      </Text>
+                      <Text
+                        style={[
+                          commonStyles.imageText,
+                          { color: styles.colors.text, fontSize: 12 },
+                        ]}
+                      >
+                        Tocar para intentar de nuevo
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesome
+                        name="camera"
+                        size={40}
+                        color={styles.colors.buttonBg}
+                      />
+                      <Text
+                        style={[
+                          commonStyles.imageText,
+                          { color: styles.colors.text },
+                        ]}
+                      >
+                        Subir foto de perfil
+                      </Text>
+                    </>
+                  )}
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             style={[
-              commonStyles.imagePickerContainer,
-              styles.imagePicker,
-              { opacity: isUploadingImage ? 0.7 : 1 },
+              commonStyles.button,
+              styles.button,
+              (isLoading || isUploadingImage || isCheckingUsername) &&
+                commonStyles.buttonDisabled,
             ]}
-            onPress={showImageOptions}
-            disabled={isUploadingImage}
+            onPress={handleNext}
+            disabled={isLoading || isUploadingImage || isCheckingUsername}
           >
-            {isUploadingImage ? (
-              <View style={commonStyles.imagePlaceholder}>
-                <LoadingAnimation size={50} />
-                <Text
-                  style={[
-                    commonStyles.imageText,
-                    { color: styles.colors.text, marginTop: 12 },
-                  ]}
-                >
-                  Procesando imagen...
-                </Text>
-              </View>
-            ) : profileImage && !imageError ? (
-              <View style={commonStyles.imagePreviewContainer}>
-                {imageLoading && (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: 'rgba(0,0,0,0.3)',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      zIndex: 1,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <LoadingAnimation size={30} />
-                  </View>
-                )}
-                <Image
-                  source={{ uri: profileImage }}
-                  style={[
-                    commonStyles.imagePreview,
-                    imageLoading && { opacity: 0.7 },
-                  ]}
-                  onError={(error) => {
-                    setImageError(true);
-                    setImageLoading(false);
-                  }}
-                  onLoad={() => {
-                    setImageError(false);
-                    setImageLoading(false);
-                  }}
-                  onLoadStart={() => {
-                    setImageLoading(true);
-                    setImageError(false);
-                  }}
-                />
-                <Text
-                  style={[
-                    commonStyles.imageText,
-                    { color: styles.colors.text },
-                  ]}
-                >
-                  Tocar para cambiar
-                </Text>
-              </View>
-            ) : (
-              <View style={commonStyles.imagePlaceholder}>
-                {imageError && profileImage ? (
-                  <>
-                    <FontAwesome
-                      name="exclamation-triangle"
-                      size={40}
-                      color={styles.colors.error}
-                    />
-                    <Text
-                      style={[
-                        commonStyles.imageText,
-                        { color: styles.colors.error, marginTop: 8 },
-                      ]}
-                    >
-                      Error al cargar imagen
-                    </Text>
-                    <Text
-                      style={[
-                        commonStyles.imageText,
-                        { color: styles.colors.text, fontSize: 12 },
-                      ]}
-                    >
-                      Tocar para intentar de nuevo
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <FontAwesome
-                      name="camera"
-                      size={40}
-                      color={styles.colors.buttonBg}
-                    />
-                    <Text
-                      style={[
-                        commonStyles.imageText,
-                        { color: styles.colors.text },
-                      ]}
-                    >
-                      Subir foto de perfil
-                    </Text>
-                  </>
-                )}
-              </View>
-            )}
+            <Text style={commonStyles.buttonText}>
+              {isLoading
+                ? 'Guardando...'
+                : isUploadingImage
+                  ? 'Subiendo imagen...'
+                  : isCheckingUsername
+                    ? 'Verificando...'
+                    : 'Finalizar registro'}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={[
-            commonStyles.button,
-            styles.button,
-            (isLoading || isUploadingImage || isCheckingUsername) &&
-              commonStyles.buttonDisabled,
-          ]}
-          onPress={handleNext}
-          disabled={isLoading || isUploadingImage || isCheckingUsername}
+        {/* Modal para selección de imagen */}
+        <Modal
+          visible={showImageModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowImageModal(false)}
         >
-          <Text style={commonStyles.buttonText}>
-            {isLoading
-              ? 'Guardando...'
-              : isUploadingImage
-                ? 'Subiendo imagen...'
-                : isCheckingUsername
-                  ? 'Verificando...'
-                  : 'Finalizar registro'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal para selección de imagen */}
-      <Modal
-        visible={showImageModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowImageModal(false)}
-      >
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor: styles.colors.modalBackdrop,
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-          }}
-          activeOpacity={1}
-          onPress={() => setShowImageModal(false)}
-        >
-          <View style={styles.modalCard} onStartShouldSetResponder={() => true}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              backgroundColor: styles.colors.modalBackdrop,
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 20,
+            }}
+            activeOpacity={1}
+            onPress={() => setShowImageModal(false)}
+          >
             <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 20,
-              }}
+              style={styles.modalCard}
+              onStartShouldSetResponder={() => true}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                  color: styles.colors.text,
-                }}
-              >
-                Seleccionar foto de perfil
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowImageModal(false)}
-                style={{
-                  padding: 8,
-                  borderRadius: 20,
-                  backgroundColor: `${styles.colors.text}10`,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 20,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 16,
-                    color: styles.colors.text,
+                    fontSize: 18,
                     fontWeight: 'bold',
+                    color: styles.colors.text,
                   }}
                 >
-                  ✕
+                  Seleccionar foto de perfil
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setShowImageModal(false)}
+                  style={{
+                    padding: 8,
+                    borderRadius: 20,
+                    backgroundColor: `${styles.colors.text}10`,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: styles.colors.text,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    ✕
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: styles.colors.text,
+                  marginBottom: 20,
+                  textAlign: 'center',
+                }}
+              >
+                Elige una opción
+              </Text>
+
+              <TouchableOpacity
+                style={{
+                  padding: 16,
+                  borderRadius: 8,
+                  backgroundColor: styles.colors.buttonBg,
+                  marginBottom: 12,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  setShowImageModal(false);
+                  takePhoto();
+                }}
+              >
+                <FontAwesome
+                  name="camera"
+                  size={20}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+                <Text
+                  style={{ color: 'white', fontSize: 16, fontWeight: '600' }}
+                >
+                  Tomar foto
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  padding: 16,
+                  borderRadius: 8,
+                  backgroundColor: styles.colors.buttonBg,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  setShowImageModal(false);
+                  pickImage();
+                }}
+              >
+                <FontAwesome
+                  name="image"
+                  size={20}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+                <Text
+                  style={{ color: 'white', fontSize: 16, fontWeight: '600' }}
+                >
+                  Elegir de galería
                 </Text>
               </TouchableOpacity>
             </View>
+          </TouchableOpacity>
+        </Modal>
 
-            <Text
-              style={{
-                fontSize: 16,
-                color: styles.colors.text,
-                marginBottom: 20,
-                textAlign: 'center',
-              }}
-            >
-              Elige una opción
-            </Text>
-
-            <TouchableOpacity
-              style={{
-                padding: 16,
-                borderRadius: 8,
-                backgroundColor: styles.colors.buttonBg,
-                marginBottom: 12,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={() => {
-                setShowImageModal(false);
-                takePhoto();
-              }}
-            >
-              <FontAwesome
-                name="camera"
-                size={20}
-                color="white"
-                style={{ marginRight: 10 }}
-              />
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                Tomar foto
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                padding: 16,
-                borderRadius: 8,
-                backgroundColor: styles.colors.buttonBg,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={() => {
-                setShowImageModal(false);
-                pickImage();
-              }}
-            >
-              <FontAwesome
-                name="image"
-                size={20}
-                color="white"
-                style={{ marginRight: 10 }}
-              />
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                Elegir de galería
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      {/* Componente de alertas personalizado */}
-      <AlertComponent />
-    </ScrollView>
-  );
-});
+        {/* Componente de alertas personalizado */}
+        <AlertComponent />
+      </ScrollView>
+    );
+  }
+);

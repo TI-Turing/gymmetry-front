@@ -38,14 +38,24 @@ export const useCatalogs = () => {
 
       const colombiaCountry =
         countriesResponse.status === 'fulfilled'
-          ? countriesResponse.value.find(
-              (country: any) => country.Nombre === 'Colombia'
-            )
+          ? countriesResponse.value.find((country: unknown) => {
+              const isRecord = (v: unknown): v is Record<string, unknown> =>
+                v !== null && typeof v === 'object';
+              if (!isRecord(country)) return false;
+              const nombre = country.Nombre as unknown;
+              return typeof nombre === 'string' && nombre === 'Colombia';
+            })
           : null;
 
       const documentTypesResponse = await Promise.allSettled([
         colombiaCountry
-          ? catalogService.getDocumentTypes(colombiaCountry.Id)
+          ? (() => {
+              const rec = colombiaCountry as unknown as Record<string, unknown>;
+              const id = rec.Id as unknown;
+              return typeof id === 'string'
+                ? catalogService.getDocumentTypes(id)
+                : Promise.resolve([]);
+            })()
           : Promise.resolve([]),
       ]);
 

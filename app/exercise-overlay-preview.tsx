@@ -27,7 +27,7 @@ export default function ExerciseOverlayPreviewScreen() {
             if (typeof exercise.TagsMuscle === 'string') {
               tags = JSON.parse(exercise.TagsMuscle) as Record<string, number>;
             } else if (typeof exercise.TagsMuscle === 'object') {
-              tags = exercise.TagsMuscle as any;
+              tags = exercise.TagsMuscle as Record<string, number>;
             }
           } catch {
             tags = {};
@@ -38,8 +38,9 @@ export default function ExerciseOverlayPreviewScreen() {
           setOverlayOpacities(overlay);
           setError(exercise ? null : 'Ejercicio no encontrado o sin datos');
         }
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || 'Error cargando ejercicio');
+      } catch (e: unknown) {
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : 'Error cargando ejercicio');
       } finally {
         if (!cancelled) setLoading(false);
       }

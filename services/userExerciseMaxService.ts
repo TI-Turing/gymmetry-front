@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddUserExerciseMaxRequest } from '@/dto/UserExerciseMax/Request/AddUserExerciseMaxRequest';
 import type { UpdateUserExerciseMaxRequest } from '@/dto/UserExerciseMax/Request/UpdateUserExerciseMaxRequest';
 import type { UserExerciseMax } from '@/models/UserExerciseMax';
@@ -7,8 +8,8 @@ import type { UserExerciseMax } from '@/models/UserExerciseMax';
 export const userExerciseMaxService = {
   async addUserExerciseMax(
     request: AddUserExerciseMaxRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/userexercisemax/add`,
       request
     );
@@ -16,15 +17,15 @@ export const userExerciseMaxService = {
   },
   async updateUserExerciseMax(
     request: UpdateUserExerciseMaxRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/userexercisemax/update`,
       request
     );
     return response;
   },
-  async deleteUserExerciseMax(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/userexercisemax/${id}`);
+  async deleteUserExerciseMax(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/userexercisemax/${id}`);
     return response;
   },
   async getUserExerciseMaxById(
@@ -41,7 +42,7 @@ export const userExerciseMaxService = {
     return response;
   },
   async findUserExerciseMaxesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<UserExerciseMax[]>> {
     const response = await apiService.post<UserExerciseMax[]>(
       `/userexercisemaxes/find`,

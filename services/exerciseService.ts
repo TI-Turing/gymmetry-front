@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddExerciseRequest } from '@/dto/Exercise/Request/AddExerciseRequest';
 import type { Exercise } from '@/models/Exercise';
 import type { UpdateExerciseRequest } from '@/dto/Exercise/Request/UpdateExerciseRequest';

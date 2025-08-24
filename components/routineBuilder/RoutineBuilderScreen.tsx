@@ -40,8 +40,8 @@ const RoutineBuilderScreen: React.FC = () => {
     buildDraft,
   } = useRoutineBuilder();
 
-  const [allExercises, setAllExercises] = useState<Exercise[]>([]);
-  const [loadingExercises, setLoadingExercises] = useState(false);
+  const [_allExercises, setAllExercises] = useState<Exercise[]>([]);
+  const [_loadingExercises, setLoadingExercises] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -58,7 +58,7 @@ const RoutineBuilderScreen: React.FC = () => {
         if (mounted && resp?.Success && Array.isArray(resp.Data)) {
           setAllExercises(resp.Data);
         }
-      } catch (e: any) {
+      } catch (_e: unknown) {
         if (mounted) setError('Error cargando ejercicios');
       } finally {
         if (mounted) setLoadingExercises(false);
@@ -96,7 +96,14 @@ const RoutineBuilderScreen: React.FC = () => {
     setSaving(true);
     try {
       const user = await authService.getUserData();
-      const addTemplateReq: any = {
+      const addTemplateReq: {
+        Name: string;
+        Comments: string;
+        GymId: string | '';
+        Author_UserId: string | null;
+        UserId: string | null;
+        Premium: boolean;
+      } = {
         Name: draft.meta.name.trim(),
         Comments: draft.meta.comments?.trim() || '',
         GymId: draft.meta.gymId || '',
@@ -106,21 +113,30 @@ const RoutineBuilderScreen: React.FC = () => {
       };
       const tplResp =
         await routineTemplateService.addRoutineTemplate(addTemplateReq);
-      if (!tplResp?.Success || !tplResp.Data?.Id)
+      const tplData = tplResp?.Data as { Id?: string } | undefined;
+      if (!tplResp?.Success || !tplData?.Id)
         throw new Error('No se pudo crear la rutina');
-      const templateId = tplResp.Data.Id;
+      const templateId: string = String(tplData.Id);
 
       // Crear cada ejercicio/día como RoutineDay (AddRoutineDayRequest)
       for (const day of draft.days) {
         for (const ex of day.exercises) {
-          const rdReq: any = {
+          const rdReq: {
+            DayNumber: number;
+            Name: string;
+            Sets: number;
+            Repetitions: string;
+            Notes: string | null;
+            RoutineTemplateId: string;
+            ExerciseId: string;
+          } = {
             DayNumber: day.dayNumber,
             Name: day.name,
             Sets: ex.sets,
             Repetitions: ex.repsOrTime,
             Notes: ex.notes || null,
             RoutineTemplateId: templateId,
-            ExerciseId: (ex.exercise as any).Id,
+            ExerciseId: (ex.exercise as unknown as { Id: string }).Id,
           };
           const rdResp = await routineDayService.addRoutineDay(rdReq);
           if (!rdResp?.Success) throw new Error('Error creando día de rutina');
@@ -128,8 +144,9 @@ const RoutineBuilderScreen: React.FC = () => {
       }
 
       setSuccess('Rutina creada correctamente');
-    } catch (e: any) {
-      setError(e.message || 'Error al guardar');
+    } catch (e) {
+      const err = e as { message?: string };
+      setError(err?.message || 'Error al guardar');
     } finally {
       setSaving(false);
     }
@@ -197,7 +214,7 @@ const RoutineBuilderScreen: React.FC = () => {
                 day.exercises.map((ex, i) => (
                   <RNView key={i} style={styles.item}>
                     <Text style={styles.itemTitle}>
-                      {(ex.exercise as any).Name}
+                      {(ex.exercise as Exercise).Name}
                     </Text>
                     <RNView style={styles.row}>
                       <RNView style={styles.col1}>

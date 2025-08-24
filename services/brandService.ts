@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddBrandRequest } from '@/dto/Brand/Request/AddBrandRequest';
 import type { Brand } from '@/models/Brand';
 import type { UpdateBrandRequest } from '@/dto/Brand/Request/UpdateBrandRequest';

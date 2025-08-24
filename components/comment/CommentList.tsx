@@ -17,20 +17,122 @@ const CommentList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   CommentList.displayName = 'CommentList';
 
-  const renderCommentItem = useCallback(
-    ({ item }: { item: any }) => (
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
+  const renderCommentItem = useCallback(({ item }: { item: unknown }) => {
+    const obj = isRecord(item) ? item : ({} as Record<string, unknown>);
+
+    const authorName =
+      (typeof obj.authorName === 'string' && obj.authorName) ||
+      (typeof obj.userName === 'string' && obj.userName) ||
+      'Usuario';
+
+    const createdAtVal = obj.createdAt as unknown;
+    const createdAt = createdAtVal ? new Date(String(createdAtVal)) : null;
+
+    const content =
+      (typeof obj.content === 'string' && obj.content) ||
+      (typeof obj.text === 'string' && obj.text) ||
+      (typeof obj.comment === 'string' && obj.comment) ||
+      'Comentario...';
+
+    const type = typeof obj.type === 'string' ? obj.type : null;
+    const typeColor =
+      type === 'feedback'
+        ? '#4caf50'
+        : type === 'suggestion'
+          ? '#2196f3'
+          : type === 'complaint'
+            ? '#ff6b6b'
+            : Colors.light.text;
+    const typeLabel =
+      type === 'feedback'
+        ? '💬 Comentario'
+        : type === 'suggestion'
+          ? '💡 Sugerencia'
+          : type === 'complaint'
+            ? '⚠️ Queja'
+            : type === 'question'
+              ? '❓ Pregunta'
+              : '💭 General';
+
+    const status = typeof obj.status === 'string' ? obj.status : null;
+    const statusColor =
+      status === 'approved'
+        ? '#4caf50'
+        : status === 'pending'
+          ? '#ffa726'
+          : status === 'rejected'
+            ? '#ff6b6b'
+            : Colors.light.text;
+    const statusLabel =
+      status === 'approved'
+        ? '✅ Aprobado'
+        : status === 'pending'
+          ? '⏳ Pendiente'
+          : status === 'rejected'
+            ? '❌ Rechazado'
+            : '📝 Borrador';
+
+    const ratingRaw = (obj as any).rating;
+    const rating = typeof ratingRaw === 'number' ? ratingRaw : null;
+
+    const category =
+      (typeof obj.category === 'string' && obj.category) ||
+      (typeof obj.topic === 'string' && obj.topic) ||
+      'General';
+
+    const likes = (obj as any).likes ?? (obj as any).upvotes ?? 0;
+    const dislikes = (obj as any).dislikes ?? (obj as any).downvotes ?? 0;
+    const replies = (obj as any).replies ?? (obj as any).repliesCount ?? 0;
+
+    const parentC = isRecord(obj.parentComment) ? obj.parentComment : null;
+    const parentAuthor =
+      (parentC && typeof parentC.authorName === 'string'
+        ? parentC.authorName
+        : 'Usuario') || 'Usuario';
+    const parentContent =
+      parentC && typeof parentC.content === 'string'
+        ? parentC.content.substring(0, 50)
+        : 'Comentario';
+
+    const reportCountRaw = (obj as any).reportCount;
+    const reportCount = typeof reportCountRaw === 'number' ? reportCountRaw : 0;
+
+    const platform = typeof obj.platform === 'string' ? obj.platform : null;
+    const platformLabel =
+      platform === 'mobile'
+        ? '� Móvil'
+        : platform === 'web'
+          ? '💻 Web'
+          : platform === 'app'
+            ? '📲 App'
+            : '🌐 General';
+
+    const moderatorNote =
+      typeof obj.moderatorNote === 'string' ? obj.moderatorNote : null;
+
+    const tagsArr = Array.isArray((obj as any).tags)
+      ? ((obj as any).tags as unknown[]).filter((t) => typeof t === 'string')
+      : [];
+
+    const lastEditedAtVal = obj.lastEditedAt as unknown;
+    const lastEditedAt = lastEditedAtVal
+      ? new Date(lastEditedAtVal as any)
+      : null;
+
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.authorName || item.userName || 'Usuario'}
-          </Text>
+          <Text style={styles.title}>{authorName}</Text>
           <Text style={styles.dateText}>
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString('es-ES', {
+            {createdAt
+              ? createdAt.toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
                   hour: '2-digit',
@@ -40,110 +142,54 @@ const CommentList = React.memo(() => {
           </Text>
         </View>
 
-        <Text style={styles.commentText}>
-          {item.content || item.text || item.comment || 'Comentario...'}
-        </Text>
+        <Text style={styles.commentText}>{content}</Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Tipo:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color:
-                  item.type === 'feedback'
-                    ? '#4caf50'
-                    : item.type === 'suggestion'
-                      ? '#2196f3'
-                      : item.type === 'complaint'
-                        ? '#ff6b6b'
-                        : Colors.light.text,
-              },
-            ]}
-          >
-            {item.type === 'feedback'
-              ? '💬 Comentario'
-              : item.type === 'suggestion'
-                ? '💡 Sugerencia'
-                : item.type === 'complaint'
-                  ? '⚠️ Queja'
-                  : item.type === 'question'
-                    ? '❓ Pregunta'
-                    : '💭 General'}
-          </Text>
+          <Text style={[styles.value, { color: typeColor }]}>{typeLabel}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Estado:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color:
-                  item.status === 'approved'
-                    ? '#4caf50'
-                    : item.status === 'pending'
-                      ? '#ffa726'
-                      : item.status === 'rejected'
-                        ? '#ff6b6b'
-                        : Colors.light.text,
-              },
-            ]}
-          >
-            {item.status === 'approved'
-              ? '✅ Aprobado'
-              : item.status === 'pending'
-                ? '⏳ Pendiente'
-                : item.status === 'rejected'
-                  ? '❌ Rechazado'
-                  : '📝 Borrador'}
+          <Text style={[styles.value, { color: statusColor }]}>
+            {statusLabel}
           </Text>
         </View>
 
-        {item.rating && (
+        {typeof rating === 'number' && (
           <View style={styles.row}>
             <Text style={styles.label}>Valoración:</Text>
             <Text style={styles.value}>
-              {'⭐'.repeat(Math.min(5, Math.max(0, item.rating)))} (
-              {item.rating}/5)
+              {'⭐'.repeat(Math.min(5, Math.max(0, rating)))} ({rating}/5)
             </Text>
           </View>
         )}
 
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>
-            {item.category || item.topic || 'General'}
-          </Text>
+          <Text style={styles.value}>{category}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Likes:</Text>
-          <Text style={styles.value}>
-            👍 {item.likes || item.upvotes || '0'}
-          </Text>
+          <Text style={styles.value}>👍 {String(likes)}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Dislikes:</Text>
-          <Text style={styles.value}>
-            👎 {item.dislikes || item.downvotes || '0'}
-          </Text>
+          <Text style={styles.value}>👎 {String(dislikes)}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Respuestas:</Text>
-          <Text style={styles.value}>
-            💬 {item.replies || item.repliesCount || '0'} respuestas
-          </Text>
+          <Text style={styles.value}>💬 {String(replies)} respuestas</Text>
         </View>
 
-        {item.parentComment && (
+        {parentC && (
           <View style={styles.row}>
             <Text style={styles.label}>Respuesta a:</Text>
             <Text style={styles.value} numberOfLines={1}>
-              {item.parentComment.authorName || 'Usuario'}: "
-              {item.parentComment.content?.substring(0, 50) || 'Comentario'}..."
+              {parentAuthor}: "{parentContent}..."
             </Text>
           </View>
         )}
@@ -153,60 +199,48 @@ const CommentList = React.memo(() => {
           <Text
             style={[
               styles.value,
-              {
-                color: item.reportCount > 0 ? '#ff6b6b' : Colors.light.text,
-              },
+              { color: reportCount > 0 ? '#ff6b6b' : Colors.light.text },
             ]}
           >
-            {item.reportCount > 0
-              ? `⚠️ ${item.reportCount} reportes`
-              : '✅ Sin reportes'}
+            {reportCount > 0 ? `⚠️ ${reportCount} reportes` : '✅ Sin reportes'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Plataforma:</Text>
-          <Text style={styles.value}>
-            {item.platform === 'mobile'
-              ? '📱 Móvil'
-              : item.platform === 'web'
-                ? '💻 Web'
-                : item.platform === 'app'
-                  ? '📲 App'
-                  : '🌐 General'}
-          </Text>
+          <Text style={styles.value}>{platformLabel}</Text>
         </View>
 
-        {item.moderatorNote && (
+        {!!moderatorNote && (
           <View style={styles.moderatorSection}>
             <Text style={styles.moderatorLabel}>🛡️ Nota del moderador:</Text>
-            <Text style={styles.moderatorText}>{item.moderatorNote}</Text>
+            <Text style={styles.moderatorText}>{moderatorNote}</Text>
           </View>
         )}
 
-        {item.tags && Array.isArray(item.tags) && (
+        {tagsArr.length > 0 && (
           <View style={styles.tagsSection}>
             <Text style={styles.tagsLabel}>Etiquetas:</Text>
             <View style={styles.tagsList}>
-              {item.tags.slice(0, 4).map((tag: string, index: number) => (
+              {tagsArr.slice(0, 4).map((tag: unknown, index: number) => (
                 <Text key={index} style={styles.tag}>
-                  #{tag}
+                  #{String(tag)}
                 </Text>
               ))}
-              {item.tags.length > 4 && (
+              {tagsArr.length > 4 && (
                 <Text style={styles.moreTags}>
-                  +{item.tags.length - 4} más...
+                  +{tagsArr.length - 4} más...
                 </Text>
               )}
             </View>
           </View>
         )}
 
-        {item.lastEditedAt && (
+        {lastEditedAt && (
           <View style={styles.editSection}>
             <Text style={styles.editLabel}>
               ✏️ Editado:{' '}
-              {new Date(item.lastEditedAt).toLocaleDateString('es-ES', {
+              {lastEditedAt.toLocaleDateString('es-ES', {
                 day: '2-digit',
                 month: '2-digit',
                 hour: '2-digit',
@@ -216,15 +250,22 @@ const CommentList = React.memo(() => {
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) =>
-      item.id || item.commentId || item.uuid || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const v =
+        (item.id as any) ??
+        (item.commentId as any) ??
+        (item.uuid as any) ??
+        (item.Id as any) ??
+        (item.CommentId as any) ??
+        (item.Uuid as any);
+      if (v != null) return String(v);
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

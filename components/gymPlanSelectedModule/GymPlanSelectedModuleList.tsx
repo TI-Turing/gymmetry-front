@@ -17,107 +17,130 @@ const GymPlanSelectedModuleList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderGymPlanSelectedModuleItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.moduleName || item.name || 'Módulo seleccionado'}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const moduleName =
+        (r['moduleName'] as string) ||
+        (r['name'] as string) ||
+        'Módulo seleccionado';
+      const isActive = (r['isActive'] as boolean) ?? false;
+      const description =
+        (r['description'] as string) ||
+        'Módulo seleccionado del plan de gimnasio';
+      const planName = (r['planName'] as string) ?? 'N/A';
+      const gymName = (r['gymName'] as string) ?? 'N/A';
+      const category = (r['category'] as string) ?? 'General';
+      const price = (r['price'] as number) ?? null;
+      const addedAt = (r['addedAt'] as string) ?? null;
+      const configuredBy = (r['configuredBy'] as string) ?? 'Sistema';
+      const usageLimit = (r['usageLimit'] as number) ?? null;
+      const currentUsage = (r['currentUsage'] as number) ?? null;
+      const features = Array.isArray(r['features'])
+        ? (r['features'] as string[])
+        : [];
 
-        <Text style={styles.description}>
-          {item.description || 'Módulo seleccionado del plan de gimnasio'}
-        </Text>
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{moduleName}</Text>
+            <Text style={styles.statusText}>
+              {isActive ? 'Activo' : 'Inactivo'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Plan:</Text>
-          <Text style={styles.value}>{item.planName || 'N/A'}</Text>
-        </View>
+          <Text style={styles.description}>{description}</Text>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Gimnasio:</Text>
-          <Text style={styles.value}>{item.gymName || 'N/A'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Plan:</Text>
+            <Text style={styles.value}>{planName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Módulo:</Text>
-          <Text style={styles.value}>{item.moduleName || 'N/A'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Gimnasio:</Text>
+            <Text style={styles.value}>{gymName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>{item.category || 'General'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Módulo:</Text>
+            <Text style={styles.value}>{moduleName}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Precio:</Text>
-          <Text style={styles.value}>
-            {item.price ? `$${item.price.toFixed(2)}` : 'Incluido'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Categoría:</Text>
+            <Text style={styles.value}>{category}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Fecha inclusión:</Text>
-          <Text style={styles.value}>
-            {item.addedAt ? new Date(item.addedAt).toLocaleDateString() : 'N/A'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Precio:</Text>
+            <Text style={styles.value}>
+              {price != null ? `$${price.toFixed(2)}` : 'Incluido'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Configurado por:</Text>
-          <Text style={styles.value}>{item.configuredBy || 'Sistema'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Fecha inclusión:</Text>
+            <Text style={styles.value}>
+              {addedAt ? new Date(addedAt).toLocaleDateString() : 'N/A'}
+            </Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Límite uso:</Text>
-          <Text style={styles.value}>
-            {item.usageLimit ? `${item.usageLimit} usos` : 'Ilimitado'}
-          </Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Configurado por:</Text>
+            <Text style={styles.value}>{configuredBy}</Text>
+          </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Usos actuales:</Text>
-          <Text style={styles.value}>{item.currentUsage || '0'}</Text>
-        </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Límite uso:</Text>
+            <Text style={styles.value}>
+              {usageLimit != null ? `${usageLimit} usos` : 'Ilimitado'}
+            </Text>
+          </View>
 
-        {item.features && Array.isArray(item.features) && (
-          <View style={styles.featuresSection}>
-            <Text style={styles.featuresLabel}>Características incluidas:</Text>
-            <View style={styles.featuresList}>
-              {item.features
-                .slice(0, 2)
-                .map((feature: string, index: number) => (
+          <View style={styles.row}>
+            <Text style={styles.label}>Usos actuales:</Text>
+            <Text style={styles.value}>{currentUsage ?? '0'}</Text>
+          </View>
+
+          {!!features.length && (
+            <View style={styles.featuresSection}>
+              <Text style={styles.featuresLabel}>
+                Características incluidas:
+              </Text>
+              <View style={styles.featuresList}>
+                {features.slice(0, 2).map((feature: string, index: number) => (
                   <Text key={index} style={styles.feature}>
                     • {feature}
                   </Text>
                 ))}
-              {item.features.length > 2 && (
-                <Text style={styles.moreFeatures}>
-                  +{item.features.length - 2} más...
-                </Text>
-              )}
+                {features.length > 2 && (
+                  <Text style={styles.moreFeatures}>
+                    +{features.length - 2} más...
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
-        )}
-      </View>
-    ),
+          )}
+        </View>
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) =>
-      item.id ||
-      item.selectionId ||
-      `${item.planId}-${item.moduleId}` ||
-      String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['SelectionId'] as string) ||
+      (r['selectionId'] as string) ||
+      (typeof r['planId'] === 'string' && typeof r['moduleId'] === 'string'
+        ? `${r['planId']}-${r['moduleId']}`
+        : null);
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

@@ -5,6 +5,34 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
+type DailyHistoryItem = {
+  id?: string;
+  historyId?: string;
+  date?: string;
+  isCompleted?: boolean;
+  isInProgress?: boolean;
+  workoutType?: string;
+  routineName?: string;
+  duration?: number;
+  totalExercises?: number;
+  exerciseCount?: number;
+  completedSets?: number;
+  totalSets?: number;
+  caloriesBurned?: number;
+  calories?: number;
+  totalWeight?: number;
+  avgHeartRate?: number;
+  startTime?: string;
+  endTime?: string;
+  trainerName?: string;
+  intensity?: 'high' | 'medium' | 'low' | string;
+  mood?: 'excellent' | 'good' | 'average' | 'bad' | string;
+  gymName?: string;
+  location?: string;
+  notes?: string;
+  achievements?: string[];
+};
+
 const DailyHistoryList = React.memo(() => {
   const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadDailyHistory = useCallback(async () => {
@@ -17,15 +45,28 @@ const DailyHistoryList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
-  const renderDailyHistoryItem = useCallback(
-    ({ item }: { item: any }) => (
+  const renderDailyHistoryItem = useCallback(({ item }: { item: unknown }) => {
+    const it = (item || {}) as Partial<DailyHistoryItem>;
+    const duration =
+      typeof it.duration === 'number' && Number.isFinite(it.duration)
+        ? it.duration
+        : 0;
+    const startTimeStr = typeof it.startTime === 'string' ? it.startTime : '';
+    const endTimeStr = typeof it.endTime === 'string' ? it.endTime : '';
+    const dateStr = typeof it.date === 'string' ? it.date : '';
+    const avgHr =
+      typeof it.avgHeartRate === 'number' ? it.avgHeartRate : undefined;
+    const achievements = Array.isArray(it.achievements)
+      ? (it.achievements as string[])
+      : [];
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.date
-              ? new Date(item.date).toLocaleDateString('es-ES', {
+            {dateStr
+              ? new Date(dateStr).toLocaleDateString('es-ES', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
@@ -34,23 +75,23 @@ const DailyHistoryList = React.memo(() => {
               : 'Día de entrenamiento'}
           </Text>
           <Text style={styles.statusText}>
-            {item.isCompleted
+            {it.isCompleted
               ? 'Completado'
-              : item.isInProgress
+              : it.isInProgress
                 ? 'En progreso'
                 : 'Pendiente'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.workoutType || item.routineName || 'Sesión de entrenamiento'}
+          {it.workoutType || it.routineName || 'Sesión de entrenamiento'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Duración:</Text>
           <Text style={styles.value}>
-            {item.duration
-              ? `${Math.floor(item.duration / 60)}h ${item.duration % 60}m`
+            {duration > 0
+              ? `${Math.floor(duration / 60)}h ${duration % 60}m`
               : 'N/A'}
           </Text>
         </View>
@@ -58,27 +99,30 @@ const DailyHistoryList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
           <Text style={styles.value}>
-            {item.totalExercises || item.exerciseCount || '0'}
+            {it.totalExercises || it.exerciseCount || '0'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Series completadas:</Text>
           <Text style={styles.value}>
-            {item.completedSets || '0'} / {item.totalSets || '0'}
+            {(it.completedSets as number | string) || '0'} /{' '}
+            {(it.totalSets as number | string) || '0'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Calorías quemadas:</Text>
           <Text style={styles.value}>
-            {item.caloriesBurned || item.calories || '0'} kcal
+            {it.caloriesBurned || it.calories || '0'} kcal
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Peso total:</Text>
-          <Text style={styles.value}>{item.totalWeight || '0'} kg</Text>
+          <Text style={styles.value}>
+            {(it.totalWeight as number | string) || '0'} kg
+          </Text>
         </View>
 
         <View style={styles.row}>
@@ -88,16 +132,16 @@ const DailyHistoryList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.avgHeartRate > 160
+                  typeof avgHr === 'number' && avgHr > 160
                     ? '#ff6b6b'
-                    : item.avgHeartRate > 120
+                    : typeof avgHr === 'number' && avgHr > 120
                       ? '#ffa726'
                       : Colors.light.text,
               },
             ]}
           >
-            {item.avgHeartRate
-              ? `${item.avgHeartRate} bpm (promedio)`
+            {typeof avgHr === 'number'
+              ? `${avgHr} bpm (promedio)`
               : 'No registrado'}
           </Text>
         </View>
@@ -105,8 +149,8 @@ const DailyHistoryList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Hora inicio:</Text>
           <Text style={styles.value}>
-            {item.startTime
-              ? new Date(item.startTime).toLocaleTimeString('es-ES', {
+            {startTimeStr
+              ? new Date(startTimeStr).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
                   minute: '2-digit',
                 })
@@ -117,8 +161,8 @@ const DailyHistoryList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Hora fin:</Text>
           <Text style={styles.value}>
-            {item.endTime
-              ? new Date(item.endTime).toLocaleTimeString('es-ES', {
+            {endTimeStr
+              ? new Date(endTimeStr).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
                   minute: '2-digit',
                 })
@@ -129,7 +173,7 @@ const DailyHistoryList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Entrenador:</Text>
           <Text style={styles.value}>
-            {item.trainerName || 'Entrenamiento personal'}
+            {it.trainerName || 'Entrenamiento personal'}
           </Text>
         </View>
 
@@ -140,17 +184,17 @@ const DailyHistoryList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.intensity === 'high'
+                  it.intensity === 'high'
                     ? '#ff6b6b'
-                    : item.intensity === 'medium'
+                    : it.intensity === 'medium'
                       ? '#ffa726'
                       : '#4caf50',
               },
             ]}
           >
-            {item.intensity === 'high'
+            {it.intensity === 'high'
               ? '🔥 Alta'
-              : item.intensity === 'medium'
+              : it.intensity === 'medium'
                 ? '⚡ Media'
                 : '💚 Suave'}
           </Text>
@@ -163,21 +207,21 @@ const DailyHistoryList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.mood === 'excellent'
+                  it.mood === 'excellent'
                     ? '#4caf50'
-                    : item.mood === 'good'
+                    : it.mood === 'good'
                       ? '#8bc34a'
-                      : item.mood === 'average'
+                      : it.mood === 'average'
                         ? '#ffa726'
                         : '#ff6b6b',
               },
             ]}
           >
-            {item.mood === 'excellent'
+            {it.mood === 'excellent'
               ? '😄 Excelente'
-              : item.mood === 'good'
+              : it.mood === 'good'
                 ? '😊 Bueno'
-                : item.mood === 'average'
+                : it.mood === 'average'
                   ? '😐 Regular'
                   : '😞 Malo'}
           </Text>
@@ -186,46 +230,45 @@ const DailyHistoryList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Ubicación:</Text>
           <Text style={styles.value}>
-            {item.gymName || item.location || 'Casa'}
+            {it.gymName || it.location || 'Casa'}
           </Text>
         </View>
 
-        {item.notes && (
+        {typeof it.notes === 'string' && it.notes.length > 0 && (
           <View style={styles.notesSection}>
             <Text style={styles.notesLabel}>Notas del día:</Text>
-            <Text style={styles.notesText}>💭 {item.notes}</Text>
+            <Text style={styles.notesText}>💭 {it.notes}</Text>
           </View>
         )}
 
-        {item.achievements && Array.isArray(item.achievements) && (
+        {achievements.length > 0 && (
           <View style={styles.achievementsSection}>
             <Text style={styles.achievementsLabel}>Logros obtenidos:</Text>
             <View style={styles.achievementsList}>
-              {item.achievements
-                .slice(0, 3)
-                .map((achievement: string, index: number) => (
-                  <Text key={index} style={styles.achievement}>
-                    🏆 {achievement}
-                  </Text>
-                ))}
-              {item.achievements.length > 3 && (
+              {achievements.slice(0, 3).map((achievement, index) => (
+                <Text key={index} style={styles.achievement}>
+                  🏆 {achievement}
+                </Text>
+              ))}
+              {achievements.length > 3 && (
                 <Text style={styles.moreAchievements}>
-                  +{item.achievements.length - 3} logros más...
+                  +{achievements.length - 3} logros más...
                 </Text>
               )}
             </View>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) =>
-      item.id || item.historyId || item.date || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const o = (item || {}) as Record<string, unknown>;
+    if (typeof o.id === 'string') return o.id;
+    if (typeof o.historyId === 'string') return o.historyId;
+    if (typeof o.date === 'string') return o.date;
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

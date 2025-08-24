@@ -1,7 +1,7 @@
 import Colors from '@/constants/Colors';
 import { ThemeMode } from '@/hooks/useThemedStyles';
 
-export const makeRoutineDayScreenStyles = (theme: ThemeMode): any => {
+export const makeRoutineDayScreenStyles = (theme: ThemeMode) => {
   const palette = Colors[theme];
   const text = palette.text;
   const tint = palette.tint;

@@ -7,6 +7,8 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { employeeRegisterDailyService } from '@/services';
 
 const EmployeeRegisterDailyList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
   const loadEmployeeRegisters = useCallback(async () => {
     const response =
       await employeeRegisterDailyService.getAllEmployeeRegisterDailies();
@@ -14,60 +16,115 @@ const EmployeeRegisterDailyList = React.memo(() => {
   }, []);
 
   const renderEmployeeRegisterItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: unknown }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.employeeName || item.employee || 'Empleado sin nombre'}
+            {(() => {
+              if (!isRecord(item)) return 'Empleado sin nombre';
+              const n1 = item.employeeName;
+              const n2 = item.employee;
+              return (typeof n1 === 'string' && n1) ||
+                (typeof n2 === 'string' && n2)
+                ? (n1 as string) || (n2 as string)
+                : 'Empleado sin nombre';
+            })()}
           </Text>
           <Text style={styles.statusText}>
-            {item.isPresent ? 'Presente' : 'Ausente'}
+            {isRecord(item) && item.isPresent ? 'Presente' : 'Ausente'}
           </Text>
         </View>
 
         <Text style={styles.date}>
-          Fecha:{' '}
-          {item.date ? new Date(item.date).toLocaleDateString() : 'Sin fecha'}
+          {(() => {
+            if (!isRecord(item)) return 'Fecha: Sin fecha';
+            const d = item.date;
+            const iso = typeof d === 'string' || d instanceof Date ? d : '';
+            try {
+              const val = iso
+                ? new Date(iso).toLocaleDateString()
+                : 'Sin fecha';
+              return `Fecha: ${val}`;
+            } catch {
+              return 'Fecha: Sin fecha';
+            }
+          })()}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Entrada:</Text>
           <Text style={styles.value}>
-            {item.checkInTime || item.entryTime || 'Sin registrar'}
+            {(() => {
+              if (!isRecord(item)) return 'Sin registrar';
+              const a = item.checkInTime;
+              const b = item.entryTime;
+              return (typeof a === 'string' && a) ||
+                (typeof b === 'string' && b)
+                ? (a as string) || (b as string)
+                : 'Sin registrar';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Salida:</Text>
           <Text style={styles.value}>
-            {item.checkOutTime || item.exitTime || 'Sin registrar'}
+            {(() => {
+              if (!isRecord(item)) return 'Sin registrar';
+              const a = item.checkOutTime;
+              const b = item.exitTime;
+              return (typeof a === 'string' && a) ||
+                (typeof b === 'string' && b)
+                ? (a as string) || (b as string)
+                : 'Sin registrar';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Horas trabajadas:</Text>
           <Text style={styles.value}>
-            {item.hoursWorked || item.totalHours || 0} horas
+            {(() => {
+              if (!isRecord(item)) return '0 horas';
+              const n =
+                (typeof item.hoursWorked === 'number' && item.hoursWorked) ||
+                (typeof item.totalHours === 'number' && item.totalHours) ||
+                0;
+              return `${n} horas`;
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Departamento:</Text>
           <Text style={styles.value}>
-            {item.department || item.area || 'No especificado'}
+            {(() => {
+              if (!isRecord(item)) return 'No especificado';
+              const a = item.department;
+              const b = item.area;
+              return (typeof a === 'string' && a) ||
+                (typeof b === 'string' && b)
+                ? (a as string) || (b as string)
+                : 'No especificado';
+            })()}
           </Text>
         </View>
 
-        {item.notes && <Text style={styles.notes}>Notas: {item.notes}</Text>}
+        {isRecord(item) && typeof item.notes === 'string' && (
+          <Text style={styles.notes}>Notas: {item.notes}</Text>
+        )}
       </View>
     ),
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.registerId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = (item.id ?? item.registerId) as unknown;
+      if (typeof id === 'string' && id) return id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

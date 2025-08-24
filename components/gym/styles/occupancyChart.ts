@@ -1,8 +1,6 @@
 import { StyleSheet } from 'react-native';
-import Colors from '@/constants/Colors';
 
 export const makeOccupancyChartStyles = (mode: 'light' | 'dark') => {
-  const c = Colors[mode];
   const colors = {
     cardBg: mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
     onCard: mode === 'dark' ? '#FFFFFF' : '#111111',

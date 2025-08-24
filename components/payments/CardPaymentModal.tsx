@@ -8,6 +8,10 @@ import { Asset } from 'expo-asset';
 import SmartImage from '@/components/common/SmartImage';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makePaymentModalStyles } from './styles';
+import mpIcon from '../../assets/icons/mercadoPago.svg';
+import ppIcon from '../../assets/icons/paypal.svg';
+import stIcon from '../../assets/icons/stripe.svg';
+import psePng from '../../assets/icons/pse.png';
 
 type Props = {
   visible: boolean;
@@ -34,15 +38,11 @@ export default function CardPaymentModal({
     let mounted = true;
     const load = async () => {
       try {
-        const mpMod = require('../../assets/icons/mercadoPago.svg');
-        const ppMod = require('../../assets/icons/paypal.svg');
-        const stMod = require('../../assets/icons/stripe.svg');
-        const pseMod = require('../../assets/icons/pse.png');
-        await Asset.loadAsync([mpMod, ppMod, stMod, pseMod]);
-        const mp = Asset.fromModule(mpMod);
-        const pp = Asset.fromModule(ppMod);
-        const st = Asset.fromModule(stMod);
-        const pse = Asset.fromModule(pseMod);
+        await Asset.loadAsync([mpIcon, ppIcon, stIcon, psePng]);
+        const mp = Asset.fromModule(mpIcon);
+        const pp = Asset.fromModule(ppIcon);
+        const st = Asset.fromModule(stIcon);
+        const pse = Asset.fromModule(psePng);
         if (!mounted) return;
         setMpUri(mp.localUri || mp.uri);
         setPpUri(pp.localUri || pp.uri);

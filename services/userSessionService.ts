@@ -56,7 +56,21 @@ class UserSessionService {
 
       // Obtener lista de países del catálogo
       const { catalogService } = await import('./catalogService');
-      const countries = await catalogService.getCountries();
+      const isRecord = (v: unknown): v is Record<string, unknown> =>
+        !!v && typeof v === 'object' && !Array.isArray(v);
+      const countriesResp = (await catalogService.getCountries()) as unknown;
+      const rawObj = countriesResp as unknown;
+      const rawData = isRecord(rawObj)
+        ? ((rawObj['Data'] as unknown) ?? rawObj)
+        : rawObj;
+      let countries: unknown[] = [];
+      if (Array.isArray(rawData)) countries = rawData as unknown[];
+      else if (
+        isRecord(rawData) &&
+        Array.isArray((rawData['$values'] as unknown[]) ?? [])
+      ) {
+        countries = ((rawData['$values'] as unknown[]) ?? []) as unknown[];
+      }
 
       // Buscar el país en la lista del catálogo
       const matchedCountry = this.findCountryInCatalog(
@@ -68,13 +82,16 @@ class UserSessionService {
       }
 
       // Guardar en memoria y AsyncStorage
+      const r = (matchedCountry ?? {}) as Record<string, unknown>;
+      const id = (r['Id'] as string) || (r['id'] as string) || '';
+      const name = (r['Nombre'] as string) || (r['name'] as string) || '';
       this.userCountryData = {
-        id: matchedCountry.Id,
-        name: matchedCountry.Nombre,
+        id,
+        name,
         code: detectedCountry.code || '',
         detectedAt: Date.now(),
       };
-      this.userCountryId = matchedCountry.Id;
+      this.userCountryId = id || null;
 
       await AsyncStorage.setItem(
         USER_COUNTRY_DATA_KEY,
@@ -164,39 +181,40 @@ class UserSessionService {
 
   private findCountryInCatalog(
     detectedCountry: { name: string; code: string },
-    catalogCountries: any[]
+    catalogCountries: unknown[]
   ) {
+    const norm = (v: unknown) => (typeof v === 'string' ? v.toLowerCase() : '');
+    const isRec = (v: unknown): v is Record<string, unknown> =>
+      !!v && typeof v === 'object' && !Array.isArray(v);
+
     // Buscar por código ISO primero
     if (detectedCountry.code) {
-      const byCode = catalogCountries.find(
-        (country) =>
-          country.CodigoISO?.toUpperCase() ===
-          detectedCountry.code.toUpperCase()
-      );
-      if (byCode) {
-        return byCode;
-      }
+      const byCode = catalogCountries.find((country) => {
+        const r = (country ?? {}) as Record<string, unknown>;
+        const codigo =
+          (r['CodigoISO'] as string) || (r['code'] as string) || '';
+        return codigo.toUpperCase() === detectedCountry.code.toUpperCase();
+      });
+      if (byCode) return byCode;
     }
 
     // Buscar por nombre (coincidencia exacta)
-    const byExactName = catalogCountries.find(
-      (country) =>
-        country.Nombre.toLowerCase() === detectedCountry.name.toLowerCase()
-    );
-    if (byExactName) {
-      return byExactName;
-    }
+    const byExactName = catalogCountries.find((country) => {
+      const r = isRec(country) ? (country as Record<string, unknown>) : {};
+      const nombre = (r['Nombre'] as string) || (r['name'] as string) || '';
+      return norm(nombre) === norm(detectedCountry.name);
+    });
+    if (byExactName) return byExactName;
 
     // Buscar por nombre (coincidencia parcial)
-    const byPartialName = catalogCountries.find(
-      (country) =>
-        country.Nombre.toLowerCase().includes(
-          detectedCountry.name.toLowerCase()
-        ) ||
-        detectedCountry.name
-          .toLowerCase()
-          .includes(country.Nombre.toLowerCase())
-    );
+    const byPartialName = catalogCountries.find((country) => {
+      const r = isRec(country) ? (country as Record<string, unknown>) : {};
+      const nombre = (r['Nombre'] as string) || (r['name'] as string) || '';
+      return (
+        norm(nombre).includes(norm(detectedCountry.name)) ||
+        norm(detectedCountry.name).includes(norm(nombre))
+      );
+    });
 
     return byPartialName;
   }

@@ -3,7 +3,6 @@ import { ScrollView, View as RNView, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
 import Button from '@/components/common/Button';
 import type { Exercise } from '@/models/Exercise';
 import type { UserExerciseMax } from '@/models/UserExerciseMax';
@@ -19,8 +18,10 @@ function formatDate(iso?: string | null) {
 }
 
 const UserExerciseMaxScreen: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const p = Colors[colorScheme];
+  const getExerciseName = (it: unknown, fallback?: string | null): string => {
+    const ex = (it as unknown as { Exercise?: { Name?: string } }).Exercise;
+    return ex?.Name || fallback || 'Ejercicio';
+  };
   const styles = useThemedStyles((theme) => {
     const pal = Colors[theme];
     return StyleSheet.create({
@@ -60,14 +61,18 @@ const UserExerciseMaxScreen: React.FC = () => {
     setError(null);
     try {
       const user = await authService.getUserData();
-      const body: any = { UserId: user?.id || '' };
+      const body: { UserId: string; ExerciseId?: string } = {
+        UserId: String(user?.id || ''),
+      };
       if (exerciseId) body.ExerciseId = exerciseId;
       const resp =
         await userExerciseMaxService.findUserExerciseMaxesByFields(body);
-      let arr: any[] = [];
+      let arr: UserExerciseMax[] = [];
       if (resp?.Success && resp.Data) {
-        const raw: any = resp.Data as any;
-        arr = Array.isArray(raw) ? raw : raw?.$values || [];
+        const raw = resp.Data as unknown;
+        arr = Array.isArray(raw)
+          ? (raw as UserExerciseMax[])
+          : (raw as { $values?: UserExerciseMax[] })?.$values || [];
       }
       arr.sort((a: UserExerciseMax, b: UserExerciseMax) => {
         const ta = new Date(a.AchievedAt || a.CreatedAt).getTime();
@@ -133,7 +138,7 @@ const UserExerciseMaxScreen: React.FC = () => {
               <View key={it.Id} style={styles.row}>
                 <Text style={styles.rowText}>
                   {formatDate(it.AchievedAt || it.CreatedAt)} ·{' '}
-                  {(it as any).Exercise?.Name || exercise?.Name || 'Ejercicio'}
+                  {getExerciseName(it, exercise?.Name)}
                 </Text>
                 <Text style={styles.rowWeight}>{it.WeightKg} kg</Text>
               </View>
@@ -166,4 +171,4 @@ const UserExerciseMaxScreen: React.FC = () => {
 
 export default UserExerciseMaxScreen;
 
-const styles = StyleSheet.create({});
+// estilos locales intencionalmente vacíos

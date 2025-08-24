@@ -16,7 +16,7 @@ interface EntityListProps<T> {
   loadingMessage?: string;
   refreshButtonText?: string;
   showRefreshButton?: boolean;
-  dependencies?: any[];
+  dependencies?: unknown[];
   extraContent?: ReactNode;
   skeletonComponent?: ReactNode;
   useSkeletonLoading?: boolean;
@@ -91,16 +91,15 @@ export function EntityList<T>({
             ? renderEmptyState()
             : items
               ? items.map((it, idx) => {
-                  const element = (renderItem as any)({
+                  type Info = Parameters<ListRenderItem<T>>[0];
+                  const separators: Info['separators'] =
+                    undefined as unknown as Info['separators'];
+                  const element = renderItem({
                     item: it,
                     index: idx,
-                    separators: {
-                      highlight() {},
-                      unhighlight() {},
-                      updateProps() {},
-                    },
-                  });
-                  const key = keyExtractor(it as any, idx);
+                    separators,
+                  } as Info);
+                  const key = keyExtractor(it, idx);
                   return <React.Fragment key={key}>{element}</React.Fragment>;
                 })
               : null}

@@ -43,7 +43,7 @@ export default function NoGymView({
     }
   };
 
-  const handleGymSelected = (gym: any) => {
+  const handleGymSelected = (_gym: unknown) => {
     // Aquí se podría manejar la selección del gym
     // Por ejemplo, actualizar el estado del usuario
     onConnect(true);

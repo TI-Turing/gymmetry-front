@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Step1Data, ApiResponse } from '../types';
+import { Step1Data, PasswordValidation } from '../types';
 import { usePasswordValidation, useFormValidation } from './useValidation';
 import { validatePassword } from '../utils/validation';
 import { handleApiError } from '../utils/api';
@@ -31,7 +31,7 @@ interface UseStep1FormReturn {
   setPassword: (password: string) => void;
   showPassword: boolean;
   setShowPassword: (show: boolean) => void;
-  validation: any;
+  validation: PasswordValidation;
   isPasswordValid: boolean;
 
   // Handlers
@@ -44,7 +44,7 @@ export const useStep1Form = ({
   onNext,
   initialData,
   showError,
-  showSuccess,
+  showSuccess: _showSuccess,
 }: UseStep1FormProps): UseStep1FormReturn => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -76,7 +76,7 @@ export const useStep1Form = ({
     passwordsMatch &&
     confirmPassword.length > 0;
 
-  const handleNext = useCallback(async () => {
+  const handleNext = useCallback(async (): Promise<void> => {
     if (!isFormValid) {
       let errorMessage = '';
 
@@ -115,10 +115,10 @@ export const useStep1Form = ({
       }
 
       // Crear usuario
-      const response = (await userService.addUser({
+      const response = await userService.addUser({
         Email: email,
         Password: password,
-      })) as ApiResponse;
+      });
 
       if (!response.Success) {
         // Manejar errores específicos del servidor
@@ -134,14 +134,13 @@ export const useStep1Form = ({
           errorMessage =
             'Este email ya está registrado. Por favor usa otro email o inicia sesión.';
         }
-
         throw new Error(errorMessage);
       }
 
       if (response.Data?.Token) {
         apiService.setAuthToken(response.Data.Token);
       }
-      const stepData = {
+      const stepData: Step1Data = {
         email,
         password,
         userId: response.Data?.Id,
@@ -149,7 +148,7 @@ export const useStep1Form = ({
       };
 
       onNext(stepData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage = handleApiError(error);
       showError(errorMessage);
     } finally {

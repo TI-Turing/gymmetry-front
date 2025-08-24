@@ -92,7 +92,7 @@ export const isValidName = (name: string): boolean => {
 /**
  * Validates required field
  */
-export const isRequired = (value: any): boolean => {
+export const isRequired = (value: unknown): boolean => {
   if (value === null || value === undefined) {
     return false;
   }
@@ -185,7 +185,7 @@ export const isValidDocumentNumber = (documentNumber: string): boolean => {
  * Generic field validator
  */
 export const validateField = (
-  value: any,
+  value: unknown,
   rules: {
     required?: boolean;
     email?: boolean;
@@ -196,7 +196,7 @@ export const validateField = (
     minLength?: number;
     maxLength?: number;
     pattern?: RegExp;
-    custom?: (value: any) => boolean;
+    custom?: (value: unknown) => boolean;
   }
 ): ValidationResult => {
   const errors: string[] = [];
@@ -212,46 +212,48 @@ export const validateField = (
     return { isValid: true, errors: [] };
   }
 
+  const str = typeof value === 'string' ? value : '';
+
   // Email validation
-  if (rules.email && !isValidEmail(value)) {
+  if (rules.email && !isValidEmail(str)) {
     errors.push('Ingresa un email válido');
   }
 
   // Phone validation
-  if (rules.phone && !isValidPhoneNumber(value)) {
+  if (rules.phone && !isValidPhoneNumber(str)) {
     errors.push('Ingresa un número de teléfono válido');
   }
 
   // Username validation
-  if (rules.username && !isValidUsername(value)) {
+  if (rules.username && !isValidUsername(str)) {
     errors.push(
       'El nombre de usuario debe tener entre 3-30 caracteres y solo contener letras, números y guiones bajos'
     );
   }
 
   // Name validation
-  if (rules.name && !isValidName(value)) {
+  if (rules.name && !isValidName(str)) {
     errors.push('Ingresa un nombre válido (solo letras y espacios)');
   }
 
   // Password validation
-  if (rules.password && !isPasswordValid(value)) {
+  if (rules.password && !isPasswordValid(str)) {
     errors.push(
       'La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y símbolos'
     );
   }
 
   // Length validations
-  if (rules.minLength && value.length < rules.minLength) {
+  if (rules.minLength && str.length < rules.minLength) {
     errors.push(`Debe tener al menos ${rules.minLength} caracteres`);
   }
 
-  if (rules.maxLength && value.length > rules.maxLength) {
+  if (rules.maxLength && str.length > rules.maxLength) {
     errors.push(`No puede tener más de ${rules.maxLength} caracteres`);
   }
 
   // Pattern validation
-  if (rules.pattern && !rules.pattern.test(value)) {
+  if (rules.pattern && !rules.pattern.test(str)) {
     errors.push('Formato inválido');
   }
 

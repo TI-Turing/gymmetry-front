@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import { isWithinQuietHours } from '@/utils/quietHours';
 import type { AppSettings } from '@/contexts/AppSettingsContext';
 import type { NotificationCreateRequestDto } from '@/dto/Notification/Request/NotificationCreateRequestDto';
@@ -11,7 +12,7 @@ export const notificationService = {
     opts?: {
       settings?: Pick<AppSettings, 'notificationsEnabled' | 'quietHours'>;
     }
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<unknown>> {
     // Respetar ajustes de la app si se proveen
     const st = opts?.settings;
     if (
@@ -25,13 +26,16 @@ export const notificationService = {
           'Notificación suprimida por ajustes del usuario (silencio/horas).',
         Data: null as any,
         StatusCode: 200,
-      } as ApiResponse<any>;
+      } as ApiResponse<unknown>;
     }
-    const response = await apiService.post<any>(`/notification/add`, request);
+    const response = await apiService.post<unknown>(
+      `/notification/add`,
+      request
+    );
     return response;
   },
-  async deleteNotification(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/notification/${id}`);
+  async deleteNotification(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/notification/${id}`);
     return response;
   },
   async getNotificationById(
@@ -48,7 +52,7 @@ export const notificationService = {
     return response;
   },
   async findNotificationsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<NotificationResponseDto[]>> {
     const response = await apiService.post<NotificationResponseDto[]>(
       `/notifications/find`,
@@ -56,8 +60,11 @@ export const notificationService = {
     );
     return response;
   },
-  async updateNotification(request: any): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/notification/update`, request);
+  async updateNotification(request: unknown): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/notification/update`,
+      request
+    );
     return response;
   },
 };

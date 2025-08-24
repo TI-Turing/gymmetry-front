@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Modal,
   TouchableOpacity,
@@ -40,10 +40,20 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const [fadeAnim] = useState(new Animated.Value(0));
 
   // Frase motivacional aleatoria
-  const motivationalPhrase = useMemo(() => {
-    if (motivationalPhrases.length === 0) return { text: '¡Tú puedes!' };
-    const randomIndex = Math.floor(Math.random() * motivationalPhrases.length);
-    return motivationalPhrases[randomIndex];
+  const [motivationalPhrase, setMotivationalPhrase] = useState<{
+    text: string;
+  }>({ text: '¡Tú puedes!' });
+  useEffect(() => {
+    if (visible) {
+      if (motivationalPhrases.length === 0) {
+        setMotivationalPhrase({ text: '¡Tú puedes!' });
+      } else {
+        const randomIndex = Math.floor(
+          Math.random() * motivationalPhrases.length
+        );
+        setMotivationalPhrase(motivationalPhrases[randomIndex]);
+      }
+    }
   }, [visible]); // Cambiar frase cada vez que se abra el modal
 
   // Animación de pulso continuo
@@ -72,7 +82,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     }).start();
   };
 
-  const stopPulseAnimation = () => {
+  const stopPulseAnimation = useCallback(() => {
     setIsExecuting(false);
     pulseAnim.stopAnimation();
     Animated.timing(pulseAnim, {
@@ -87,7 +97,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
       duration: 300,
       useNativeDriver: true,
     }).start();
-  };
+  }, [fadeAnim, pulseAnim]);
 
   const handleStartSet = () => {
     if (!exercise) return;
@@ -146,7 +156,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     if (!visible) {
       stopPulseAnimation();
     }
-  }, [visible]);
+  }, [visible, stopPulseAnimation]);
 
   if (!exercise) return null;
 

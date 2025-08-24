@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddPermissionRequest } from '@/dto/Permission/Request/AddPermissionRequest';
 import type { Permission } from '@/models/Permission';
 import type { UpdatePermissionRequest } from '@/dto/Permission/Request/UpdatePermissionRequest';
@@ -7,12 +8,12 @@ import type { UpdatePermissionRequest } from '@/dto/Permission/Request/UpdatePer
 export const permissionService = {
   async addPermission(
     request: AddPermissionRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/permission/add`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(`/permission/add`, request);
     return response;
   },
-  async deletePermission(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/permission/${id}`);
+  async deletePermission(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/permission/${id}`);
     return response;
   },
   async getPermissionById(id: string): Promise<ApiResponse<Permission>> {
@@ -24,7 +25,7 @@ export const permissionService = {
     return response;
   },
   async findPermissionsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<Permission[]>> {
     const response = await apiService.post<Permission[]>(
       `/permissions/find`,
@@ -34,8 +35,11 @@ export const permissionService = {
   },
   async updatePermission(
     request: UpdatePermissionRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/permission/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/permission/update`,
+      request
+    );
     return response;
   },
 };

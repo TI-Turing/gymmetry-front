@@ -17,125 +17,146 @@ const NotificationOptionList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
+  type NotificationOptionItem = {
+    id?: string;
+    optionId?: string;
+    name?: string;
+    optionName?: string;
+    isEnabled?: boolean;
+    description?: string;
+    type?: string;
+    channel?: 'email' | 'push' | 'sms' | 'app' | string;
+    frequency?: 'immediate' | 'daily' | 'weekly' | string;
+    priority?: 'high' | 'medium' | 'low' | string;
+    activeUsers?: number | string;
+    subscribedUsers?: number | string;
+    preferredTime?: string;
+    activeDays?: string[];
+    createdAt?: string | number | Date;
+    template?: string;
+  };
   const renderNotificationOptionItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || item.optionName || 'Opción de notificación'}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isEnabled ? 'Habilitada' : 'Deshabilitada'}
-          </Text>
-        </View>
-
-        <Text style={styles.description}>
-          {item.description || 'Configuración de notificaciones'}
-        </Text>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Tipo:</Text>
-          <Text style={styles.value}>{item.type || 'General'}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Canal:</Text>
-          <Text style={styles.value}>
-            {item.channel === 'email'
-              ? '📧 Email'
-              : item.channel === 'push'
-                ? '📱 Push'
-                : item.channel === 'sms'
-                  ? '📲 SMS'
-                  : 'App'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Frecuencia:</Text>
-          <Text style={styles.value}>
-            {item.frequency === 'immediate'
-              ? 'Inmediata'
-              : item.frequency === 'daily'
-                ? 'Diaria'
-                : item.frequency === 'weekly'
-                  ? 'Semanal'
-                  : 'Personalizada'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Prioridad:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color:
-                  item.priority === 'high'
-                    ? '#FF6B35'
-                    : item.priority === 'medium'
-                      ? '#ffa726'
-                      : '#ff6300',
-              },
-            ]}
-          >
-            {item.priority === 'high'
-              ? 'Alta'
-              : item.priority === 'medium'
-                ? 'Media'
-                : 'Baja'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Usuarios activos:</Text>
-          <Text style={styles.value}>
-            {item.activeUsers || item.subscribedUsers || '0'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Hora preferida:</Text>
-          <Text style={styles.value}>
-            {item.preferredTime || 'Cualquier hora'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Días activos:</Text>
-          <Text style={styles.value}>
-            {item.activeDays?.join(', ') || 'Todos los días'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Creada:</Text>
-          <Text style={styles.value}>
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString()
-              : 'N/A'}
-          </Text>
-        </View>
-
-        {item.template && (
-          <View style={styles.templateSection}>
-            <Text style={styles.templateLabel}>Plantilla:</Text>
-            <Text style={styles.template} numberOfLines={2}>
-              {item.template}
+    ({ item }: { item: unknown }) => {
+      const it = (item || {}) as NotificationOptionItem;
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              {it.name || it.optionName || 'Opción de notificación'}
+            </Text>
+            <Text style={styles.statusText}>
+              {it.isEnabled ? 'Habilitada' : 'Deshabilitada'}
             </Text>
           </View>
-        )}
-      </View>
-    ),
+
+          <Text style={styles.description}>
+            {it.description || 'Configuración de notificaciones'}
+          </Text>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Tipo:</Text>
+            <Text style={styles.value}>{it.type || 'General'}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Canal:</Text>
+            <Text style={styles.value}>
+              {it.channel === 'email'
+                ? '📧 Email'
+                : it.channel === 'push'
+                  ? '📱 Push'
+                  : it.channel === 'sms'
+                    ? '📲 SMS'
+                    : 'App'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Frecuencia:</Text>
+            <Text style={styles.value}>
+              {it.frequency === 'immediate'
+                ? 'Inmediata'
+                : it.frequency === 'daily'
+                  ? 'Diaria'
+                  : it.frequency === 'weekly'
+                    ? 'Semanal'
+                    : 'Personalizada'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Prioridad:</Text>
+            <Text
+              style={[
+                styles.value,
+                {
+                  color:
+                    it.priority === 'high'
+                      ? '#FF6B35'
+                      : it.priority === 'medium'
+                        ? '#ffa726'
+                        : '#ff6300',
+                },
+              ]}
+            >
+              {it.priority === 'high'
+                ? 'Alta'
+                : it.priority === 'medium'
+                  ? 'Media'
+                  : 'Baja'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Usuarios activos:</Text>
+            <Text style={styles.value}>
+              {it.activeUsers || it.subscribedUsers || '0'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Hora preferida:</Text>
+            <Text style={styles.value}>
+              {it.preferredTime || 'Cualquier hora'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Días activos:</Text>
+            <Text style={styles.value}>
+              {it.activeDays?.join(', ') || 'Todos los días'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Creada:</Text>
+            <Text style={styles.value}>
+              {it.createdAt
+                ? new Date(it.createdAt).toLocaleDateString()
+                : 'N/A'}
+            </Text>
+          </View>
+
+          {it.template && (
+            <View style={styles.templateSection}>
+              <Text style={styles.templateLabel}>Plantilla:</Text>
+              <Text style={styles.template} numberOfLines={2}>
+                {it.template}
+              </Text>
+            </View>
+          )}
+        </View>
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.optionId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const it = (item || {}) as NotificationOptionItem;
+    return it.id || it.optionId || String(Math.random());
+  }, []);
 
   return (
     <EntityList

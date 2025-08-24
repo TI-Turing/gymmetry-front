@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddEmployeeTypeRequest } from '@/dto/EmployeeType/Request/AddEmployeeTypeRequest';
 import type { EmployeeType } from '@/models/EmployeeType';
 import type { UpdateEmployeeTypeRequest } from '@/dto/EmployeeType/Request/UpdateEmployeeTypeRequest';
@@ -7,12 +8,15 @@ import type { UpdateEmployeeTypeRequest } from '@/dto/EmployeeType/Request/Updat
 export const employeeTypeService = {
   async addEmployeeType(
     request: AddEmployeeTypeRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/employeetype/add`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/employeetype/add`,
+      request
+    );
     return response;
   },
-  async deleteEmployeeType(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/employeetype/${id}`);
+  async deleteEmployeeType(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/employeetype/${id}`);
     return response;
   },
   async getEmployeeTypeById(id: string): Promise<ApiResponse<EmployeeType>> {
@@ -24,7 +28,7 @@ export const employeeTypeService = {
     return response;
   },
   async findEmployeeTypesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<EmployeeType[]>> {
     const response = await apiService.post<EmployeeType[]>(
       `/employeetypes/find`,
@@ -34,8 +38,11 @@ export const employeeTypeService = {
   },
   async updateEmployeeType(
     request: UpdateEmployeeTypeRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/employeetype/update`, request);
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/employeetype/update`,
+      request
+    );
     return response;
   },
 };

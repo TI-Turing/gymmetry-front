@@ -7,85 +7,111 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { fitUserService } from '@/services';
 
 const FitUserList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadFitUsers = useCallback(async () => {
     const response = await fitUserService.getAllUsers();
-    return response.Data || [];
+    const raw = (response?.Data ?? []) as unknown;
+    let items: unknown[] = [];
+    if (Array.isArray(raw)) items = raw as unknown[];
+    else if (
+      isRecord(raw) &&
+      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
+    ) {
+      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
+      items = (values ?? []) as unknown[];
+    }
+    return items;
   }, []);
 
-  const renderFitUserItem = useCallback(
-    ({ item }: { item: any }) => (
+  const renderFitUserItem = useCallback(({ item }: { item: unknown }) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const fullName =
+      (r['fullName'] as string) ||
+      (r['name'] as string) ||
+      'Usuario sin nombre';
+    const isActive =
+      (r['isActive'] as boolean) ?? (r['IsActive'] as boolean) ?? false;
+    const email =
+      (r['email'] as string) ??
+      (r['Email'] as string) ??
+      'Sin email configurado';
+    const age = (r['age'] as number) ?? null;
+    const weight = (r['weight'] as number) ?? null;
+    const height = (r['height'] as number) ?? null;
+    const goal =
+      (r['goal'] as string) || (r['fitnessGoal'] as string) || 'Sin objetivo';
+    const fitnessLevel = (r['fitnessLevel'] as string) ?? 'Principiante';
+    const routineCount = (r['routineCount'] as number) ?? 0;
+    const progressPercentage = (r['progressPercentage'] as number) ?? 0;
+    const joinDate = (r['joinDate'] as string) ?? null;
+
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.fullName || item.name || 'Usuario sin nombre'}
-          </Text>
+          <Text style={styles.title}>{fullName}</Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
+            {isActive ? 'Activo' : 'Inactivo'}
           </Text>
         </View>
 
-        <Text style={styles.email}>
-          {item.email || 'Sin email configurado'}
-        </Text>
+        <Text style={styles.email}>{email}</Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Edad:</Text>
-          <Text style={styles.value}>{item.age || 'N/A'} años</Text>
+          <Text style={styles.value}>{age ?? 'N/A'} años</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Peso:</Text>
-          <Text style={styles.value}>{item.weight || 'N/A'} kg</Text>
+          <Text style={styles.value}>{weight ?? 'N/A'} kg</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Altura:</Text>
-          <Text style={styles.value}>{item.height || 'N/A'} cm</Text>
+          <Text style={styles.value}>{height ?? 'N/A'} cm</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Objetivo:</Text>
-          <Text style={styles.value}>
-            {item.goal || item.fitnessGoal || 'Sin objetivo'}
-          </Text>
+          <Text style={styles.value}>{goal}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Nivel:</Text>
-          <Text style={styles.value}>
-            {item.fitnessLevel || 'Principiante'}
-          </Text>
+          <Text style={styles.value}>{fitnessLevel}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Rutinas:</Text>
-          <Text style={styles.value}>{item.routineCount || 0} asignadas</Text>
+          <Text style={styles.value}>{routineCount} asignadas</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Progreso:</Text>
-          <Text style={styles.value}>
-            {item.progressPercentage || 0}% completado
-          </Text>
+          <Text style={styles.value}>{progressPercentage}% completado</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Inscripción:</Text>
           <Text style={styles.value}>
-            {item.joinDate
-              ? new Date(item.joinDate).toLocaleDateString()
-              : 'N/A'}
+            {joinDate ? new Date(joinDate).toLocaleDateString() : 'N/A'}
           </Text>
         </View>
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.userId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['UserId'] as string) ||
+      (r['userId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

@@ -40,8 +40,9 @@ export default function AddBranchForm({
     adminUserId: '',
   });
 
-  const handleFormDataChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleFormDataChange = (field: string, value: unknown) => {
+    const v = typeof value === 'string' ? value : String(value ?? '');
+    setFormData((prev) => ({ ...prev, [field]: v }));
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
@@ -161,7 +162,9 @@ export default function AddBranchForm({
         return (
           <Step1
             formData={formData}
-            onFormDataChange={handleFormDataChange}
+            onFormDataChange={(field: string, value: string) =>
+              handleFormDataChange(field, value)
+            }
             errors={errors}
           />
         );
@@ -174,7 +177,7 @@ export default function AddBranchForm({
           />
         );
       case 3:
-        return <Step3 branchId={branchId} onMediaUpload={() => {}} />;
+        return <Step3 branchId={branchId} />;
       default:
         return null;
     }

@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import { GymPlanSelectedType } from '@/dto/gymPlan/GymPlanSelectedType';
 import { CreateGymPlanRequest } from '@/dto/gymPlan/CreateGymPlanRequest';
 import { GymPlanSelected } from '@/dto/gymPlan/GymPlanSelected';

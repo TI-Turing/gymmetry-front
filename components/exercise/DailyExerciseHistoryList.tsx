@@ -17,218 +17,246 @@ const DailyExerciseHistoryList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderDailyExerciseHistoryItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.exerciseName || item.name || 'Ejercicio'}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isCompleted
-              ? 'Completado'
-              : item.isInProgress
-                ? 'En progreso'
-                : 'Pendiente'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const exerciseName =
+        (r['exerciseName'] as string) || (r['name'] as string) || 'Ejercicio';
+      const isCompleted =
+        (r['isCompleted'] as boolean) ?? (r['IsCompleted'] as boolean) ?? false;
+      const isInProgress =
+        (r['isInProgress'] as boolean) ??
+        (r['IsInProgress'] as boolean) ??
+        false;
+      const description =
+        (r['description'] as string) ||
+        (r['muscleGroup'] as string) ||
+        'Ejercicio del día';
+      const dateStr = (r['date'] as string) ?? null;
+      const completedSets =
+        (r['completedSets'] as number) ?? (r['CompletedSets'] as number) ?? 0;
+      const totalSets =
+        (r['totalSets'] as number) ?? (r['TotalSets'] as number) ?? 0;
+      const averageReps =
+        (r['averageReps'] as number) ?? (r['reps'] as number) ?? 0;
+      const weight = (r['weight'] as number) ?? (r['maxWeight'] as number) ?? 0;
+      const restTime = (r['restTime'] as number) ?? null;
+      const duration = (r['duration'] as number) ?? null;
+      const calories =
+        (r['caloriesBurned'] as number) ?? (r['calories'] as number) ?? 0;
+      const difficulty =
+        (r['difficulty'] as string) ?? (r['Difficulty'] as string) ?? '';
+      const muscleGroup =
+        (r['muscleGroup'] as string) ??
+        (r['targetMuscle'] as string) ??
+        'General';
+      const equipment =
+        (r['equipment'] as string) ?? (r['machine'] as string) ?? 'Peso libre';
+      const technique =
+        (r['technique'] as string) ?? (r['Technique'] as string) ?? '';
+      const startTime = (r['startTime'] as string) ?? null;
+      const endTime = (r['endTime'] as string) ?? null;
+      const progress = (r['progress'] as number) ?? null;
+      const personalRecord =
+        (r['personalRecord'] as {
+          type: string;
+          value: number | string;
+        } | null) ?? null;
+      const notes = (r['notes'] as string) ?? null;
 
-        <Text style={styles.description}>
-          {item.description || item.muscleGroup || 'Ejercicio del día'}
-        </Text>
+      const fmtMinSec = (secs: number | null) =>
+        typeof secs === 'number'
+          ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`
+          : 'N/A';
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Fecha:</Text>
-          <Text style={styles.value}>
-            {item.date
-              ? new Date(item.date).toLocaleDateString('es-ES')
-              : 'Hoy'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Series:</Text>
-          <Text style={styles.value}>
-            {item.completedSets || '0'} / {item.totalSets || '0'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Repeticiones:</Text>
-          <Text style={styles.value}>
-            {item.averageReps || item.reps || '0'} por serie
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Peso:</Text>
-          <Text style={styles.value}>
-            {item.weight || item.maxWeight || '0'} kg
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Tiempo descanso:</Text>
-          <Text style={styles.value}>
-            {item.restTime
-              ? `${Math.floor(item.restTime / 60)}:${String(
-                  item.restTime % 60
-                ).padStart(2, '0')}`
-              : 'N/A'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration
-              ? `${Math.floor(item.duration / 60)}:${String(
-                  item.duration % 60
-                ).padStart(2, '0')}`
-              : 'N/A'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Calorías:</Text>
-          <Text style={styles.value}>
-            {item.caloriesBurned || item.calories || '0'} kcal
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Dificultad:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color:
-                  item.difficulty === 'hard'
-                    ? '#ff6b6b'
-                    : item.difficulty === 'medium'
-                      ? '#ffa726'
-                      : '#4caf50',
-              },
-            ]}
-          >
-            {item.difficulty === 'hard'
-              ? '🔴 Difícil'
-              : item.difficulty === 'medium'
-                ? '🟡 Medio'
-                : '🟢 Fácil'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Grupo muscular:</Text>
-          <Text style={styles.value}>
-            {item.muscleGroup || item.targetMuscle || 'General'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Equipo usado:</Text>
-          <Text style={styles.value}>
-            {item.equipment || item.machine || 'Peso libre'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Técnica:</Text>
-          <Text
-            style={[
-              styles.value,
-              {
-                color:
-                  item.technique === 'excellent'
-                    ? '#4caf50'
-                    : item.technique === 'good'
-                      ? '#8bc34a'
-                      : item.technique === 'average'
-                        ? '#ffa726'
-                        : '#ff6b6b',
-              },
-            ]}
-          >
-            {item.technique === 'excellent'
-              ? '⭐ Excelente'
-              : item.technique === 'good'
-                ? '👍 Buena'
-                : item.technique === 'average'
-                  ? '👌 Regular'
-                  : '👎 Mejorable'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Tiempo inicio:</Text>
-          <Text style={styles.value}>
-            {item.startTime
-              ? new Date(item.startTime).toLocaleTimeString('es-ES', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              : 'N/A'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Tiempo fin:</Text>
-          <Text style={styles.value}>
-            {item.endTime
-              ? new Date(item.endTime).toLocaleTimeString('es-ES', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              : 'No finalizado'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Progreso:</Text>
-          <Text style={styles.value}>
-            {item.progress
-              ? `${item.progress}% completado`
-              : item.isCompleted
-                ? '100% completado'
-                : '0% completado'}
-          </Text>
-        </View>
-
-        {item.personalRecord && (
-          <View style={styles.recordSection}>
-            <Text style={styles.recordLabel}>🏆 Récord personal:</Text>
-            <Text style={styles.recordText}>
-              {item.personalRecord.type === 'weight'
-                ? `Peso máximo: ${item.personalRecord.value} kg`
-                : item.personalRecord.type === 'reps'
-                  ? `Más repeticiones: ${item.personalRecord.value}`
-                  : `Mejor tiempo: ${item.personalRecord.value}`}
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{exerciseName}</Text>
+            <Text style={styles.statusText}>
+              {isCompleted
+                ? 'Completado'
+                : isInProgress
+                  ? 'En progreso'
+                  : 'Pendiente'}
             </Text>
           </View>
-        )}
 
-        {item.notes && (
-          <View style={styles.notesSection}>
-            <Text style={styles.notesLabel}>Observaciones:</Text>
-            <Text style={styles.notesText}>💭 {item.notes}</Text>
+          <Text style={styles.description}>{description}</Text>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Fecha:</Text>
+            <Text style={styles.value}>
+              {dateStr ? new Date(dateStr).toLocaleDateString('es-ES') : 'Hoy'}
+            </Text>
           </View>
-        )}
-      </View>
-    ),
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Series:</Text>
+            <Text style={styles.value}>
+              {completedSets} / {totalSets}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Repeticiones:</Text>
+            <Text style={styles.value}>{averageReps} por serie</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Peso:</Text>
+            <Text style={styles.value}>{weight} kg</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Tiempo descanso:</Text>
+            <Text style={styles.value}>{fmtMinSec(restTime)}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Duración:</Text>
+            <Text style={styles.value}>{fmtMinSec(duration)}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Calorías:</Text>
+            <Text style={styles.value}>{calories} kcal</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Dificultad:</Text>
+            <Text
+              style={[
+                styles.value,
+                {
+                  color:
+                    difficulty === 'hard'
+                      ? '#ff6b6b'
+                      : difficulty === 'medium'
+                        ? '#ffa726'
+                        : '#4caf50',
+                },
+              ]}
+            >
+              {difficulty === 'hard'
+                ? '🔴 Difícil'
+                : difficulty === 'medium'
+                  ? '🟡 Medio'
+                  : '🟢 Fácil'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Grupo muscular:</Text>
+            <Text style={styles.value}>{muscleGroup}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Equipo usado:</Text>
+            <Text style={styles.value}>{equipment}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Técnica:</Text>
+            <Text
+              style={[
+                styles.value,
+                {
+                  color:
+                    technique === 'excellent'
+                      ? '#4caf50'
+                      : technique === 'good'
+                        ? '#8bc34a'
+                        : technique === 'average'
+                          ? '#ffa726'
+                          : '#ff6b6b',
+                },
+              ]}
+            >
+              {technique === 'excellent'
+                ? '⭐ Excelente'
+                : technique === 'good'
+                  ? '👍 Buena'
+                  : technique === 'average'
+                    ? '👌 Regular'
+                    : '👎 Mejorable'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Tiempo inicio:</Text>
+            <Text style={styles.value}>
+              {startTime
+                ? new Date(startTime).toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : 'N/A'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Tiempo fin:</Text>
+            <Text style={styles.value}>
+              {endTime
+                ? new Date(endTime).toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : 'No finalizado'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Progreso:</Text>
+            <Text style={styles.value}>
+              {typeof progress === 'number'
+                ? `${progress}% completado`
+                : isCompleted
+                  ? '100% completado'
+                  : '0% completado'}
+            </Text>
+          </View>
+
+          {!!personalRecord && (
+            <View style={styles.recordSection}>
+              <Text style={styles.recordLabel}>🏆 Récord personal:</Text>
+              <Text style={styles.recordText}>
+                {personalRecord.type === 'weight'
+                  ? `Peso máximo: ${personalRecord.value} kg`
+                  : personalRecord.type === 'reps'
+                    ? `Más repeticiones: ${personalRecord.value}`
+                    : `Mejor tiempo: ${personalRecord.value}`}
+              </Text>
+            </View>
+          )}
+
+          {!!notes && (
+            <View style={styles.notesSection}>
+              <Text style={styles.notesLabel}>Observaciones:</Text>
+              <Text style={styles.notesText}>💭 {notes}</Text>
+            </View>
+          )}
+        </View>
+      );
+    },
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) =>
-      item.id ||
-      item.exerciseHistoryId ||
-      item.exerciseId ||
-      String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['exerciseHistoryId'] as string) ||
+      (r['ExerciseHistoryId'] as string) ||
+      (r['exerciseId'] as string) ||
+      (r['ExerciseId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

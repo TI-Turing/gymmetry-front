@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { Bill } from '@/models/Bill';
 
 // Auto-generated service for Bill Azure Functions
@@ -12,7 +13,7 @@ export const billService = {
     return response;
   },
   async findBillsByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<Bill[]>> {
     const response = await apiService.post<Bill[]>(`/bills/find`, request);
     return response;

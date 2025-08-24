@@ -2,20 +2,45 @@ import React, { useCallback } from 'react';
 import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { feedService } from '@/services';
+import type { FeedResponseDto } from '@/dto/Feed/Response/FeedResponseDto';
 import { styles } from './styles';
 
+type FeedItem = {
+  id: string;
+  title: string;
+  content: string;
+  isPublic: boolean;
+  authorName?: string;
+  createdAt?: string;
+  likesCount?: number;
+  commentsCount?: number;
+  sharesCount?: number;
+  tags?: string;
+};
+
 const FeedList = React.memo(() => {
-  const loadFeeds = useCallback(async () => {
+  const loadFeeds = useCallback(async (): Promise<FeedItem[]> => {
     const response = await feedService.getAllFeeds();
-    return response.Success ? response.Data || [] : [];
+    const data = (
+      response.Success ? response.Data || [] : []
+    ) as FeedResponseDto[];
+    const items: FeedItem[] = data.map((f) => ({
+      id: f.Id,
+      title: f.Title,
+      content: f.Description || '',
+      isPublic: true,
+      authorName: '',
+      createdAt: f.CreatedAt,
+    }));
+    return items;
   }, []);
 
   const renderFeedItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: FeedItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.title || item.postTitle || 'Publicación sin título'}
+            {item.title || 'Publicación sin título'}
           </Text>
           <Text style={styles.statusText}>
             {item.isPublic ? 'Público' : 'Privado'}
@@ -23,12 +48,12 @@ const FeedList = React.memo(() => {
         </View>
 
         <Text style={styles.content}>
-          {item.content || item.description || 'Sin contenido disponible'}
+          {item.content || 'Sin contenido disponible'}
         </Text>
 
         <View style={styles.authorSection}>
           <Text style={styles.author}>
-            Por: {item.authorName || item.userName || 'Usuario anónimo'}
+            Por: {item.authorName || 'Usuario anónimo'}
           </Text>
           <Text style={styles.date}>
             {item.createdAt
@@ -64,13 +89,10 @@ const FeedList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.feedId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: FeedItem) => item.id, []);
 
   return (
-    <EntityList
+    <EntityList<FeedItem>
       title="Feed de Publicaciones"
       loadFunction={loadFeeds}
       renderItem={renderFeedItem}

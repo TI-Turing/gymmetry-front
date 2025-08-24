@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddMachineCategoryRequest } from '@/dto/MachineCategory/Request/AddMachineCategoryRequest';
 import type { MachineCategory } from '@/models/MachineCategory';
 import type { UpdateMachineCategoryRequest } from '@/dto/MachineCategory/Request/UpdateMachineCategoryRequest';
@@ -7,15 +8,15 @@ import type { UpdateMachineCategoryRequest } from '@/dto/MachineCategory/Request
 export const machineCategoryService = {
   async addMachineCategory(
     request: AddMachineCategoryRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/machinecategory/add`,
       request
     );
     return response;
   },
-  async deleteMachineCategory(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/machinecategory/${id}`);
+  async deleteMachineCategory(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/machinecategory/${id}`);
     return response;
   },
   async getMachineCategoryById(
@@ -32,7 +33,7 @@ export const machineCategoryService = {
     return response;
   },
   async findMachineCategoriesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<MachineCategory[]>> {
     const response = await apiService.post<MachineCategory[]>(
       `/machinecategories/find`,
@@ -42,8 +43,8 @@ export const machineCategoryService = {
   },
   async updateMachineCategory(
     request: UpdateMachineCategoryRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/machinecategory/update`,
       request
     );

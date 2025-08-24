@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Platform,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { makeAppHeaderStyles } from './styles';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -11,7 +19,7 @@ interface AppHeaderProps {
   showBackButton?: boolean;
   onPressBack?: () => void;
   RightComponent?: React.ReactNode;
-  containerStyle?: any;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -25,7 +33,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const { t } = useI18n();
   const colorScheme = useColorScheme();
   const styles = makeAppHeaderStyles(colorScheme);
-  const Wrapper: any = Platform.OS === 'web' ? View : SafeAreaView;
+  const Wrapper = (Platform.OS === 'web' ? View : SafeAreaView) as
+    | typeof View
+    | typeof SafeAreaView;
 
   return (
     <Wrapper style={styles.safeArea}>

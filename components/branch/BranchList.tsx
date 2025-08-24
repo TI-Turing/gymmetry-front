@@ -6,6 +6,8 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 const BranchList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === 'object';
   const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
   const loadBranches = useCallback(async () => {
     try {
@@ -15,44 +17,66 @@ const BranchList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
   const renderBranchItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: unknown }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            {item.name || item.branchName || 'Sucursal'}
+            {(() => {
+              if (!isRecord(item)) return 'Sucursal';
+              const name = item.name;
+              const branchName = item.branchName;
+              return (typeof name === 'string' && name) ||
+                (typeof branchName === 'string' && branchName)
+                ? (name as string) || (branchName as string)
+                : 'Sucursal';
+            })()}
           </Text>
           <Text style={styles.statusText}>
-            {item.isActive ? 'Activa' : 'Inactiva'}
+            {isRecord(item) && item.isActive ? 'Activa' : 'Inactiva'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.description || 'Sucursal del gimnasio'}
+          {isRecord(item) && typeof item.description === 'string'
+            ? item.description
+            : 'Sucursal del gimnasio'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Dirección:</Text>
-          <Text style={styles.value}>{item.address || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {isRecord(item) && typeof item.address === 'string'
+              ? item.address
+              : 'N/A'}
+          </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Ciudad:</Text>
-          <Text style={styles.value}>{item.city || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {isRecord(item) && typeof item.city === 'string'
+              ? item.city
+              : 'N/A'}
+          </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Teléfono:</Text>
-          <Text style={styles.value}>{item.phone || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {isRecord(item) && typeof item.phone === 'string'
+              ? item.phone
+              : 'N/A'}
+          </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Horario:</Text>
           <Text style={styles.value}>
-            {item.openingTime && item.closingTime
-              ? `${item.openingTime} - ${item.closingTime}`
+            {isRecord(item) && item.openingTime && item.closingTime
+              ? `${item.openingTime as string} - ${item.closingTime as string}`
               : 'Consultar'}
           </Text>
         </View>
@@ -60,50 +84,90 @@ const BranchList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Capacidad:</Text>
           <Text style={styles.value}>
-            {item.currentOccupancy || 0} / {item.maxCapacity || 0}
+            {isRecord(item) && typeof item.currentOccupancy === 'number'
+              ? item.currentOccupancy
+              : 0}{' '}
+            /{' '}
+            {isRecord(item) && typeof item.maxCapacity === 'number'
+              ? item.maxCapacity
+              : 0}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Servicios:</Text>
           <Text style={styles.value}>
-            {item.servicesCount || item.services?.length || '0'}
+            {(() => {
+              if (!isRecord(item)) return '0';
+              const count = item.servicesCount;
+              if (typeof count === 'number') return String(count);
+              const arr = item.services;
+              return Array.isArray(arr) ? String(arr.length) : '0';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Entrenadores:</Text>
           <Text style={styles.value}>
-            {item.trainersCount || item.trainers?.length || '0'}
+            {(() => {
+              if (!isRecord(item)) return '0';
+              const count = item.trainersCount;
+              if (typeof count === 'number') return String(count);
+              const arr = item.trainers;
+              return Array.isArray(arr) ? String(arr.length) : '0';
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Rating:</Text>
           <Text style={styles.value}>
-            ⭐ {item.rating || '0.0'} ({item.reviewCount || 0})
+            {(() => {
+              const rating =
+                isRecord(item) && typeof item.rating === 'number'
+                  ? item.rating.toFixed(1)
+                  : '0.0';
+              const reviews =
+                isRecord(item) && typeof item.reviewCount === 'number'
+                  ? item.reviewCount
+                  : 0;
+              return `⭐ ${rating} (${reviews})`;
+            })()}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Gerente:</Text>
-          <Text style={styles.value}>{item.manager || 'N/A'}</Text>
+          <Text style={styles.value}>
+            {isRecord(item) && typeof item.manager === 'string'
+              ? item.manager
+              : 'N/A'}
+          </Text>
         </View>
 
-        {item.amenities && Array.isArray(item.amenities) && (
+        {!!(
+          isRecord(item) &&
+          item.amenities &&
+          Array.isArray(item.amenities)
+        ) && (
           <View style={styles.amenitiesSection}>
             <Text style={styles.amenitiesLabel}>Amenidades:</Text>
             <View style={styles.amenitiesList}>
-              {item.amenities
+              {(
+                (item.amenities as unknown[]).filter(
+                  (v): v is string => typeof v === 'string'
+                ) as string[]
+              )
                 .slice(0, 4)
                 .map((amenity: string, index: number) => (
                   <Text key={index} style={styles.amenity}>
                     ✓ {amenity}
                   </Text>
                 ))}
-              {item.amenities.length > 4 && (
+              {(item.amenities as unknown[]).length > 4 && (
                 <Text style={styles.moreAmenities}>
-                  +{item.amenities.length - 4} más...
+                  +{(item.amenities as unknown[]).length - 4} más...
                 </Text>
               )}
             </View>
@@ -114,10 +178,13 @@ const BranchList = React.memo(() => {
     []
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.branchId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = (item.id ?? item.branchId) as unknown;
+      if (typeof id === 'string' && id) return id;
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

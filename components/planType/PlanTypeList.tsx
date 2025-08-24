@@ -13,54 +13,69 @@ const PlanTypeList = React.memo(() => {
     return response.Data || [];
   }, []);
 
+  type PlanTypeItem = {
+    id?: string;
+    name?: string;
+    isActive?: boolean;
+    description?: string;
+    price?: number;
+    currency?: string;
+    duration?: number | string;
+    durationType?: string;
+    userCount?: number;
+    features?: string;
+  };
   const renderPlanTypeItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{item.name || 'Plan sin nombre'}</Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
-          </Text>
-        </View>
-
-        <Text style={styles.description}>
-          {item.description || 'Sin descripción disponible'}
-        </Text>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Precio:</Text>
-          <Text style={styles.value}>
-            ${item.price || 0} {item.currency || 'USD'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Duración:</Text>
-          <Text style={styles.value}>
-            {item.duration || 'N/A'} {item.durationType || 'días'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Usuarios:</Text>
-          <Text style={styles.value}>{item.userCount || 0} activos</Text>
-        </View>
-
-        {item.features && (
-          <View style={styles.featuresContainer}>
-            <Text style={styles.featuresTitle}>Características:</Text>
-            <Text style={styles.features}>{item.features}</Text>
+    ({ item }: { item: unknown }) => {
+      const it = (item || {}) as PlanTypeItem;
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{it.name || 'Plan sin nombre'}</Text>
+            <Text style={styles.statusText}>
+              {it.isActive ? 'Activo' : 'Inactivo'}
+            </Text>
           </View>
-        )}
-      </View>
-    ),
+
+          <Text style={styles.description}>
+            {it.description || 'Sin descripción disponible'}
+          </Text>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Precio:</Text>
+            <Text style={styles.value}>
+              ${it.price || 0} {it.currency || 'USD'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Duración:</Text>
+            <Text style={styles.value}>
+              {it.duration || 'N/A'} {it.durationType || 'días'}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Usuarios:</Text>
+            <Text style={styles.value}>{it.userCount || 0} activos</Text>
+          </View>
+
+          {it.features && (
+            <View style={styles.featuresContainer}>
+              <Text style={styles.featuresTitle}>Características:</Text>
+              <Text style={styles.features}>{it.features}</Text>
+            </View>
+          )}
+        </View>
+      );
+    },
     [styles]
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const it = (item || {}) as PlanTypeItem;
+    return it.id || String(Math.random());
+  }, []);
 
   return (
     <EntityList

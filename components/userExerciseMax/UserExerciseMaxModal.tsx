@@ -110,9 +110,17 @@ const UserExerciseMaxModal: React.FC<Props> = ({
         setLoading(false);
         return;
       }
+      const exerciseId =
+        (exercise &&
+          'Id' in exercise &&
+          (exercise as unknown as { Id?: string }).Id) ||
+        (exercise &&
+          'id' in exercise &&
+          (exercise as unknown as { id?: string }).id) ||
+        '';
       const req: AddUserExerciseMaxRequest = {
         UserId: String(u?.id || ''),
-        ExerciseId: String(exercise?.Id || (exercise as any)?.id),
+        ExerciseId: String(exerciseId || ''),
         WeightKg: w,
         AchievedAt: dateStr ? new Date(dateStr).toISOString() : undefined,
       };
@@ -200,6 +208,6 @@ const UserExerciseMaxModal: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({});
+// estilos locales no utilizados intencionalmente
 
 export default UserExerciseMaxModal;

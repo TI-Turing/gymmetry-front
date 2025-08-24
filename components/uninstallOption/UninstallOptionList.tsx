@@ -7,13 +7,36 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { uninstallOptionService } from '@/services';
 
 const UninstallOptionList = React.memo(() => {
-  const loadUninstallOptions = useCallback(async () => {
+  type UninstallOptionItem = {
+    id?: string;
+    name?: string;
+    isActive?: boolean;
+    description?: string;
+    reason?: string;
+    createdAt?: string | number | Date;
+  };
+  const loadUninstallOptions = useCallback(async (): Promise<
+    UninstallOptionItem[]
+  > => {
     const response = await uninstallOptionService.getAllUninstallOptions();
-    return response.Data || [];
+    const raw = (response.Data || []) as unknown[];
+    return raw.map((r) => {
+      const o = r as Record<string, unknown>;
+      return {
+        id: (o.id as string) ?? (o.Id as string),
+        name: (o.name as string) ?? (o.Name as string),
+        isActive: (o.isActive as boolean) ?? (o.IsActive as boolean),
+        description:
+          (o.description as string) ?? (o.Description as string) ?? undefined,
+        reason: (o.reason as string) ?? (o.Reason as string) ?? undefined,
+        createdAt:
+          (o.createdAt as string) ?? (o.CreatedAt as string) ?? undefined,
+      };
+    });
   }, []);
 
   const renderUninstallOptionItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: UninstallOptionItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -49,12 +72,12 @@ const UninstallOptionList = React.memo(() => {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
+    (item: UninstallOptionItem) => item.id || String(Math.random()),
     []
   );
 
   return (
-    <EntityList
+    <EntityList<UninstallOptionItem>
       title="Opciones de Desinstalación"
       loadFunction={loadUninstallOptions}
       renderItem={renderUninstallOptionItem}

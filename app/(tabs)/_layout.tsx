@@ -3,7 +3,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeTabsLayoutStyles } from './styles/tabsLayout';
@@ -16,7 +15,6 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const styles = useThemedStyles(makeTabsLayoutStyles);
 
   return (

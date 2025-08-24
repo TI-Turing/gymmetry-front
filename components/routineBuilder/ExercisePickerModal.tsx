@@ -47,7 +47,7 @@ const ExercisePickerModal: React.FC<Props> = ({
       // Parse tags for diagram
       let tags: Record<string, number> = {};
       try {
-        const raw: any = (ex as any)?.TagsMuscle;
+        const raw: unknown = (ex as any)?.TagsMuscle;
         if (raw) {
           if (typeof raw === 'string') tags = JSON.parse(raw);
           else if (typeof raw === 'object') tags = raw as any;
@@ -78,8 +78,8 @@ const ExercisePickerModal: React.FC<Props> = ({
   const [showDetail, setShowDetail] = useState(false);
 
   const handlePick = useCallback(
-    (ex: Exercise) => {
-      const id: any = (ex as any).Id || (ex as any).id;
+    (ex: unknown) => {
+      const id: unknown = (ex as any).Id || (ex as any).id;
       if (id) {
         setSelectedId(String(id));
         fetchDetail(String(id));
@@ -92,7 +92,7 @@ const ExercisePickerModal: React.FC<Props> = ({
 
   const muscleChartData = useMemo(() => {
     const entries = Object.entries(muscleTags01 || {});
-    const normalize01 = (v: any) => {
+    const normalize01 = (v: unknown) => {
       const n = Number(v);
       if (!isFinite(n)) return 0;
       if (n > 1 && n <= 10) return Math.max(0, Math.min(1, n / 10));

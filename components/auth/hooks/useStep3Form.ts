@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Region, City, EPS, DocumentType } from '@/dto/common';
+import type { Step3Data } from '../types';
 
 interface UseStep3FormResult {
   // Form data
@@ -73,7 +74,9 @@ interface UseStep3FormResult {
   clearCityData: () => void;
 }
 
-export const useStep3Form = (initialData?: any): UseStep3FormResult => {
+export const useStep3Form = (
+  initialData?: Partial<Step3Data>
+): UseStep3FormResult => {
   // Form states
   const [country, setCountry] = useState(initialData?.country || '');
   const [selectedCountryId, setSelectedCountryId] = useState(
@@ -160,16 +163,16 @@ export const useStep3Form = (initialData?: any): UseStep3FormResult => {
     [documentTypeFilter]
   );
 
-  const clearRegionData = useCallback(() => {
-    setRegion('');
-    setSelectedRegionId('');
-    clearCityData();
-  }, []);
-
   const clearCityData = useCallback(() => {
     setCity('');
     setSelectedCityId('');
   }, []);
+
+  const clearRegionData = useCallback(() => {
+    setRegion('');
+    setSelectedRegionId('');
+    clearCityData();
+  }, [clearCityData]);
 
   return {
     // Form data

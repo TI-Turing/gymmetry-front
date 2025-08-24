@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import type { RegisterData } from '../RegisterForm';
 import { apiService } from '@/services/apiService';
 
 interface RegistrationData {
@@ -35,7 +36,7 @@ interface RegistrationData {
 }
 
 interface UseRegisterFormProps {
-  onRegister: (userData: any) => void;
+  onRegister: (userData: RegisterData) => void;
 }
 
 export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
@@ -136,7 +137,13 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
   );
 
   const handleWelcomeContinue = useCallback(() => {
-    onRegister(registrationData);
+    const payload: RegisterData = {
+      firstName: registrationData.firstName || '',
+      lastName: registrationData.lastName || '',
+      email: registrationData.email,
+      password: registrationData.password,
+    };
+    onRegister(payload);
   }, [onRegister, registrationData]);
 
   // Funciones para retroceder

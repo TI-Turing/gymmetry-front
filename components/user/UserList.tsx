@@ -7,6 +7,26 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export function UserList() {
   const servicePlaceholder = () => Promise.resolve([]);
+  type Membership = { isActive?: boolean; expiresAt?: string | number | Date };
+  type UserItem = {
+    id?: string;
+    userId?: string;
+    fullName?: string;
+    firstName?: string;
+    lastName?: string;
+    isActive?: boolean;
+    email?: string;
+    userType?: string;
+    phone?: string;
+    gender?: string;
+    age?: number;
+    birthDate?: string | number | Date;
+    createdAt?: string | number | Date;
+    lastLogin?: string | number | Date;
+    currentPlan?: string;
+    gymName?: string;
+    membership?: Membership | null;
+  };
   const loadUsers = useCallback(async () => {
     try {
       // Placeholder for actual service call
@@ -20,7 +40,7 @@ export function UserList() {
   }, []);
 
   const renderUserItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: UserItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -118,7 +138,7 @@ export function UserList() {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.id || item.userId || String(Math.random()),
+    (item: UserItem) => item.id || item.userId || String(Math.random()),
     []
   );
 

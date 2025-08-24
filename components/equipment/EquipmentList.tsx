@@ -12,59 +12,73 @@ const EquipmentList = React.memo(() => {
     return response || [];
   }, []);
 
-  const renderEquipmentItem = useCallback(
-    ({ item }: { item: any }) => (
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
+  const renderEquipmentItem = useCallback(({ item }: { item: unknown }) => {
+    const o = isRecord(item) ? item : ({} as Record<string, unknown>);
+    const title =
+      (typeof o.name === 'string' && o.name) || 'Equipamiento sin nombre';
+    const isAvailable = Boolean((o as any).isAvailable);
+    const description =
+      (typeof o.description === 'string' && o.description) ||
+      'Sin descripción disponible';
+    const category =
+      (typeof o.category === 'string' && o.category) || 'General';
+    const brand = (typeof o.brand === 'string' && o.brand) || 'N/A';
+    const condition =
+      (typeof o.condition === 'string' && o.condition) || 'Bueno';
+    const location =
+      (typeof o.location === 'string' && o.location) ||
+      (typeof o.zone === 'string' && o.zone) ||
+      'N/A';
+    const exerciseCount = (o as any).exerciseCount ?? 0;
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || 'Equipamiento sin nombre'}
-          </Text>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.statusText}>
-            {item.isAvailable ? 'Disponible' : 'No disponible'}
+            {isAvailable ? 'Disponible' : 'No disponible'}
           </Text>
         </View>
 
-        <Text style={styles.description}>
-          {item.description || 'Sin descripción disponible'}
-        </Text>
+        <Text style={styles.description}>{description}</Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Categoría:</Text>
-          <Text style={styles.value}>{item.category || 'General'}</Text>
+          <Text style={styles.value}>{category}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Marca:</Text>
-          <Text style={styles.value}>{item.brand || 'N/A'}</Text>
+          <Text style={styles.value}>{brand}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Estado:</Text>
-          <Text style={styles.value}>{item.condition || 'Bueno'}</Text>
+          <Text style={styles.value}>{condition}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Ubicación:</Text>
-          <Text style={styles.value}>
-            {item.location || item.zone || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{location}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Ejercicios:</Text>
-          <Text style={styles.value}>
-            {item.exerciseCount || 0} configurados
-          </Text>
+          <Text style={styles.value}>{String(exerciseCount)} configurados</Text>
         </View>
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    if (isRecord(item)) {
+      const id = (item.id as any) ?? (item.Id as any);
+      if (id != null) return String(id);
+    }
+    return String(Math.random());
+  }, []);
 
   return (
     <EntityList

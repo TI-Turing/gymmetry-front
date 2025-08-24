@@ -7,13 +7,41 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { submoduleService } from '@/services';
 
 const SubModuleList = React.memo(() => {
-  const loadSubModules = useCallback(async () => {
+  type SubModuleItem = {
+    id?: string;
+    name?: string;
+    isActive?: boolean;
+    moduleName?: string;
+    moduleId?: string;
+    description?: string;
+    order?: number;
+    permissions?: unknown[];
+  };
+  const loadSubModules = useCallback(async (): Promise<SubModuleItem[]> => {
     const response = await submoduleService.getAllSubModules();
-    return response.Data || [];
+    const raw = (response.Data || []) as unknown[];
+    return raw.map((r) => {
+      const o = r as Record<string, unknown>;
+      return {
+        id: (o.id as string) ?? (o.Id as string),
+        name: (o.name as string) ?? (o.Name as string),
+        isActive: (o.isActive as boolean) ?? (o.IsActive as boolean),
+        moduleName:
+          (o.moduleName as string) ??
+          ((o.Module as Record<string, unknown> | undefined)?.Name as string),
+        moduleId: (o.moduleId as string) ?? (o.ModuleId as string),
+        description:
+          (o.description as string) ?? (o.Description as string) ?? undefined,
+        order: (o.order as number) ?? (o.Order as number),
+        permissions: Array.isArray(o.permissions)
+          ? (o.permissions as unknown[])
+          : [],
+      };
+    });
   }, []);
 
   const renderSubModuleItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: SubModuleItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -49,12 +77,12 @@ const SubModuleList = React.memo(() => {
   );
 
   const keyExtractor = useCallback(
-    (item: any) => item.id || String(Math.random()),
+    (item: SubModuleItem) => item.id || String(Math.random()),
     []
   );
 
   return (
-    <EntityList
+    <EntityList<SubModuleItem>
       title="Sub-Módulos"
       loadFunction={loadSubModules}
       renderItem={renderSubModuleItem}

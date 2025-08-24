@@ -17,56 +17,84 @@ const LogUninstallList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
 
-  const renderLogUninstallItem = useCallback(
-    ({ item }: { item: any }) => (
+  type LogUninstallItem = {
+    id?: string;
+    logId?: string;
+    status?: 'completed' | 'failed' | string;
+    reason?: string;
+    userName?: string;
+    userId?: string;
+    device?: 'android' | 'ios' | 'web' | string;
+    appVersion?: string;
+    uninstallDate?: string | number | Date;
+    createdAt?: string | number | Date;
+    primaryReason?:
+      | 'bugs'
+      | 'performance'
+      | 'features'
+      | 'design'
+      | 'price'
+      | 'competitor'
+      | string;
+    usageDays?: number;
+    usageHours?: number;
+    rating?: number;
+    platform?: string;
+    ipAddress?: string;
+    feedback?: string;
+    suggestions?: string;
+  };
+  const renderLogUninstallItem = useCallback(({ item }: { item: unknown }) => {
+    const it = (item || {}) as LogUninstallItem;
+    return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Text style={styles.title}>Desinstalación #{item.id || 'N/A'}</Text>
+          <Text style={styles.title}>Desinstalación #{it.id || 'N/A'}</Text>
           <Text style={styles.statusText}>
-            {item.status === 'completed'
+            {it.status === 'completed'
               ? 'Completado'
-              : item.status === 'failed'
+              : it.status === 'failed'
                 ? 'Fallido'
                 : 'En proceso'}
           </Text>
         </View>
 
         <Text style={styles.description}>
-          {item.reason || 'Registro de desinstalación de la aplicación'}
+          {it.reason || 'Registro de desinstalación de la aplicación'}
         </Text>
 
         <View style={styles.row}>
           <Text style={styles.label}>Usuario:</Text>
-          <Text style={styles.value}>
-            {item.userName || item.userId || 'N/A'}
-          </Text>
+          <Text style={styles.value}>{it.userName || it.userId || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Dispositivo:</Text>
           <Text style={styles.value}>
-            {item.device === 'android'
+            {it.device === 'android'
               ? '🤖 Android'
-              : item.device === 'ios'
+              : it.device === 'ios'
                 ? '🍎 iOS'
-                : item.device === 'web'
+                : it.device === 'web'
                   ? '🌐 Web'
-                  : item.device || 'Desconocido'}
+                  : it.device || 'Desconocido'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Versión app:</Text>
-          <Text style={styles.value}>{item.appVersion || 'N/A'}</Text>
+          <Text style={styles.value}>{it.appVersion || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Fecha:</Text>
           <Text style={styles.value}>
-            {item.uninstallDate || item.createdAt
-              ? new Date(item.uninstallDate || item.createdAt).toLocaleString()
+            {it.uninstallDate || it.createdAt
+              ? new Date(
+                  (it.uninstallDate ?? it.createdAt) as string | number | Date
+                ).toLocaleString()
               : 'N/A'}
           </Text>
         </View>
@@ -74,29 +102,29 @@ const LogUninstallList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Motivo principal:</Text>
           <Text style={styles.value}>
-            {item.primaryReason === 'bugs'
+            {it.primaryReason === 'bugs'
               ? '🐛 Errores/Bugs'
-              : item.primaryReason === 'performance'
+              : it.primaryReason === 'performance'
                 ? '⚡ Rendimiento'
-                : item.primaryReason === 'features'
+                : it.primaryReason === 'features'
                   ? '🔧 Faltan funciones'
-                  : item.primaryReason === 'design'
+                  : it.primaryReason === 'design'
                     ? '🎨 Diseño'
-                    : item.primaryReason === 'price'
+                    : it.primaryReason === 'price'
                       ? '💰 Precio'
-                      : item.primaryReason === 'competitor'
+                      : it.primaryReason === 'competitor'
                         ? '🏆 Competencia'
-                        : item.primaryReason || 'Otro'}
+                        : it.primaryReason || 'Otro'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Tiempo de uso:</Text>
           <Text style={styles.value}>
-            {item.usageDays
-              ? `${item.usageDays} días`
-              : item.usageHours
-                ? `${item.usageHours} horas`
+            {typeof it.usageDays === 'number'
+              ? `${it.usageDays} días`
+              : typeof it.usageHours === 'number'
+                ? `${it.usageHours} horas`
                 : 'N/A'}
           </Text>
         </View>
@@ -108,56 +136,55 @@ const LogUninstallList = React.memo(() => {
               styles.value,
               {
                 color:
-                  item.rating >= 4
+                  typeof it.rating === 'number' && it.rating >= 4
                     ? '#ff6300'
-                    : item.rating >= 2
+                    : typeof it.rating === 'number' && it.rating >= 2
                       ? '#ffa726'
                       : '#FF6B35',
               },
             ]}
           >
-            {item.rating
-              ? `${'⭐'.repeat(item.rating)} (${item.rating}/5)`
+            {typeof it.rating === 'number'
+              ? `${'⭐'.repeat(it.rating)} (${it.rating}/5)`
               : 'Sin valorar'}
           </Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Plataforma:</Text>
-          <Text style={styles.value}>{item.platform || 'N/A'}</Text>
+          <Text style={styles.value}>{it.platform || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>IP origen:</Text>
-          <Text style={styles.value}>{item.ipAddress || 'N/A'}</Text>
+          <Text style={styles.value}>{it.ipAddress || 'N/A'}</Text>
         </View>
 
-        {item.feedback && (
+        {it.feedback && (
           <View style={styles.feedbackSection}>
             <Text style={styles.feedbackLabel}>Comentarios:</Text>
             <Text style={styles.feedback} numberOfLines={3}>
-              {item.feedback}
+              {it.feedback}
             </Text>
           </View>
         )}
 
-        {item.suggestions && (
+        {it.suggestions && (
           <View style={styles.suggestionsSection}>
             <Text style={styles.suggestionsLabel}>Sugerencias:</Text>
             <Text style={styles.suggestions} numberOfLines={2}>
-              {item.suggestions}
+              {it.suggestions}
             </Text>
           </View>
         )}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.logId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const it = (item || {}) as LogUninstallItem;
+    return it.id || it.logId || String(Math.random());
+  }, []);
 
   return (
     <EntityList

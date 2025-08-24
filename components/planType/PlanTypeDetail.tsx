@@ -7,9 +7,9 @@ import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makePlanTypeDetailStyles } from './styles.detail';
 
 export function PlanTypeDetail() {
-  const { styles, colors } = useThemedStyles(makePlanTypeDetailStyles);
+  const { styles } = useThemedStyles(makePlanTypeDetailStyles);
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, _setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

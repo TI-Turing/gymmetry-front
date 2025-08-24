@@ -1,14 +1,18 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { BranchMedia } from '@/models/BranchMedia';
 
 // Auto-generated service for BranchMedia Azure Functions
 export const branchMediaService = {
-  async addBranchMedia(request: BranchMedia): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/branchmedia/add`, request);
+  async addBranchMedia(request: BranchMedia): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/branchmedia/add`,
+      request
+    );
     return response;
   },
-  async deleteBranchMedia(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/branchmedia/${id}`);
+  async deleteBranchMedia(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/branchmedia/${id}`);
     return response;
   },
   async getBranchMediaById(id: string): Promise<ApiResponse<BranchMedia>> {
@@ -20,7 +24,7 @@ export const branchMediaService = {
     return response;
   },
   async findBranchMediasByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<BranchMedia[]>> {
     const response = await apiService.post<BranchMedia[]>(
       `/branchmedias/find`,
@@ -28,8 +32,11 @@ export const branchMediaService = {
     );
     return response;
   },
-  async updateBranchMedia(request: BranchMedia): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/branchmedia/update`, request);
+  async updateBranchMedia(request: BranchMedia): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
+      `/branchmedia/update`,
+      request
+    );
     return response;
   },
 };

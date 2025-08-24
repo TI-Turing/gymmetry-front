@@ -30,15 +30,19 @@ export default function CardPaymentModalWeb({
     }
   }, [visible, publicKey]);
 
-  const initialization = {
+  const initialization: { amount: number; payer: { email?: string } } = {
     amount: Math.max(1, Number(amount || 0)),
     payer: { email: buyerEmail || undefined },
-  } as any;
+  };
 
-  const onSubmit = async (formData: any) => {
+  const onSubmit = async (formData: unknown) => {
     return new Promise<void>((resolve, reject) => {
       try {
-        const token = (formData as any)?.token;
+        const fd = formData as Record<string, unknown> | null;
+        const token =
+          fd && typeof fd === 'object' && 'token' in fd
+            ? (fd.token as unknown)
+            : undefined;
         if (!token) {
           reject(new Error('No se generó token'));
           return;

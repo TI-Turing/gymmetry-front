@@ -11,7 +11,7 @@ import { makeRoutineDayDetailStyles } from './styles/routineDayDetail';
 export function RoutineDayDetail() {
   const styles = useThemedStyles(makeRoutineDayDetailStyles);
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, _setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ export function RoutineDayDetail() {
       <View style={styles.bodyOverlay}>
         <BodyMusclesDiagram
           width="100%"
-          height={undefined as any}
+          height={undefined}
           palette="mono"
           backgroundColor="transparent"
           activeMuscles={[

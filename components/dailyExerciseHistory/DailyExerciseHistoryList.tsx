@@ -13,15 +13,22 @@ export function DailyExerciseHistoryList() {
     }
   }, []);
 
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object';
+
   const renderDailyExerciseHistoryItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.itemContainer}>
-        <Text style={styles.itemTitle}>DailyExerciseHistory {item.id}</Text>
-        <Text style={styles.itemSubtitle}>
-          {item.name || 'DailyExerciseHistory name'}
-        </Text>
-      </View>
-    ),
+    ({ item }: { item: unknown }) => {
+      const o = isRecord(item) ? item : ({} as Record<string, unknown>);
+      const id = o.id != null ? String(o.id as unknown as string) : '';
+      const name =
+        (typeof o.name === 'string' && o.name) || 'DailyExerciseHistory name';
+      return (
+        <View style={styles.itemContainer}>
+          <Text style={styles.itemTitle}>DailyExerciseHistory {id}</Text>
+          <Text style={styles.itemSubtitle}>{name}</Text>
+        </View>
+      );
+    },
     []
   );
 
@@ -30,7 +37,11 @@ export function DailyExerciseHistoryList() {
       title="Daily Exercise History"
       loadFunction={loadDailyExerciseHistories}
       renderItem={renderDailyExerciseHistoryItem}
-      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      keyExtractor={(item) =>
+        isRecord(item) && item.id != null
+          ? String(item.id as unknown as string)
+          : Math.random().toString()
+      }
       emptyMessage="No daily exercise histories found"
     />
   );

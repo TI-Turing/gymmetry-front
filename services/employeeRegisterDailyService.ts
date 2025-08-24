@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddEmployeeRegisterDailyRequest } from '@/dto/EmployeeRegisterDaily/Request/AddEmployeeRegisterDailyRequest';
 import type { EmployeeRegisterDaily } from '@/models/EmployeeRegisterDaily';
 import type { UpdateEmployeeRegisterDailyRequest } from '@/dto/EmployeeRegisterDaily/Request/UpdateEmployeeRegisterDailyRequest';
@@ -7,15 +8,15 @@ import type { UpdateEmployeeRegisterDailyRequest } from '@/dto/EmployeeRegisterD
 export const employeeRegisterDailyService = {
   async addEmployeeRegisterDaily(
     request: AddEmployeeRegisterDailyRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/employeeregisterdaily/add`,
       request
     );
     return response;
   },
-  async deleteEmployeeRegisterDaily(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(
+  async deleteEmployeeRegisterDaily(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(
       `/employeeregisterdaily/${id}`
     );
     return response;
@@ -37,7 +38,7 @@ export const employeeRegisterDailyService = {
     return response;
   },
   async findEmployeeRegisterDailiesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<EmployeeRegisterDaily[]>> {
     const response = await apiService.post<EmployeeRegisterDaily[]>(
       `/employeeregisterdailies/find`,
@@ -47,8 +48,8 @@ export const employeeRegisterDailyService = {
   },
   async updateEmployeeRegisterDaily(
     request: UpdateEmployeeRegisterDailyRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/employeeregisterdaily/update`,
       request
     );

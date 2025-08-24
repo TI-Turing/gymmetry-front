@@ -10,9 +10,14 @@ import { Gym } from '../dto/gym/Gym';
 import { useAuth } from './AuthContext';
 // import { useGymDataObserver } from '@/hooks/useAsyncStorageObserver';
 
+type InicioData = {
+  welcomeMessage: string;
+  stats: { workouts: number; progress: number };
+};
+
 interface PreloadContextType {
   gymData: Gym | null;
-  inicioData: any | null;
+  inicioData: InicioData | null;
   isPreloading: boolean;
   preloadError: string | null;
   refreshGymData: () => Promise<void>;
@@ -37,7 +42,7 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
   children,
 }) => {
   const [gymData, setGymData] = useState<Gym | null>(null);
-  const [inicioData, setInicioData] = useState<any | null>(null);
+  const [inicioData, setInicioData] = useState<InicioData | null>(null);
   const [isPreloading, setIsPreloading] = useState(false);
   const [preloadError, setPreloadError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
@@ -61,11 +66,11 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
     }
   }, []);
 
-  const precargarDatosInicio = async () => {
+  const precargarDatosInicio = useCallback(async (): Promise<void> => {
     try {
       // Aquí puedes agregar consultas para datos de inicio
       // Por ahora retornamos datos simulados
-      const mockInicioData = {
+      const mockInicioData: InicioData = {
         welcomeMessage: 'Bienvenido a Gymmetry',
         stats: {
           workouts: 0,
@@ -76,7 +81,7 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
     } catch {
       setPreloadError('Error al cargar datos de inicio');
     }
-  };
+  }, []);
 
   const precargarDatos = useCallback(async () => {
     setIsPreloading(true);
@@ -89,7 +94,7 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
     } finally {
       setIsPreloading(false);
     }
-  }, [refreshGymData]);
+  }, [refreshGymData, precargarDatosInicio]);
 
   useEffect(() => {
     // Precargar datos cuando hay sesión activa; si no, limpiar estado
@@ -103,7 +108,9 @@ export const PreloadProvider: React.FC<PreloadProviderProps> = ({
       // También limpiar cache en memoria del servicio, si estuviera presente
       import('@/services/gymService')
         .then(({ GymService }) => GymService.clearCache?.())
-        .catch(() => {});
+        .catch(() => {
+          // ignore
+        });
     }
   }, [isAuthenticated, precargarDatos]);
 

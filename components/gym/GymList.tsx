@@ -6,90 +6,127 @@ import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymListStyles } from './styles/gymList';
 
 const GymList = React.memo(() => {
+  const isRecord = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadGyms = useCallback(async () => {
     const response = await gymService.getAllGyms();
-    return response.Data || [];
+    const raw = (response?.Data ?? []) as unknown;
+    let items: unknown[] = [];
+    if (Array.isArray(raw)) items = raw as unknown[];
+    else if (isRecord(raw)) {
+      const maybeValues = raw['$values'] as unknown;
+      if (Array.isArray(maybeValues)) items = maybeValues as unknown[];
+    }
+    return items;
   }, []);
 
   const { styles } = useThemedStyles(makeGymListStyles);
 
   const renderGymItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {item.name || item.gymName || 'Gimnasio sin nombre'}
-          </Text>
-          <Text style={styles.statusText}>
-            {item.isActive ? 'Abierto' : 'Cerrado'}
-          </Text>
-        </View>
+    ({ item }: { item: unknown }) => {
+      const r = (item ?? {}) as Record<string, unknown>;
+      const name =
+        (r['name'] as string) ||
+        (r['gymName'] as string) ||
+        'Gimnasio sin nombre';
+      const isActive =
+        (r['isActive'] as boolean) ?? (r['IsActive'] as boolean) ?? false;
+      const description =
+        (r['description'] as string) ?? 'Sin descripción disponible';
+      const address =
+        (r['address'] as string) ||
+        (r['fullAddress'] as string) ||
+        'Dirección no disponible';
+      const city = (r['city'] as string) ?? '';
+      const state = (r['state'] as string) ?? '';
+      const zipCode = (r['zipCode'] as string) ?? '';
+      const phone =
+        (r['phone'] as string) || (r['phoneNumber'] as string) || 'N/A';
+      const email = (r['email'] as string) ?? 'N/A';
+      const currentOccupancy = (r['currentOccupancy'] as number) ?? 0;
+      const maxCapacity = (r['maxCapacity'] as number) ?? 0;
+      const openTime = (r['openTime'] as string) ?? '06:00';
+      const closeTime = (r['closeTime'] as string) ?? '22:00';
+      const serviceCount = (r['serviceCount'] as number) ?? 0;
+      const memberCount = (r['memberCount'] as number) ?? 0;
+      const rating = (r['rating'] as number) ?? null;
+      const reviewCount = (r['reviewCount'] as number) ?? 0;
 
-        <Text style={styles.description}>
-          {item.description || 'Sin descripción disponible'}
-        </Text>
-
-        <View style={styles.addressSection}>
-          <Text style={styles.address}>
-            📍 {item.address || item.fullAddress || 'Dirección no disponible'}
-          </Text>
-          <Text style={styles.city}>
-            {item.city || ''} {item.state || ''} {item.zipCode || ''}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Teléfono:</Text>
-          <Text style={styles.value}>
-            {item.phone || item.phoneNumber || 'N/A'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Email:</Text>
-          <Text style={styles.value}>{item.email || 'N/A'}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Capacidad:</Text>
-          <Text style={styles.value}>
-            {item.currentOccupancy || 0} / {item.maxCapacity || 0} personas
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Horarios:</Text>
-          <Text style={styles.value}>
-            {item.openTime || '06:00'} - {item.closeTime || '22:00'}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Servicios:</Text>
-          <Text style={styles.value}>{item.serviceCount || 0} disponibles</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Miembros:</Text>
-          <Text style={styles.value}>{item.memberCount || 0} activos</Text>
-        </View>
-
-        {item.rating && (
-          <View style={styles.ratingSection}>
-            <Text style={styles.rating}>
-              ⭐ Calificación: {item.rating}/5 ({item.reviewCount || 0} reviews)
+      return (
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{name}</Text>
+            <Text style={styles.statusText}>
+              {isActive ? 'Abierto' : 'Cerrado'}
             </Text>
           </View>
-        )}
-      </View>
-    ),
-    []
+
+          <Text style={styles.description}>{description}</Text>
+
+          <View style={styles.addressSection}>
+            <Text style={styles.address}>📍 {address}</Text>
+            <Text style={styles.city}>
+              {city} {state} {zipCode}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Teléfono:</Text>
+            <Text style={styles.value}>{phone}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.value}>{email}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Capacidad:</Text>
+            <Text style={styles.value}>
+              {currentOccupancy} / {maxCapacity} personas
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Horarios:</Text>
+            <Text style={styles.value}>
+              {openTime} - {closeTime}
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Servicios:</Text>
+            <Text style={styles.value}>{serviceCount} disponibles</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Miembros:</Text>
+            <Text style={styles.value}>{memberCount} activos</Text>
+          </View>
+
+          {rating != null && (
+            <View style={styles.ratingSection}>
+              <Text style={styles.rating}>
+                ⭐ Calificación: {rating}/5 ({reviewCount || 0} reviews)
+              </Text>
+            </View>
+          )}
+        </View>
+      );
+    },
+    [styles]
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.gymId || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: unknown) => {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const id =
+      (r['Id'] as string) ||
+      (r['id'] as string) ||
+      (r['GymId'] as string) ||
+      (r['gymId'] as string) ||
+      null;
+    return id ?? String(Math.random());
+  }, []);
 
   return (
     <EntityList

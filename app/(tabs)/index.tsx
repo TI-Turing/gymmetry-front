@@ -17,7 +17,7 @@ type DayStatus = 'completed' | 'failed' | 'rest';
 
 function HomeScreen() {
   const styles = useThemedStyles(makeHomeStyles);
-  const { showSuccess, AlertComponent } = useCustomAlert();
+  const { showSuccess: _showSuccess, AlertComponent } = useCustomAlert();
 
   // Datos de prueba para disciplina y consistencia
   const disciplineData = [
@@ -119,12 +119,13 @@ function HomeScreen() {
   return (
     <ScreenWrapper
       headerTitle="Gymmetry"
+      headerSubtitle={headerSubtitle}
       backgroundColor={styles.colors.background}
     >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: 12 }]}
       >
         {/* Sección 1: Disciplina y Consistencia */}
         <DisciplineConsistency

@@ -15,7 +15,7 @@ import { makeRoutineExerciseDetailStyles } from './styles/routineExerciseDetail'
 export function RoutineExerciseDetail() {
   const styles = useThemedStyles(makeRoutineExerciseDetailStyles);
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [overlayOpacities, setOverlayOpacities] = useState<
@@ -61,7 +61,7 @@ export function RoutineExerciseDetail() {
   // Derivar datos del gráfico (ordenado desc, valores 0..10)
   const muscleChartData = useMemo(() => {
     const entries = Object.entries(muscleTags01 || {});
-    const normalize01 = (v: any) => {
+    const normalize01 = (v: unknown) => {
       const n = Number(v);
       if (!isFinite(n)) return 0;
       if (n > 1 && n <= 10) return Math.max(0, Math.min(1, n / 10));
@@ -98,10 +98,19 @@ export function RoutineExerciseDetail() {
             ) : null}
             {item ? (
               <View style={styles.card}>
-                <Text style={styles.exerciseName}>{item?.Name}</Text>
-                {!!item?.Description && (
-                  <Text style={styles.exerciseDesc}>{item.Description}</Text>
-                )}
+                {(() => {
+                  const ex = item as Exercise;
+                  return (
+                    <>
+                      <Text style={styles.exerciseName}>{ex?.Name}</Text>
+                      {!!ex?.Description && (
+                        <Text style={styles.exerciseDesc}>
+                          {ex.Description}
+                        </Text>
+                      )}
+                    </>
+                  );
+                })()}
               </View>
             ) : null}
 

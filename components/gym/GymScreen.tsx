@@ -10,7 +10,7 @@ import { logger } from '@/utils';
 import { AddBranchForm } from '@/components/branches';
 import GymRegistrationSteps from './GymRegistrationSteps';
 import GymInfoView from './GymInfoView';
-import { GymCompleteData } from './types';
+import { GymCompleteData, Gym } from './types';
 import { GymService } from '@/services/gymService';
 import { useLocalSearchParams } from 'expo-router';
 // Import direct views to avoid potential circular import via index barrel
@@ -30,7 +30,7 @@ function GymScreen(): React.JSX.Element {
   const [showAddBranchForm, setShowAddBranchForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userGymId, setUserGymId] = useState<string | null>(null);
-  const [cachedGym, setCachedGym] = useState<any>(null);
+  const [cachedGym, setCachedGym] = useState<Gym | null>(null);
   // Owner ahora se infiere solo por tener gymId (roles manejados en authService)
 
   // Obtiene gymId desde params o del usuario (si no hay param)
@@ -39,7 +39,7 @@ function GymScreen(): React.JSX.Element {
     const targetGymId: string | null =
       (paramGymId as string) ?? ((user?.gymId ?? null) as string | null);
 
-    let currentCachedGym: any = null;
+    let currentCachedGym: Gym | null = null;
 
     if (targetGymId) {
       currentCachedGym = await GymService.getCachedGymById?.(targetGymId);
@@ -59,7 +59,8 @@ function GymScreen(): React.JSX.Element {
 
   useEffect(() => {
     updateUserData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paramGymId]);
 
   useEffect(() => {
     const checkGymStatus = async () => {
@@ -127,7 +128,7 @@ function GymScreen(): React.JSX.Element {
           />
         ) : hasGym ? (
           <GymInfoView
-            gym={gymData || cachedGym!}
+            gym={(gymData as Gym) || (cachedGym as Gym)}
             onRefresh={handleRefreshGym}
             onAddBranch={handleAddBranch}
           />

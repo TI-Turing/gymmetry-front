@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
@@ -10,7 +17,7 @@ interface LoadingSpinnerProps {
   color?: string;
   text?: string;
   overlay?: boolean;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
@@ -23,7 +30,11 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const colorScheme = useColorScheme();
   const spinnerColor = color || Colors[colorScheme].tint;
 
-  const containerStyles = [styles.container, overlay && styles.overlay, style];
+  const containerStyles: StyleProp<ViewStyle> = [
+    styles.container,
+    overlay && styles.overlay,
+    style,
+  ];
 
   return (
     <View style={containerStyles}>

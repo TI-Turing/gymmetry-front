@@ -8,7 +8,7 @@ import Colors from '@/constants/Colors';
 
 export function ScheduleDetail() {
   const [id, setId] = useState('');
-  const [item, setItem] = useState<any>(null);
+  const [item, _setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,4 +66,4 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
 });
-export default styles;
+// sin export por defecto para evitar variables no usadas

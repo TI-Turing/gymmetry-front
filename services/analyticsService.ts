@@ -1,11 +1,14 @@
 import { apiService } from './apiService';
-import type { ApiResponse } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AnalyticsSummaryRequest, AnalyticsSummaryResponse } from '@/dto';
 import { dailyService } from './dailyService';
 import { routineDayService } from './routineDayService';
 import { authService } from './authService';
 
 const base = '/analytics';
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null;
 
 export const analyticsService = {
   async getSummary(
@@ -84,16 +87,21 @@ export const analyticsService = {
   ): Promise<ApiResponse<AnalyticsSummaryResponse>> {
     try {
       // 1) Obtener dailies por usuario y rango (sin horas en filtros)
-      const payload: Record<string, any> = {
+      const payload: Record<string, unknown> = {
         UserId: req.UserId,
         StartDate: req.StartDate,
         EndDate: req.EndDate,
       };
       const dResp = await dailyService.findDailiesByFields(payload);
-      let dailies: any[] = [];
+      let dailies: unknown[] = [];
       if (dResp?.Success && dResp.Data) {
-        const raw: any = dResp.Data as any;
-        dailies = Array.isArray(raw) ? raw : raw?.$values || [];
+        const raw: unknown = dResp.Data as unknown;
+        if (Array.isArray(raw)) {
+          dailies = raw;
+        } else if (isRecord(raw)) {
+          const vals = (raw as Record<string, unknown>)['$values'];
+          if (Array.isArray(vals)) dailies = vals as unknown[];
+        }
       }
 
       // Normalizar fecha sin horas y filtrar inclusivo
@@ -103,14 +111,15 @@ export const analyticsService = {
       };
       const byDate = new Map<
         string,
-        { anyAdvance: boolean; durations: number[]; items: any[] }
+        { anyAdvance: boolean; durations: number[]; items: unknown[] }
       >();
       for (const d of dailies) {
-        const dateKey = String(d?.StartDate || '').slice(0, 10);
+        const r = isRecord(d) ? d : {};
+        const dateKey = String((r['StartDate'] as string) || '').slice(0, 10);
         if (!inRange(dateKey)) continue;
-        const adv = Number(d?.Percentage || 0) > 0;
-        const start = new Date(d?.StartDate || '').getTime();
-        const end = new Date(d?.EndDate || '').getTime();
+        const adv = Number((r['Percentage'] as number) || 0) > 0;
+        const start = new Date((r['StartDate'] as string) || '').getTime();
+        const end = new Date((r['EndDate'] as string) || '').getTime();
         const mins =
           Number.isFinite(start) && Number.isFinite(end) && end > start
             ? Math.round((end - start) / 60000)
@@ -145,13 +154,21 @@ export const analyticsService = {
       let routineTemplateId: string | null =
         authService.getActiveRoutineTemplateId?.() || null;
       if (!routineTemplateId) {
-        const first = dailies.find((x) => Boolean(x?.RoutineDayId));
-        if (first?.RoutineDayId) {
+        const first = dailies.find(
+          (x) =>
+            isRecord(x) &&
+            Boolean((x as Record<string, unknown>)['RoutineDayId'])
+        );
+        if (first && isRecord(first) && first['RoutineDayId']) {
           const rd = await routineDayService.getRoutineDay(
-            String(first.RoutineDayId)
+            String(first['RoutineDayId'])
           );
-          if (rd?.Success && rd.Data)
-            routineTemplateId = String((rd.Data as any).RoutineTemplateId);
+          if (rd?.Success && rd.Data) {
+            const ddata = rd.Data as unknown;
+            const rrec = isRecord(ddata) ? ddata : {};
+            const rid = rrec['RoutineTemplateId'];
+            if (typeof rid === 'string' && rid) routineTemplateId = rid;
+          }
         }
       }
 
@@ -160,14 +177,20 @@ export const analyticsService = {
         const rResp = await routineDayService.findRoutineDaysByFields({
           RoutineTemplateId: routineTemplateId,
         });
-        let rds: any[] = [];
+        let rds: unknown[] = [];
         if (rResp?.Success && rResp.Data) {
-          const raw: any = rResp.Data as any;
-          rds = Array.isArray(raw) ? raw : raw?.$values || [];
+          const raw: unknown = rResp.Data as unknown;
+          if (Array.isArray(raw)) {
+            rds = raw;
+          } else if (isRecord(raw)) {
+            const vals = (raw as Record<string, unknown>)['$values'];
+            if (Array.isArray(vals)) rds = vals as unknown[];
+          }
         }
         const set = new Set<number>();
         for (const r of rds) {
-          const dn = Number(r?.DayNumber);
+          const rr = isRecord(r) ? r : {};
+          const dn = Number(rr['DayNumber']);
           if (dn >= 1 && dn <= 7) set.add(dn);
         }
         schedDays = Array.from(set.values());
@@ -266,7 +289,7 @@ export const analyticsService = {
       return {
         Success: false,
         Message: 'FAILED',
-        Data: undefined as any,
+        Data: null,
         StatusCode: 500,
       };
     }

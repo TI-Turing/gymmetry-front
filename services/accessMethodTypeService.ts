@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddAccessMethodTypeRequest } from '@/dto/accessMethodType/AddAccessMethodTypeRequest';
 import type { AccessMethodType } from '@/models/AccessMethodType';
 import type { FindAccessMethodTypesByFieldsRequest } from '@/dto/accessMethodType/FindAccessMethodTypesByFieldsRequest';
@@ -8,15 +9,17 @@ import type { UpdateAccessMethodTypeRequest } from '@/dto/accessMethodType/Updat
 export const accessMethodTypeService = {
   async addAccessMethodType(
     request: AddAccessMethodTypeRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/accessmethodtype/add`,
       request
     );
     return response;
   },
-  async deleteAccessMethodType(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/accessmethodtype/${id}`);
+  async deleteAccessMethodType(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(
+      `/accessmethodtype/${id}`
+    );
     return response;
   },
   async getAccessMethodTypeById(
@@ -43,8 +46,8 @@ export const accessMethodTypeService = {
   },
   async updateAccessMethodType(
     request: UpdateAccessMethodTypeRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/accessmethodtype/update`,
       request
     );

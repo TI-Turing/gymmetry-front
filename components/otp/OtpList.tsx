@@ -6,8 +6,11 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 const OtpList = React.memo(() => {
-  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
-  const loadOtps = useCallback(async () => {
+  const servicePlaceholder = useCallback(
+    () => Promise.resolve([] as Record<string, unknown>[]),
+    []
+  );
+  const loadOtps = useCallback(async (): Promise<Record<string, unknown>[]> => {
     try {
       // Placeholder for actual service call
 
@@ -17,10 +20,34 @@ const OtpList = React.memo(() => {
     } catch (_error) {
       return [];
     }
-  }, []);
+  }, [servicePlaceholder]);
+
+  type OtpListItem = Record<string, unknown> & {
+    code?: string;
+    isUsed?: boolean;
+    isExpired?: boolean;
+    purpose?: string;
+    userEmail?: string;
+    phone?: string;
+    type?: string;
+    createdAt?: string;
+    expiresAt?: string;
+    attempts?: number;
+    maxAttempts?: number;
+    originIp?: string;
+    usedAt?: string;
+    id?: string;
+    otpId?: string;
+  };
+
+  const getAttemptsColor = useCallback(
+    (attempts?: number) =>
+      (attempts ?? 0) >= 3 ? '#ff6b6b' : Colors.light.text,
+    []
+  );
 
   const renderOtpItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: OtpListItem }) => (
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>{item.code || 'Código OTP'}</Text>
@@ -103,12 +130,7 @@ const OtpList = React.memo(() => {
         <View style={styles.row}>
           <Text style={styles.label}>Intentos:</Text>
           <Text
-            style={[
-              styles.value,
-              {
-                color: item.attempts >= 3 ? '#ff6b6b' : Colors.light.text,
-              },
-            ]}
+            style={[styles.value, { color: getAttemptsColor(item.attempts) }]}
           >
             {item.attempts || 0} / {item.maxAttempts || 3}
           </Text>
@@ -129,13 +151,17 @@ const OtpList = React.memo(() => {
         )}
       </View>
     ),
-    []
+    [getAttemptsColor]
   );
 
-  const keyExtractor = useCallback(
-    (item: any) => item.id || item.otpId || item.code || String(Math.random()),
-    []
-  );
+  const keyExtractor = useCallback((item: OtpListItem) => {
+    return (
+      (item.id as string) ||
+      (item.otpId as string) ||
+      (item.code as string) ||
+      String(Math.random())
+    );
+  }, []);
 
   return (
     <EntityList

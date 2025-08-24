@@ -1,4 +1,5 @@
-import { apiService, ApiResponse } from './apiService';
+import { apiService } from './apiService';
+import type { ApiResponse } from '@/dto/common/ApiResponse';
 import type { AddRoutineExerciseRequest } from '@/dto/RoutineExercise/Request/AddRoutineExerciseRequest';
 import type { RoutineExercise } from '@/models/RoutineExercise';
 import type { UpdateRoutineExerciseRequest } from '@/dto/RoutineExercise/Request/UpdateRoutineExerciseRequest';
@@ -7,15 +8,15 @@ import type { UpdateRoutineExerciseRequest } from '@/dto/RoutineExercise/Request
 export const routineExerciseService = {
   async addRoutineExercise(
     request: AddRoutineExerciseRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
       `/routineexercise/add`,
       request
     );
     return response;
   },
-  async deleteRoutineExercise(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/routineexercise/${id}`);
+  async deleteRoutineExercise(id: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.delete<unknown>(`/routineexercise/${id}`);
     return response;
   },
   async getRoutineExercise(id: string): Promise<ApiResponse<RoutineExercise>> {
@@ -30,7 +31,7 @@ export const routineExerciseService = {
     return response;
   },
   async findRoutineExercisesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<RoutineExercise[]>> {
     const response = await apiService.post<RoutineExercise[]>(
       `/routineexercises/find`,
@@ -40,8 +41,8 @@ export const routineExerciseService = {
   },
   async updateRoutineExercise(
     request: UpdateRoutineExerciseRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<unknown>> {
+    const response = await apiService.put<unknown>(
       `/routineexercise/update`,
       request
     );

@@ -57,7 +57,7 @@ export default function LoginForm({
         showAlert(result.error || t('unknown_error'));
       }
       // Si es Success: true, AuthContainer manejará el éxito
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage = handleApiError(error);
       if (showAlert) {
         showAlert(errorMessage);
@@ -65,7 +65,7 @@ export default function LoginForm({
     } finally {
       setIsLoading(false);
     }
-  }, [userNameOrEmail, password, onLogin, showAlert]);
+  }, [userNameOrEmail, password, onLogin, showAlert, t]);
 
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);

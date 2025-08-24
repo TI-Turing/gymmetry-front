@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   Modal,
   TouchableOpacity,
@@ -16,7 +22,6 @@ import Button from '@/components/common/Button';
 import type { RoutineDay } from '@/models/RoutineDay';
 import motivationalPhrases from '@/utils/motivationalPhrases.json';
 import { router } from 'expo-router';
-import { useRef } from 'react';
 import {
   getItem as rsGetItem,
   setItem as rsSetItem,
@@ -62,7 +67,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const [showRepsPrompt, setShowRepsPrompt] = useState(false);
   const [repsValue, setRepsValue] = useState<string>('');
   // Timer para ejercicios de tiempo
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [timerRemaining, setTimerRemaining] = useState<number>(0);
   const [timerPhase, setTimerPhase] = useState<'on' | 'off' | 'prep' | null>(
     null
@@ -160,12 +165,12 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     return null;
   }, [exercise?.Repetitions]);
 
-  const clearTimer = () => {
+  const clearTimer = React.useCallback(() => {
     if (timerRef.current) {
-      clearInterval(timerRef.current as any);
+      clearInterval(timerRef.current);
       timerRef.current = null;
     }
-  };
+  }, []);
 
   const startTimer = () => {
     if (!timeSpec) return;
@@ -230,7 +235,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 },
                 undefined,
                 { settings }
-              ).catch(() => {});
+              ).catch(() => undefined);
             }
           }
           if (phase === 'prep') {
@@ -277,7 +282,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 },
                 undefined,
                 { settings }
-              ).catch(() => {});
+              ).catch(() => undefined);
             }
           } else if (phase === 'prep') {
             // Termina preparación, arrancar siguiente ciclo
@@ -310,7 +315,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
         }, 0);
         return 0;
       });
-    }, 1000) as any;
+    }, 1000);
   };
 
   const stopTimer = () => {
@@ -351,14 +356,22 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   };
 
   // Frase motivacional aleatoria
-  const motivationalPhrase = useMemo(() => {
-    if (motivationalPhrases.length === 0) return { text: '¡Tú puedes!' };
-    const randomIndex = Math.floor(Math.random() * motivationalPhrases.length);
-    return motivationalPhrases[randomIndex];
-  }, [visible]); // Cambiar frase cada vez que se abra el modal
+  const [motivationalPhrase, setMotivationalPhrase] = useState<{
+    text: string;
+  }>({ text: '¡Tú puedes!' });
+  useEffect(() => {
+    const pick = () => {
+      if (motivationalPhrases.length === 0) return { text: '¡Tú puedes!' };
+      const randomIndex = Math.floor(
+        Math.random() * motivationalPhrases.length
+      );
+      return motivationalPhrases[randomIndex] as { text: string };
+    };
+    setMotivationalPhrase(pick());
+  }, [visible]);
 
   // Animación de pulso continuo
-  const startPulseAnimation = () => {
+  const startPulseAnimation = useCallback(() => {
     setIsExecuting(true);
     const maxScale = timeSpec ? 1.15 : 1.3; // reducir escala cuando se muestra cronómetro
     Animated.loop(
@@ -382,9 +395,9 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
       duration: 500,
       useNativeDriver: true,
     }).start();
-  };
+  }, [fadeAnim, pulseAnim, timeSpec]);
 
-  const stopPulseAnimation = () => {
+  const stopPulseAnimation = useCallback(() => {
     setIsExecuting(false);
     pulseAnim.stopAnimation();
     Animated.timing(pulseAnim, {
@@ -399,7 +412,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
       duration: 300,
       useNativeDriver: true,
     }).start();
-  };
+  }, [fadeAnim, pulseAnim]);
 
   const handleStartSet = () => {
     if (!exercise) return;
@@ -472,8 +485,11 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   useEffect(() => {
     if (!visible) {
       stopPulseAnimation();
+      clearTimer();
+      setTimerPhase(null);
+      timerPhaseRef.current = null;
     }
-  }, [visible]);
+  }, [visible, stopPulseAnimation, clearTimer]);
 
   if (!exercise) return null;
 
@@ -511,9 +527,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               style={[styles.linkText]}
               onPress={() => {
                 const eid =
-                  (exercise as any).ExerciseId ||
-                  (exercise as any).Exercise?.Id ||
-                  null;
+                  exercise.ExerciseId ?? exercise.Exercise?.Id ?? null;
                 if (eid) {
                   router.push({
                     pathname: '/exercise-detail',
@@ -606,7 +620,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 {timeSpec.mode === 'single' && (timeSpec.cycles || 1) > 1 && (
                   <Text style={[styles.timerSubLabel, { marginTop: 2 }]}>
                     {(() => {
-                      const base = (timeSpec as any).perLabel || 'lado';
+                      const base = timeSpec.perLabel || 'lado';
                       const label =
                         String(base).charAt(0).toUpperCase() +
                         String(base).slice(1);
@@ -717,7 +731,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
             style={styles.promptOverlay}
             onPress={() => setShowRepsPrompt(false)}
           >
-            <Pressable style={styles.promptCard} onPress={() => {}}>
+            <Pressable style={styles.promptCard} onPress={() => undefined}>
               <Text style={styles.promptTitle}>Repeticiones realizadas</Text>
               <Text style={styles.promptSubtitle}>
                 Set {Math.min(completedSets + 1, exercise.Sets)} de{' '}
