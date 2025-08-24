@@ -22,6 +22,8 @@ import type { AddDailyExerciseRequest } from '@/dto/DailyExercise/Request/AddDai
 import type { AddDailyRequest } from '@/dto/Daily/Request/AddDailyRequest';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { getItem as rsGetItem, setItem as rsSetItem, removeItem as rsRemoveItem, getJSON as rsGetJSON, keyDailyStart, keyExerciseProgress, keyExerciseReps } from '@/utils/routineStorage';
+import { scheduleLocalNotificationAsync } from '@/utils/localNotifications';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 type ExerciseProgress = {
   completedSets: number;
@@ -39,6 +41,7 @@ function getWeekdayNameEs(dayNum: number) {
 }
 
 export default function RoutineDayScreen() {
+  const { settings } = useAppSettings();
   const params = useLocalSearchParams<{ day?: string }>();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
@@ -96,6 +99,19 @@ export default function RoutineDayScreen() {
     if (totalSets === 0) return 0;
     return Math.round((doneSets / totalSets) * 100);
   }, [exercises, progressById]);
+
+  // Recordatorio suave para retomar si hay progreso pero no finalizó
+  useEffect(() => {
+    if (!settings.trainingNotificationsEnabled) return;
+    if (!settings.notificationsEnabled) return;
+    if (!hasAnyProgress || overallProgress >= 100) return;
+    scheduleLocalNotificationAsync(
+      { title: '¿Retomas tu rutina?', body: 'Tienes una rutina en curso. Cuando puedas, vuelve a darle.' },
+      { seconds: 600 },
+      { settings }
+    ).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasAnyProgress, overallProgress, settings.notificationsEnabled, settings.trainingNotificationsEnabled]);
 
   // Orden y etiquetas de categorías
   const CATEGORY_ORDER: { id: string; label: string }[] = [

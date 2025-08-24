@@ -12,6 +12,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useScreenWidth } from './useScreenWidth';
 import Colors from '@/constants/Colors';
 import { router } from 'expo-router';
+import SmartImage from '@/components/common/SmartImage';
 
 interface WebHeaderProps {
   userName?: string;
@@ -49,9 +50,6 @@ export default function WebHeader({
         break;
       case 'routines':
         router.push('/routine-templates');
-        break;
-      case 'theme':
-        // TODO: Implementar cambio de tema
         break;
       case 'settings':
   router.push('/settings');
@@ -106,12 +104,6 @@ export default function WebHeader({
       icon: 'line-chart',
       label: 'RM',
       action: () => handleMenuOption('user-exercise-max'),
-    },
-    {
-      key: 'theme',
-      icon: 'moon-o',
-      label: 'Modo Oscuro',
-      action: () => handleMenuOption('theme'),
     },
     {
       key: 'settings',
@@ -180,7 +172,7 @@ export default function WebHeader({
           onPress={handleUserMenuToggle}
         >
           {userAvatar ? (
-            <Image source={{ uri: userAvatar }} style={styles.userAvatar} />
+            <SmartImage uri={userAvatar} style={styles.userAvatar} deferOnDataSaver={false} />
           ) : (
             <View style={styles.defaultAvatar}>
               <FontAwesome name='user' size={20} color='#FFFFFF' />

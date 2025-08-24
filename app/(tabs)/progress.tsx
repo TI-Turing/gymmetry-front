@@ -6,10 +6,12 @@ import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { analyticsService, authService } from '@/services';
 import type { AnalyticsSummaryResponse } from '@/dto';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 const { width } = Dimensions.get('window');
 
 function ProgressScreen() {
+  const { settings } = useAppSettings();
   const [selectedPeriod, setSelectedPeriod] = useState<'semana' | 'mes' | 'year'>('semana');
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<AnalyticsSummaryResponse | null>(null);
@@ -48,12 +50,12 @@ function ProgressScreen() {
       try {
         setLoading(true);
         const user = await authService.getUserData();
-        // 1) Llamar al backend primero
-        const resp = await analyticsService.getSummary({
+  // 1) Llamar al backend primero (si analytics habilitado)
+  const resp = settings.analyticsEnabled ? await analyticsService.getSummary({
           UserId: user?.id ?? '',
           StartDate: dateRange.start,
           EndDate: dateRange.end,
-        });
+  }) : null;
         if (resp?.Success && resp.Data) {
           if (!cancelled) setSummary(resp.Data);
         } else {

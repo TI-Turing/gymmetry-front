@@ -5,6 +5,7 @@ import Colors from '@/constants/Colors';
 import { FontAwesome } from '@expo/vector-icons';
 import { SvgUri } from 'react-native-svg';
 import { Asset } from 'expo-asset';
+import SmartImage from '@/components/common/SmartImage';
 
 type Props = {
   visible: boolean;
@@ -87,7 +88,7 @@ export default function CardPaymentModal({ visible, onClose, onFallbackToExterna
               <View style={styles.methodLeft}>
                 <View style={styles.methodIconWrap}>
                   {pseUri ? (
-                    <Image source={{ uri: pseUri }} style={{ width: 24, height: 24, resizeMode: 'contain' }} />
+                    <SmartImage uri={pseUri} style={{ width: 24, height: 24 }} deferOnDataSaver />
                   ) : (
                     <FontAwesome name="university" size={16} color="#999" />
                   )}

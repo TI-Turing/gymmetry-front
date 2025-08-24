@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import Colors from '@/constants/Colors';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 interface LoadingAnimationProps {
   size?: number;
@@ -12,6 +13,10 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
   size = 40,
   style,
 }) => {
+  const { settings } = useAppSettings();
+  if (settings.reduceMotion || settings.dataSaver) {
+    return <FallbackLoadingAnimation size={size} style={style} />;
+  }
   return (
     <View style={[{ width: size, height: size }, style]}>
       <LottieView

@@ -1,6 +1,7 @@
-import { useColorScheme as _useColorScheme } from 'react-native';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 export function useColorScheme() {
-  // Siempre devolver 'dark' como tema predeterminado
-  return 'dark' as const;
+  // Resuelve desde AppSettings para RN
+  const { resolvedColorScheme } = useAppSettings();
+  return resolvedColorScheme;
 }

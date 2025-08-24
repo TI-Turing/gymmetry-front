@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity } from 'react-native';
+import SmartImage from '@/components/common/SmartImage';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -37,7 +38,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onToggleLike, onOpenCo
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+  <SmartImage uri={avatarUrl} style={styles.avatar} deferOnDataSaver={false} />
         <View style={styles.userInfo}>
           <Text style={styles.userName}>{userName}</Text>
           <Text style={styles.time}>hace 2h</Text>
@@ -49,7 +50,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onToggleLike, onOpenCo
 
       {post.Content ? <Text style={styles.content}>{post.Content}</Text> : null}
       {post.MediaUrl ? (
-        <Image source={{ uri: post.MediaUrl }} style={styles.image} />
+        <SmartImage uri={post.MediaUrl} style={styles.image} deferOnDataSaver label='Cargar imagen' />
       ) : null}
 
       <View style={styles.actions}>

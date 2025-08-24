@@ -16,6 +16,7 @@ import { gymServiceExtensions } from '@/services/gymService';
 import type { FindGymsByNameResponse } from '@/dto/gym/FindGymsByNameResponse';
 import { authService } from '@/services/authService';
 import GymInfoView from './GymInfoView';
+import SmartImage from '@/components/common/SmartImage';
 
 interface GymSearchModalProps {
   visible: boolean;
@@ -144,7 +145,7 @@ export default function GymSearchModal({
           {/* TODO: Mostrar imagen del gym cuando el backend la retorne */}
           <View style={styles.gymImageContainer}>
             {gym.LogoUrl ? (
-              <Image source={{ uri: gym.LogoUrl }} style={styles.gymImage} />
+              <SmartImage uri={gym.LogoUrl} style={styles.gymImage} deferOnDataSaver />
             ) : (
               <View style={styles.gymImagePlaceholder}>
                 <FontAwesome name='building' size={24} color='#B0B0B0' />

@@ -11,6 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useRef } from 'react';
 import { getItem as rsGetItem, setItem as rsSetItem, getJSON as rsGetJSON, setJSON as rsSetJSON, keyExerciseReps, keyExerciseProgress } from '@/utils/routineStorage';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
+import { scheduleLocalNotificationAsync } from '@/utils/localNotifications';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -31,6 +33,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   onMarkExercise,
   completedSets,
 }) => {
+  const { settings } = useAppSettings();
   const [isExecuting, setIsExecuting] = useState(false);
   const [pulseAnim] = useState(new Animated.Value(1));
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -147,7 +150,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     // Intervalo de 1s
     clearTimer();
   const PREP_SECONDS = Math.max(0, prepSeconds);
-    timerRef.current = setInterval(() => {
+  timerRef.current = setInterval(() => {
       setTimerRemaining(prev => {
         const next = Math.max(prev - 1, 0);
         if (next > 0) return next;
@@ -173,6 +176,14 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(20); else Vibration.vibrate([0, 20]); } catch {} }
               return PREP_SECONDS;
             }
+            // Sin más ciclos, avisar fin de intervalo si corresponde
+            if (settings.trainingNotificationsEnabled) {
+              scheduleLocalNotificationAsync(
+                { title: 'Intervalo finalizado', body: 'Buen trabajo. Continúa con el siguiente ejercicio.' },
+                undefined,
+                { settings }
+              ).catch(() => {});
+            }
           }
           if (phase === 'prep') {
             // Termina preparación, arrancar siguiente ON
@@ -196,6 +207,14 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               timerPhaseRef.current = 'prep';
               if (soundCues) { try { if (Platform.OS === 'web') Vibration.vibrate(20); else Vibration.vibrate([0, 20]); } catch {} }
               return PREP_SECONDS;
+            }
+            // Último ciclo completado
+            if (settings.trainingNotificationsEnabled) {
+              scheduleLocalNotificationAsync(
+                { title: 'Ciclo completado', body: timeSpec.perLabel ? `Cambiar de ${timeSpec.perLabel}` : 'Siguiente paso listo' },
+                undefined,
+                { settings }
+              ).catch(() => {});
             }
           } else if (phase === 'prep') {
             // Termina preparación, arrancar siguiente ciclo

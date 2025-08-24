@@ -13,6 +13,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
+import { useI18n } from '@/i18n';
 
 export interface MenuOption {
   key: string;
@@ -40,6 +41,7 @@ export default function MobileHeader({
   hideMenuButton = false,
   menuOptions, // opciones de menú dinámicas
 }: MobileHeaderProps) {
+  const { t } = useI18n();
   const { logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [slideAnim] = useState(
@@ -56,7 +58,7 @@ export default function MobileHeader({
         router.push('/routine-templates');
         break;
       case 'settings':
-  router.push('/settings');
+        router.push('/settings');
         break;
       case 'physical-assessment':
         router.push('/physical-assessment');
@@ -111,49 +113,49 @@ export default function MobileHeader({
     {
       key: 'routines',
       icon: 'tasks',
-      label: 'Rutinas',
+      label: t('routines'),
       action: () => handleMenuOption('routines'),
     },
     {
       key: 'plans',
       icon: 'star',
-      label: 'Planes',
+      label: t('plans'),
       action: () => handleMenuOption('plans'),
     },
     {
       key: 'physical-assessment',
       icon: 'heartbeat',
-      label: 'Estado físico',
+      label: t('physical_assessment'),
       action: () => handleMenuOption('physical-assessment'),
     },
     {
       key: 'user-exercise-max',
       icon: 'line-chart',
-      label: 'RM',
+      label: t('user_exercise_max_short'),
       action: () => handleMenuOption('user-exercise-max'),
     },
     {
       key: 'settings',
       icon: 'cog',
-      label: 'Ajustes',
+      label: t('settings_label'),
       action: () => handleMenuOption('settings'),
     },
     {
       key: 'support',
       icon: 'life-ring',
-      label: 'Contactar Soporte',
+      label: t('support_contact'),
       action: () => handleMenuOption('support'),
     },
     {
       key: 'bug',
       icon: 'bug',
-      label: 'Reportar un problema o bug',
+      label: t('report_bug'),
       action: () => handleMenuOption('bug'),
     },
     {
       key: 'logout',
       icon: 'sign-out',
-      label: 'Cerrar Sesión',
+      label: t('logout'),
       action: () => handleMenuOption('logout'),
     },
   ];
@@ -173,41 +175,41 @@ export default function MobileHeader({
         ]}
       >
         {/* Left slot (back) */}
-          <View style={styles.leftSlot}>
-            {showBackButton && (
-              <TouchableOpacity
-                onPress={onPressBack}
-                accessibilityLabel='Atrás'
-                style={styles.backButton}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <FontAwesome name='chevron-left' size={20} color={Colors.dark.text} />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {/* Center (title / subtitle) */}
-          <View style={styles.centerBlock}>
-            <Text style={styles.logoText}>{title}</Text>
-            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-          </View>
-
-            {/* Right slot (menu or custom) */}
-          <View style={styles.rightSlot}>
-            {RightComponent ? (
-              RightComponent
-            ) : !hideMenuButton ? (
-              <TouchableOpacity
-                style={styles.menuButton}
-                onPress={openMenu}
-                accessibilityLabel='Abrir menú'
-                accessibilityRole='button'
-              >
-                <FontAwesome name='bars' size={24} color='#FFFFFF' />
-              </TouchableOpacity>
-            ) : null}
-          </View>
+        <View style={styles.leftSlot}>
+          {showBackButton && (
+            <TouchableOpacity
+              onPress={onPressBack}
+              accessibilityLabel={t('back')}
+              style={styles.backButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <FontAwesome name='chevron-left' size={20} color={Colors.dark.text} />
+            </TouchableOpacity>
+          )}
         </View>
+
+        {/* Center (title / subtitle) */}
+        <View style={styles.centerBlock}>
+          <Text style={styles.logoText}>{title}</Text>
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        </View>
+
+        {/* Right slot (menu or custom) */}
+        <View style={styles.rightSlot}>
+          {RightComponent ? (
+            RightComponent
+          ) : !hideMenuButton ? (
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={openMenu}
+              accessibilityLabel={t('menu_open')}
+              accessibilityRole='button'
+            >
+              <FontAwesome name='bars' size={24} color='#FFFFFF' />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      </View>
 
       {/* Modal del menú */}
       <Modal
@@ -233,11 +235,11 @@ export default function MobileHeader({
           >
             {/* Header del menú */}
             <View style={styles.menuHeader}>
-              <Text style={styles.menuTitle}>Menú</Text>
+              <Text style={styles.menuTitle}>{t('menu_title')}</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={closeMenu}
-                accessibilityLabel='Cerrar menú'
+                accessibilityLabel={t('menu_close')}
                 accessibilityRole='button'
               >
                 <FontAwesome name='times' size={24} color='#FFFFFF' />
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
     minHeight: 38,
     overflow: 'hidden', // Evitar elementos decorativos
     zIndex: 1000, // Asegurar que esté por encima de otros elementos
-    height: 55
+    height: 55,
   },
   leftSlot: {
     width: 40,

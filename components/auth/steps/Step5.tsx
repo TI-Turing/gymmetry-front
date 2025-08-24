@@ -13,6 +13,7 @@ import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { userService } from '@/services/userService';
 import { apiService } from '@/services/apiService';
 import { Environment } from '@/environment';
@@ -288,26 +289,30 @@ export default forwardRef(function Step5(
     }),
   }));
 
+  const { settings } = useAppSettings();
   // Función para redimensionar imagen y validar tamaño máximo de 2MB
   const resizeImageTo2MB = async (uri: string): Promise<string> => {
-    let quality = 0.9; // Calidad inicial alta
+    let quality = settings.dataSaver ? 0.6 : 0.9; // Calidad inicial según ahorro de datos
     let result;
 
     do {
+      // Intentar obtener dimensiones originales con Image.getSize si fuera RN; como fallback usar 1000x1000
+      const targetW = settings.imageQuality === 'low' ? 800 : settings.imageQuality === 'medium' ? 1280 : 1000;
+      const targetH = settings.imageQuality === 'low' ? 600 : settings.imageQuality === 'medium' ? 720 : 1000;
       result = await ImageManipulator.manipulateAsync(
         uri,
         [
-          // Redimensionar manteniendo aspecto
           {
             resize: {
-              width: 1000, // Tamaño inicial
-              height: 1000,
+              width: targetW,
+              height: targetH,
             },
           },
         ],
         {
           compress: quality,
-          format: ImageManipulator.SaveFormat.PNG, // Convertir a PNG
+          // usar JPG para mejor compresión cuando no se requiere transparencia
+          format: ImageManipulator.SaveFormat.JPEG,
         }
       );
 
@@ -324,20 +329,20 @@ export default forwardRef(function Step5(
       quality -= 0.1;
 
       // Si la calidad es muy baja, reducir también las dimensiones
-      if (quality < 0.3) {
+    if (quality < 0.3) {
         result = await ImageManipulator.manipulateAsync(
           uri,
           [
             {
               resize: {
-                width: 800,
-                height: 800,
+        width: 800,
+        height: 800,
               },
             },
           ],
           {
             compress: 0.3,
-            format: ImageManipulator.SaveFormat.PNG,
+      format: ImageManipulator.SaveFormat.JPEG,
           }
         );
         break;
@@ -409,7 +414,7 @@ export default forwardRef(function Step5(
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1], // Imagen cuadrada
-        quality: 1,
+        quality: settings.dataSaver ? 0.6 : 1,
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -452,7 +457,7 @@ export default forwardRef(function Step5(
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [1, 1], // Imagen cuadrada
-        quality: 0.8,
+        quality: settings.dataSaver ? 0.6 : 0.9,
       });
 
       if (!result.canceled && result.assets[0]) {

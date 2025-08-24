@@ -15,7 +15,10 @@ import { LogBox } from 'react-native';
 import { useColorScheme } from '@/components/useColorScheme';
 import { userSessionService } from '@/services/userSessionService';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AppSettingsProvider, useAppSettings } from '@/contexts/AppSettingsContext';
+import { scheduleLocalNotificationAsync, addNotificationReceivedListener, addNotificationResponseReceivedListener } from '@/utils/localNotifications';
 import { PreloadProvider } from '@/contexts/PreloadContext';
+import { I18nProvider } from '@/i18n';
 
 // Importar el watcher para activarlo globalmente
 import '@/services/gymDataWatcher';
@@ -70,16 +73,21 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <PreloadProvider>
-        <RootLayoutNav />
-      </PreloadProvider>
-    </AuthProvider>
+    <AppSettingsProvider>
+      <AuthProvider>
+        <PreloadProvider>
+          <I18nProvider>
+            <RootLayoutNav />
+          </I18nProvider>
+        </PreloadProvider>
+      </AuthProvider>
+    </AppSettingsProvider>
   );
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const { resolvedColorScheme } = useAppSettings();
+  const { settings } = useAppSettings();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -117,8 +125,88 @@ function RootLayoutNav() {
     }
   }, [isAuthenticated, segments, isLoading, router]);
 
+  // Programar recordatorios de bienestar (una sola próxima ocurrencia) según ajustes
+  useEffect(() => {
+    if (!settings.notificationsEnabled) return;
+    // Hidratación
+    if (settings.hydrationRemindersEnabled) {
+      const secs = Math.max(5 * 60, (settings.hydrationIntervalMinutes || 60) * 60);
+      scheduleLocalNotificationAsync(
+        { title: 'Hidrátate', body: 'Toma un vaso de agua y recarga energía.', data: { type: 'wellness:hydration' } },
+        { seconds: secs },
+        { settings }
+      ).catch(() => {});
+    }
+    // Pausas activas
+    if (settings.activeBreaksEnabled) {
+      const secs = Math.max(10 * 60, (settings.activeBreaksIntervalMinutes || 120) * 60);
+      scheduleLocalNotificationAsync(
+        { title: 'Pausa activa', body: 'Levántate, camina un poco y estira tus músculos.', data: { type: 'wellness:activeBreak' } },
+        { seconds: secs },
+        { settings }
+      ).catch(() => {});
+    }
+  }, [settings.notificationsEnabled, settings.hydrationRemindersEnabled, settings.hydrationIntervalMinutes, settings.activeBreaksEnabled, settings.activeBreaksIntervalMinutes]);
+
+  // Listener para re-agendar wellness al recibir la notificación
+  useEffect(() => {
+    let sub: { remove: () => void } | null = null;
+    let subResp: { remove: () => void } | null = null;
+    (async () => {
+      sub = await addNotificationReceivedListener(async (event: any) => {
+        try {
+          const type = event?.request?.content?.data?.type || event?.request?.content?.data?.kind;
+          if (!type) return;
+          if (!settings.notificationsEnabled) return;
+          if (type === 'wellness:hydration' && settings.hydrationRemindersEnabled) {
+            const secs = Math.max(5 * 60, (settings.hydrationIntervalMinutes || 60) * 60);
+            await scheduleLocalNotificationAsync(
+              { title: 'Hidrátate', body: 'Toma un vaso de agua y recarga energía.', data: { type } },
+              { seconds: secs },
+              { settings }
+            );
+          }
+          if (type === 'wellness:activeBreak' && settings.activeBreaksEnabled) {
+            const secs = Math.max(10 * 60, (settings.activeBreaksIntervalMinutes || 120) * 60);
+            await scheduleLocalNotificationAsync(
+              { title: 'Pausa activa', body: 'Levántate, camina un poco y estira tus músculos.', data: { type } },
+              { seconds: secs },
+              { settings }
+            );
+          }
+        } catch {}
+      });
+
+      // Tap/response listener (cuando la app está en background)
+      subResp = await addNotificationResponseReceivedListener(async (response: any) => {
+        try {
+          const type = response?.notification?.request?.content?.data?.type || response?.notification?.request?.content?.data?.kind;
+          if (!type) return;
+          if (!settings.notificationsEnabled) return;
+          if (type === 'wellness:hydration' && settings.hydrationRemindersEnabled) {
+            const secs = Math.max(5 * 60, (settings.hydrationIntervalMinutes || 60) * 60);
+            await scheduleLocalNotificationAsync(
+              { title: 'Hidrátate', body: 'Toma un vaso de agua y recarga energía.', data: { type } },
+              { seconds: secs },
+              { settings }
+            );
+          }
+          if (type === 'wellness:activeBreak' && settings.activeBreaksEnabled) {
+            const secs = Math.max(10 * 60, (settings.activeBreaksIntervalMinutes || 120) * 60);
+            await scheduleLocalNotificationAsync(
+              { title: 'Pausa activa', body: 'Levántate, camina un poco y estira tus músculos.', data: { type } },
+              { seconds: secs },
+              { settings }
+            );
+          }
+        } catch {}
+      });
+    })();
+    return () => { try { sub?.remove?.(); } catch {}; try { subResp?.remove?.(); } catch {} };
+  }, [settings.notificationsEnabled, settings.hydrationRemindersEnabled, settings.hydrationIntervalMinutes, settings.activeBreaksEnabled, settings.activeBreaksIntervalMinutes]);
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={resolvedColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {isAuthenticated && <BiometricGate />}
       <Stack>
         {/* Grupo principal con tabs */}

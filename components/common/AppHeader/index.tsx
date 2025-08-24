@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { appHeaderStyles as styles } from './styles';
+import { useI18n } from '@/i18n';
 
 interface AppHeaderProps {
   title?: string;
@@ -20,6 +21,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   RightComponent,
   containerStyle,
 }) => {
+  const { t } = useI18n();
   const Wrapper: any = Platform.OS === 'web' ? View : SafeAreaView;
 
   return (
@@ -28,7 +30,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <View style={styles.leftSlot}>
           {showBackButton && (
             <TouchableOpacity
-              accessibilityLabel='Volver'
+              accessibilityLabel={t('back')}
               onPress={onPressBack}
               style={styles.backButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}

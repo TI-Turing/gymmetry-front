@@ -16,6 +16,7 @@ import { handleApiError } from '@/utils';
 import { commonStyles } from './styles/common';
 import Colors from '@/constants/Colors';
 import { LoginRequest } from '@/dto/auth/requests';
+import { useI18n } from '@/i18n';
 
 interface LoginFormProps {
   onLogin: (
@@ -30,6 +31,7 @@ export default function LoginForm({
   onSwitchToRegister,
   showAlert,
 }: LoginFormProps) {
+  const { t } = useI18n();
   const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +43,7 @@ export default function LoginForm({
     // Validation
     if (!userNameOrEmail || !password) {
       if (showAlert) {
-        showAlert('Por favor completa todos los campos');
+  showAlert(t('fill_all_fields'));
       }
       return;
     }
@@ -50,11 +52,11 @@ export default function LoginForm({
     try {
       const result = await onLogin({ userNameOrEmail, password });
       if (!result.Success && showAlert) {
-        showAlert(result.error || 'Error desconocido');
+        showAlert(result.error || t('unknown_error'));
       }
       // Si es Success: true, AuthContainer manejará el éxito
     } catch (error: any) {
-      const errorMessage = handleApiError(error);
+  const errorMessage = handleApiError(error);
       if (showAlert) {
         showAlert(errorMessage);
       }
@@ -179,6 +181,7 @@ function WebFormContent({
   handleLogin,
   onSwitchToRegister,
 }: FormContentProps) {
+  const { t } = useI18n();
   return (
     <>
       <View
@@ -208,7 +211,7 @@ function WebFormContent({
             },
           ]}
         >
-          Inicia sesión para continuar
+          {t('login_subtitle')}
         </Text>
       </View>
 
@@ -228,7 +231,7 @@ function WebFormContent({
               },
             ]}
           >
-            Usuario o Email
+            {t('username_or_email')}
           </Text>
           <TextInput
             style={[
@@ -248,8 +251,8 @@ function WebFormContent({
             autoCorrect={false}
             autoComplete='email'
             textContentType='emailAddress'
-            accessibilityLabel='Campo de usuario o email'
-            accessibilityHint='Ingresa tu nombre de usuario o dirección de correo electrónico'
+            accessibilityLabel={t('username_or_email')}
+            accessibilityHint={t('username_or_email')}
           />
         </View>
 
@@ -268,7 +271,7 @@ function WebFormContent({
               },
             ]}
           >
-            Contraseña
+            {t('password_label')}
           </Text>
           <View
             style={{ position: 'relative', backgroundColor: 'transparent' }}
@@ -302,9 +305,7 @@ function WebFormContent({
                 backgroundColor: 'transparent',
               }}
               onPress={togglePasswordVisibility}
-              accessibilityLabel={
-                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-              }
+              accessibilityLabel={showPassword ? t('hide_password') : t('show_password')}
               accessibilityRole='button'
             >
               <FontAwesome
@@ -327,12 +328,12 @@ function WebFormContent({
           ]}
           onPress={handleLogin}
           disabled={!isFormValid || isLoading}
-          accessibilityLabel={isLoading ? 'Iniciando sesión' : 'Iniciar sesión'}
+          accessibilityLabel={isLoading ? t('signing_in') : t('sign_in')}
           accessibilityRole='button'
           accessibilityState={{ disabled: !isFormValid || isLoading }}
         >
           <Text style={[commonStyles.buttonText, { color: '#FFFFFF' }]}>
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            {isLoading ? t('signing_in') : t('sign_in')}
           </Text>
         </TouchableOpacity>
 
@@ -350,11 +351,11 @@ function WebFormContent({
               backgroundColor: 'transparent',
             }}
           >
-            ¿No tienes cuenta?
+            {t('no_account')}
           </Text>
           <TouchableOpacity
             onPress={onSwitchToRegister}
-            accessibilityLabel='Ir a registro'
+            accessibilityLabel={t('go_register')}
             accessibilityRole='button'
           >
             <Text
@@ -364,7 +365,7 @@ function WebFormContent({
                 backgroundColor: 'transparent',
               }}
             >
-              Regístrate
+              {t('go_register')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -386,6 +387,7 @@ function MobileFormContent({
   handleLogin,
   onSwitchToRegister,
 }: FormContentProps) {
+  const { t } = useI18n();
   return (
     <>
       <View style={[commonStyles.header, { marginBottom: 40 }]}>
@@ -404,7 +406,7 @@ function MobileFormContent({
         <Text
           style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}
         >
-          Inicia sesión para continuar
+          {t('login_subtitle')}
         </Text>
       </View>
 
@@ -413,7 +415,7 @@ function MobileFormContent({
           <Text
             style={[commonStyles.label, { color: Colors[colorScheme].text }]}
           >
-            Usuario o Email
+            {t('username_or_email')}
           </Text>
           <TextInput
             style={[
@@ -432,8 +434,8 @@ function MobileFormContent({
             autoCorrect={false}
             autoComplete='email'
             textContentType='emailAddress'
-            accessibilityLabel='Campo de usuario o email'
-            accessibilityHint='Ingresa tu nombre de usuario o dirección de correo electrónico'
+            accessibilityLabel={t('username_or_email')}
+            accessibilityHint={t('username_or_email')}
           />
         </View>
 
@@ -441,7 +443,7 @@ function MobileFormContent({
           <Text
             style={[commonStyles.label, { color: Colors[colorScheme].text }]}
           >
-            Contraseña
+            {t('password_label')}
           </Text>
           <View style={{ position: 'relative' }}>
             <TextInput
@@ -460,8 +462,8 @@ function MobileFormContent({
               secureTextEntry={!showPassword}
               autoComplete='password'
               textContentType='password'
-              accessibilityLabel='Campo de contraseña'
-              accessibilityHint='Ingresa tu contraseña'
+              accessibilityLabel={t('password_label')}
+              accessibilityHint={t('password_label')}
             />
             <TouchableOpacity
               style={{
@@ -471,9 +473,7 @@ function MobileFormContent({
                 padding: 4,
               }}
               onPress={togglePasswordVisibility}
-              accessibilityLabel={
-                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-              }
+              accessibilityLabel={showPassword ? t('hide_password') : t('show_password')}
               accessibilityRole='button'
             >
               <FontAwesome
@@ -493,28 +493,28 @@ function MobileFormContent({
           ]}
           onPress={handleLogin}
           disabled={!isFormValid || isLoading}
-          accessibilityLabel={isLoading ? 'Iniciando sesión' : 'Iniciar sesión'}
+          accessibilityLabel={isLoading ? t('signing_in') : t('sign_in')}
           accessibilityRole='button'
           accessibilityState={{ disabled: !isFormValid || isLoading }}
         >
           <Text style={commonStyles.buttonText}>
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            {isLoading ? t('signing_in') : t('sign_in')}
           </Text>
         </TouchableOpacity>
 
         <View style={{ alignItems: 'center', marginTop: 24 }}>
           <Text style={[{ color: Colors[colorScheme].text, marginBottom: 8 }]}>
-            ¿No tienes cuenta?
+            {t('no_account')}
           </Text>
           <TouchableOpacity
             onPress={onSwitchToRegister}
-            accessibilityLabel='Ir a registro'
+            accessibilityLabel={t('go_register')}
             accessibilityRole='button'
           >
             <Text
               style={[{ color: Colors[colorScheme].tint, fontWeight: '600' }]}
             >
-              Regístrate
+              {t('go_register')}
             </Text>
           </TouchableOpacity>
         </View>

@@ -1,12 +1,25 @@
 import { apiService, ApiResponse } from './apiService';
+import { isWithinQuietHours } from '@/utils/quietHours';
+import type { AppSettings } from '@/contexts/AppSettingsContext';
 import type { NotificationCreateRequestDto } from '@/dto/Notification/Request/NotificationCreateRequestDto';
 import type { NotificationResponseDto } from '@/dto/Notification/Response/NotificationResponseDto';
 
 // Auto-generated service for Notification Azure Functions
 export const notificationService = {
   async addNotification(
-    request: NotificationCreateRequestDto
+    request: NotificationCreateRequestDto,
+    opts?: { settings?: Pick<AppSettings, 'notificationsEnabled' | 'quietHours'> }
   ): Promise<ApiResponse<any>> {
+    // Respetar ajustes de la app si se proveen
+    const st = opts?.settings;
+    if (st && (!st.notificationsEnabled || isWithinQuietHours(new Date(), st.quietHours))) {
+      return {
+        Success: true,
+        Message: 'Notificación suprimida por ajustes del usuario (silencio/horas).',
+        Data: null as any,
+        StatusCode: 200,
+      } as ApiResponse<any>;
+    }
     const response = await apiService.post<any>(`/notification/add`, request);
     return response;
   },

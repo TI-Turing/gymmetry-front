@@ -62,6 +62,21 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "type-check (agent)",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"-s",
+				"type-check"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
 		}
 	]
 }

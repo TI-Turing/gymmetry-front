@@ -3,7 +3,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Alert,
   SafeAreaView,
   Platform,
@@ -14,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import Colors from '@/constants/Colors';
+import SmartImage from '@/components/common/SmartImage';
 
 function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -54,10 +54,7 @@ function ProfileScreen() {
   const renderProfileHeader = () => (
     <View style={styles.profileHeader}>
       <View style={styles.avatarContainer}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/100' }}
-          style={styles.avatar}
-        />
+  <SmartImage uri={'https://via.placeholder.com/100'} style={styles.avatar} deferOnDataSaver={false} />
         <TouchableOpacity style={styles.editAvatarButton}>
           <FontAwesome name='camera' size={16} color='#FFFFFF' />
         </TouchableOpacity>

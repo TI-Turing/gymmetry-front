@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import SmartImage from '@/components/common/SmartImage';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -45,7 +46,7 @@ export default function GymInfoView({
       {/* Header del Gym */}
       <View style={styles.header}>
         {gym.LogoUrl ? (
-          <Image source={{ uri: gym.LogoUrl }} style={styles.logo} />
+          <SmartImage uri={gym.LogoUrl} style={styles.logo} deferOnDataSaver />
         ) : (
           <View style={styles.logoPlaceholder}>
             <FontAwesome name='building-o' size={40} color={Colors.dark.tint} />

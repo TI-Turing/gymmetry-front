@@ -6,8 +6,10 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 import { notificationService } from '@/services';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 export function NotificationForm() {
+  const { settings } = useAppSettings();
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,8 +19,8 @@ export function NotificationForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const body = JSON.parse(payload);
-      const res = await notificationService.addNotification(body);
+  const body = JSON.parse(payload);
+  const res = await notificationService.addNotification(body, { settings });
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');

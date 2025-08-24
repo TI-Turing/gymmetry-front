@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Image, Modal, StyleSheet, TextInput, TouchableOpacity, View as RNView } from 'react-native';
+import { Modal, StyleSheet, TextInput, TouchableOpacity, View as RNView } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import Button from '@/components/common/Button';
+import SmartImage from '@/components/common/SmartImage';
 
 export interface PostComposerProps {
   avatarUrl?: string | null;
@@ -22,7 +23,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({ avatarUrl, onSubmit 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Image source={{ uri: avatarUrl || 'https://via.placeholder.com/40' }} style={styles.avatar} />
+  <SmartImage uri={avatarUrl || 'https://via.placeholder.com/40'} style={styles.avatar} deferOnDataSaver={false} />
         <TouchableOpacity style={styles.inputFake} onPress={() => setOpen(true)}>
           <Text style={styles.placeholder}>¿Cómo fue tu entrenamiento hoy?</Text>
         </TouchableOpacity>
