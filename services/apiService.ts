@@ -37,6 +37,14 @@ class ApiService {
     this.axiosInstance.interceptors.request.use(
       async config => {
         if (config.headers) {
+          // No enviar Authorization en login/refresh para evitar rechazos por token expirado
+          const isAuthEndpoint =
+            (config.url || '').includes('/auth/refresh-token') ||
+            (config.url || '').includes('/auth/login');
+          if (isAuthEndpoint) {
+            delete (config.headers as any)['Authorization'];
+            delete (config.headers as any)['authorization'];
+          }
           // Extraer host dinámicamente de la URL base
           const baseUrl = config.baseURL || Environment.API_BASE_URL;
           try {
@@ -55,7 +63,7 @@ class ApiService {
           // Inyectar Authorization si no viene en el request y hay token guardado
           const hasAuthHeader =
             !!config.headers['Authorization'] || !!config.headers['authorization'];
-          if (!hasAuthHeader) {
+          if (!hasAuthHeader && !isAuthEndpoint) {
             try {
               let token = await AsyncStorage.getItem('authToken');
               if (!token) {
@@ -166,6 +174,9 @@ class ApiService {
                 if (newToken) {
                   this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
                   if (!originalRequest.headers) originalRequest.headers = {};
+                  // Evitar mezclar header previo; sobrescribir con el nuevo token
+                  delete originalRequest.headers['authorization'];
+                  delete originalRequest.headers['Authorization'];
                   originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
                 }
               } catch {

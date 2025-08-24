@@ -45,22 +45,27 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+  const [fontReady, setFontReady] = useState(false);
 
-  useEffect(() => {
-    if (error) {
-      throw error;
-    }
-  }, [error]);
-
+  // Si la carga de fuentes falla (por ejemplo, al descargar FontAwesome.ttf desde Metro), no detengas la app.
   useEffect(() => {
     if (loaded) {
+      setFontReady(true);
+    } else if (error) {
+      console.warn('No se pudieron cargar las fuentes. Continuando sin pre-carga de íconos.', error);
+      setFontReady(true);
+    }
+  }, [loaded, error]);
+
+  useEffect(() => {
+    if (fontReady) {
       SplashScreen.hideAsync();
       // Inicializar país del usuario al cargar la app
       userSessionService.initializeUserCountry();
     }
-  }, [loaded]);
+  }, [fontReady]);
 
-  if (!loaded) {
+  if (!fontReady) {
     return null;
   }
 
@@ -87,7 +92,7 @@ function RootLayoutNav() {
     const first = segments[0] as string | undefined; // p.ej. '(tabs)', 'login', 'register', 'plans', 'modal', etc.
 
     // Rutas de la app a las que un usuario autenticado SÍ puede entrar aunque no sean parte de (tabs)
-  const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal', 'routine-day', 'routine-day-detail', 'routine-exercise-detail', 'routine-templates', 'routine-template-detail', 'routine-template-days', 'exercise-detail', 'settings', 'create-routine']);
+  const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal', 'routine-day', 'routine-day-detail', 'routine-exercise-detail', 'routine-templates', 'routine-template-detail', 'routine-template-days', 'exercise-detail', 'settings', 'create-routine', 'physical-assessment', 'user-exercise-max']);
 
     // Usuario NO autenticado intentando entrar a la app (tabs, plans, modal) -> mandar a login
     if (

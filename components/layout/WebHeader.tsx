@@ -128,20 +128,8 @@ export default function WebHeader({
     {
       key: 'bug',
       icon: 'bug',
-      label: 'Reportar Bug',
+      label: 'Reportar un problema o bug',
       action: () => handleMenuOption('bug'),
-    },
-    {
-      key: 'help',
-      icon: 'question-circle',
-      label: 'Ayuda',
-      action: () => handleMenuOption('help'),
-    },
-    {
-      key: 'privacy',
-      icon: 'shield',
-      label: 'Privacidad',
-      action: () => handleMenuOption('privacy'),
     },
     {
       key: 'logout',

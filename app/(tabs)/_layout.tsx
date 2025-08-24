@@ -72,7 +72,6 @@ export default function TabLayout() {
           tabBarShowLabel: false,
         }}
       />
-  {/** Estado físico y RM se movieron al menú lateral, no en tabs */}
       <Tabs.Screen
         name='feed'
         options={{
@@ -89,6 +88,9 @@ export default function TabLayout() {
           tabBarShowLabel: false,
         }}
       />
+  {/* Ocultar rutas que existen dentro de (tabs) pero no deben mostrarse como pestañas */}
+  <Tabs.Screen name='physical-assessment' options={{ href: null }} />
+  <Tabs.Screen name='user-exercise-max' options={{ href: null }} />
     </Tabs>
   );
 }

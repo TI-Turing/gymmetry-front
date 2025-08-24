@@ -55,9 +55,6 @@ export default function MobileHeader({
       case 'routines':
         router.push('/routine-templates');
         break;
-      case 'theme':
-        // Handle theme change
-        break;
       case 'settings':
   router.push('/settings');
         break;
@@ -136,12 +133,6 @@ export default function MobileHeader({
       action: () => handleMenuOption('user-exercise-max'),
     },
     {
-      key: 'theme',
-      icon: 'moon-o',
-      label: 'Modo Oscuro',
-      action: () => handleMenuOption('theme'),
-    },
-    {
       key: 'settings',
       icon: 'cog',
       label: 'Ajustes',
@@ -156,20 +147,8 @@ export default function MobileHeader({
     {
       key: 'bug',
       icon: 'bug',
-      label: 'Reportar Bug',
+      label: 'Reportar un problema o bug',
       action: () => handleMenuOption('bug'),
-    },
-    {
-      key: 'help',
-      icon: 'question-circle',
-      label: 'Ayuda',
-      action: () => handleMenuOption('help'),
-    },
-    {
-      key: 'privacy',
-      icon: 'shield',
-      label: 'Privacidad',
-      action: () => handleMenuOption('privacy'),
     },
     {
       key: 'logout',
