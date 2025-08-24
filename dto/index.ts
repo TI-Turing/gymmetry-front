@@ -118,3 +118,6 @@ export * from './common/ApplicationResponse';
 // Analytics
 export * from './Analytics/Request/AnalyticsSummaryRequest';
 export * from './Analytics/Response/AnalyticsSummaryResponse';
+// UserExerciseMax
+export * from './UserExerciseMax/Request/AddUserExerciseMaxRequest';
+export * from './UserExerciseMax/Request/UpdateUserExerciseMaxRequest';

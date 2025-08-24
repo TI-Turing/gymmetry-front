@@ -85,6 +85,7 @@ export { subModuleService as submoduleService } from './subModuleService';
 // Servicios de dieta y evaluación
 export { dietService } from './dietService';
 export { physicalAssessmentService } from './physicalAssessmentService';
+export { userExerciseMaxService } from './userExerciseMaxService';
 
 // Servicios de horarios y ocupación
 export { scheduleService } from './scheduleService';

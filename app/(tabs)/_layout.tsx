@@ -83,6 +83,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name='user-exercise-max'
+        options={{
+          title: 'RM',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name='weight-lifter' size={28} color={color} style={{ marginBottom: -3 }} />
+          ),
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tabs.Screen
         name='feed'
         options={{
           title: 'Feed',
