@@ -75,13 +75,13 @@ const DietList = React.memo(() => {
 
   return (
     <EntityList
-      title='Planes de Dieta'
+      title="Planes de Dieta"
       loadFunction={loadDiets}
       renderItem={renderDietItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay dietas'
-      emptyMessage='No se encontraron planes de dieta configurados'
-      loadingMessage='Cargando dietas...'
+      emptyTitle="No hay dietas"
+      emptyMessage="No se encontraron planes de dieta configurados"
+      loadingMessage="Cargando dietas..."
     />
   );
 });

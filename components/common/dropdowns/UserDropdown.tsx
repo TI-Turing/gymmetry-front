@@ -53,9 +53,9 @@ export default function UserDropdown({
       if (response.Success) {
         //TODO: filtrar por empleados del gym.
         const items = response.Data || [];
-        
+
         // Mapear User a UserBasicInfo
-        const mappedUsers = items.map(user => ({
+        const mappedUsers = items.map((user) => ({
           id: user.Id,
           name: user.Name || '',
           lastName: user.LastName || '',
@@ -64,7 +64,7 @@ export default function UserDropdown({
           gymId: user.GymId || undefined,
           userTypeId: user.UserTypeId || undefined,
         }));
-        
+
         setUsers(mappedUsers);
 
         // Si solo hay un usuario, seleccionarlo automáticamente y deshabilitar
@@ -76,7 +76,7 @@ export default function UserDropdown({
       } else {
         setError(response.Message || 'Error al cargar usuarios del gym');
       }
-  } catch {
+    } catch {
       setError('Error al cargar usuarios del gym');
     } finally {
       setIsLoading(false);
@@ -87,7 +87,7 @@ export default function UserDropdown({
     loadGymUsers();
   }, [loadGymUsers]);
 
-  const selectedUser = users.find(user => user.id === value);
+  const selectedUser = users.find((user) => user.id === value);
   const isDisabledState = disabled || users.length <= 1;
 
   const handleSelect = (userId: string) => {
@@ -105,7 +105,7 @@ export default function UserDropdown({
           </Text>
         )}
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size='small' color={Colors.dark.tint} />
+          <ActivityIndicator size="small" color={Colors.dark.tint} />
           <Text style={styles.loadingText}>Cargando usuarios...</Text>
         </View>
       </View>
@@ -122,7 +122,7 @@ export default function UserDropdown({
           </Text>
         )}
         <View style={styles.errorContainer}>
-          <FontAwesome name='exclamation-triangle' size={16} color='#FF6B6B' />
+          <FontAwesome name="exclamation-triangle" size={16} color="#FF6B6B" />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity onPress={loadGymUsers} style={styles.retryButton}>
             <Text style={styles.retryText}>Reintentar</Text>
@@ -203,7 +203,7 @@ export default function UserDropdown({
             showsVerticalScrollIndicator={false}
             nestedScrollEnabled={true}
           >
-            {users.map(user => (
+            {users.map((user) => (
               <TouchableOpacity
                 key={user.id}
                 style={[
@@ -242,7 +242,7 @@ export default function UserDropdown({
                 </View>
                 {value === user.id && (
                   <FontAwesome
-                    name='check'
+                    name="check"
                     size={16}
                     color={Colors.dark.tint}
                   />

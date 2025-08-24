@@ -1,3 +1,4 @@
+// DEPRECATED: No usar. Migrado a factories en components/gym/styles/gymSteps.ts y otros.
 import { StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 

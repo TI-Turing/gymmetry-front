@@ -30,7 +30,7 @@ export function LoadingOverlay({
   return (
     <View style={[styles.overlay, style]}>
       <View style={styles.container}>
-        <ActivityIndicator size='large' color={Colors.tint} />
+        <ActivityIndicator size="large" color={Colors.tint} />
         {message && <Text style={styles.message}>{message}</Text>}
       </View>
     </View>

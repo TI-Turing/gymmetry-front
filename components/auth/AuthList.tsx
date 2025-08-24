@@ -4,7 +4,6 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { authService } from '@/services';
 
 export function AuthList() {
   const [items, setItems] = useState<any[]>([]);
@@ -43,7 +42,7 @@ export function AuthList() {
           </View>
         )}
       />
-      <Button title='Refrescar' onPress={load} />
+      <Button title="Refrescar" onPress={load} />
     </View>
   );
 }

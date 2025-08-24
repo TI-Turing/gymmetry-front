@@ -18,9 +18,7 @@ export function DailyExerciseHistoryDetail() {
     setError(null);
     try {
       const res =
-        await dailyExerciseHistoryService.getDailyExerciseHistoryById(
-          id
-        );
+        await dailyExerciseHistoryService.getDailyExerciseHistoryById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -32,8 +30,8 @@ export function DailyExerciseHistoryDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>DailyExerciseHistory - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

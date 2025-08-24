@@ -14,8 +14,9 @@ const DailyHistoryList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
 
   const renderDailyHistoryItem = useCallback(
@@ -28,7 +29,7 @@ const DailyHistoryList = React.memo(() => {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
-                  day: 'numeric'
+                  day: 'numeric',
                 })
               : 'Día de entrenamiento'}
           </Text>
@@ -91,8 +92,8 @@ const DailyHistoryList = React.memo(() => {
                     ? '#ff6b6b'
                     : item.avgHeartRate > 120
                       ? '#ffa726'
-                      : Colors.light.text
-  },
+                      : Colors.light.text,
+              },
             ]}
           >
             {item.avgHeartRate
@@ -107,8 +108,8 @@ const DailyHistoryList = React.memo(() => {
             {item.startTime
               ? new Date(item.startTime).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit'
-})
+                  minute: '2-digit',
+                })
               : 'N/A'}
           </Text>
         </View>
@@ -119,8 +120,8 @@ const DailyHistoryList = React.memo(() => {
             {item.endTime
               ? new Date(item.endTime).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit'
-})
+                  minute: '2-digit',
+                })
               : 'No finalizado'}
           </Text>
         </View>
@@ -143,8 +144,8 @@ const DailyHistoryList = React.memo(() => {
                     ? '#ff6b6b'
                     : item.intensity === 'medium'
                       ? '#ffa726'
-                      : '#4caf50'
-  },
+                      : '#4caf50',
+              },
             ]}
           >
             {item.intensity === 'high'
@@ -168,8 +169,8 @@ const DailyHistoryList = React.memo(() => {
                       ? '#8bc34a'
                       : item.mood === 'average'
                         ? '#ffa726'
-                        : '#ff6b6b'
-  },
+                        : '#ff6b6b',
+              },
             ]}
           >
             {item.mood === 'excellent'
@@ -228,13 +229,13 @@ const DailyHistoryList = React.memo(() => {
 
   return (
     <EntityList
-      title='Historial Diario'
+      title="Historial Diario"
       loadFunction={loadDailyHistory}
       renderItem={renderDailyHistoryItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay historial'
-      emptyMessage='No se encontró historial de entrenamientos'
-      loadingMessage='Cargando historial...'
+      emptyTitle="No hay historial"
+      emptyMessage="No se encontró historial de entrenamientos"
+      loadingMessage="Cargando historial..."
     />
   );
 });
@@ -248,20 +249,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -270,74 +271,75 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 140
+    minWidth: 140,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   notesSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   notesLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   notesText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     fontStyle: 'italic',
-    lineHeight: 18
+    lineHeight: 18,
   },
   achievementsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   achievementsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   achievementsList: {
-    gap: SPACING.xs
+    gap: SPACING.xs,
   },
   achievement: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    marginLeft: SPACING.sm
+    marginLeft: SPACING.sm,
   },
   moreAchievements: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
     fontStyle: 'italic',
     marginLeft: SPACING.sm,
-}});
+  },
+});
 
 DailyHistoryList.displayName = 'DailyHistoryList';
 

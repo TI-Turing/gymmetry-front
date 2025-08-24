@@ -1,4 +1,9 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosResponse,
+  AxiosError,
+  AxiosRequestConfig,
+} from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Environment } from '../environment';
 import { logger } from '@/utils';
@@ -15,8 +20,8 @@ class ApiService {
   private axiosInstance: AxiosInstance;
   private isRefreshing = false;
   private failedQueue: {
-    resolve: (value?: any) => void;
-    reject: (error?: any) => void;
+    resolve: (value?: unknown) => void;
+    reject: (error?: unknown) => void;
   }[] = [];
 
   constructor() {
@@ -29,21 +34,22 @@ class ApiService {
         'Accept-Encoding': 'gzip, deflate, br',
         Connection: 'keep-alive',
         'User-Agent': 'ExpoApp/1.0.0',
-  // Azure Functions (API principal)
-  'x-functions-key': Environment.API_MAIN_FUNCTIONS_KEY,
+        // Azure Functions (API principal)
+        'x-functions-key': Environment.API_MAIN_FUNCTIONS_KEY,
       },
     });
 
     this.axiosInstance.interceptors.request.use(
-      async config => {
+      async (config) => {
         if (config.headers) {
           // No enviar Authorization en login/refresh para evitar rechazos por token expirado
           const isAuthEndpoint =
             (config.url || '').includes('/auth/refresh-token') ||
             (config.url || '').includes('/auth/login');
           if (isAuthEndpoint) {
-            delete (config.headers as any)['Authorization'];
-            delete (config.headers as any)['authorization'];
+            const h = config.headers as Record<string, unknown>;
+            delete h['Authorization'];
+            delete h['authorization'];
           }
           // Extraer host dinámicamente de la URL base
           const baseUrl = config.baseURL || Environment.API_BASE_URL;
@@ -57,12 +63,14 @@ class ApiService {
           config.headers['Cache-Control'] = 'no-cache';
           // Asegurar la clave de funciones para el API principal
           if (!config.headers['x-functions-key']) {
-            config.headers['x-functions-key'] = Environment.API_MAIN_FUNCTIONS_KEY;
+            config.headers['x-functions-key'] =
+              Environment.API_MAIN_FUNCTIONS_KEY;
           }
 
           // Inyectar Authorization si no viene en el request y hay token guardado
           const hasAuthHeader =
-            !!config.headers['Authorization'] || !!config.headers['authorization'];
+            !!config.headers['Authorization'] ||
+            !!config.headers['authorization'];
           if (!hasAuthHeader && !isAuthEndpoint) {
             try {
               let token = await AsyncStorage.getItem('authToken');
@@ -84,14 +92,14 @@ class ApiService {
           const curlCommand = generateCurlCommand(
             (config.method?.toUpperCase() as HttpMethod) || 'GET',
             fullUrl,
-            config.headers,
-            config.data
+            (config.headers as Record<string, unknown>) || {},
+            config.data as unknown
           );
           logger.debug('📋 CURL del request:', curlCommand);
         }
         return config;
       },
-      error => {
+      (error) => {
         return Promise.reject(error);
       }
     );
@@ -99,21 +107,22 @@ class ApiService {
     function generateCurlCommand(
       method: HttpMethod,
       url: string,
-      headers: any = {},
-      data?: any
+      headers: Record<string, unknown> = {},
+      data?: unknown
     ): string {
       let curlCommand = `curl -X ${method}`;
-      Object.keys(headers || {}).forEach(key => {
-        if (headers[key] && key !== 'common') {
+      Object.keys(headers || {}).forEach((key) => {
+        const value = headers[key];
+        if (value && key !== 'common') {
           const isAuth = key.toLowerCase() === 'authorization';
           const headerValue = isAuth
             ? 'Bearer ****'
-            : String(headers[key]).replace(/"/g, '\\"');
+            : String(value).replace(/"/g, '\\"');
           curlCommand += ` ^
   -H "${key}: ${headerValue}"`;
         }
       });
-      if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
+      if (data != null && ['POST', 'PUT', 'PATCH'].includes(method)) {
         const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
         const escapedData = jsonData.replace(/"/g, '\\"');
         curlCommand += ` ^
@@ -135,7 +144,11 @@ class ApiService {
         return response;
       },
       async (error: AxiosError) => {
-        const originalRequest = error.config as any;
+        const originalRequest = (error.config || {}) as AxiosRequestConfig & {
+          _retry?: boolean;
+          url?: string;
+          headers?: Record<string, unknown>;
+        };
 
         // Si es un error 401 y no es el endpoint de refresh token ni login
         if (
@@ -152,7 +165,7 @@ class ApiService {
               .then(() => {
                 return this.axiosInstance(originalRequest);
               })
-              .catch(err => {
+              .catch((err) => {
                 return Promise.reject(err);
               });
           }
@@ -172,12 +185,14 @@ class ApiService {
               try {
                 const newToken = await AsyncStorage.getItem('authToken');
                 if (newToken) {
-                  this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+                  this.axiosInstance.defaults.headers.common['Authorization'] =
+                    `Bearer ${newToken}`;
                   if (!originalRequest.headers) originalRequest.headers = {};
                   // Evitar mezclar header previo; sobrescribir con el nuevo token
                   delete originalRequest.headers['authorization'];
                   delete originalRequest.headers['Authorization'];
-                  originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                  originalRequest.headers['Authorization'] =
+                    `Bearer ${newToken}`;
                 }
               } catch {
                 // si falla la lectura, igual reintentamos
@@ -210,7 +225,10 @@ class ApiService {
   private buildFullUrl(endpoint: string): string {
     // Si ya es absoluta, regresar tal cual
     if (/^https?:\/\//i.test(endpoint)) return endpoint;
-    const base = (this.axiosInstance.defaults.baseURL || '').replace(/\/+$/, '');
+    const base = (this.axiosInstance.defaults.baseURL || '').replace(
+      /\/+$/,
+      ''
+    );
     const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     return `${base}${path}`;
   }
@@ -218,16 +236,24 @@ class ApiService {
   // Helper: fusionar headers por defecto del axiosInstance con los pasados por options
   private mergeHeaders(extra?: Record<string, string>): Record<string, string> {
     const merged: Record<string, string> = {};
-    const defaults: any = this.axiosInstance.defaults.headers as any;
+    const defaultsUnknown = this.axiosInstance.defaults.headers as unknown;
+    const isRecord = (v: unknown): v is Record<string, unknown> =>
+      typeof v === 'object' && v !== null;
+
     // headers comunes definidos en axios
-    if (defaults && defaults.common) {
-      for (const k of Object.keys(defaults.common)) {
-        if (defaults.common[k] != null) merged[k] = String(defaults.common[k]);
+    if (isRecord(defaultsUnknown)) {
+      const common = defaultsUnknown['common'];
+      if (isRecord(common)) {
+        for (const k of Object.keys(common)) {
+          const val = common[k];
+          if (val != null) merged[k] = String(val);
+        }
       }
+      const ct = defaultsUnknown['Content-Type'];
+      if (typeof ct === 'string') merged['Content-Type'] = ct;
+      const ct2 = defaultsUnknown['content-type'];
+      if (typeof ct2 === 'string') merged['content-type'] = ct2;
     }
-    // Content-Type específico si existe en defaults
-    if (defaults && defaults['Content-Type']) merged['Content-Type'] = String(defaults['Content-Type']);
-    if (defaults && defaults['content-type']) merged['content-type'] = String(defaults['content-type']);
     // Asegurar algunos headers útiles
     merged['Accept'] = merged['Accept'] || '*/*';
     // Extra sobrescribe
@@ -244,10 +270,10 @@ class ApiService {
     method: HttpMethod,
     url: string,
     headers: Record<string, string> = {},
-    data?: any
+    data?: unknown
   ): string {
     let curlCommand = `curl -X ${method}`;
-    Object.keys(headers || {}).forEach(key => {
+    Object.keys(headers || {}).forEach((key) => {
       if (headers[key] && key !== 'common') {
         const headerValue = String(headers[key]).replace(/"/g, '\\"');
         curlCommand += ` ^\n  -H "${key}: ${headerValue}"`;
@@ -258,7 +284,7 @@ class ApiService {
       const escapedData = jsonData.replace(/"/g, '\\"');
       curlCommand += ` ^\n  -d "${escapedData}"`;
       const hasContentType = Object.keys(headers).some(
-        h => h.toLowerCase() === 'content-type'
+        (h) => h.toLowerCase() === 'content-type'
       );
       if (!hasContentType) {
         curlCommand += ` ^\n  -H "Content-Type: application/json"`;
@@ -269,7 +295,7 @@ class ApiService {
   }
 
   // Método para procesar la cola de requests fallidos
-  private processQueue(error: any) {
+  private processQueue(error: unknown) {
     this.failedQueue.forEach(({ resolve, reject }) => {
       if (error) {
         reject(error);
@@ -284,6 +310,7 @@ class ApiService {
   // Método privado para manejar errores
   private handleError(error: AxiosError): Promise<never> {
     if (Environment.DEBUG) {
+      // espacio reservado para logs detallados si se requiere
     }
 
     if (error.code === 'ECONNABORTED') {
@@ -295,41 +322,43 @@ class ApiService {
     }
 
     const status = error.response.status;
-    const data = error.response.data as any;
+    const data: unknown = error.response.data as unknown;
 
     // Si el servidor devuelve una respuesta con formato ApiResponse, preservarla
+    const isRecord = (v: unknown): v is Record<string, unknown> =>
+      typeof v === 'object' && v !== null;
     if (
-      data &&
-      typeof data === 'object' &&
-      typeof data.Success === 'boolean' &&
-      typeof data.Message === 'string'
+      isRecord(data) &&
+      typeof data['Success'] === 'boolean' &&
+      typeof data['Message'] === 'string'
     ) {
       // Es una respuesta del servidor con formato ApiResponse, devolverla tal como está
       // En lugar de lanzar un error, rechazar con la respuesta completa
       return Promise.reject({
         isApiResponse: true,
-        response: data,
+        response: data as unknown as BackendApiResponse<unknown>,
       });
     }
 
     // Si el servidor devuelve un mensaje específico, usarlo (revisar diferentes formatos)
-    if (data?.Message) {
-      throw new Error(data.Message);
-    }
-    if (data?.message) {
-      throw new Error(data.message);
-    }
-    if (data?.error) {
-      throw new Error(data.error);
+    if (isRecord(data)) {
+      const m1 = data['Message'];
+      if (typeof m1 === 'string') throw new Error(m1);
+      const m2 = data['message'];
+      if (typeof m2 === 'string') throw new Error(m2);
+      const m3 = data['error'];
+      if (typeof m3 === 'string') throw new Error(m3);
     }
 
     // Si hay errores de validación específicos
-    if (data?.errors && typeof data.errors === 'object') {
-      const firstError = Object.values(data.errors)[0];
+    if (isRecord(data) && isRecord(data['errors'])) {
+      const errorsObj = data['errors'] as Record<string, unknown>;
+      const firstError = Object.values(errorsObj)[0];
       if (Array.isArray(firstError)) {
-        throw new Error(firstError[0] as string);
+        const first = firstError[0];
+        if (typeof first === 'string') throw new Error(first);
       }
-      throw new Error(firstError as string);
+      if (typeof firstError === 'string') throw new Error(firstError);
     }
 
     // Mensajes por defecto según el código de estado
@@ -357,8 +386,8 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-  // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
-  // console.log(__curl);
+      // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+      // console.log(__curl);
       const response = await this.axiosInstance.get<BackendApiResponse<T>>(
         endpoint,
         {
@@ -369,18 +398,22 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       // Si es una respuesta del servidor con formato ApiResponse, devolverla
-      if (error?.isApiResponse) {
-        return error.response;
+      const err = error as unknown;
+      const isRecord = (v: unknown): v is Record<string, unknown> =>
+        typeof v === 'object' && v !== null;
+      if (isRecord(err) && err['isApiResponse'] === true && 'response' in err) {
+        const resp = err['response'] as BackendApiResponse<unknown>;
+        return resp as BackendApiResponse<T>;
       }
-      throw error;
+      throw err;
     }
   }
 
   async post<T>(
     endpoint: string,
-    body: any,
+    body: unknown,
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
@@ -398,23 +431,27 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       // Si es una respuesta del servidor con formato ApiResponse, devolverla
-      if (error?.isApiResponse) {
-        return error.response;
+      const err = error as unknown;
+      const isRecord = (v: unknown): v is Record<string, unknown> =>
+        typeof v === 'object' && v !== null;
+      if (isRecord(err) && err['isApiResponse'] === true && 'response' in err) {
+        const resp = err['response'] as BackendApiResponse<unknown>;
+        return resp as BackendApiResponse<T>;
       }
-      throw error;
+      throw err;
     }
   }
 
   async put<T>(
     endpoint: string,
-    body: any,
+    body: unknown,
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-  // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
-  // console.log(__curl);
+      // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      // console.log(__curl);
       const response = await this.axiosInstance.put<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -426,23 +463,27 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       // Si es una respuesta del servidor con formato ApiResponse, devolverla
-      if (error?.isApiResponse) {
-        return error.response;
+      const err = error as unknown;
+      const isRecord = (v: unknown): v is Record<string, unknown> =>
+        typeof v === 'object' && v !== null;
+      if (isRecord(err) && err['isApiResponse'] === true && 'response' in err) {
+        const resp = err['response'] as BackendApiResponse<unknown>;
+        return resp as BackendApiResponse<T>;
       }
-      throw error;
+      throw err;
     }
   }
 
   async patch<T>(
     endpoint: string,
-    body: any,
+    body: unknown,
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-  // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
-  // console.log(__curl);
+      // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      // console.log(__curl);
       const response = await this.axiosInstance.patch<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -454,12 +495,16 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       // Si es una respuesta del servidor con formato ApiResponse, devolverla
-      if (error?.isApiResponse) {
-        return error.response;
+      const err = error as unknown;
+      const isRecord = (v: unknown): v is Record<string, unknown> =>
+        typeof v === 'object' && v !== null;
+      if (isRecord(err) && err['isApiResponse'] === true && 'response' in err) {
+        const resp = err['response'] as BackendApiResponse<unknown>;
+        return resp as BackendApiResponse<T>;
       }
-      throw error;
+      throw err;
     }
   }
 
@@ -468,8 +513,8 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-  // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
-  // console.log(__curl);
+      // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+      // console.log(__curl);
       const response = await this.axiosInstance.delete<BackendApiResponse<T>>(
         endpoint,
         {
@@ -480,12 +525,16 @@ class ApiService {
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       // Si es una respuesta del servidor con formato ApiResponse, devolverla
-      if (error?.isApiResponse) {
-        return error.response;
+      const err = error as unknown;
+      const isRecord = (v: unknown): v is Record<string, unknown> =>
+        typeof v === 'object' && v !== null;
+      if (isRecord(err) && err['isApiResponse'] === true && 'response' in err) {
+        const resp = err['response'] as BackendApiResponse<unknown>;
+        return resp as BackendApiResponse<T>;
       }
-      throw error;
+      throw err;
     }
   }
 
@@ -513,4 +562,4 @@ export const apiService = new ApiService();
 export default ApiService;
 
 // Re-export del tipo para mantener compatibilidad con importaciones existentes en servicios
-export type ApiResponse<T = any> = BackendApiResponse<T>;
+export type ApiResponse<T = unknown> = BackendApiResponse<T>;

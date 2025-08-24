@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { Asset } from 'expo-asset';
@@ -15,7 +15,7 @@ interface BodyMusclesDiagramProps {
   width?: number | string; // admite porcentajes como '100%'
   height?: number | string; // permite porcentaje; si se omite, usa 100%
   // listado de ids de músculos activos o estructuras con role
-  activeMuscles?: Array<string | ActiveMuscle>;
+  activeMuscles?: (string | ActiveMuscle)[];
   // color por defecto de músculos inactivos
   defaultColor?: string;
   // escala general (zoom simple). Si no se pasa, ajusta a width/height automáticamente con viewBox
@@ -49,7 +49,12 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
 }) => {
   const [frontXml, setFrontXml] = useState<string | null>(null);
   const [backXml, setBackXml] = useState<string | null>(null);
-  type OverlayLayer = { key: string; xml: string; opacity: number; side: 'front' | 'back' };
+  type OverlayLayer = {
+    key: string;
+    xml: string;
+    opacity: number;
+    side: 'front' | 'back';
+  };
   const [overlayLayers, setOverlayLayers] = useState<OverlayLayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,28 +76,88 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
         const frontMod = require('../../assets/images/muscles/muscular_system_front.svg');
         const backMod = require('../../assets/images/muscles/muscular_system_back.svg');
         const overlayDefs = [
-          { mod: require('../../assets/images/muscles/main/front-biceps.svg'), key: 'front-biceps', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-cuadriceps.svg'), key: 'front-cuadriceps', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-deltoides.svg'), key: 'front-deltoides', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-dorsales.svg'), key: 'front-dorsales', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-oblicuos.svg'), key: 'front-oblicuos', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-pectoralMayor.svg'), key: 'front-pectoralMayor', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-rectoAbdominal.svg'), key: 'front-rectoAbdominal', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/front-serratoAnterior.svg'), key: 'front-serratoAnterior', side: 'front' as const },
-          { mod: require('../../assets/images/muscles/main/back-dorsal.svg'), key: 'back-dorsal', side: 'back' as const },
-          { mod: require('../../assets/images/muscles/main/back-gluteos.svg'), key: 'back-gluteos', side: 'back' as const },
-          { mod: require('../../assets/images/muscles/main/back-isquiotibiales.svg'), key: 'back-isquiotibiales', side: 'back' as const },
-          { mod: require('../../assets/images/muscles/main/back-pantorrillas.svg'), key: 'back-pantorrillas', side: 'back' as const },
-          { mod: require('../../assets/images/muscles/main/back-soleo.svg'), key: 'back-soleo', side: 'back' as const },
-          { mod: require('../../assets/images/muscles/main/back-trapecio.svg'), key: 'back-trapecio', side: 'back' as const },
-          { mod: require('../../assets/images/muscles/main/back-triceps.svg'), key: 'back-triceps', side: 'back' as const },
+          {
+            mod: require('../../assets/images/muscles/main/front-biceps.svg'),
+            key: 'front-biceps',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-cuadriceps.svg'),
+            key: 'front-cuadriceps',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-deltoides.svg'),
+            key: 'front-deltoides',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-dorsales.svg'),
+            key: 'front-dorsales',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-oblicuos.svg'),
+            key: 'front-oblicuos',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-pectoralMayor.svg'),
+            key: 'front-pectoralMayor',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-rectoAbdominal.svg'),
+            key: 'front-rectoAbdominal',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/front-serratoAnterior.svg'),
+            key: 'front-serratoAnterior',
+            side: 'front' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-dorsal.svg'),
+            key: 'back-dorsal',
+            side: 'back' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-gluteos.svg'),
+            key: 'back-gluteos',
+            side: 'back' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-isquiotibiales.svg'),
+            key: 'back-isquiotibiales',
+            side: 'back' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-pantorrillas.svg'),
+            key: 'back-pantorrillas',
+            side: 'back' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-soleo.svg'),
+            key: 'back-soleo',
+            side: 'back' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-trapecio.svg'),
+            key: 'back-trapecio',
+            side: 'back' as const,
+          },
+          {
+            mod: require('../../assets/images/muscles/main/back-triceps.svg'),
+            key: 'back-triceps',
+            side: 'back' as const,
+          },
         ];
 
         // Cargar todos los assets de una vez y obtener instancias con localUri
         const allAssets = await Asset.loadAsync([
           frontMod,
           backMod,
-          ...overlayDefs.map(d => d.mod),
+          ...overlayDefs.map((d) => d.mod),
         ]);
         const frontAsset = allAssets[0];
         const backAsset = allAssets[1];
@@ -111,18 +176,20 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
         const [frontText, backText, overlayTexts] = await Promise.all([
           readText(frontAsset),
           readText(backAsset),
-          Promise.all(overlayAssets.map(a => readText(a))),
+          Promise.all(overlayAssets.map((a) => readText(a))),
         ]);
 
         if (!cancelled) {
           setFrontXml(monoTransform(frontText));
           setBackXml(monoTransform(backText));
-          const initialLayers: OverlayLayer[] = overlayTexts.map((xml, idx) => ({
-            key: overlayDefs[idx].key,
-            xml,
-            opacity: 0,
-            side: overlayDefs[idx].side,
-          }));
+          const initialLayers: OverlayLayer[] = overlayTexts.map(
+            (xml, idx) => ({
+              key: overlayDefs[idx].key,
+              xml,
+              opacity: 0,
+              side: overlayDefs[idx].side,
+            })
+          );
           setOverlayLayers(initialLayers);
           setError(null);
         }
@@ -142,7 +209,12 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
   useEffect(() => {
     if (!overlayLayers.length) return;
     if (overlayOpacities) {
-      setOverlayLayers(prev => prev.map(layer => ({ ...layer, opacity: Math.max(0, Math.min(1, overlayOpacities[layer.key] ?? 0)) })));
+      setOverlayLayers((prev) =>
+        prev.map((layer) => ({
+          ...layer,
+          opacity: Math.max(0, Math.min(1, overlayOpacities[layer.key] ?? 0)),
+        }))
+      );
       return;
     }
     // Simulación de API: intensidades mock entre 0 y 1
@@ -151,12 +223,22 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
       if (i % 11 === 0) return 0.55;
       return 0;
     });
-    setOverlayLayers(prev => prev.map((layer, i) => ({ ...layer, opacity: mockOpacities[i] })));
+    setOverlayLayers((prev) =>
+      prev.map((layer, i) => ({ ...layer, opacity: mockOpacities[i] }))
+    );
   }, [overlayLayers.length, overlayOpacities]);
 
   if (loading) {
     return (
-      <View style={{ width: width as any, height: height as any, alignItems: 'center', justifyContent: 'center', backgroundColor }}>
+      <View
+        style={{
+          width: width as any,
+          height: height as any,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor,
+        }}
+      >
         <ActivityIndicator />
       </View>
     );
@@ -164,42 +246,113 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
 
   if (error || !frontXml || !backXml) {
     return (
-      <View style={{ width: width as any, height: height as any, alignItems: 'center', justifyContent: 'center', backgroundColor }}>
+      <View
+        style={{
+          width: width as any,
+          height: height as any,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor,
+        }}
+      >
         {/* Fallback simple si falla la carga */}
       </View>
     );
   }
 
   const renderFront = (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', position: 'relative', aspectRatio: 200/369 }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        aspectRatio: 200 / 369,
+      }}
+    >
       <SvgXml xml={frontXml} width="100%" height="100%" />
-      {overlayLayers.filter(l => l.side === 'front').map(layer => (
-        <View key={`front-${layer.key}`} pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: layer.opacity }}>
-          <SvgXml xml={layer.xml} width="100%" height="100%" />
-        </View>
-      ))}
+      {overlayLayers
+        .filter((l) => l.side === 'front')
+        .map((layer) => (
+          <View
+            key={`front-${layer.key}`}
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              opacity: layer.opacity,
+            }}
+          >
+            <SvgXml xml={layer.xml} width="100%" height="100%" />
+          </View>
+        ))}
     </View>
   );
   const renderBack = (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', position: 'relative', aspectRatio: 200/369 }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        aspectRatio: 200 / 369,
+      }}
+    >
       <SvgXml xml={backXml} width="100%" height="100%" />
-      {overlayLayers.filter(l => l.side === 'back').map(layer => (
-        <View key={`back-${layer.key}`} pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: layer.opacity }}>
-          <SvgXml xml={layer.xml} width="100%" height="100%" />
-        </View>
-      ))}
+      {overlayLayers
+        .filter((l) => l.side === 'back')
+        .map((layer) => (
+          <View
+            key={`back-${layer.key}`}
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              opacity: layer.opacity,
+            }}
+          >
+            <SvgXml xml={layer.xml} width="100%" height="100%" />
+          </View>
+        ))}
     </View>
   );
 
   if (side === 'front') {
-    return <View style={{ width: width as any, height: height as any, backgroundColor }}>{renderFront}</View>;
+    return (
+      <View
+        style={{ width: width as any, height: height as any, backgroundColor }}
+      >
+        {renderFront}
+      </View>
+    );
   }
   if (side === 'back') {
-    return <View style={{ width: width as any, height: height as any, backgroundColor }}>{renderBack}</View>;
+    return (
+      <View
+        style={{ width: width as any, height: height as any, backgroundColor }}
+      >
+        {renderBack}
+      </View>
+    );
   }
 
   return (
-    <View style={{ width: width as any, height: height as any, backgroundColor, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+    <View
+      style={{
+        width: width as any,
+        height: height as any,
+        backgroundColor,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <View style={{ flex: 1, maxWidth: '50%' }}>{renderFront}</View>
       <View style={{ width: 8 }} />
       <View style={{ flex: 1, maxWidth: '50%' }}>{renderBack}</View>

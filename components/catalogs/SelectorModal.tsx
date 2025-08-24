@@ -44,14 +44,14 @@ export const SelectorModal = memo<SelectorModalProps>(
     const filtered = useMemo(() => {
       const t = normalize(term.trim());
       if (!t) return data;
-      return data.filter(item => normalize(item.Nombre).includes(t));
+      return data.filter((item) => normalize(item.Nombre).includes(t));
     }, [data, term]);
 
     return (
       <Modal
         visible={visible}
         transparent={true}
-        animationType='slide'
+        animationType="slide"
         onRequestClose={onClose}
       >
         <TouchableOpacity
@@ -70,14 +70,17 @@ export const SelectorModal = memo<SelectorModalProps>(
             {showSearch && (
               <View style={catalogStyles.searchWrapper}>
                 <TextInput
-                  style={[catalogStyles.searchInput, colorStyles.searchInputText]}
+                  style={[
+                    catalogStyles.searchInput,
+                    colorStyles.searchInputText,
+                  ]}
                   // Sin placeholder visible por requerimiento
                   placeholderTextColor={colorStyles.placeholderText.color}
                   onChangeText={setTerm}
                   value={term}
                 />
                 <FontAwesome
-                  name='search'
+                  name="search"
                   size={18}
                   color={colorStyles.selectorText.color}
                   style={catalogStyles.searchIcon}
@@ -87,17 +90,18 @@ export const SelectorModal = memo<SelectorModalProps>(
 
             {loading ? (
               <View style={catalogStyles.loadingContainer}>
-                <LoadingSpinner size='large' />
+                <LoadingSpinner size="large" />
               </View>
             ) : (
               <ScrollView showsVerticalScrollIndicator={false}>
-                {filtered.map(item => (
+                {filtered.map((item) => (
                   <TouchableOpacity
                     key={item.Id}
                     style={[
                       catalogStyles.optionItem,
                       colorStyles.optionItem,
-                      selectedId === item.Id && catalogStyles.optionItemSelected,
+                      selectedId === item.Id &&
+                        catalogStyles.optionItemSelected,
                     ]}
                     onPress={() => onSelect(item.Id)}
                   >
@@ -105,7 +109,8 @@ export const SelectorModal = memo<SelectorModalProps>(
                       style={[
                         catalogStyles.optionText,
                         colorStyles.optionText,
-                        selectedId === item.Id && catalogStyles.optionTextSelected,
+                        selectedId === item.Id &&
+                          catalogStyles.optionTextSelected,
                       ]}
                     >
                       {item.Nombre}

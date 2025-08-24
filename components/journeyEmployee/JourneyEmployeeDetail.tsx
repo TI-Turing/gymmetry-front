@@ -17,8 +17,7 @@ export function JourneyEmployeeDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await journeyEmployeeService.getJourneyEmployeeById(id);
+      const res = await journeyEmployeeService.getJourneyEmployeeById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function JourneyEmployeeDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>JourneyEmployee - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

@@ -29,8 +29,8 @@ export function PermissionDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Permission - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

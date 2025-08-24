@@ -18,7 +18,7 @@ export function GymAwareComponent() {
     // if (gymData) {
     //   console.debug('Datos del gym actualizados:', gymData.gym?.Name);
     // }
-    return () => {};
+    return undefined;
   }, [gymData]);
 
   if (error) {
@@ -59,7 +59,7 @@ export function useGymDataUpdates() {
         );
       };
     }
-    return () => {};
+    return undefined;
   }, []);
 }
 

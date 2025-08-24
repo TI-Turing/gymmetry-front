@@ -17,8 +17,7 @@ export function AccessMethodTypeDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await accessMethodTypeService.getAccessMethodTypeById(id);
+      const res = await accessMethodTypeService.getAccessMethodTypeById(id);
       setItem(res.Data);
     } catch (e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function AccessMethodTypeDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AccessMethodType - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

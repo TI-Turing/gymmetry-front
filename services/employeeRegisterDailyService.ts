@@ -60,5 +60,5 @@ export const employeeRegisterDailyService = {
     ApiResponse<EmployeeRegisterDaily[]>
   > {
     return this.getAllEmployeeRegisterDailies();
-  }
+  },
 };

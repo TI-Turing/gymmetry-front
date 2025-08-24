@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
-import { StyleSheet } from 'react-native';
-import { View, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { View } from 'react-native';
 import { Text } from '@/components/Themed';
 import { styles } from './styles';
 import { EntityList } from '@/components/common';
-import { Colors } from '@/constants';
-import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
+// Colors desde la paleta tematizada
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/components/useColorScheme';
 
 const RoutineAssignedList = React.memo(() => {
   const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
@@ -16,9 +16,13 @@ const RoutineAssignedList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
+
+  const theme = useColorScheme();
+  const palette = Colors[theme];
 
   const renderRoutineAssignedItem = useCallback(
     ({ item }: { item: any }) => (
@@ -66,11 +70,11 @@ const RoutineAssignedList = React.memo(() => {
               {
                 color:
                   item.difficulty === 'hard'
-                    ? '#FF6B35'
+                    ? palette.danger
                     : item.difficulty === 'medium'
-                      ? '#ffa726'
-                      : '#ff6300'
-  },
+                      ? palette.warning
+                      : palette.tint,
+              },
             ]}
           >
             {item.difficulty === 'hard'
@@ -148,13 +152,13 @@ const RoutineAssignedList = React.memo(() => {
 
   return (
     <EntityList
-      title='Rutinas Asignadas'
+      title="Rutinas Asignadas"
       loadFunction={loadRoutineAssigned}
       renderItem={renderRoutineAssignedItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay rutinas asignadas'
-      emptyMessage='No se encontraron rutinas asignadas'
-      loadingMessage='Cargando rutinas asignadas...'
+      emptyTitle="No hay rutinas asignadas"
+      emptyMessage="No se encontraron rutinas asignadas"
+      loadingMessage="Cargando rutinas asignadas..."
     />
   );
 });

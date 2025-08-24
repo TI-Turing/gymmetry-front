@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Animated, Easing } from 'react-native';
-import { SPACING, BORDER_RADIUS } from '@/constants/Theme';
-import { styles } from './styles';
+import { SPACING } from '@/constants/Theme';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineTemplateStyles } from './styles.themed';
 
 interface SkeletonProps {
   width?: number | string;
@@ -10,12 +11,13 @@ interface SkeletonProps {
   style?: any;
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({ 
-  width = '100%', 
-  height = 20, 
+const Skeleton: React.FC<SkeletonProps> = ({
+  width = '100%',
+  height = 20,
   borderRadius = 4,
-  style 
+  style,
 }) => {
+  const styles = useThemedStyles(makeRoutineTemplateStyles);
   const animatedValue = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -53,7 +55,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
           width,
           height,
           borderRadius,
-          backgroundColor: '#333333',
+          backgroundColor: styles.colors.skeleton,
           opacity,
         },
         style,
@@ -66,23 +68,39 @@ interface RoutineTemplateSkeletonProps {
   count?: number;
 }
 
-export const RoutineTemplateSkeleton: React.FC<RoutineTemplateSkeletonProps> = ({ 
-  count = 3 
-}) => {
+export const RoutineTemplateSkeleton: React.FC<
+  RoutineTemplateSkeletonProps
+> = ({ count = 3 }) => {
+  const styles = useThemedStyles(makeRoutineTemplateStyles);
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
         <View key={index} style={styles.card}>
           {/* Título de la rutina */}
-          <Skeleton width="85%" height={18} borderRadius={4} style={{ marginBottom: SPACING.xs }} />
-          
+          <Skeleton
+            width="85%"
+            height={18}
+            borderRadius={4}
+            style={{ marginBottom: SPACING.xs }}
+          />
+
           {/* Comentarios (simulando 1-3 líneas de texto, a veces sin comentarios) */}
           {index % 3 !== 0 && (
             <View style={{ marginBottom: SPACING.sm }}>
-              <Skeleton width="100%" height={14} borderRadius={4} style={{ marginBottom: SPACING.xs / 2 }} />
+              <Skeleton
+                width="100%"
+                height={14}
+                borderRadius={4}
+                style={{ marginBottom: SPACING.xs / 2 }}
+              />
               {index % 2 === 0 && (
                 <>
-                  <Skeleton width="80%" height={14} borderRadius={4} style={{ marginBottom: SPACING.xs / 2 }} />
+                  <Skeleton
+                    width="80%"
+                    height={14}
+                    borderRadius={4}
+                    style={{ marginBottom: SPACING.xs / 2 }}
+                  />
                   <Skeleton width="60%" height={14} borderRadius={4} />
                 </>
               )}

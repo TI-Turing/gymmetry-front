@@ -17,8 +17,7 @@ export function MachineCategoryDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await machineCategoryService.getMachineCategoryById(id);
+      const res = await machineCategoryService.getMachineCategoryById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function MachineCategoryDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>MachineCategory - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

@@ -68,13 +68,13 @@ const EquipmentList = React.memo(() => {
 
   return (
     <EntityList
-      title='Equipamiento'
+      title="Equipamiento"
       loadFunction={loadEquipment}
       renderItem={renderEquipmentItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay equipamiento'
-      emptyMessage='No se encontró equipamiento registrado'
-      loadingMessage='Cargando equipamiento...'
+      emptyTitle="No hay equipamiento"
+      emptyMessage="No se encontró equipamiento registrado"
+      loadingMessage="Cargando equipamiento..."
     />
   );
 });
@@ -88,20 +88,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -110,30 +110,30 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 80
+    minWidth: 80,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
 EquipmentList.displayName = 'EquipmentList';

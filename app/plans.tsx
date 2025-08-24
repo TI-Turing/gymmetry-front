@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, ActivityIndicator } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -7,17 +7,21 @@ import PlanTypeView from '@/components/planType/PlanTypeView';
 import PlanView from '@/components/plan/PlanView';
 import GymPlanView from '@/components/gym/GymPlanView';
 import { authService } from '@/services/authService';
-import { gymService, gymPlanSelectedService } from '@/services';
-import Colors from '@/constants/Colors';
+import { gymService } from '@/services';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makePlansStyles } from './styles/plans';
 
 export default function PlansModal() {
+  const styles = useThemedStyles(makePlansStyles);
   const [isOwner, setIsOwner] = useState<boolean | null>(null);
   const [gymId, setGymId] = useState<string | null>(null);
   // Usado sólo para forzar refresh de vistas al crear/cambiar plan
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeUserPlanTypeId, setActiveUserPlanTypeId] = useState<string | null>(null);
+  const [activeUserPlanTypeId, setActiveUserPlanTypeId] = useState<
+    string | null
+  >(null);
   const [usingFallbackFreePlan, setUsingFallbackFreePlan] = useState(false);
 
   useEffect(() => {
@@ -47,8 +51,16 @@ export default function PlansModal() {
       if (userGymId) {
         try {
           const gymData = await gymService.getCachedGymById(userGymId);
-          if (gymData && (gymData.Owner_UserId === userId || gymData.OwnerUserId === userId)) {
-            userIsOwner = true;
+          if (gymData) {
+            const legacyOwnerId = (
+              gymData as unknown as { OwnerUserId?: string }
+            ).OwnerUserId;
+            if (
+              gymData.Owner_UserId === userId ||
+              (legacyOwnerId !== undefined && legacyOwnerId === userId)
+            ) {
+              userIsOwner = true;
+            }
           }
         } catch {}
       }
@@ -64,7 +76,7 @@ export default function PlansModal() {
   }, []);
 
   const handlePlanCreatedOrChanged = () => {
-    setRefreshCounter(c => c + 1);
+    setRefreshCounter((c) => c + 1);
   };
 
   if (isLoading) {
@@ -76,12 +88,12 @@ export default function PlansModal() {
             style={styles.closeButton}
             onPress={() => router.back()}
           >
-            <FontAwesome name='times' size={24} color='#FFFFFF' />
+            <FontAwesome name="times" size={24} color={styles.colors.text} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size='large' color={Colors.light.tint} />
+          <ActivityIndicator size="large" color={styles.colors.tint} />
           <Text style={styles.loadingText}>Verificando permisos...</Text>
         </View>
       </View>
@@ -97,12 +109,16 @@ export default function PlansModal() {
             style={styles.closeButton}
             onPress={() => router.back()}
           >
-            <FontAwesome name='times' size={24} color='#FFFFFF' />
+            <FontAwesome name="times" size={24} color={styles.colors.text} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.errorContainer}>
-          <FontAwesome name='exclamation-triangle' size={48} color='#FF6B6B' />
+          <FontAwesome
+            name="exclamation-triangle"
+            size={48}
+            color={styles.colors.danger as string}
+          />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={checkUserRole}>
             <Text style={styles.retryButtonText}>Reintentar</Text>
@@ -122,7 +138,7 @@ export default function PlansModal() {
           style={styles.closeButton}
           onPress={() => router.back()}
         >
-          <FontAwesome name='times' size={24} color='#FFFFFF' />
+          <FontAwesome name="times" size={24} color={styles.colors.text} />
         </TouchableOpacity>
       </View>
       {isOwner && gymId ? (
@@ -143,7 +159,11 @@ export default function PlansModal() {
           />
           <PlanTypeView
             onPlanSelected={handlePlanCreatedOrChanged}
-            activePlanTypeId={usingFallbackFreePlan ? activeUserPlanTypeId || '4aa8380c-8479-4334-8236-3909be9c842b' : activeUserPlanTypeId || undefined}
+            activePlanTypeId={
+              usingFallbackFreePlan
+                ? activeUserPlanTypeId || '4aa8380c-8479-4334-8236-3909be9c842b'
+                : activeUserPlanTypeId || undefined
+            }
             hideActive={true}
           />
         </>
@@ -151,60 +171,3 @@ export default function PlansModal() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 60, // Para el notch/status bar
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  closeButton: {
-    padding: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    color: '#FFFFFF',
-    marginTop: 16,
-    fontSize: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    color: '#FF6B6B',
-    textAlign: 'center',
-    marginVertical: 16,
-    fontSize: 16,
-  },
-  retryButton: {
-    backgroundColor: Colors.light.tint,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-});

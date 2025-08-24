@@ -8,9 +8,9 @@ import GymTypeDropdown from '../GymTypeDropdown';
 import { GymStep2Data, GymStepProps, GymType } from '../types';
 import { GymService } from '@/services/gymService';
 import { gymTypeService } from '@/services/gymTypeService';
-import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
-import { GymStyles } from '../styles/GymStyles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from '../styles/gymSteps';
 
 interface GymStep2Props extends GymStepProps<GymStep2Data> {
   gymId: string;
@@ -24,6 +24,7 @@ export default function GymStep2({
   isLoading = false,
 }: GymStep2Props) {
   const { showAlert, AlertComponent } = useCustomAlert();
+  const { styles, colors } = useThemedStyles(makeGymStepsStyles);
   const [formData, setFormData] = useState<GymStep2Data>({
     gymTypeId: initialData?.gymTypeId || '',
     slogan: initialData?.slogan || '',
@@ -64,12 +65,12 @@ export default function GymStep2({
   }, [loadGymTypes]);
 
   const handleInputChange = (field: keyof GymStep2Data, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [field]: '',
       }));
@@ -111,53 +112,53 @@ export default function GymStep2({
   };
 
   const selectedGymType = Array.isArray(gymTypes)
-    ? gymTypes.find(type => type.Id === formData.gymTypeId)
+    ? gymTypes.find((type) => type.Id === formData.gymTypeId)
     : null;
 
   return (
     <KeyboardAvoidingView
-      style={GymStyles.container}
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        style={GymStyles.scrollView}
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={GymStyles.scrollContent}
+        contentContainerStyle={styles.scrollContent}
       >
         {/* Header */}
-        <View style={GymStyles.header}>
-          <Text style={GymStyles.headerTitle}>Tipo y Descripción</Text>
-          <Text style={GymStyles.headerSubtitle}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Tipo y Descripción</Text>
+          <Text style={styles.headerSubtitle}>
             Cuéntanos qué tipo de gimnasio es y sus características principales
           </Text>
         </View>
 
         {/* Tipo de Gimnasio */}
-        <View style={GymStyles.section}>
+        <View style={styles.section}>
           <GymTypeDropdown
-            label='Tipo de Gimnasio *'
+            label="Tipo de Gimnasio *"
             options={gymTypes}
             value={formData.gymTypeId}
-            onSelect={typeId => handleInputChange('gymTypeId', typeId)}
+            onSelect={(typeId) => handleInputChange('gymTypeId', typeId)}
             error={errors.gymTypeId}
             loading={loadingTypes}
           />
         </View>
 
         {/* Formulario */}
-        <View style={GymStyles.form}>
+        <View style={styles.form}>
           <FormInput
-            label='Slogan (Opcional)'
+            label="Slogan (Opcional)"
             value={formData.slogan}
-            onChangeText={value => handleInputChange('slogan', value)}
+            onChangeText={(value) => handleInputChange('slogan', value)}
             multiline
             numberOfLines={2}
           />
 
           <FormInput
-            label='Descripción del Gimnasio *'
+            label="Descripción del Gimnasio *"
             value={formData.description}
-            onChangeText={value => handleInputChange('description', value)}
+            onChangeText={(value) => handleInputChange('description', value)}
             multiline
             maxLines={6}
             error={errors.description}
@@ -166,27 +167,23 @@ export default function GymStep2({
 
         {/* Información del tipo seleccionado */}
         {selectedGymType && (
-          <View style={GymStyles.infoCard}>
-            <FontAwesome
-              name='info-circle'
-              size={20}
-              color={Colors.dark.tint}
-            />
-            <View style={GymStyles.infoContent}>
-              <Text style={GymStyles.infoTitle}>Tipo seleccionado:</Text>
-              <Text style={GymStyles.infoText}>{selectedGymType.Name}</Text>
+          <View style={styles.infoCard}>
+            <FontAwesome name="info-circle" size={20} color={colors.tint} />
+            <View style={styles.infoContent}>
+              <Text style={styles.infoTitle}>Tipo seleccionado:</Text>
+              <Text style={styles.infoText}>{selectedGymType.Name}</Text>
             </View>
           </View>
         )}
       </ScrollView>
 
       {/* Botones */}
-      <View style={GymStyles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Button
           title={loading ? 'Guardando...' : 'Continuar'}
           onPress={handleNext}
           disabled={loading || isLoading || loadingTypes}
-          style={GymStyles.nextButton}
+          style={styles.nextButton}
         />
       </View>
       <AlertComponent />

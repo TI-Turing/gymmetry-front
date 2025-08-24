@@ -8,14 +8,21 @@ import type { NotificationResponseDto } from '@/dto/Notification/Response/Notifi
 export const notificationService = {
   async addNotification(
     request: NotificationCreateRequestDto,
-    opts?: { settings?: Pick<AppSettings, 'notificationsEnabled' | 'quietHours'> }
+    opts?: {
+      settings?: Pick<AppSettings, 'notificationsEnabled' | 'quietHours'>;
+    }
   ): Promise<ApiResponse<any>> {
     // Respetar ajustes de la app si se proveen
     const st = opts?.settings;
-    if (st && (!st.notificationsEnabled || isWithinQuietHours(new Date(), st.quietHours))) {
+    if (
+      st &&
+      (!st.notificationsEnabled ||
+        isWithinQuietHours(new Date(), st.quietHours))
+    ) {
       return {
         Success: true,
-        Message: 'Notificación suprimida por ajustes del usuario (silencio/horas).',
+        Message:
+          'Notificación suprimida por ajustes del usuario (silencio/horas).',
         Data: null as any,
         StatusCode: 200,
       } as ApiResponse<any>;

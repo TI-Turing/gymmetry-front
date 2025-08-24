@@ -30,7 +30,7 @@ export default function Step1({
       </Text>
 
       <FormInput
-        label='Nombre de la sede'
+        label="Nombre de la sede"
         value={formData.name}
         onChangeText={(text: string) => onFormDataChange('name', text)}
         required
@@ -38,7 +38,7 @@ export default function Step1({
       />
 
       <FormInput
-        label='Dirección'
+        label="Dirección"
         value={formData.address}
         onChangeText={(text: string) => onFormDataChange('address', text)}
         required
@@ -46,7 +46,7 @@ export default function Step1({
       />
 
       <AccessMethodDropdown
-        label='Método de acceso'
+        label="Método de acceso"
         value={formData.accessMethodId}
         onValueChange={(value: string) =>
           onFormDataChange('accessMethodId', value)
@@ -55,7 +55,7 @@ export default function Step1({
       />
 
       <GymAdminDropdown
-        label='Administrador principal del gym'
+        label="Administrador principal del gym"
         value={formData.adminUserId}
         onValueChange={(value: string) =>
           onFormDataChange('adminUserId', value)

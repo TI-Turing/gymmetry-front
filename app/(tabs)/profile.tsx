@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   SafeAreaView,
   Platform,
 } from 'react-native';
@@ -12,12 +10,16 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import MobileHeader from '@/components/layout/MobileHeader';
 import { withWebLayout } from '@/components/layout/withWebLayout';
-import Colors from '@/constants/Colors';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import SmartImage from '@/components/common/SmartImage';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeProfileStyles } from './styles/profile';
 
 function ProfileScreen() {
   const { user, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const styles = useThemedStyles(makeProfileStyles);
+  const { showAlert, AlertComponent } = useCustomAlert();
 
   const userStats = {
     workouts: 156,
@@ -29,10 +31,10 @@ function ProfileScreen() {
   };
 
   const achievements = [
-    { icon: 'trophy', title: '100 Entrenamientos', color: '#FFD700' },
-    { icon: 'fire', title: '30 Días Consecutivos', color: '#FF6B35' },
-    { icon: 'star', title: 'Meta Mensual', color: '#4CAF50' },
-    { icon: 'medal', title: 'Primer PR', color: Colors.dark.tint },
+    { icon: 'trophy', title: '100 Entrenamientos', color: styles.colors.tint },
+    { icon: 'fire', title: '30 Días Consecutivos', color: styles.colors.tint },
+    { icon: 'star', title: 'Meta Mensual', color: styles.colors.tint },
+    { icon: 'medal', title: 'Primer PR', color: styles.colors.tint },
   ];
 
   const menuItems = [
@@ -45,18 +47,28 @@ function ProfileScreen() {
   ];
 
   const handleLogout = () => {
-    Alert.alert('Cerrar Sesión', '¿Estás seguro que deseas cerrar sesión?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Cerrar Sesión', style: 'destructive', onPress: logout },
-    ]);
+    showAlert(
+      'warning',
+      'Cerrar Sesión',
+      '¿Estás seguro que deseas cerrar sesión?',
+      {
+        confirmText: 'Cerrar Sesión',
+        cancelText: 'Cancelar',
+        onConfirm: logout,
+      }
+    );
   };
 
   const renderProfileHeader = () => (
     <View style={styles.profileHeader}>
       <View style={styles.avatarContainer}>
-  <SmartImage uri={'https://via.placeholder.com/100'} style={styles.avatar} deferOnDataSaver={false} />
+        <SmartImage
+          uri={'https://via.placeholder.com/100'}
+          style={styles.avatar}
+          deferOnDataSaver={false}
+        />
         <TouchableOpacity style={styles.editAvatarButton}>
-          <FontAwesome name='camera' size={16} color='#FFFFFF' />
+          <FontAwesome name="camera" size={16} color={styles.colors.text} />
         </TouchableOpacity>
       </View>
       <Text style={styles.userName}>{user?.email || 'Usuario'}</Text>
@@ -109,14 +121,19 @@ function ProfileScreen() {
 
   const renderMenuItem = (item: (typeof menuItems)[0], index: number) => (
     <TouchableOpacity key={index} style={styles.menuItem} onPress={item.action}>
-      <FontAwesome name={item.icon as any} size={20} color='#B0B0B0' />
+      <FontAwesome
+        name={item.icon as any}
+        size={20}
+        color={styles.colors.muted}
+      />
       <Text style={styles.menuItemText}>{item.title}</Text>
-      <FontAwesome name='chevron-right' size={16} color='#B0B0B0' />
+      <FontAwesome name="chevron-right" size={16} color={styles.colors.muted} />
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <AlertComponent />
       {Platform.OS !== 'web' && <MobileHeader />}
       <ScrollView
         style={styles.scrollView}
@@ -128,7 +145,7 @@ function ProfileScreen() {
             <FontAwesome
               name={isEditing ? 'check' : 'edit'}
               size={24}
-              color='#FFFFFF'
+              color={styles.colors.text}
             />
           </TouchableOpacity>
         </View>
@@ -143,7 +160,7 @@ function ProfileScreen() {
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <FontAwesome name='sign-out' size={20} color='#FF6B6B' />
+          <FontAwesome name="sign-out" size={20} color={styles.colors.red} />
           <Text style={styles.logoutText}>Cerrar Sesión</Text>
         </TouchableOpacity>
 
@@ -154,179 +171,3 @@ function ProfileScreen() {
 }
 
 export default withWebLayout(ProfileScreen, { defaultTab: 'profile' });
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  profileHeader: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 24,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  editAvatarButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#4CAF50',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#121212',
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    marginBottom: 4,
-  },
-  joinDate: {
-    fontSize: 14,
-    color: '#B0B0B0',
-  },
-  statsCard: {
-    backgroundColor: '#1E1E1E',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  statItem: {
-    width: '48%',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    textAlign: 'center',
-  },
-  achievementsCard: {
-    backgroundColor: '#1E1E1E',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  achievementsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  achievementsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  achievementItem: {
-    width: '48%',
-    alignItems: 'center',
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#333333',
-    borderRadius: 12,
-  },
-  achievementTitle: {
-    fontSize: 12,
-    color: '#B0B0B0',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  menuCard: {
-    backgroundColor: '#1E1E1E',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  menuTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  menuItemText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#FFFFFF',
-    marginLeft: 16,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1E1E1E',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-  },
-  logoutText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FF6B6B',
-    marginLeft: 12,
-  },
-  footer: {
-    height: 100,
-  },
-});

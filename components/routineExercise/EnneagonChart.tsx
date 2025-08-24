@@ -9,7 +9,10 @@ interface Props {
 }
 
 // Utilidad para calcular los puntos del eneágono
-function getEnneagonPoints(size: number, values: number[]): { x: number; y: number }[] {
+function getEnneagonPoints(
+  size: number,
+  values: number[]
+): { x: number; y: number }[] {
   const cx = size / 2;
   const cy = size / 2;
   const r = size * 0.4;
@@ -30,11 +33,11 @@ export default function EnneagonChart({ objectives, size = 320 }: Props) {
   const keys = Object.keys(objectives);
   // Si hay menos de 9, rellenar con vacío
   const paddedKeys = [...keys, ...Array(9 - keys.length).fill('')].slice(0, 9);
-  const values = paddedKeys.map(k => (k ? objectives[k] ?? 0 : 0));
+  const values = paddedKeys.map((k) => (k ? (objectives[k] ?? 0) : 0));
   const points = getEnneagonPoints(size, values);
   const basePoints = getEnneagonPoints(size, Array(9).fill(1));
-  const pointsStr = points.map(p => `${p.x},${p.y}`).join(' ');
-  const baseStr = basePoints.map(p => `${p.x},${p.y}`).join(' ');
+  const pointsStr = points.map((p) => `${p.x},${p.y}`).join(' ');
+  const baseStr = basePoints.map((p) => `${p.x},${p.y}`).join(' ');
   const cx = size / 2;
   const cy = size / 2;
 
@@ -42,9 +45,20 @@ export default function EnneagonChart({ objectives, size = 320 }: Props) {
     <View style={{ alignItems: 'center', marginVertical: 24 }}>
       <Svg width={size} height={size}>
         {/* Base eneágono */}
-        <Polygon points={baseStr} fill="#fff2" stroke={Colors.tint} strokeWidth={2} />
+        <Polygon
+          points={baseStr}
+          fill="#fff2"
+          stroke={Colors.tint}
+          strokeWidth={2}
+        />
         {/* Relleno según valores */}
-        <Polygon points={pointsStr} fill={Colors.tint} fillOpacity={0.7} stroke={Colors.tint} strokeWidth={3} />
+        <Polygon
+          points={pointsStr}
+          fill={Colors.tint}
+          fillOpacity={0.7}
+          stroke={Colors.tint}
+          strokeWidth={3}
+        />
         {/* Puntos y labels */}
         {basePoints.map((p, i) => (
           <>

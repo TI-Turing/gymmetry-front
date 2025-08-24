@@ -3,9 +3,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 
-import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeTabsLayoutStyles } from './styles/tabsLayout';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -16,44 +17,37 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const styles = useThemedStyles(makeTabsLayoutStyles);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: styles.tabBarActiveTintColor,
         headerShown: false,
         tabBarStyle:
           Platform.OS === 'web'
             ? { display: 'none' }
             : {
-                backgroundColor: '#1E1E1E',
-                borderTopColor: '#333333',
-                borderTopWidth: 1,
-                height: 80,
-                paddingBottom: 20,
-                paddingTop: 10,
+                ...styles.tabBarStyleNative,
               },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-        },
+        tabBarLabelStyle: styles.tabBarLabelStyle,
       }}
     >
       <Tabs.Screen
-        name='index'
+        name="index"
         options={{
           title: 'Inicio',
-          tabBarIcon: ({ color }) => <TabBarIcon name='home' color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
-        name='gym'
+        name="gym"
         options={{
           title: 'Gym',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
-              name='dumbbell'
+              name="dumbbell"
               size={28}
               color={color}
               style={{ marginBottom: -3 }}
@@ -63,34 +57,34 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='progress'
+        name="progress"
         options={{
           title: 'Progreso',
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name='bar-chart' color={color} />
+            <TabBarIcon name="bar-chart" color={color} />
           ),
           tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
-        name='feed'
+        name="feed"
         options={{
           title: 'Feed',
-          tabBarIcon: ({ color }) => <TabBarIcon name='users' color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
           tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
-        name='profile'
+        name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <TabBarIcon name='user' color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           tabBarShowLabel: false,
         }}
       />
-  {/* Ocultar rutas que existen dentro de (tabs) pero no deben mostrarse como pestañas */}
-  <Tabs.Screen name='physical-assessment' options={{ href: null }} />
-  <Tabs.Screen name='user-exercise-max' options={{ href: null }} />
+      {/* Ocultar rutas que existen dentro de (tabs) pero no deben mostrarse como pestañas */}
+      <Tabs.Screen name="physical-assessment" options={{ href: null }} />
+      <Tabs.Screen name="user-exercise-max" options={{ href: null }} />
     </Tabs>
   );
 }

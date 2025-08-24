@@ -36,25 +36,25 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     fontSize: FONT_SIZES.xs,
     fontWeight: '600',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   badgePremium: {
     backgroundColor: Colors.dark.tint,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   badgeFree: {
     backgroundColor: '#2E2E2E',
-    color: '#B0B0B0'
+    color: '#B0B0B0',
   },
 
   // RoutineAssignedDetail styles
-  error: { 
-    color: 'red', 
-    marginVertical: SPACING.sm 
+  error: {
+    color: 'red',
+    marginVertical: SPACING.sm,
   },
-  info: { 
-    color: Colors.dark.tint, 
-    marginTop: SPACING.sm 
+  info: {
+    color: Colors.dark.tint,
+    marginTop: SPACING.sm,
   },
   card: {
     backgroundColor: '#fff2',
@@ -62,13 +62,13 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.sm,
     marginVertical: SPACING.xs,
   },
-  cardText: { 
+  cardText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
   },
-  label: { 
-    marginBottom: SPACING.xs, 
-    color: Colors.dark.text 
+  label: {
+    marginBottom: SPACING.xs,
+    color: Colors.dark.text,
   },
   textarea: {
     borderWidth: 1,
@@ -81,10 +81,10 @@ export const styles = StyleSheet.create({
     color: Colors.dark.text,
     backgroundColor: '#1A1A1A',
   },
-  row: { 
-    flexDirection: 'row', 
-    gap: SPACING.sm, 
-    marginVertical: SPACING.sm 
+  row: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginVertical: SPACING.sm,
   },
 
   // RoutineAssignedForm styles
@@ -141,7 +141,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -150,43 +150,43 @@ export const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.dark.tint,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.dark.text,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    flex: 1
+    flex: 1,
   },
   goalsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: '#333333'
+    borderTopColor: '#333333',
   },
   goalsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   goalsList: {
-    gap: SPACING.xs
+    gap: SPACING.xs,
   },
   goal: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    marginLeft: SPACING.sm
+    marginLeft: SPACING.sm,
   },
   moreGoals: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.tint,
     fontStyle: 'italic',
-    marginLeft: SPACING.sm
+    marginLeft: SPACING.sm,
   },
 });

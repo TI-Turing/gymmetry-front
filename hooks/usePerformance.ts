@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 /**
  * Hook para debounce de funciones
  */
-export function useDebounce<T extends (...args: any[]) => any>(
+export function useDebounce<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T {
@@ -12,7 +12,10 @@ export function useDebounce<T extends (...args: any[]) => any>(
   const debouncedCallback = useCallback(
     (...args: Parameters<T>) => {
       clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => callback(...args), delay) as any;
+      timeoutRef.current = setTimeout(
+        () => callback(...(args as Parameters<T>)),
+        delay
+      ) as unknown as number;
     },
     [callback, delay]
   );
@@ -23,7 +26,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
 /**
  * Hook para throttle de funciones
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T {

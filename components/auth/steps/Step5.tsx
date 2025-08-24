@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {
   TextInput,
   TouchableOpacity,
@@ -9,14 +15,12 @@ import {
 } from 'react-native';
 import { Text, View } from '../../Themed';
 import { useColorScheme } from '../../useColorScheme';
-import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { userService } from '@/services/userService';
 import { apiService } from '@/services/apiService';
-import { Environment } from '@/environment';
 
 // Imports locales
 import { Step5Data, UsernameCheckRequest } from '../types';
@@ -24,6 +28,8 @@ import { handleApiError } from '../utils/api';
 import { commonStyles } from '../styles/common';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { LoadingAnimation } from '../LoadingAnimation';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeStep5Styles } from '../styles/step5';
 
 interface Step5Props {
   userId: string;
@@ -37,6 +43,7 @@ export default forwardRef(function Step5(
   ref
 ) {
   const colorScheme = useColorScheme();
+  const styles = useThemedStyles(makeStep5Styles);
   const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const [username, setUsername] = useState(initialData?.username || '');
   const [profileImage, setProfileImage] = useState<string | null>(
@@ -297,8 +304,18 @@ export default forwardRef(function Step5(
 
     do {
       // Intentar obtener dimensiones originales con Image.getSize si fuera RN; como fallback usar 1000x1000
-      const targetW = settings.imageQuality === 'low' ? 800 : settings.imageQuality === 'medium' ? 1280 : 1000;
-      const targetH = settings.imageQuality === 'low' ? 600 : settings.imageQuality === 'medium' ? 720 : 1000;
+      const targetW =
+        settings.imageQuality === 'low'
+          ? 800
+          : settings.imageQuality === 'medium'
+            ? 1280
+            : 1000;
+      const targetH =
+        settings.imageQuality === 'low'
+          ? 600
+          : settings.imageQuality === 'medium'
+            ? 720
+            : 1000;
       result = await ImageManipulator.manipulateAsync(
         uri,
         [
@@ -329,20 +346,20 @@ export default forwardRef(function Step5(
       quality -= 0.1;
 
       // Si la calidad es muy baja, reducir también las dimensiones
-    if (quality < 0.3) {
+      if (quality < 0.3) {
         result = await ImageManipulator.manipulateAsync(
           uri,
           [
             {
               resize: {
-        width: 800,
-        height: 800,
+                width: 800,
+                height: 800,
               },
             },
           ],
           {
             compress: 0.3,
-      format: ImageManipulator.SaveFormat.JPEG,
+            format: ImageManipulator.SaveFormat.JPEG,
           }
         );
         break;
@@ -563,21 +580,17 @@ export default forwardRef(function Step5(
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
       <View style={commonStyles.header}>
-        <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
+        <Text style={[commonStyles.title, { color: styles.colors.text }]}>
           Perfil de usuario
         </Text>
-        <Text
-          style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}
-        >
+        <Text style={[commonStyles.subtitle, { color: styles.colors.text }]}>
           Personaliza tu perfil (opcional)
         </Text>
       </View>
 
       <View style={commonStyles.form}>
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             Nombre de usuario
           </Text>
           <View style={{ position: 'relative' }}>
@@ -585,30 +598,25 @@ export default forwardRef(function Step5(
               ref={usernameInputRef}
               style={[
                 commonStyles.input,
-                {
-                  backgroundColor: Colors[colorScheme].background,
-                  color: Colors[colorScheme].text,
-                  borderColor:
-                    usernameStatus === 'available'
-                      ? '#00C851'
-                      : usernameStatus === 'taken' ||
-                          usernameStatus === 'invalid'
-                        ? '#FF4444'
-                        : '#666',
-                  paddingRight: 45, // Espacio para el icono
-                },
+                styles.input,
+                usernameStatus === 'available'
+                  ? styles.inputSuccess
+                  : usernameStatus === 'taken' || usernameStatus === 'invalid'
+                    ? styles.inputError
+                    : null,
+                { paddingRight: 45 },
               ]}
               value={username}
               onChangeText={handleUsernameChange}
               onBlur={handleUsernameBlur}
               onFocus={handleUsernameFocus}
-              placeholderTextColor={`${Colors[colorScheme].text}60`}
-              autoCapitalize='none'
+              placeholderTextColor={styles.colors.placeholder}
+              autoCapitalize="none"
               autoCorrect={false}
               blurOnSubmit={false}
-              returnKeyType='done'
-              keyboardType='default'
-              textContentType='username'
+              returnKeyType="done"
+              keyboardType="default"
+              textContentType="username"
             />
 
             {/* Icono de estado */}
@@ -623,9 +631,17 @@ export default forwardRef(function Step5(
               {isCheckingUsername ? (
                 <LoadingAnimation size={20} />
               ) : usernameStatus === 'available' ? (
-                <FontAwesome name='check-circle' size={20} color='#00C851' />
+                <FontAwesome
+                  name="check-circle"
+                  size={20}
+                  color={styles.colors.success}
+                />
               ) : usernameStatus === 'taken' || usernameStatus === 'invalid' ? (
-                <FontAwesome name='times-circle' size={20} color='#FF4444' />
+                <FontAwesome
+                  name="times-circle"
+                  size={20}
+                  color={styles.colors.error}
+                />
               ) : null}
             </View>
           </View>
@@ -634,7 +650,7 @@ export default forwardRef(function Step5(
           {usernameError ? (
             <Text
               style={{
-                color: '#FF4444',
+                color: styles.colors.error,
                 fontSize: 12,
                 marginTop: 5,
                 marginLeft: 5,
@@ -645,7 +661,7 @@ export default forwardRef(function Step5(
           ) : usernameStatus === 'available' && username.trim() ? (
             <Text
               style={{
-                color: '#00C851',
+                color: styles.colors.success,
                 fontSize: 12,
                 marginTop: 5,
                 marginLeft: 5,
@@ -657,20 +673,15 @@ export default forwardRef(function Step5(
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             Foto de perfil
           </Text>
 
           <TouchableOpacity
             style={[
               commonStyles.imagePickerContainer,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
-                opacity: isUploadingImage ? 0.7 : 1,
-              },
+              styles.imagePicker,
+              { opacity: isUploadingImage ? 0.7 : 1 },
             ]}
             onPress={showImageOptions}
             disabled={isUploadingImage}
@@ -681,7 +692,7 @@ export default forwardRef(function Step5(
                 <Text
                   style={[
                     commonStyles.imageText,
-                    { color: Colors[colorScheme].text, marginTop: 12 },
+                    { color: styles.colors.text, marginTop: 12 },
                   ]}
                 >
                   Procesando imagen...
@@ -713,7 +724,7 @@ export default forwardRef(function Step5(
                     commonStyles.imagePreview,
                     imageLoading && { opacity: 0.7 },
                   ]}
-                  onError={error => {
+                  onError={(error) => {
                     setImageError(true);
                     setImageLoading(false);
                   }}
@@ -729,7 +740,7 @@ export default forwardRef(function Step5(
                 <Text
                   style={[
                     commonStyles.imageText,
-                    { color: Colors[colorScheme].text },
+                    { color: styles.colors.text },
                   ]}
                 >
                   Tocar para cambiar
@@ -740,14 +751,14 @@ export default forwardRef(function Step5(
                 {imageError && profileImage ? (
                   <>
                     <FontAwesome
-                      name='exclamation-triangle'
+                      name="exclamation-triangle"
                       size={40}
-                      color='#FF6B6B'
+                      color={styles.colors.error}
                     />
                     <Text
                       style={[
                         commonStyles.imageText,
-                        { color: '#FF6B6B', marginTop: 8 },
+                        { color: styles.colors.error, marginTop: 8 },
                       ]}
                     >
                       Error al cargar imagen
@@ -755,7 +766,7 @@ export default forwardRef(function Step5(
                     <Text
                       style={[
                         commonStyles.imageText,
-                        { color: Colors[colorScheme].text, fontSize: 12 },
+                        { color: styles.colors.text, fontSize: 12 },
                       ]}
                     >
                       Tocar para intentar de nuevo
@@ -764,14 +775,14 @@ export default forwardRef(function Step5(
                 ) : (
                   <>
                     <FontAwesome
-                      name='camera'
+                      name="camera"
                       size={40}
-                      color={Colors[colorScheme].tint}
+                      color={styles.colors.buttonBg}
                     />
                     <Text
                       style={[
                         commonStyles.imageText,
-                        { color: Colors[colorScheme].text },
+                        { color: styles.colors.text },
                       ]}
                     >
                       Subir foto de perfil
@@ -786,9 +797,7 @@ export default forwardRef(function Step5(
         <TouchableOpacity
           style={[
             commonStyles.button,
-            {
-              backgroundColor: Colors[colorScheme].tint,
-            },
+            styles.button,
             (isLoading || isUploadingImage || isCheckingUsername) &&
               commonStyles.buttonDisabled,
           ]}
@@ -810,14 +819,14 @@ export default forwardRef(function Step5(
       {/* Modal para selección de imagen */}
       <Modal
         visible={showImageModal}
-        transparent={true}
-        animationType='slide'
+        transparent
+        animationType="slide"
         onRequestClose={() => setShowImageModal(false)}
       >
         <TouchableOpacity
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: styles.colors.modalBackdrop,
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20,
@@ -825,21 +834,7 @@ export default forwardRef(function Step5(
           activeOpacity={1}
           onPress={() => setShowImageModal(false)}
         >
-          <View
-            style={{
-              backgroundColor: Colors[colorScheme].background,
-              borderRadius: 12,
-              padding: 20,
-              width: '90%',
-              maxWidth: 400,
-              elevation: 5,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-            }}
-            onStartShouldSetResponder={() => true}
-          >
+          <View style={styles.modalCard} onStartShouldSetResponder={() => true}>
             <View
               style={{
                 flexDirection: 'row',
@@ -852,7 +847,7 @@ export default forwardRef(function Step5(
                 style={{
                   fontSize: 18,
                   fontWeight: 'bold',
-                  color: Colors[colorScheme].text,
+                  color: styles.colors.text,
                 }}
               >
                 Seleccionar foto de perfil
@@ -862,13 +857,13 @@ export default forwardRef(function Step5(
                 style={{
                   padding: 8,
                   borderRadius: 20,
-                  backgroundColor: `${Colors[colorScheme].text}10`,
+                  backgroundColor: `${styles.colors.text}10`,
                 }}
               >
                 <Text
                   style={{
                     fontSize: 16,
-                    color: Colors[colorScheme].text,
+                    color: styles.colors.text,
                     fontWeight: 'bold',
                   }}
                 >
@@ -880,7 +875,7 @@ export default forwardRef(function Step5(
             <Text
               style={{
                 fontSize: 16,
-                color: Colors[colorScheme].text,
+                color: styles.colors.text,
                 marginBottom: 20,
                 textAlign: 'center',
               }}
@@ -892,7 +887,7 @@ export default forwardRef(function Step5(
               style={{
                 padding: 16,
                 borderRadius: 8,
-                backgroundColor: Colors[colorScheme].tint,
+                backgroundColor: styles.colors.buttonBg,
                 marginBottom: 12,
                 flexDirection: 'row',
                 justifyContent: 'center',
@@ -904,9 +899,9 @@ export default forwardRef(function Step5(
               }}
             >
               <FontAwesome
-                name='camera'
+                name="camera"
                 size={20}
-                color='white'
+                color="white"
                 style={{ marginRight: 10 }}
               />
               <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
@@ -918,7 +913,7 @@ export default forwardRef(function Step5(
               style={{
                 padding: 16,
                 borderRadius: 8,
-                backgroundColor: Colors[colorScheme].tint,
+                backgroundColor: styles.colors.buttonBg,
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -929,9 +924,9 @@ export default forwardRef(function Step5(
               }}
             >
               <FontAwesome
-                name='image'
+                name="image"
                 size={20}
-                color='white'
+                color="white"
                 style={{ marginRight: 10 }}
               />
               <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>

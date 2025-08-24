@@ -1,17 +1,12 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import ChatComponent from './ChatComponent';
 import WebHeader from './WebHeader';
 import { useScreenWidth } from './useScreenWidth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Colors from '@/constants/Colors';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeWebLayoutStyles } from './styles/webLayout';
 
 interface WebLayoutProps {
   children: React.ReactNode;
@@ -59,6 +54,7 @@ export default function WebLayout({
   onTabChange,
 }: WebLayoutProps) {
   const screenWidth = useScreenWidth();
+  const styles = useThemedStyles(makeWebLayoutStyles);
 
   if (Platform.OS !== 'web') {
     return <>{children}</>;
@@ -77,7 +73,7 @@ export default function WebLayout({
         <View style={[styles.leftColumn, { width: leftColumnWidth }]}>
           {/* Menú de navegación */}
           <View style={styles.menuContainer}>
-            {menuItems.map(item => (
+            {menuItems.map((item) => (
               <TouchableOpacity
                 key={item.key}
                 style={[
@@ -91,11 +87,11 @@ export default function WebLayout({
                   <MaterialCommunityIcons
                     name={item.icon}
                     size={20}
-                    color={
-                      activeTab === item.key ? Colors.dark.tint : '#B0B0B0'
-                    }
                     style={[
                       styles.menuIcon,
+                      activeTab === item.key
+                        ? styles.menuIconActive
+                        : styles.menuIconInactive,
                       isCompact && styles.menuIconCompact,
                     ]}
                   />
@@ -103,11 +99,11 @@ export default function WebLayout({
                   <FontAwesome
                     name={item.icon}
                     size={20}
-                    color={
-                      activeTab === item.key ? Colors.dark.tint : '#B0B0B0'
-                    }
                     style={[
                       styles.menuIcon,
+                      activeTab === item.key
+                        ? styles.menuIconActive
+                        : styles.menuIconInactive,
                       isCompact && styles.menuIconCompact,
                     ]}
                   />
@@ -139,62 +135,4 @@ export default function WebLayout({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#121212',
-  },
-  mainContent: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  leftColumn: {
-    width: 250,
-    backgroundColor: '#121212', // Mismo color del fondo principal
-    paddingVertical: 20,
-  },
-  menuContainer: {
-    flex: 1,
-    paddingHorizontal: 10,
-    paddingTop: 20,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginBottom: 5,
-  },
-  menuItemCompact: {
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-  },
-  activeMenuItem: {
-    backgroundColor: 'rgba(255, 99, 0, 0.1)',
-  },
-  menuIcon: {
-    marginRight: 15,
-  },
-  menuIconCompact: {
-    marginRight: 0,
-  },
-  menuText: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    fontWeight: '500',
-  },
-  activeMenuText: {
-    color: Colors.dark.tint,
-    fontWeight: '600',
-  },
-  centerColumn: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  rightColumn: {
-    width: 300,
-    backgroundColor: '#121212', // Mismo color del fondo principal
-  },
-});
+// styles via makeWebLayoutStyles

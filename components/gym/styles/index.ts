@@ -1,1 +1,1 @@
-export { GymStyles } from './GymStyles';
+export {};

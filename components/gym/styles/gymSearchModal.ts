@@ -1,0 +1,206 @@
+import { StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import type { ThemeMode } from '@/hooks/useThemedStyles';
+
+export const makeGymSearchModalStyles = (theme: ThemeMode) => {
+  const isDark = theme === 'dark';
+  const palette = Colors[theme];
+
+  const colors = {
+    background: palette.background,
+    cardBg: isDark ? '#1A1A1A' : '#F7F7F7',
+    surface2: isDark ? '#2A2A2A' : '#ECECEC',
+    border: isDark ? '#333333' : '#DDDDDD',
+    text: palette.text,
+    muted: isDark ? '#B0B0B0' : '#666666',
+    dim: isDark ? '#666666' : '#999999',
+    tint: palette.tint,
+    success: '#4CAF50',
+    warning: '#FFA726',
+    danger: '#FF6B6B',
+    onTint: '#FFFFFF',
+  } as const;
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingTop: 60,
+      paddingBottom: 20,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    closeButton: { padding: 8 },
+    headerTitle: { fontSize: 18, fontWeight: '600', color: colors.text },
+    placeholder: { width: 40 },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.cardBg,
+      borderRadius: 12,
+      marginHorizontal: 20,
+      marginVertical: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    searchIcon: { marginRight: 12 },
+    searchInput: { flex: 1, color: colors.text, fontSize: 16 },
+    clearButton: { padding: 4, marginLeft: 8 },
+    content: { flex: 1 },
+    loadingContainer: { alignItems: 'center', paddingVertical: 40 },
+    loadingText: { color: colors.muted, fontSize: 16, marginTop: 12 },
+    errorContainer: {
+      alignItems: 'center',
+      paddingVertical: 40,
+      paddingHorizontal: 20,
+    },
+    errorText: {
+      color: colors.danger,
+      fontSize: 16,
+      textAlign: 'center',
+      marginVertical: 12,
+    },
+    retryButton: {
+      backgroundColor: colors.tint,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+      marginTop: 8,
+    },
+    retryText: { color: colors.onTint, fontSize: 14, fontWeight: '600' },
+    emptyContainer: {
+      alignItems: 'center',
+      paddingVertical: 60,
+      paddingHorizontal: 20,
+    },
+    emptyTitle: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: '600',
+      marginTop: 16,
+    },
+    emptySubtitle: {
+      color: colors.muted,
+      fontSize: 14,
+      textAlign: 'center',
+      marginTop: 8,
+    },
+    initialContainer: {
+      alignItems: 'center',
+      paddingVertical: 60,
+      paddingHorizontal: 20,
+    },
+    initialTitle: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: '600',
+      marginTop: 16,
+    },
+    initialSubtitle: {
+      color: colors.muted,
+      fontSize: 14,
+      textAlign: 'center',
+      marginTop: 8,
+    },
+    resultsContainer: { paddingHorizontal: 20, paddingBottom: 20 },
+    resultsHeader: {
+      color: colors.muted,
+      fontSize: 14,
+      marginBottom: 16,
+      fontWeight: '500',
+    },
+    gymItem: {
+      backgroundColor: colors.cardBg,
+      borderRadius: 12,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    gymItemContent: { flexDirection: 'row', alignItems: 'center', padding: 16 },
+    gymImageContainer: { marginRight: 16 },
+    gymImage: { width: 60, height: 60, borderRadius: 8 },
+    gymImagePlaceholder: {
+      width: 60,
+      height: 60,
+      borderRadius: 8,
+      backgroundColor: colors.surface2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    gymDetails: { flex: 1 },
+    gymName: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    gymLocation: { color: colors.muted, fontSize: 14, marginBottom: 2 },
+    gymDistance: { color: colors.muted, fontSize: 14, marginBottom: 6 },
+    verifiedBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+    },
+    verifiedText: {
+      color: colors.success,
+      fontSize: 12,
+      marginLeft: 4,
+      fontWeight: '500',
+    },
+    gymInfoContainer: { flex: 1, backgroundColor: colors.background },
+    gymInfoHeader: {
+      paddingTop: 60,
+      paddingBottom: 20,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    backButton: { flexDirection: 'row', alignItems: 'center' },
+    backButtonText: { color: colors.tint, fontSize: 16, marginLeft: 8 },
+    connectButtonContainer: {
+      padding: 20,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    connectButton: {
+      backgroundColor: colors.tint,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 16,
+      borderRadius: 12,
+    },
+    connectButtonText: {
+      color: colors.onTint,
+      fontSize: 18,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    currentGymContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    currentGymText: {
+      color: colors.success,
+      fontSize: 16,
+      marginLeft: 8,
+      fontWeight: '500',
+    },
+  });
+
+  return { ...styles, colors };
+};

@@ -55,38 +55,79 @@ export interface PaymentStatus {
 }
 
 class PaymentService {
-  async createUserPlanPreference(req: CreateUserPlanPreferenceRequest): Promise<ApiResponse<PaymentPreferenceResponse>> {
-    return apiService.post<PaymentPreferenceResponse>('/payments/plan/preference', req);
+  async createUserPlanPreference(
+    req: CreateUserPlanPreferenceRequest
+  ): Promise<ApiResponse<PaymentPreferenceResponse>> {
+    return apiService.post<PaymentPreferenceResponse>(
+      '/payments/plan/preference',
+      req
+    );
   }
 
-  async createGymPlanPreference(req: CreateGymPlanPreferenceRequest): Promise<ApiResponse<PaymentPreferenceResponse>> {
-    return apiService.post<PaymentPreferenceResponse>('/payments/gymplan/preference', req);
+  async createGymPlanPreference(
+    req: CreateGymPlanPreferenceRequest
+  ): Promise<ApiResponse<PaymentPreferenceResponse>> {
+    return apiService.post<PaymentPreferenceResponse>(
+      '/payments/gymplan/preference',
+      req
+    );
   }
 
-  async getPaymentStatus(paymentId: string): Promise<ApiResponse<PaymentStatus>> {
+  async getPaymentStatus(
+    paymentId: string
+  ): Promise<ApiResponse<PaymentStatus>> {
     return apiService.get<PaymentStatus>(`/payments/status/${paymentId}`);
   }
 
-  async pollPaymentStatus(id: string, intervalMs = 5000, timeoutMs = 180000, shouldStop?: () => boolean): Promise<ApiResponse<any>> {
+  async pollPaymentStatus(
+    id: string,
+    intervalMs = 5000,
+    timeoutMs = 180000,
+    shouldStop?: () => boolean
+  ): Promise<ApiResponse<any>> {
     const start = Date.now();
     while (true) {
       if (shouldStop?.()) throw new Error('Polling cancelled');
-    const resp = await this.getPaymentStatus(id);
-  const status: string = (resp?.Data?.status || resp?.Data?.Status || '').toString();
+      const resp = await this.getPaymentStatus(id);
+      const status: string = (
+        resp?.Data?.status ||
+        resp?.Data?.Status ||
+        ''
+      ).toString();
       if (!resp.Success) return resp;
-      if (['Approved', 'Rejected', 'Cancelled', 'Expired'].includes(status)) return resp;
+      if (['Approved', 'Rejected', 'Cancelled', 'Expired'].includes(status))
+        return resp;
       if (Date.now() - start > timeoutMs) return resp; // devolver último pending
-      await new Promise(r => setTimeout(r, intervalMs));
+      await new Promise((r) => setTimeout(r, intervalMs));
     }
   }
 
   // Nuevo: crear pago con tarjeta usando token (Bricks)
-  async createUserPlanCardPayment(req: { PlanTypeId: string; UserId: string; CardToken: string; BuyerEmail?: string | null; Amount?: number | null; }): Promise<ApiResponse<PaymentPreferenceResponse>> {
-    return apiService.post<PaymentPreferenceResponse>('/payments/plan/card', req);
+  async createUserPlanCardPayment(req: {
+    PlanTypeId: string;
+    UserId: string;
+    CardToken: string;
+    BuyerEmail?: string | null;
+    Amount?: number | null;
+  }): Promise<ApiResponse<PaymentPreferenceResponse>> {
+    return apiService.post<PaymentPreferenceResponse>(
+      '/payments/plan/card',
+      req
+    );
   }
 
-  async createGymPlanCardPayment(req: { GymPlanSelectedTypeId: string; GymId: string; UserId: string; CardToken: string; BuyerEmail?: string | null; Amount?: number | null; }): Promise<ApiResponse<PaymentPreferenceResponse>> {
-    return apiService.post<PaymentPreferenceResponse>('/payments/gymplan/card', req);
+  async createGymPlanCardPayment(req: {
+    GymPlanSelectedTypeId: string;
+    GymId: string;
+    UserId: string;
+    CardToken: string;
+    BuyerEmail?: string | null;
+    Amount?: number | null;
+  }): Promise<ApiResponse<PaymentPreferenceResponse>> {
+    return apiService.post<PaymentPreferenceResponse>(
+      '/payments/gymplan/card',
+      req
+    );
   }
 }
 

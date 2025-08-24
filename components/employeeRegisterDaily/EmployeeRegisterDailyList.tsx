@@ -26,7 +26,7 @@ const EmployeeRegisterDailyList = React.memo(() => {
         </View>
 
         <Text style={styles.date}>
-          Fecha: {' '}
+          Fecha:{' '}
           {item.date ? new Date(item.date).toLocaleDateString() : 'Sin fecha'}
         </Text>
 
@@ -71,13 +71,13 @@ const EmployeeRegisterDailyList = React.memo(() => {
 
   return (
     <EntityList
-      title='Registro Diario de Empleados'
+      title="Registro Diario de Empleados"
       loadFunction={loadEmployeeRegisters}
       renderItem={renderEmployeeRegisterItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay registros'
-      emptyMessage='No se encontraron registros de empleados'
-      loadingMessage='Cargando registros...'
+      emptyTitle="No hay registros"
+      emptyMessage="No se encontraron registros de empleados"
+      loadingMessage="Cargando registros..."
     />
   );
 });
@@ -91,20 +91,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -113,37 +113,37 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   date: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconSelected,
     marginBottom: SPACING.sm,
-    fontWeight: '500'
+    fontWeight: '500',
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 120
+    minWidth: 120,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   notes: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontStyle: 'italic',
-    marginTop: SPACING.sm
-
-}});
+    marginTop: SPACING.sm,
+  },
+});
 
 EmployeeRegisterDailyList.displayName = 'EmployeeRegisterDailyList';
 

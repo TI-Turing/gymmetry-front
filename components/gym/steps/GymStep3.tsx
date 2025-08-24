@@ -13,15 +13,16 @@ import {
 } from '@/components/catalogs';
 import { GymStepProps, GymStep3Data } from '../types';
 import { GymService } from '@/services/gymService';
-import { GymStyles } from '../styles/GymStyles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from '../styles/gymSteps';
 import { Country, Region, City } from '@/dto/common';
-import Colors from '@/constants/Colors';
 
 export default function GymStep3({
   gymId,
   onNext,
 }: GymStepProps<GymStep3Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
+  const { styles, colors } = useThemedStyles(makeGymStepsStyles);
   const [countries, setCountries] = useState<Country[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -46,7 +47,7 @@ export default function GymStep3({
 
   // El campo país estará deshabilitado, no se permite selección manual
   const handleCountrySelect = async (countryId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       countryId,
       regionId: '',
@@ -89,10 +90,10 @@ export default function GymStep3({
     // Seleccionar Colombia por defecto cuando los países estén disponibles
     if (countries.length > 0 && !formData.countryId) {
       const colombia = countries.find(
-        c => c.Nombre.toLowerCase() === 'colombia'
+        (c) => c.Nombre.toLowerCase() === 'colombia'
       );
       if (colombia) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           countryId: colombia.Id,
           regionId: '',
@@ -104,7 +105,7 @@ export default function GymStep3({
   }, [countries, formData.countryId, loadRegions]);
 
   const handleRegionSelect = async (regionId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       regionId,
       cityId: '',
@@ -113,11 +114,11 @@ export default function GymStep3({
   };
 
   const handleCitySelect = (cityId: string) => {
-    setFormData(prev => ({ ...prev, cityId }));
+    setFormData((prev) => ({ ...prev, cityId }));
   };
 
   const handleAddressChange = (text: string) => {
-    setFormData(prev => ({ ...prev, address: text }));
+    setFormData((prev) => ({ ...prev, address: text }));
   };
 
   const validate = () => {
@@ -161,24 +162,24 @@ export default function GymStep3({
 
   return (
     <KeyboardAvoidingView
-      style={GymStyles.step3Container}
+      style={styles.step3Container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        style={GymStyles.scrollView}
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        <View style={GymStyles.step3Header}>
-          <FontAwesome name='map-marker' size={40} color={Colors.dark.tint} />
-          <Text style={GymStyles.step3Title}>Ubicación de la empresa</Text>
-          <Text style={GymStyles.step3Subtitle}>
+        <View style={styles.step3Header}>
+          <FontAwesome name="map-marker" size={40} color={colors.tint} />
+          <Text style={styles.step3Title}>Ubicación de la empresa</Text>
+          <Text style={styles.step3Subtitle}>
             Selecciona el país, región, ciudad en el que se encuentra registrado
             el gimnasio
           </Text>
         </View>
 
-        <View style={GymStyles.step3Form}>
-          <View style={{ opacity: 0.6 }} pointerEvents='none'>
+        <View style={styles.step3Form}>
+          <View style={{ opacity: 0.6 }} pointerEvents="none">
             <CountrySelector
               countries={countries}
               value={formData.countryId}
@@ -202,7 +203,7 @@ export default function GymStep3({
             required
           />
           <FormInput
-            label='Dirección de la oficina principal*'
+            label="Dirección de la oficina principal*"
             value={formData.address}
             onChangeText={handleAddressChange}
             multiline
@@ -210,8 +211,8 @@ export default function GymStep3({
           />
         </View>
       </ScrollView>
-      <View style={GymStyles.step3ButtonContainer}>
-        <Button title='Continuar' onPress={onSubmit} loading={loading} />
+      <View style={styles.step3ButtonContainer}>
+        <Button title="Continuar" onPress={onSubmit} loading={loading} />
       </View>
       <AlertComponent />
     </KeyboardAvoidingView>

@@ -17,8 +17,7 @@ export function PhysicalAssessmentDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await physicalAssessmentService.getPhysicalAssessmentById(id);
+      const res = await physicalAssessmentService.getPhysicalAssessmentById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function PhysicalAssessmentDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>PhysicalAssessment - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

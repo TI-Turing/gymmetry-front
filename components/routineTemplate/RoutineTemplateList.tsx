@@ -3,12 +3,13 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { routineTemplateService } from '@/services';
 import { RoutineTemplateSkeleton } from './RoutineTemplateSkeleton';
-import { styles } from './styles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineTemplateStyles } from './styles.themed';
 
 const RoutineTemplateList = React.memo(() => {
+  const styles = useThemedStyles(makeRoutineTemplateStyles);
   const loadRoutineTemplates = useCallback(async () => {
-    const response =
-      await routineTemplateService.getAllRoutineTemplates();
+    const response = await routineTemplateService.getAllRoutineTemplates();
     return response.Data || [];
   }, []);
 
@@ -60,13 +61,13 @@ const RoutineTemplateList = React.memo(() => {
 
   return (
     <EntityList
-      title='Plantillas de Rutina'
+      title="Plantillas de Rutina"
       loadFunction={loadRoutineTemplates}
       renderItem={renderRoutineTemplateItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay plantillas'
-      emptyMessage='No se encontraron plantillas de rutina'
-      loadingMessage='Cargando plantillas...'
+      emptyTitle="No hay plantillas"
+      emptyMessage="No se encontraron plantillas de rutina"
+      loadingMessage="Cargando plantillas..."
       useSkeletonLoading={true}
       skeletonComponent={<RoutineTemplateSkeleton count={5} />}
     />

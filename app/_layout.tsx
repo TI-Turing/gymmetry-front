@@ -8,17 +8,32 @@ import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, View as RNView, Text as RNText, TouchableOpacity, TextInput, Platform } from 'react-native';
+import {
+  Modal,
+  View as RNView,
+  Text as RNText,
+  TouchableOpacity,
+  TextInput,
+  Platform,
+} from 'react-native';
 import 'react-native-reanimated';
 import { LogBox } from 'react-native';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import { userSessionService } from '@/services/userSessionService';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { AppSettingsProvider, useAppSettings } from '@/contexts/AppSettingsContext';
-import { scheduleLocalNotificationAsync, addNotificationReceivedListener, addNotificationResponseReceivedListener } from '@/utils/localNotifications';
+import {
+  AppSettingsProvider,
+  useAppSettings,
+} from '@/contexts/AppSettingsContext';
+import {
+  scheduleLocalNotificationAsync,
+  addNotificationReceivedListener,
+  addNotificationResponseReceivedListener,
+} from '@/utils/localNotifications';
 import { PreloadProvider } from '@/contexts/PreloadContext';
 import { I18nProvider } from '@/i18n';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRootLayoutStyles } from './styles/rootLayout';
 
 // Importar el watcher para activarlo globalmente
 import '@/services/gymDataWatcher';
@@ -55,7 +70,10 @@ export default function RootLayout() {
     if (loaded) {
       setFontReady(true);
     } else if (error) {
-      console.warn('No se pudieron cargar las fuentes. Continuando sin pre-carga de íconos.', error);
+      console.warn(
+        'No se pudieron cargar las fuentes. Continuando sin pre-carga de íconos.',
+        error
+      );
       setFontReady(true);
     }
   }, [loaded, error]);
@@ -100,12 +118,32 @@ function RootLayoutNav() {
     const first = segments[0] as string | undefined; // p.ej. '(tabs)', 'login', 'register', 'plans', 'modal', etc.
 
     // Rutas de la app a las que un usuario autenticado SÍ puede entrar aunque no sean parte de (tabs)
-  const allowedWhenAuth = new Set(['(tabs)', 'plans', 'modal', 'routine-day', 'routine-day-detail', 'routine-exercise-detail', 'routine-templates', 'routine-template-detail', 'routine-template-days', 'exercise-detail', 'settings', 'create-routine', 'physical-assessment', 'user-exercise-max']);
+    const allowedWhenAuth = new Set([
+      '(tabs)',
+      'plans',
+      'modal',
+      'routine-day',
+      'routine-day-detail',
+      'routine-exercise-detail',
+      'routine-templates',
+      'routine-template-detail',
+      'routine-template-days',
+      'exercise-detail',
+      'settings',
+      'create-routine',
+      'physical-assessment',
+      'user-exercise-max',
+    ]);
 
     // Usuario NO autenticado intentando entrar a la app (tabs, plans, modal) -> mandar a login
     if (
-    !isAuthenticated &&
-  (first === '(tabs)' || first === 'plans' || first === 'modal' || first === 'routine-day' || first === 'routine-day-detail' || first === 'routine-exercise-detail')
+      !isAuthenticated &&
+      (first === '(tabs)' ||
+        first === 'plans' ||
+        first === 'modal' ||
+        first === 'routine-day' ||
+        first === 'routine-day-detail' ||
+        first === 'routine-exercise-detail')
     ) {
       router.replace('/login');
       return;
@@ -130,23 +168,43 @@ function RootLayoutNav() {
     if (!settings.notificationsEnabled) return;
     // Hidratación
     if (settings.hydrationRemindersEnabled) {
-      const secs = Math.max(5 * 60, (settings.hydrationIntervalMinutes || 60) * 60);
+      const secs = Math.max(
+        5 * 60,
+        (settings.hydrationIntervalMinutes || 60) * 60
+      );
       scheduleLocalNotificationAsync(
-        { title: 'Hidrátate', body: 'Toma un vaso de agua y recarga energía.', data: { type: 'wellness:hydration' } },
+        {
+          title: 'Hidrátate',
+          body: 'Toma un vaso de agua y recarga energía.',
+          data: { type: 'wellness:hydration' },
+        },
         { seconds: secs },
         { settings }
       ).catch(() => {});
     }
     // Pausas activas
     if (settings.activeBreaksEnabled) {
-      const secs = Math.max(10 * 60, (settings.activeBreaksIntervalMinutes || 120) * 60);
+      const secs = Math.max(
+        10 * 60,
+        (settings.activeBreaksIntervalMinutes || 120) * 60
+      );
       scheduleLocalNotificationAsync(
-        { title: 'Pausa activa', body: 'Levántate, camina un poco y estira tus músculos.', data: { type: 'wellness:activeBreak' } },
+        {
+          title: 'Pausa activa',
+          body: 'Levántate, camina un poco y estira tus músculos.',
+          data: { type: 'wellness:activeBreak' },
+        },
         { seconds: secs },
         { settings }
       ).catch(() => {});
     }
-  }, [settings.notificationsEnabled, settings.hydrationRemindersEnabled, settings.hydrationIntervalMinutes, settings.activeBreaksEnabled, settings.activeBreaksIntervalMinutes]);
+  }, [
+    settings.notificationsEnabled,
+    settings.hydrationRemindersEnabled,
+    settings.hydrationIntervalMinutes,
+    settings.activeBreaksEnabled,
+    settings.activeBreaksIntervalMinutes,
+  ]);
 
   // Listener para re-agendar wellness al recibir la notificación
   useEffect(() => {
@@ -155,21 +213,40 @@ function RootLayoutNav() {
     (async () => {
       sub = await addNotificationReceivedListener(async (event: any) => {
         try {
-          const type = event?.request?.content?.data?.type || event?.request?.content?.data?.kind;
+          const type =
+            event?.request?.content?.data?.type ||
+            event?.request?.content?.data?.kind;
           if (!type) return;
           if (!settings.notificationsEnabled) return;
-          if (type === 'wellness:hydration' && settings.hydrationRemindersEnabled) {
-            const secs = Math.max(5 * 60, (settings.hydrationIntervalMinutes || 60) * 60);
+          if (
+            type === 'wellness:hydration' &&
+            settings.hydrationRemindersEnabled
+          ) {
+            const secs = Math.max(
+              5 * 60,
+              (settings.hydrationIntervalMinutes || 60) * 60
+            );
             await scheduleLocalNotificationAsync(
-              { title: 'Hidrátate', body: 'Toma un vaso de agua y recarga energía.', data: { type } },
+              {
+                title: 'Hidrátate',
+                body: 'Toma un vaso de agua y recarga energía.',
+                data: { type },
+              },
               { seconds: secs },
               { settings }
             );
           }
           if (type === 'wellness:activeBreak' && settings.activeBreaksEnabled) {
-            const secs = Math.max(10 * 60, (settings.activeBreaksIntervalMinutes || 120) * 60);
+            const secs = Math.max(
+              10 * 60,
+              (settings.activeBreaksIntervalMinutes || 120) * 60
+            );
             await scheduleLocalNotificationAsync(
-              { title: 'Pausa activa', body: 'Levántate, camina un poco y estira tus músculos.', data: { type } },
+              {
+                title: 'Pausa activa',
+                body: 'Levántate, camina un poco y estira tus músculos.',
+                data: { type },
+              },
               { seconds: secs },
               { settings }
             );
@@ -178,84 +255,117 @@ function RootLayoutNav() {
       });
 
       // Tap/response listener (cuando la app está en background)
-      subResp = await addNotificationResponseReceivedListener(async (response: any) => {
-        try {
-          const type = response?.notification?.request?.content?.data?.type || response?.notification?.request?.content?.data?.kind;
-          if (!type) return;
-          if (!settings.notificationsEnabled) return;
-          if (type === 'wellness:hydration' && settings.hydrationRemindersEnabled) {
-            const secs = Math.max(5 * 60, (settings.hydrationIntervalMinutes || 60) * 60);
-            await scheduleLocalNotificationAsync(
-              { title: 'Hidrátate', body: 'Toma un vaso de agua y recarga energía.', data: { type } },
-              { seconds: secs },
-              { settings }
-            );
-          }
-          if (type === 'wellness:activeBreak' && settings.activeBreaksEnabled) {
-            const secs = Math.max(10 * 60, (settings.activeBreaksIntervalMinutes || 120) * 60);
-            await scheduleLocalNotificationAsync(
-              { title: 'Pausa activa', body: 'Levántate, camina un poco y estira tus músculos.', data: { type } },
-              { seconds: secs },
-              { settings }
-            );
-          }
-        } catch {}
-      });
+      subResp = await addNotificationResponseReceivedListener(
+        async (response: any) => {
+          try {
+            const type =
+              response?.notification?.request?.content?.data?.type ||
+              response?.notification?.request?.content?.data?.kind;
+            if (!type) return;
+            if (!settings.notificationsEnabled) return;
+            if (
+              type === 'wellness:hydration' &&
+              settings.hydrationRemindersEnabled
+            ) {
+              const secs = Math.max(
+                5 * 60,
+                (settings.hydrationIntervalMinutes || 60) * 60
+              );
+              await scheduleLocalNotificationAsync(
+                {
+                  title: 'Hidrátate',
+                  body: 'Toma un vaso de agua y recarga energía.',
+                  data: { type },
+                },
+                { seconds: secs },
+                { settings }
+              );
+            }
+            if (
+              type === 'wellness:activeBreak' &&
+              settings.activeBreaksEnabled
+            ) {
+              const secs = Math.max(
+                10 * 60,
+                (settings.activeBreaksIntervalMinutes || 120) * 60
+              );
+              await scheduleLocalNotificationAsync(
+                {
+                  title: 'Pausa activa',
+                  body: 'Levántate, camina un poco y estira tus músculos.',
+                  data: { type },
+                },
+                { seconds: secs },
+                { settings }
+              );
+            }
+          } catch {}
+        }
+      );
     })();
-    return () => { try { sub?.remove?.(); } catch {}; try { subResp?.remove?.(); } catch {} };
-  }, [settings.notificationsEnabled, settings.hydrationRemindersEnabled, settings.hydrationIntervalMinutes, settings.activeBreaksEnabled, settings.activeBreaksIntervalMinutes]);
+    return () => {
+      try {
+        sub?.remove?.();
+      } catch {}
+      try {
+        subResp?.remove?.();
+      } catch {}
+    };
+  }, [
+    settings.notificationsEnabled,
+    settings.hydrationRemindersEnabled,
+    settings.hydrationIntervalMinutes,
+    settings.activeBreaksEnabled,
+    settings.activeBreaksIntervalMinutes,
+  ]);
 
   return (
-    <ThemeProvider value={resolvedColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider
+      value={resolvedColorScheme === 'dark' ? DarkTheme : DefaultTheme}
+    >
       {isAuthenticated && <BiometricGate />}
       <Stack>
         {/* Grupo principal con tabs */}
-        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
         {/* Auth */}
-        <Stack.Screen name='login' options={{ headerShown: false }} />
-        <Stack.Screen name='register' options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
 
         {/* Modales / pantallas fuera de tabs */}
-        <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen
-          name='plans'
+          name="plans"
           options={{ presentation: 'modal', headerShown: false }}
         />
         <Stack.Screen
-          name='routine-day'
+          name="routine-day"
           options={{ presentation: 'modal', headerShown: false }}
         />
         <Stack.Screen
-          name='routine-day-detail'
+          name="routine-day-detail"
           options={{ presentation: 'modal', headerShown: false }}
         />
         <Stack.Screen
-          name='routine-exercise-detail'
+          name="routine-exercise-detail"
           options={{ presentation: 'modal', headerShown: false }}
         />
         <Stack.Screen
-          name='routine-templates'
+          name="routine-templates"
           options={{ presentation: 'modal', headerShown: false }}
         />
         <Stack.Screen
-          name='routine-template-detail'
+          name="routine-template-detail"
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name='routine-template-days'
+          name="routine-template-days"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="exercise-detail" options={{ headerShown: false }} />
+        <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen
-          name='exercise-detail'
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='settings'
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='create-routine'
+          name="create-routine"
           options={{ presentation: 'modal', headerShown: false }}
         />
       </Stack>
@@ -272,6 +382,7 @@ function BiometricGate() {
   const [error, setError] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [identifier, setIdentifier] = useState<string | null>(null);
+  const styles = useThemedStyles(makeRootLayoutStyles);
 
   useEffect(() => {
     let cancelled = false;
@@ -279,7 +390,7 @@ function BiometricGate() {
       if (!user) return;
       setIdentifier(user.email || user.userName || null);
       // Gate sólo para roles privilegiados sin gym vinculado aún (dueño en proceso de set up)
-  if (hasRole('owner') && user.gymId) {
+      if (hasRole('owner') && user.gymId) {
         if (!cancelled) {
           setVisible(true);
           setMode('choice');
@@ -297,12 +408,16 @@ function BiometricGate() {
     setError(null);
     try {
       // Dynamic import without static analysis to avoid type errors when module is not installed
-      const dynamicImport: any = (Function('return import')() as any);
-      const LocalAuthentication = (await dynamicImport('expo-local-authentication')).default || (await dynamicImport('expo-local-authentication'));
+      const dynamicImport: any = Function('return import')() as any;
+      const LocalAuthentication =
+        (await dynamicImport('expo-local-authentication')).default ||
+        (await dynamicImport('expo-local-authentication'));
       const hasHardware = await LocalAuthentication.hasHardwareAsync?.();
       const supported = await LocalAuthentication.isEnrolledAsync?.();
       if (!hasHardware || !supported) {
-        setError('Biometría no disponible en este dispositivo. Usa contraseña.');
+        setError(
+          'Biometría no disponible en este dispositivo. Usa contraseña.'
+        );
         setMode('choice');
         return;
       }
@@ -319,7 +434,9 @@ function BiometricGate() {
         setMode('choice');
       }
     } catch {
-      setError('No se pudo iniciar la autenticación biométrica. Usa contraseña.');
+      setError(
+        'No se pudo iniciar la autenticación biométrica. Usa contraseña.'
+      );
       setMode('choice');
     }
   });
@@ -333,7 +450,10 @@ function BiometricGate() {
     setError(null);
     try {
       const { authService } = await import('@/services/authService');
-      const res: any = await authService.login({ UserNameOrEmail: identifier, Password: password } as any);
+      const res: any = await authService.login({
+        UserNameOrEmail: identifier,
+        Password: password,
+      } as any);
       if (res?.Success) {
         setVisible(false);
       } else {
@@ -353,47 +473,69 @@ function BiometricGate() {
 
   if (!visible) return null;
   return (
-    <Modal transparent animationType='fade' visible={visible}>
-      <RNView style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-        <RNView style={{ width: '100%', maxWidth: 360, backgroundColor: '#1E1E1E', borderRadius: 12, padding: 20 }}>
-          <RNText style={{ color: '#fff', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Verificación requerida</RNText>
-          {error ? <RNText style={{ color: '#ff7675', marginBottom: 8 }}>{error}</RNText> : null}
+    <Modal transparent animationType="fade" visible={visible}>
+      <RNView style={styles.overlay}>
+        <RNView style={styles.dialog}>
+          <RNText style={styles.title}>Verificación requerida</RNText>
+          {error ? <RNText style={styles.errorText}>{error}</RNText> : null}
           {mode === 'choice' && (
             <>
-              <TouchableOpacity onPress={tryBiometric} style={{ backgroundColor: '#0EA5E9', padding: 12, borderRadius: 8, marginBottom: 8 }}>
-                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Usar huella</RNText>
+              <TouchableOpacity
+                onPress={tryBiometric}
+                style={styles.primaryBtn}
+              >
+                <RNText style={styles.primaryBtnText}>Usar huella</RNText>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { setMode('password'); setError(null); }} style={{ backgroundColor: '#444', padding: 12, borderRadius: 8, marginBottom: 8 }}>
-                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Verificar por contraseña</RNText>
+              <TouchableOpacity
+                onPress={() => {
+                  setMode('password');
+                  setError(null);
+                }}
+                style={styles.secondaryBtn}
+              >
+                <RNText style={styles.secondaryBtnText}>
+                  Verificar por contraseña
+                </RNText>
               </TouchableOpacity>
-              <TouchableOpacity onPress={doLogout} style={{ backgroundColor: '#EF4444', padding: 12, borderRadius: 8 }}>
-                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Cerrar sesión</RNText>
+              <TouchableOpacity onPress={doLogout} style={styles.dangerBtn}>
+                <RNText style={styles.dangerBtnText}>Cerrar sesión</RNText>
               </TouchableOpacity>
             </>
           )}
           {mode === 'password' && (
             <>
-              <RNText style={{ color: '#ddd', marginBottom: 8 }}>Ingresa tu contraseña para continuar</RNText>
+              <RNText style={styles.infoText}>
+                Ingresa tu contraseña para continuar
+              </RNText>
               <TextInput
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                placeholder='Contraseña'
-                placeholderTextColor={'#888'}
-                style={{ backgroundColor: '#2A2A2A', color: '#fff', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12 }}
-                autoCapitalize='none'
+                placeholder="Contraseña"
+                placeholderTextColor={styles.colors.placeholder}
+                style={styles.input}
+                autoCapitalize="none"
                 autoCorrect={false}
               />
-              <TouchableOpacity onPress={verifyPassword} style={{ backgroundColor: '#10B981', padding: 12, borderRadius: 8, marginBottom: 8 }}>
-                <RNText style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Verificar</RNText>
+              <TouchableOpacity
+                onPress={verifyPassword}
+                style={styles.primaryBtn}
+              >
+                <RNText style={styles.primaryBtnText}>Verificar</RNText>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { setMode('choice'); setError(null); }} style={{ padding: 12, borderRadius: 8 }}>
-                <RNText style={{ color: '#bbb', textAlign: 'center' }}>Volver</RNText>
+              <TouchableOpacity
+                onPress={() => {
+                  setMode('choice');
+                  setError(null);
+                }}
+                style={{ padding: 12, borderRadius: 8 }}
+              >
+                <RNText style={styles.backText}>Volver</RNText>
               </TouchableOpacity>
             </>
           )}
           {mode === 'working' && (
-            <RNText style={{ color: '#bbb' }}>Verificando…</RNText>
+            <RNText style={styles.workingText}>Verificando…</RNText>
           )}
         </RNView>
       </RNView>

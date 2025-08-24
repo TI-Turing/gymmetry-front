@@ -107,7 +107,7 @@ class AsyncStorageObserver {
             observer.currentValue = newValue;
 
             // Notificar a todos los listeners
-            observer.listeners.forEach(listener => {
+            observer.listeners.forEach((listener) => {
               try {
                 listener(newValue, oldValue, key);
               } catch (error) {
@@ -135,7 +135,7 @@ class AsyncStorageObserver {
           const oldValue = observer.currentValue;
           observer.currentValue = newValue;
 
-          observer.listeners.forEach(listener => {
+          observer.listeners.forEach((listener) => {
             try {
               listener(newValue, oldValue, key);
             } catch (error) {

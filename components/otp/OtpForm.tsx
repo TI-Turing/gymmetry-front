@@ -5,7 +5,6 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { otpService } from '@/services';
 
 export function OtpForm() {
   const [payload, setPayload] = useState<string>('{}');
@@ -61,11 +60,11 @@ export function OtpForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

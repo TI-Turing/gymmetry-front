@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
@@ -74,7 +73,6 @@ export default function RoutineFilters({
 }: FilterProps) {
   const [filters, setFilters] = useState<FilterState>(currentFilters);
 
-
   // Sincronizar con currentFilters cuando el modal se abre
   React.useEffect(() => {
     if (visible) {
@@ -88,7 +86,7 @@ export default function RoutineFilters({
   }, [filters, onFiltersChange]);
 
   const toggleBooleanFilter = (key: 'requiereEquipos' | 'calistenia') => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [key]: prev[key] === null ? true : prev[key] === true ? false : null,
     }));
@@ -98,7 +96,7 @@ export default function RoutineFilters({
     key: string,
     level: 'bajo' | 'medio' | 'alto'
   ) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       objectives: {
         ...prev.objectives,
@@ -130,7 +128,7 @@ export default function RoutineFilters({
               styles.booleanOption,
               value === null && styles.booleanOptionActive,
             ]}
-            onPress={() => setFilters(prev => ({ ...prev, [key]: null }))}
+            onPress={() => setFilters((prev) => ({ ...prev, [key]: null }))}
           >
             <Text
               style={[
@@ -146,7 +144,7 @@ export default function RoutineFilters({
               styles.booleanOption,
               value === true && styles.booleanOptionActive,
             ]}
-            onPress={() => setFilters(prev => ({ ...prev, [key]: true }))}
+            onPress={() => setFilters((prev) => ({ ...prev, [key]: true }))}
           >
             <Text
               style={[
@@ -162,7 +160,7 @@ export default function RoutineFilters({
               styles.booleanOption,
               value === false && styles.booleanOptionActive,
             ]}
-            onPress={() => setFilters(prev => ({ ...prev, [key]: false }))}
+            onPress={() => setFilters((prev) => ({ ...prev, [key]: false }))}
           >
             <Text
               style={[
@@ -184,7 +182,7 @@ export default function RoutineFilters({
       <View style={styles.objectiveSection}>
         <Text style={styles.objectiveLabel}>{label}</Text>
         <View style={styles.levelOptions}>
-          {(['bajo', 'medio', 'alto'] as const).map(level => (
+          {(['bajo', 'medio', 'alto'] as const).map((level) => (
             <TouchableOpacity
               key={level}
               style={[
@@ -212,7 +210,11 @@ export default function RoutineFilters({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="formSheet">
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="formSheet"
+    >
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -223,7 +225,8 @@ export default function RoutineFilters({
             <Text style={styles.title}>Filtros de Rutinas</Text>
             <View style={styles.headerResults}>
               <Text style={styles.headerResultsText}>
-                {totalResults} rutina{totalResults !== 1 ? 's' : ''} encontrada{totalResults !== 1 ? 's' : ''}
+                {totalResults} rutina{totalResults !== 1 ? 's' : ''} encontrada
+                {totalResults !== 1 ? 's' : ''}
               </Text>
             </View>
           </View>
@@ -248,9 +251,7 @@ export default function RoutineFilters({
               Selecciona el nivel de enfoque para cada objetivo
             </Text>
             {Object.entries(objectiveLabels).map(([key, label]) => (
-              <View key={key}>
-                {renderObjectiveFilter(key, label)}
-              </View>
+              <View key={key}>{renderObjectiveFilter(key, label)}</View>
             ))}
           </View>
         </ScrollView>

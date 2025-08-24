@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -12,12 +10,16 @@ import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
 import { GymRegistrationFormData, GymRegistrationFormProps } from './types';
-import Colors from '@/constants/Colors';
+import { useCustomAlert } from '@/components/common/CustomAlert';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymRegistrationFormStyles } from './styles/gymRegistrationForm';
 
 export default function GymRegistrationForm({
   onSubmit,
   onCancel,
 }: GymRegistrationFormProps) {
+  const styles = useThemedStyles(makeGymRegistrationFormStyles);
+  const { showAlert, AlertComponent } = useCustomAlert();
   const [formData, setFormData] = useState<GymRegistrationFormData>({
     name: '',
     nit: '',
@@ -82,7 +84,8 @@ export default function GymRegistrationForm({
     if (validateForm()) {
       onSubmit(formData);
     } else {
-      Alert.alert(
+      showAlert(
+        'warning',
         'Formulario incompleto',
         'Por favor completa todos los campos requeridos'
       );
@@ -96,7 +99,7 @@ export default function GymRegistrationForm({
     >
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onCancel}>
-          <FontAwesome name='arrow-left' size={20} color='#FFFFFF' />
+          <FontAwesome name="arrow-left" size={20} color={styles.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Registrar Gimnasio</Text>
       </View>
@@ -111,47 +114,47 @@ export default function GymRegistrationForm({
           <Text style={styles.sectionTitle}>Información Básica</Text>
 
           <FormInput
-            label='Nombre del Gimnasio *'
+            label="Nombre del Gimnasio *"
             value={formData.name}
-            onChangeText={value => handleInputChange('name', value)}
+            onChangeText={(value) => handleInputChange('name', value)}
             error={errors.name}
           />
 
           <FormInput
-            label='NIT *'
+            label="NIT *"
             value={formData.nit}
-            onChangeText={value => handleInputChange('nit', value)}
+            onChangeText={(value) => handleInputChange('nit', value)}
             error={errors.nit}
           />
 
           <FormInput
-            label='Email *'
+            label="Email *"
             value={formData.email}
-            onChangeText={value => handleInputChange('email', value)}
-            keyboardType='email-address'
-            autoCapitalize='none'
+            onChangeText={(value) => handleInputChange('email', value)}
+            keyboardType="email-address"
+            autoCapitalize="none"
             error={errors.email}
           />
 
           <FormInput
-            label='Teléfono de Contacto *'
+            label="Teléfono de Contacto *"
             value={formData.phone}
-            onChangeText={value => handleInputChange('phone', value)}
-            keyboardType='phone-pad'
+            onChangeText={(value) => handleInputChange('phone', value)}
+            keyboardType="phone-pad"
             error={errors.phone}
           />
 
           <FormInput
-            label='País *'
+            label="País *"
             value={formData.country}
-            onChangeText={value => handleInputChange('country', value)}
+            onChangeText={(value) => handleInputChange('country', value)}
             error={errors.country}
           />
 
           <FormInput
-            label='Slogan'
+            label="Slogan"
             value={formData.slogan}
-            onChangeText={value => handleInputChange('slogan', value)}
+            onChangeText={(value) => handleInputChange('slogan', value)}
             multiline
             numberOfLines={2}
           />
@@ -162,31 +165,35 @@ export default function GymRegistrationForm({
           <Text style={styles.sectionTitle}>Presencia Digital</Text>
 
           <FormInput
-            label='Sitio Web'
+            label="Sitio Web"
             value={formData.website}
-            onChangeText={value => handleInputChange('website', value)}
-            keyboardType='url'
-            autoCapitalize='none'
+            onChangeText={(value) => handleInputChange('website', value)}
+            keyboardType="url"
+            autoCapitalize="none"
           />
 
           <FormInput
-            label='Instagram'
+            label="Instagram"
             value={formData.instagram}
-            onChangeText={value => handleInputChange('instagram', value)}
-            autoCapitalize='none'
+            onChangeText={(value) => handleInputChange('instagram', value)}
+            autoCapitalize="none"
           />
 
           <FormInput
-            label='Facebook'
+            label="Facebook"
             value={formData.facebook}
-            onChangeText={value => handleInputChange('facebook', value)}
-            autoCapitalize='none'
+            onChangeText={(value) => handleInputChange('facebook', value)}
+            autoCapitalize="none"
           />
         </View>
 
         {/* Nota informativa */}
         <View style={styles.infoCard}>
-          <FontAwesome name='info-circle' size={20} color='#2196F3' />
+          <FontAwesome
+            name="info-circle"
+            size={20}
+            color={styles.colors.tint}
+          />
           <Text style={styles.infoText}>
             Una vez registrado, nuestro equipo revisará la información y te
             contactaremos para completar el proceso de verificación.
@@ -196,7 +203,7 @@ export default function GymRegistrationForm({
         {/* Botones */}
         <View style={styles.buttonContainer}>
           <Button
-            title='Registrar Gimnasio'
+            title="Registrar Gimnasio"
             onPress={handleSubmit}
             style={styles.submitButton}
           />
@@ -205,83 +212,7 @@ export default function GymRegistrationForm({
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <AlertComponent />
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  backButton: {
-    marginRight: 15,
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 30,
-  },
-  section: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 20,
-  },
-  infoCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderLeftWidth: 3,
-    borderLeftColor: '#2196F3',
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#B0B0B0',
-    lineHeight: 20,
-    marginLeft: 12,
-  },
-  buttonContainer: {
-    padding: 20,
-    gap: 15,
-  },
-  submitButton: {
-    backgroundColor: Colors.dark.tint,
-  },
-  cancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#666666',
-    borderRadius: 8,
-    paddingVertical: 15,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

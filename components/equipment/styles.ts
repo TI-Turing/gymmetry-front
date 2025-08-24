@@ -9,12 +9,12 @@ export const styles = StyleSheet.create({
     padding: SPACING.md,
   },
   equipmentCard: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: Colors.dark.card,
     padding: SPACING.lg,
     borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#333333',
+    borderColor: Colors.dark.border,
   },
   equipmentHeader: {
     flexDirection: 'row',
@@ -37,20 +37,20 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.sm,
   },
   statusAvailable: {
-    backgroundColor: '#10B981',
-    color: '#FFFFFF',
+    backgroundColor: Colors.dark.tint,
+    color: Colors.dark.onTint,
   },
   statusInUse: {
-    backgroundColor: '#EF4444',
-    color: '#FFFFFF',
+    backgroundColor: Colors.dark.danger,
+    color: Colors.dark.onTint,
   },
   statusMaintenance: {
-    backgroundColor: '#F59E0B',
-    color: '#FFFFFF',
+    backgroundColor: Colors.dark.neutral,
+    color: Colors.dark.text,
   },
   statusOutOfService: {
-    backgroundColor: '#6B7280',
-    color: '#FFFFFF',
+    backgroundColor: Colors.dark.neutral,
+    color: Colors.dark.onTint,
   },
   equipmentDescription: {
     fontSize: FONT_SIZES.sm,
@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: SPACING.xs,
     borderBottomWidth: 1,
-    borderBottomColor: '#333333',
+    borderBottomColor: Colors.dark.border,
   },
   specLabel: {
     fontSize: FONT_SIZES.sm,
@@ -92,7 +92,7 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.sm,
   },
   categoryText: {
-    color: '#FFFFFF',
+    color: Colors.dark.onTint,
     fontSize: FONT_SIZES.xs,
     fontWeight: '500',
   },
@@ -117,23 +117,23 @@ export const styles = StyleSheet.create({
     borderColor: Colors.dark.tint,
   },
   disabledButton: {
-    backgroundColor: '#666666',
+    backgroundColor: Colors.dark.tabIconDefault,
   },
   buttonText: {
     fontSize: FONT_SIZES.sm,
     fontWeight: '600',
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: Colors.dark.onTint,
   },
   secondaryButtonText: {
     color: Colors.dark.tint,
   },
   disabledButtonText: {
-    color: '#CCCCCC',
+    color: Colors.dark.textMuted,
   },
   reservationInfo: {
-    backgroundColor: '#333333',
+    backgroundColor: Colors.dark.neutral,
     padding: SPACING.sm,
     borderRadius: BORDER_RADIUS.sm,
     marginTop: SPACING.sm,
@@ -150,7 +150,7 @@ export const styles = StyleSheet.create({
     opacity: 0.8,
   },
   usageHistory: {
-    backgroundColor: '#333333',
+    backgroundColor: Colors.dark.neutral,
     padding: SPACING.sm,
     borderRadius: BORDER_RADIUS.sm,
     marginTop: SPACING.sm,
@@ -178,7 +178,7 @@ export const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     marginBottom: SPACING.md,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: Colors.dark.card,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.xs,
   },
@@ -197,7 +197,7 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeFilterText: {
-    color: '#FFFFFF',
+    color: Colors.dark.onTint,
     fontWeight: '600',
   },
   categoryContainer: {
@@ -216,11 +216,11 @@ export const styles = StyleSheet.create({
   },
   gridItem: {
     width: '48%',
-    backgroundColor: '#1A1A1A',
+    backgroundColor: Colors.dark.card,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     borderWidth: 1,
-    borderColor: '#333333',
+    borderColor: Colors.dark.border,
   },
   gridItemName: {
     fontSize: FONT_SIZES.md,
@@ -237,12 +237,12 @@ export const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1A1A1A',
+    backgroundColor: Colors.dark.card,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.sm,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#333333',
+    borderColor: Colors.dark.border,
   },
   searchInput: {
     flex: 1,

@@ -3,7 +3,7 @@ export interface FeedCreateRequestDto {
   UserId: string | null;
   Title: string | null;
   Description: string | null;
-  Media: any[] | null;
+  Media: unknown[] | null;
   MediaType: string | null;
   FileName: string | null;
   Id: string;

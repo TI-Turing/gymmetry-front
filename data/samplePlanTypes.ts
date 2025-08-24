@@ -85,10 +85,10 @@ export const getPlanTypesSample = () => samplePlanTypes;
 
 // Función helper para buscar un plan por ID
 export const findPlanTypeById = (id: string) =>
-  samplePlanTypes.find(plan => plan.id === id);
+  samplePlanTypes.find((plan) => plan.id === id);
 
 // Función helper para obtener planes por rango de precio
 export const getPlanTypesByPriceRange = (minPrice: number, maxPrice: number) =>
   samplePlanTypes.filter(
-    plan => plan.price >= minPrice && plan.price <= maxPrice
+    (plan) => plan.price >= minPrice && plan.price <= maxPrice
   );

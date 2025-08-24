@@ -100,13 +100,13 @@ export function GymPlanSelectedList() {
 
   return (
     <EntityList
-      title='Planes de Gimnasio Seleccionados'
+      title="Planes de Gimnasio Seleccionados"
       loadFunction={loadGymPlanSelected}
       renderItem={renderGymPlanSelectedItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay planes seleccionados'
-      emptyMessage='No se encontraron planes de gimnasio seleccionados'
-      loadingMessage='Cargando planes seleccionados...'
+      emptyTitle="No hay planes seleccionados"
+      emptyMessage="No se encontraron planes de gimnasio seleccionados"
+      loadingMessage="Cargando planes seleccionados..."
     />
   );
 }

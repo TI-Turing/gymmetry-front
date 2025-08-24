@@ -124,13 +124,13 @@ export function UserList() {
 
   return (
     <EntityList
-      title='Usuarios'
+      title="Usuarios"
       loadFunction={loadUsers}
       renderItem={renderUserItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay usuarios'
-      emptyMessage='No se encontraron usuarios'
-      loadingMessage='Cargando usuarios...'
+      emptyTitle="No hay usuarios"
+      emptyMessage="No se encontraron usuarios"
+      loadingMessage="Cargando usuarios..."
     />
   );
 }

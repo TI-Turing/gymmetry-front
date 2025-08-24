@@ -38,14 +38,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeAuth = async () => {
     try {
       const isInitialized = await authService.initializeFromStorage();
-      
+
       if (isInitialized) {
         // Intentar refrescar token si está cerca de expirar
         const tokenValid = await authService.checkAndRefreshToken();
-        
+
         if (tokenValid) {
           const user = await authService.getUserData();
-          
+
           if (user) {
             setIsAuthenticated(true);
             setUserData(user);
@@ -77,7 +77,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string
   ): Promise<boolean> => {
     try {
-      const response = await authService.login({ UserNameOrEmail, Password: password });
+      const response = await authService.login({
+        UserNameOrEmail,
+        Password: password,
+      });
 
       if (response.Success) {
         setIsAuthenticated(true);
@@ -115,8 +118,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     userData,
     user: userData, // Alias para userData
-  userRoles: userData?.roles || ['user'],
-  hasRole: (role: string) => !!userData?.roles.includes(role.toLowerCase()),
+    userRoles: userData?.roles || ['user'],
+    hasRole: (role: string) => !!userData?.roles.includes(role.toLowerCase()),
     login,
     logout,
   };

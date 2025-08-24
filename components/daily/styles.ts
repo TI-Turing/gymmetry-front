@@ -19,20 +19,20 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 5
+    elevation: 5,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.md
+    marginBottom: SPACING.md,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.dark.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   dateText: {
     fontSize: FONT_SIZES.sm,
@@ -41,63 +41,63 @@ export const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
     backgroundColor: Colors.dark.tint,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.md
+    marginBottom: SPACING.md,
   },
   statusIndicator: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusCompleted: {
-    backgroundColor: '#4CAF50'
+    backgroundColor: '#4CAF50',
   },
   statusPartial: {
-    backgroundColor: Colors.dark.tint
+    backgroundColor: Colors.dark.tint,
   },
   statusPending: {
-    backgroundColor: '#888888'
+    backgroundColor: '#888888',
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    fontWeight: '500'
+    fontWeight: '500',
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: '#B0B0B0',
     marginBottom: SPACING.md,
-    lineHeight: 22
+    lineHeight: 22,
   },
   progressContainer: {
-    marginBottom: SPACING.md
+    marginBottom: SPACING.md,
   },
   progressLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#888888',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   progressBar: {
     height: 8,
     backgroundColor: '#333333',
     borderRadius: 4,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: Colors.dark.tint,
-    borderRadius: 4
+    borderRadius: 4,
   },
   progressText: {
     fontSize: FONT_SIZES.xs,
     color: Colors.dark.text,
     textAlign: 'center',
-    marginTop: SPACING.xs
+    marginTop: SPACING.xs,
   },
   metricsContainer: {
     flexDirection: 'row',
@@ -106,43 +106,43 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#333333',
     backgroundColor: '#0F0F0F',
-    marginTop: SPACING.md
+    marginTop: SPACING.md,
   },
   metricItem: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   metricLabel: {
     fontSize: FONT_SIZES.xs,
     color: '#888888',
-    marginBottom: 4
+    marginBottom: 4,
   },
   metricValue: {
     fontSize: FONT_SIZES.md,
     color: Colors.dark.text,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   metricUnit: {
     fontSize: FONT_SIZES.xs,
-    color: '#888888'
+    color: '#888888',
   },
 
   // Daily Form styles
   formContainer: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg
+    padding: SPACING.lg,
   },
   formTitle: {
     fontSize: FONT_SIZES.xl,
     fontWeight: '600',
     color: Colors.dark.text,
-    marginBottom: SPACING.lg
+    marginBottom: SPACING.lg,
   },
   formLabel: {
     fontSize: FONT_SIZES.md,
     fontWeight: '500',
     color: Colors.dark.text,
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   textarea: {
     borderWidth: 1,
@@ -154,29 +154,29 @@ export const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: 'top',
     marginBottom: SPACING.md,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   formRow: {
     flexDirection: 'row',
     gap: SPACING.md,
-    marginVertical: SPACING.md
+    marginVertical: SPACING.md,
   },
   info: {
     color: Colors.dark.tint,
     marginTop: SPACING.md,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   error: {
     color: '#ff6b6b',
     marginVertical: SPACING.sm,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
 
   // Daily Detail styles
   detailContainer: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg
+    padding: SPACING.lg,
   },
   detailCard: {
     backgroundColor: '#1A1A1A',
@@ -184,13 +184,13 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.xl,
     marginVertical: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
   detailText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
     fontFamily: 'monospace',
-    lineHeight: 18
+    lineHeight: 18,
   },
 
   // Daily tracker styles
@@ -200,19 +200,19 @@ export const styles = StyleSheet.create({
     padding: SPACING.lg,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
   trackerTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.dark.text,
     marginBottom: SPACING.md,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   trackingGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: SPACING.sm
+    gap: SPACING.sm,
   },
   trackingItem: {
     flex: 1,
@@ -220,40 +220,40 @@ export const styles = StyleSheet.create({
     backgroundColor: '#333333',
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   trackingItemActive: {
-    backgroundColor: Colors.dark.tint
+    backgroundColor: Colors.dark.tint,
   },
   trackingIcon: {
     fontSize: FONT_SIZES.xl,
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   trackingLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
     fontWeight: '500',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   trackingValue: {
     fontSize: FONT_SIZES.xs,
     color: '#888888',
-    marginTop: SPACING.xs
+    marginTop: SPACING.xs,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: '#888888',
     fontWeight: '500',
-    minWidth: 80
+    minWidth: 80,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    flex: 1
-  }
+    flex: 1,
+  },
 });

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import FormInput from '../common/FormInput';
 import { Text } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
-import { routineDayService } from '@/services';
 import BodyMusclesDiagram from '@/components/body/BodyMusclesDiagram';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineDayDetailStyles } from './styles/routineDayDetail';
 
 export function RoutineDayDetail() {
+  const styles = useThemedStyles(makeRoutineDayDetailStyles);
   const [id, setId] = useState('');
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -47,8 +48,8 @@ export function RoutineDayDetail() {
       </View>
 
       <Text style={styles.title}>RoutineDay - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (
@@ -61,37 +62,4 @@ export function RoutineDayDetail() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  bodyOverlay: {
-    marginBottom: 12,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#0f0f0f',
-    height: '70%', // ocupar al menos 70% de alto de pantalla
-    padding: 8,
-  },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
-  card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
-  },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
-});
-export default styles;
+// styles are provided by makeRoutineDayDetailStyles via useThemedStyles

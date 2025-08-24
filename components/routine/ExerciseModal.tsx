@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TouchableOpacity, Animated, Vibration, StyleSheet, Platform } from 'react-native';
+import {
+  Modal,
+  TouchableOpacity,
+  Animated,
+  Vibration,
+  Platform,
+} from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
 import Button from '@/components/common/Button';
 import type { RoutineDay } from '@/models/RoutineDay';
 import motivationalPhrases from '@/utils/motivationalPhrases.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineExerciseModalStyles } from './styles/exerciseModal';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -27,13 +34,14 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   onMarkExercise,
   completedSets,
 }) => {
+  const styles = useThemedStyles(makeRoutineExerciseModalStyles);
   const [isExecuting, setIsExecuting] = useState(false);
   const [pulseAnim] = useState(new Animated.Value(1));
   const [fadeAnim] = useState(new Animated.Value(0));
 
   // Frase motivacional aleatoria
   const motivationalPhrase = useMemo(() => {
-    if (motivationalPhrases.length === 0) return { text: "¡Tú puedes!" };
+    if (motivationalPhrases.length === 0) return { text: '¡Tú puedes!' };
     const randomIndex = Math.floor(Math.random() * motivationalPhrases.length);
     return motivationalPhrases[randomIndex];
   }, [visible]); // Cambiar frase cada vez que se abra el modal
@@ -83,7 +91,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
   const handleStartSet = () => {
     if (!exercise) return;
-    
+
     // Vibración leve al iniciar
     Vibration.vibrate(50);
     startPulseAnimation();
@@ -150,10 +158,14 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{exercise.Name}</Text>
             <TouchableOpacity onPress={onClose} disabled={isExecuting}>
-              <FontAwesome 
-                name="times" 
-                size={22} 
-                color={isExecuting ? '#666' : Colors.light.text} 
+              <FontAwesome
+                name="times"
+                size={22}
+                color={
+                  isExecuting
+                    ? (styles.closeIconDisabled.color as string)
+                    : (styles.closeIcon.color as string)
+                }
               />
             </TouchableOpacity>
           </View>
@@ -171,21 +183,21 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
             <Animated.View
               style={[
                 styles.pulseCircle,
-                {
-                  transform: [{ scale: pulseAnim }],
-                  backgroundColor: isExecuting ? '#FF6B35' : '#333',
-                }
+                { transform: [{ scale: pulseAnim }] },
+                isExecuting ? styles.pulseBgExecuting : styles.pulseBgIdle,
               ]}
             >
               <FontAwesome
-                name={isExecuting ? "heartbeat" : "play"}
+                name={isExecuting ? 'heartbeat' : 'play'}
                 size={40}
-                color="#FFF"
+                color={styles.pulseIcon.color as string}
               />
             </Animated.View>
 
             {/* Frase motivacional */}
-            <Animated.View style={[styles.phraseContainer, { opacity: fadeAnim }]}>
+            <Animated.View
+              style={[styles.phraseContainer, { opacity: fadeAnim }]}
+            >
               <Text style={styles.motivationalText}>
                 {motivationalPhrase.text}
               </Text>
@@ -229,85 +241,6 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  modalCard: {
-    width: '100%',
-    backgroundColor: '#1D1D1D',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    minHeight: 400,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  modalTitle: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  modalSub: {
-    color: '#B0B0B0',
-    marginBottom: 12,
-    fontSize: 14,
-  },
-  progressText: {
-    color: '#FF6B35',
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  animationContainer: {
-    alignItems: 'center',
-    marginVertical: 30,
-    height: 180,
-    justifyContent: 'center',
-  },
-  pulseCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  phraseContainer: {
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  motivationalText: {
-    color: '#FFF',
-    fontSize: 16,
-    textAlign: 'center',
-    fontStyle: 'italic',
-    lineHeight: 22,
-  },
-  buttonContainer: {
-    gap: 12,
-  },
-  startButton: {
-    backgroundColor: '#ff6300',
-  },
-  finishButton: {
-    backgroundColor: '#FF6B35',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  halfButton: {
-    flex: 1,
-  },
-});
+// styles via makeRoutineExerciseModalStyles
 
 export default ExerciseModal;

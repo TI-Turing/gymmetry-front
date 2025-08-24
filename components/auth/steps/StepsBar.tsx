@@ -2,8 +2,9 @@ import React from 'react';
 import { View } from 'react-native';
 import { Text } from '../../Themed';
 import { useColorScheme } from '../../useColorScheme';
-import Colors from '@/constants/Colors';
 import { commonStyles } from '../styles/common';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeStepsBarStyles } from '../styles/stepsBar';
 
 interface StepsBarProps {
   currentStep: number;
@@ -17,6 +18,7 @@ export default function StepsBar({
   stepTitles,
 }: StepsBarProps) {
   const colorScheme = useColorScheme();
+  const styles = useThemedStyles(makeStepsBarStyles);
 
   return (
     <View style={commonStyles.stepsContainer}>
@@ -29,18 +31,17 @@ export default function StepsBar({
               <View
                 style={[
                   commonStyles.stepCircle,
-                  {
-                    backgroundColor: isActive
-                      ? Colors[colorScheme].tint
-                      : '#333',
-                    borderColor: isActive ? Colors[colorScheme].tint : '#666',
-                  },
+                  isActive
+                    ? styles.stepCircleActive
+                    : styles.stepCircleInactive,
                 ]}
               >
                 <Text
                   style={[
                     commonStyles.stepNumber,
-                    { color: isActive ? '#fff' : '#999' },
+                    isActive
+                      ? styles.stepNumberActive
+                      : styles.stepNumberInactive,
                   ]}
                 >
                   {index + 1}
@@ -51,10 +52,9 @@ export default function StepsBar({
                 <View
                   style={[
                     commonStyles.stepLine,
-                    {
-                      backgroundColor:
-                        index < currentStep ? Colors[colorScheme].tint : '#333',
-                    },
+                    index < currentStep
+                      ? styles.stepLineActive
+                      : styles.stepLineInactive,
                   ]}
                 />
               )}

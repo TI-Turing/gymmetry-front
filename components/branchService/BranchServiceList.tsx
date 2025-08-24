@@ -127,13 +127,13 @@ const BranchServiceList = React.memo(() => {
 
   return (
     <EntityList
-      title='Servicios de Sucursal'
+      title="Servicios de Sucursal"
       loadFunction={loadBranchServices}
       renderItem={renderBranchServiceItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay servicios'
-      emptyMessage='No se encontraron servicios para esta sucursal'
-      loadingMessage='Cargando servicios...'
+      emptyTitle="No hay servicios"
+      emptyMessage="No se encontraron servicios para esta sucursal"
+      loadingMessage="Cargando servicios..."
     />
   );
 });

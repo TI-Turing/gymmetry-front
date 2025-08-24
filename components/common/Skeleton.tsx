@@ -8,7 +8,12 @@ interface SkeletonProps {
   style?: any;
 }
 
-export const Skeleton: React.FC<SkeletonProps> = ({ width = '100%', height = 16, borderRadius = 8, style }) => {
+export const Skeleton: React.FC<SkeletonProps> = ({
+  width = '100%',
+  height = 16,
+  borderRadius = 8,
+  style,
+}) => {
   const shimmer = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -24,7 +29,10 @@ export const Skeleton: React.FC<SkeletonProps> = ({ width = '100%', height = 16,
     return () => loop.stop();
   }, [shimmer]);
 
-  const translateX = shimmer.interpolate({ inputRange: [0, 1], outputRange: [-100, 100] });
+  const translateX = shimmer.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-100, 100],
+  });
 
   return (
     <View style={[styles.container, { width, height, borderRadius }, style]}>

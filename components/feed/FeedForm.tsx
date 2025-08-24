@@ -67,11 +67,11 @@ export function FeedForm() {
         placeholderTextColor="#666666"
       />
       <View style={styles.formRow}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

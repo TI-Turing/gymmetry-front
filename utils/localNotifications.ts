@@ -4,17 +4,36 @@ import type { AppSettings } from '@/contexts/AppSettingsContext';
 type NotificationContent = {
   title?: string;
   body?: string;
-  data?: any;
+  data?: unknown;
   sound?: boolean | null;
 };
 
-type NotificationTrigger = any; // dejamos flexible para no depender de tipos de expo-notifications
+type NotificationTrigger = unknown; // dejamos flexible para no depender de tipos de expo-notifications
 
-async function getExpoNotifications(): Promise<any | null> {
+type ExpoNotificationsLike = {
+  scheduleNotificationAsync?: (params: unknown) => Promise<string>;
+  cancelScheduledNotificationAsync?: (id: string) => Promise<void>;
+  cancelAllScheduledNotificationsAsync?: () => Promise<void>;
+  requestPermissionsAsync?: () => Promise<
+    { status?: string; granted?: boolean } | undefined
+  >;
+  addNotificationReceivedListener?: (cb: (e: unknown) => void) => {
+    remove: () => void;
+  };
+  addNotificationResponseReceivedListener?: (cb: (r: unknown) => void) => {
+    remove: () => void;
+  };
+};
+
+async function getExpoNotifications(): Promise<unknown | null> {
   try {
-    const dynamicImport: any = (Function('return import')() as any);
+    const importer = Function('return import')() as unknown;
+    const dynamicImport = importer as <T = unknown>(
+      specifier: string
+    ) => Promise<T>;
     const mod = await dynamicImport('expo-notifications');
-    return mod?.default || mod;
+    return ((mod as unknown as { default?: unknown }).default ??
+      mod) as unknown;
   } catch {
     return null;
   }
@@ -34,18 +53,25 @@ export async function scheduleLocalNotificationAsync(
     if (!st.notificationsEnabled) return null;
     if (isWithinQuietHours(new Date(), st.quietHours)) return null;
   }
-  const Notifications = await getExpoNotifications();
+  const Notifications =
+    (await getExpoNotifications()) as ExpoNotificationsLike | null;
   if (!Notifications?.scheduleNotificationAsync) return null;
   try {
-    const id: string = await Notifications.scheduleNotificationAsync({ content, trigger });
+    const id: string = await Notifications.scheduleNotificationAsync({
+      content,
+      trigger,
+    });
     return id || null;
   } catch {
     return null;
   }
 }
 
-export async function cancelScheduledNotificationAsync(identifier: string): Promise<boolean> {
-  const Notifications = await getExpoNotifications();
+export async function cancelScheduledNotificationAsync(
+  identifier: string
+): Promise<boolean> {
+  const Notifications =
+    (await getExpoNotifications()) as ExpoNotificationsLike | null;
   if (!Notifications?.cancelScheduledNotificationAsync) return false;
   try {
     await Notifications.cancelScheduledNotificationAsync(identifier);
@@ -56,7 +82,8 @@ export async function cancelScheduledNotificationAsync(identifier: string): Prom
 }
 
 export async function cancelAllScheduledNotificationsAsync(): Promise<boolean> {
-  const Notifications = await getExpoNotifications();
+  const Notifications =
+    (await getExpoNotifications()) as ExpoNotificationsLike | null;
   if (!Notifications?.cancelAllScheduledNotificationsAsync) return false;
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
@@ -67,12 +94,13 @@ export async function cancelAllScheduledNotificationsAsync(): Promise<boolean> {
 }
 
 export async function requestNotificationPermissionsAsync(): Promise<boolean> {
-  const Notifications = await getExpoNotifications();
+  const Notifications =
+    (await getExpoNotifications()) as ExpoNotificationsLike | null;
   if (!Notifications?.requestPermissionsAsync) return false;
   try {
     const res = await Notifications.requestPermissionsAsync();
-    const status = res?.status || res?.granted ? 'granted' : 'denied';
-    return status === 'granted';
+    const granted = res?.status === 'granted' || res?.granted === true;
+    return granted;
   } catch {
     return false;
   }
@@ -83,9 +111,10 @@ export async function requestNotificationPermissionsAsync(): Promise<boolean> {
  * Devuelve un objeto con remove() o null si no está disponible en la plataforma.
  */
 export async function addNotificationReceivedListener(
-  callback: (event: any) => void
+  callback: (event: unknown) => void
 ): Promise<{ remove: () => void } | null> {
-  const Notifications = await getExpoNotifications();
+  const Notifications =
+    (await getExpoNotifications()) as ExpoNotificationsLike | null;
   if (!Notifications?.addNotificationReceivedListener) return null;
   try {
     const sub = Notifications.addNotificationReceivedListener(callback);
@@ -100,9 +129,10 @@ export async function addNotificationReceivedListener(
  * Útil para re-agendar cuando la app estaba en background.
  */
 export async function addNotificationResponseReceivedListener(
-  callback: (response: any) => void
+  callback: (response: unknown) => void
 ): Promise<{ remove: () => void } | null> {
-  const Notifications = await getExpoNotifications();
+  const Notifications =
+    (await getExpoNotifications()) as ExpoNotificationsLike | null;
   if (!Notifications?.addNotificationResponseReceivedListener) return null;
   try {
     const sub = Notifications.addNotificationResponseReceivedListener(callback);

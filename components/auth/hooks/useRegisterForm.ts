@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { BackHandler } from 'react-native';
 import { apiService } from '@/services/apiService';
 
 interface RegistrationData {
@@ -48,10 +47,13 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
   });
 
   // Permite actualizar parcialmente los datos entre pasos (p.ej., al retroceder)
-  const patchRegistrationData = useCallback((patch: Partial<RegistrationData>) => {
-    if (!patch) return;
-    setRegistrationData(prev => ({ ...prev, ...patch }));
-  }, []);
+  const patchRegistrationData = useCallback(
+    (patch: Partial<RegistrationData>) => {
+      if (!patch) return;
+      setRegistrationData((prev) => ({ ...prev, ...patch }));
+    },
+    []
+  );
 
   const handleSkipToWelcome = useCallback(() => {
     if (registrationData.token) {
@@ -67,7 +69,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
       userId?: string;
       token?: string;
     }) => {
-      setRegistrationData(prev => ({ ...prev, ...data }));
+      setRegistrationData((prev) => ({ ...prev, ...data }));
 
       if (data.token) {
         apiService.setAuthToken(data.token);
@@ -86,7 +88,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
       birthDate?: string;
       genderId?: string;
     }) => {
-      setRegistrationData(prev => ({ ...prev, ...data }));
+      setRegistrationData((prev) => ({ ...prev, ...data }));
       setCurrentStep(2);
     },
     []
@@ -105,7 +107,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
       documentTypeId?: string;
       countryId?: string;
     }) => {
-      setRegistrationData(prev => ({ ...prev, ...data }));
+      setRegistrationData((prev) => ({ ...prev, ...data }));
       setCurrentStep(3);
     },
     []
@@ -118,7 +120,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
       additionalInfo?: string;
       rh?: string;
     }) => {
-      setRegistrationData(prev => ({ ...prev, ...data }));
+      setRegistrationData((prev) => ({ ...prev, ...data }));
       setCurrentStep(4);
     },
     []
@@ -140,7 +142,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
   // Funciones para retroceder
   const handleGoBack = useCallback(() => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   }, [currentStep]);
 
@@ -149,7 +151,7 @@ export const useRegisterForm = ({ onRegister }: UseRegisterFormProps) => {
     showWelcomeScreen,
     registrationData,
     setCurrentStep,
-  patchRegistrationData,
+    patchRegistrationData,
     handleSkipToWelcome,
     handleStep1Next,
     handleStep2Next,

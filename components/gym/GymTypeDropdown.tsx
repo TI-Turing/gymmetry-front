@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import { useColorScheme } from '@/components/useColorScheme';
-import Colors from '@/constants/Colors';
 import { GymType } from './types';
-// Import directo para evitar conflicto de export en barril styles
-import { GymStyles } from './styles/GymStyles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymTypeDropdownStyles } from './styles/gymTypeDropdown';
 
 interface GymTypeDropdownProps {
   label: string;
@@ -28,9 +26,9 @@ export default function GymTypeDropdown({
   loading = false,
 }: GymTypeDropdownProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const colorScheme = useColorScheme();
+  const { styles, colors } = useThemedStyles(makeGymTypeDropdownStyles);
 
-  const selectedOption = options.find(option => option.Id === value);
+  const selectedOption = options.find((option) => option.Id === value);
   const selectedName = selectedOption?.Name || placeholder;
 
   const handleSelect = (typeId: string) => {
@@ -51,31 +49,22 @@ export default function GymTypeDropdown({
   };
 
   return (
-    <View style={GymStyles.dropdownContainer}>
-      <Text
-        style={[GymStyles.dropdownLabel, { color: Colors[colorScheme].text }]}
-      >
-        {label}
-      </Text>
+    <View style={styles.dropdownContainer}>
+      <Text style={styles.dropdownLabel}>{label}</Text>
 
       <TouchableOpacity
         style={[
-          GymStyles.dropdownInput,
-          {
-            backgroundColor: Colors[colorScheme].background,
-            borderColor: error ? '#F44336' : '#666',
-          },
+          styles.dropdownInput,
+          { borderColor: error ? colors.danger : colors.border },
         ]}
         onPress={handleOpen}
         disabled={loading}
         accessibilityLabel={label}
-        accessibilityHint='Presiona para abrir la lista de tipos de gimnasio'
+        accessibilityHint="Presiona para abrir la lista de tipos de gimnasio"
       >
         <Text
           style={{
-            color: selectedOption
-              ? Colors[colorScheme].text
-              : `${Colors[colorScheme].text}60`,
+            color: selectedOption ? colors.text : `${colors.text}60`,
             fontSize: 16,
           }}
         >
@@ -83,84 +72,50 @@ export default function GymTypeDropdown({
         </Text>
       </TouchableOpacity>
 
-      {error && <Text style={GymStyles.dropdownErrorText}>{error}</Text>}
+      {error && <Text style={styles.dropdownErrorText}>{error}</Text>}
 
       {/* Modal de selección */}
       <Modal
         visible={isModalVisible}
         transparent={true}
-        animationType='slide'
+        animationType="slide"
         onRequestClose={() => setIsModalVisible(false)}
       >
         <TouchableOpacity
-          style={GymStyles.modalOverlay}
+          style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setIsModalVisible(false)}
         >
-          <View
-            style={[
-              GymStyles.modalContent,
-              { backgroundColor: Colors[colorScheme].background },
-            ]}
-          >
-            <Text
-              style={[
-                GymStyles.modalTitle,
-                { color: Colors[colorScheme].text },
-              ]}
-            >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
               Selecciona el tipo de gimnasio
             </Text>
 
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={GymStyles.optionsList}
+              style={styles.optionsList}
             >
-              {options.map(item => (
+              {options.map((item) => (
                 <TouchableOpacity
                   key={item.Id}
-                  style={[
-                    GymStyles.optionItem,
-                    { borderBottomColor: `${Colors[colorScheme].text}` },
-                  ]}
+                  style={styles.optionItem}
                   onPress={() => handleSelect(item.Id)}
                 >
-                  <View style={GymStyles.optionContent}>
-                    <Text
-                      style={[
-                        GymStyles.optionName,
-                        { color: Colors[colorScheme].text },
-                      ]}
-                    >
-                      {item.Name}
-                    </Text>
-                    <Text
-                      style={[
-                        GymStyles.optionDescription,
-                        { color: `${Colors[colorScheme].text}80` },
-                      ]}
-                    >
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionName}>{item.Name}</Text>
+                    <Text style={styles.optionDescription}>
                       {item.Description}
                     </Text>
                   </View>
                   {value === item.Id && (
-                    <FontAwesome
-                      name='check'
-                      size={16}
-                      color={Colors.dark.tint}
-                    />
+                    <FontAwesome name="check" size={16} color={colors.tint} />
                   )}
                 </TouchableOpacity>
               ))}
 
               {options.length === 0 && !loading && (
-                <Text
-                  style={[
-                    GymStyles.noOptionsText,
-                    { color: Colors[colorScheme].text },
-                  ]}
-                >
-                  No hay tipos de gimnasio disponibles
+                <Text style={styles.noOptionsText}>
+                  Sin opciones disponibles
                 </Text>
               )}
             </ScrollView>

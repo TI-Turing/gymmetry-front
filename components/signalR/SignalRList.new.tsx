@@ -4,7 +4,6 @@ import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
-import { signalRService } from '@/services';
 
 export function SignalRList() {
   const loadSignalRItems = useCallback(async () => {
@@ -51,13 +50,13 @@ export function SignalRList() {
 
   return (
     <EntityList
-      title='Conexiones SignalR'
+      title="Conexiones SignalR"
       loadFunction={loadSignalRItems}
       renderItem={renderSignalRItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay conexiones activas'
-      emptyMessage='No se encontraron conexiones SignalR'
-      loadingMessage='Cargando conexiones...'
+      emptyTitle="No hay conexiones activas"
+      emptyMessage="No se encontraron conexiones SignalR"
+      loadingMessage="Cargando conexiones..."
     />
   );
 }

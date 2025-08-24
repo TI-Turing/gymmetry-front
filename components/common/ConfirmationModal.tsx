@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Button from './Button';
 
 interface ConfirmationModalProps {
@@ -31,7 +31,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => { if (!disableBackdropClose) onCancel(); }}
+          onPress={() => {
+            if (!disableBackdropClose) onCancel();
+          }}
         />
         <View style={styles.card}>
           <Text style={styles.title}>{title}</Text>
@@ -73,8 +75,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
   },
-  title: { color: '#FFF', fontSize: 16, fontWeight: '700', marginBottom: 8, textAlign: 'center' },
-  message: { color: '#B0B0B0', fontSize: 13, lineHeight: 18, textAlign: 'center', marginBottom: 16 },
+  title: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  message: {
+    color: '#B0B0B0',
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
   actions: { flexDirection: 'row', gap: 12 },
   actionBtn: { flex: 1 },
   // Podrías manejar variante destructiva directamente dentro del componente Button en el futuro

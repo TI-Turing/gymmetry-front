@@ -4,10 +4,10 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 export const styles = StyleSheet.create({
   // RoutineTemplatesScreen styles
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.dark.background, 
-    padding: SPACING.lg 
+  container: {
+    flex: 1,
+    backgroundColor: Colors.dark.background,
+    padding: SPACING.lg,
   },
   header: {
     paddingTop: SPACING.sm,
@@ -23,49 +23,49 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: '#B0B0B0',
   },
-  title: { 
-    fontSize: 24, 
-    fontWeight: '700', 
-    color: Colors.dark.text, 
-    marginBottom: SPACING.md 
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.dark.text,
+    marginBottom: SPACING.md,
   },
-  sectionTitle: { 
-    fontSize: FONT_SIZES.xl, 
-    fontWeight: '600', 
-    color: Colors.dark.text, 
-    marginTop: SPACING.xl, 
-    marginBottom: SPACING.sm 
-  },
-  text: { 
-    color: '#B0B0B0', 
-    marginBottom: SPACING.xs,
-    fontSize: FONT_SIZES.md
-  },
-  error: { 
-    color: '#FF6B35', 
+  sectionTitle: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '600',
+    color: Colors.dark.text,
+    marginTop: SPACING.xl,
     marginBottom: SPACING.sm,
-    fontSize: FONT_SIZES.md
   },
-  card: { 
-    backgroundColor: '#1F1F1F', 
-    padding: SPACING.lg, 
-    borderRadius: BORDER_RADIUS.xl, 
+  text: {
+    color: '#B0B0B0',
+    marginBottom: SPACING.xs,
+    fontSize: FONT_SIZES.md,
+  },
+  error: {
+    color: '#FF6B35',
+    marginBottom: SPACING.sm,
+    fontSize: FONT_SIZES.md,
+  },
+  card: {
+    backgroundColor: '#1F1F1F',
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
-  cardTitle: { 
-    fontSize: FONT_SIZES.lg, 
-    fontWeight: '600', 
-    color: Colors.dark.text, 
-    marginBottom: SPACING.xs 
+  cardTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '600',
+    color: Colors.dark.text,
+    marginBottom: SPACING.xs,
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginBottom: SPACING.xs,
-    backgroundColor: '#1F1F1F'
+    backgroundColor: '#1F1F1F',
   },
   badge: {
     paddingHorizontal: 10,
@@ -73,15 +73,15 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     fontSize: FONT_SIZES.xs,
     fontWeight: '600',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   badgePremium: {
     backgroundColor: Colors.dark.tint,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   badgeFree: {
     backgroundColor: '#2E2E2E',
-    color: '#B0B0B0'
+    color: '#B0B0B0',
   },
   assignButton: {
     marginTop: SPACING.sm,
@@ -91,10 +91,10 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
   },
-  assignLabel: { 
-    color: '#FFFFFF', 
+  assignLabel: {
+    color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
 
   // RoutineTemplateList styles
@@ -109,19 +109,19 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   listTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.dark.text,
-    flex: 1
+    flex: 1,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -130,52 +130,52 @@ export const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.dark.tint,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   description: {
     fontSize: FONT_SIZES.sm,
     color: '#B0B0B0',
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: '#888888',
     fontWeight: '500',
-    minWidth: 80
+    minWidth: 80,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    flex: 1
+    flex: 1,
   },
 
   // RoutineTemplateForm & RoutineTemplateDetail styles
-  formContainer: { 
-    flex: 1, 
+  formContainer: {
+    flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg 
+    padding: SPACING.lg,
   },
-  formTitle: { 
-    fontSize: FONT_SIZES.xl, 
-    fontWeight: '600', 
+  formTitle: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '600',
     color: Colors.dark.text,
-    marginBottom: SPACING.md 
+    marginBottom: SPACING.md,
   },
-  formError: { 
-    color: '#FF6B35', 
+  formError: {
+    color: '#FF6B35',
     marginVertical: SPACING.sm,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
-  info: { 
-    color: Colors.dark.tint, 
+  info: {
+    color: Colors.dark.tint,
     marginTop: SPACING.sm,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   formCard: {
     backgroundColor: '#1A1A1A',
@@ -183,18 +183,18 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.xl,
     marginVertical: SPACING.xs,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
-  cardText: { 
+  cardText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    fontFamily: 'monospace'
+    fontFamily: 'monospace',
   },
-  formLabel: { 
-    marginBottom: SPACING.xs, 
+  formLabel: {
+    marginBottom: SPACING.xs,
     color: Colors.dark.text,
     fontSize: FONT_SIZES.md,
-    fontWeight: '500'
+    fontWeight: '500',
   },
   textarea: {
     borderWidth: 1,
@@ -206,12 +206,12 @@ export const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: 'top',
     marginBottom: SPACING.sm,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
-  formRow: { 
-    flexDirection: 'row', 
-    gap: SPACING.sm, 
-    marginVertical: SPACING.sm 
+  formRow: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginVertical: SPACING.sm,
   },
   // Filter button styles
   filterButton: {
@@ -241,7 +241,7 @@ export const styles = StyleSheet.create({
   },
   fabCreate: {
     position: 'absolute',
-  bottom: 64,
+    bottom: 64,
     right: 24,
     backgroundColor: Colors.dark.tint,
     width: 56,

@@ -15,8 +15,7 @@ export function CategoryExerciseList() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await categoryExerciseService.getAllCategoryExercises();
+      const res = await categoryExerciseService.getAllCategoryExercises();
       setItems(res.Data || []);
     } catch (_e) {
       setError('Error al cargar');
@@ -45,7 +44,7 @@ export function CategoryExerciseList() {
           </View>
         )}
       />
-      <Button title='Refrescar' onPress={load} />
+      <Button title="Refrescar" onPress={load} />
     </View>
   );
 }

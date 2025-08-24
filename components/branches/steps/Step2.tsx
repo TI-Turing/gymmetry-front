@@ -28,7 +28,7 @@ export default function Step2({
 
       {/* Placeholder para futuras funcionalidades */}
       <View style={styles.placeholderContainer}>
-        <FontAwesome name='info-circle' size={32} color={Colors.dark.tint} />
+        <FontAwesome name="info-circle" size={32} color={Colors.dark.tint} />
         <Text style={styles.placeholderTitle}>Configuraciones Adicionales</Text>
         <Text style={styles.placeholderText}>• Horarios de funcionamiento</Text>
         <Text style={styles.placeholderText}>• Capacidad máxima</Text>

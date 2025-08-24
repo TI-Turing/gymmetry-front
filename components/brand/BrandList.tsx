@@ -44,7 +44,7 @@ export function BrandList() {
           </View>
         )}
       />
-      <Button title='Refrescar' onPress={load} />
+      <Button title="Refrescar" onPress={load} />
     </View>
   );
 }

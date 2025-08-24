@@ -18,8 +18,7 @@ export function GymPlanSelectedTypeForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await gymPlanSelectedTypeService.addGymPlanSelectedType(body);
+      const res = await gymPlanSelectedTypeService.addGymPlanSelectedType(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -34,9 +33,7 @@ export function GymPlanSelectedTypeForm() {
     try {
       const body = JSON.parse(payload);
       const res =
-        await gymPlanSelectedTypeService.updateGymPlanSelectedType(
-          body
-        );
+        await gymPlanSelectedTypeService.updateGymPlanSelectedType(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -71,11 +68,11 @@ export function GymPlanSelectedTypeForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

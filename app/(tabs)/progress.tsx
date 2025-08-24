@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { ScrollView, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
@@ -7,12 +7,15 @@ import { withWebLayout } from '@/components/layout/withWebLayout';
 import { analyticsService, authService } from '@/services';
 import type { AnalyticsSummaryResponse } from '@/dto';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
-
-const { width } = Dimensions.get('window');
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeProgressStyles } from './styles/progress';
 
 function ProgressScreen() {
   const { settings } = useAppSettings();
-  const [selectedPeriod, setSelectedPeriod] = useState<'semana' | 'mes' | 'year'>('semana');
+  const styles = useThemedStyles(makeProgressStyles);
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    'semana' | 'mes' | 'year'
+  >('semana');
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<AnalyticsSummaryResponse | null>(null);
 
@@ -37,10 +40,14 @@ function ProgressScreen() {
       return { start, end };
     }
     if (selectedPeriod === 'mes') {
-      const first = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+      const first = new Date(today.getFullYear(), today.getMonth(), 1)
+        .toISOString()
+        .slice(0, 10);
       return { start: first, end };
     }
-    const firstY = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
+    const firstY = new Date(today.getFullYear(), 0, 1)
+      .toISOString()
+      .slice(0, 10);
     return { start: firstY, end };
   }, [selectedPeriod]);
 
@@ -50,12 +57,14 @@ function ProgressScreen() {
       try {
         setLoading(true);
         const user = await authService.getUserData();
-  // 1) Llamar al backend primero (si analytics habilitado)
-  const resp = settings.analyticsEnabled ? await analyticsService.getSummary({
-          UserId: user?.id ?? '',
-          StartDate: dateRange.start,
-          EndDate: dateRange.end,
-  }) : null;
+        // 1) Llamar al backend primero (si analytics habilitado)
+        const resp = settings.analyticsEnabled
+          ? await analyticsService.getSummary({
+              UserId: user?.id ?? '',
+              StartDate: dateRange.start,
+              EndDate: dateRange.end,
+            })
+          : null;
         if (resp?.Success && resp.Data) {
           if (!cancelled) setSummary(resp.Data);
         } else {
@@ -95,13 +104,23 @@ function ProgressScreen() {
 
   const renderPeriodSelector = () => (
     <View style={styles.periodContainer}>
-      {periods.map(period => (
+      {periods.map((period) => (
         <TouchableOpacity
           key={period.key}
-          style={[styles.periodButton, selectedPeriod === period.key && styles.periodButtonActive]}
-          onPress={() => setSelectedPeriod(period.key as 'semana' | 'mes' | 'year')}
+          style={[
+            styles.periodButton,
+            selectedPeriod === period.key && styles.periodButtonActive,
+          ]}
+          onPress={() =>
+            setSelectedPeriod(period.key as 'semana' | 'mes' | 'year')
+          }
         >
-          <Text style={[styles.periodText, selectedPeriod === period.key && styles.periodTextActive]}>
+          <Text
+            style={[
+              styles.periodText,
+              selectedPeriod === period.key && styles.periodTextActive,
+            ]}
+          >
             {period.label}
           </Text>
         </TouchableOpacity>
@@ -119,15 +138,20 @@ function ProgressScreen() {
     <View style={styles.statCard}>
       <View style={styles.statHeader}>
         {icon != null && icon !== '' && (
-          <FontAwesome name={icon as any} size={20} color='#FFFFFF' style={styles.statIcon} />
+          <FontAwesome
+            name={icon as any}
+            size={20}
+            color={styles.colors.text}
+            style={styles.statIcon}
+          />
         )}
         <Text style={styles.statTitle}>{title}</Text>
       </View>
       <Text style={styles.statValue}>{value}</Text>
-      {(target !== undefined && target !== null) && (
+      {target !== undefined && target !== null && (
         <Text style={styles.statTarget}>Meta: {target}</Text>
       )}
-      {(subtitle != null && subtitle !== '') && (
+      {subtitle != null && subtitle !== '' && (
         <Text style={styles.statSubtitle}>{subtitle}</Text>
       )}
     </View>
@@ -142,13 +166,14 @@ function ProgressScreen() {
             style={[
               styles.chartProgress,
               {
-                width: `${summary ? Math.min(100, (summary.DaysAdvanced / Math.max(1, (summary.DaysExpected ?? 1))) * 100) : 0}%`,
+                width: `${summary ? Math.min(100, (summary.DaysAdvanced / Math.max(1, summary.DaysExpected ?? 1)) * 100) : 0}%`,
               },
             ]}
           />
         </View>
         <Text style={styles.chartLabel}>
-          {(summary?.DaysAdvanced ?? 0)} / {(summary?.DaysExpected ?? 0)} días avanzados
+          {summary?.DaysAdvanced ?? 0} / {summary?.DaysExpected ?? 0} días
+          avanzados
         </Text>
       </View>
 
@@ -158,12 +183,14 @@ function ProgressScreen() {
           <View
             style={[
               styles.chartProgress,
-              { width: `${summary ? Math.min(100, (summary.TotalCalories / Math.max(1, 6000)) * 100) : 0}%` },
+              {
+                width: `${summary ? Math.min(100, (summary.TotalCalories / Math.max(1, 6000)) * 100) : 0}%`,
+              },
             ]}
           />
         </View>
         <Text style={styles.chartLabel}>
-          {(summary?.TotalCalories ?? 0)} / 6000 calorías
+          {summary?.TotalCalories ?? 0} / 6000 calorías
         </Text>
       </View>
     </View>
@@ -172,7 +199,11 @@ function ProgressScreen() {
   const renderWeightProgress = () => (
     <View style={styles.weightCard}>
       <View style={styles.weightHeader}>
-        <FontAwesome name='balance-scale' size={24} color='#FFFFFF' />
+        <FontAwesome
+          name="balance-scale"
+          size={24}
+          color={styles.colors.text}
+        />
         <Text style={styles.weightTitle}>Peso Actual</Text>
       </View>
       <Text style={styles.weightValue}>{summary?.CurrentWeightKg ?? 0} kg</Text>
@@ -180,10 +211,22 @@ function ProgressScreen() {
         <FontAwesome
           name={(summary?.WeightChangeKg ?? 0) < 0 ? 'arrow-down' : 'arrow-up'}
           size={16}
-          color={(summary?.WeightChangeKg ?? 0) < 0 ? '#4CAF50' : '#F44336'}
+          color={
+            (summary?.WeightChangeKg ?? 0) < 0
+              ? styles.colors.green
+              : styles.colors.red
+          }
         />
         <Text
-          style={[styles.weightChangeText, { color: (summary?.WeightChangeKg ?? 0) < 0 ? '#4CAF50' : '#F44336' }]}
+          style={[
+            styles.weightChangeText,
+            {
+              color:
+                (summary?.WeightChangeKg ?? 0) < 0
+                  ? styles.colors.green
+                  : styles.colors.red,
+            },
+          ]}
         >
           {Math.abs(summary?.WeightChangeKg ?? 0)} kg
         </Text>
@@ -196,15 +239,15 @@ function ProgressScreen() {
       <Text style={styles.achievementsTitle}>Logros Recientes</Text>
       <View style={styles.achievementsList}>
         <View style={styles.achievementItem}>
-          <FontAwesome name='trophy' size={20} color='#FFD700' />
+          <FontAwesome name="trophy" size={20} color={styles.colors.gold} />
           <Text style={styles.achievementText}>5 días consecutivos</Text>
         </View>
         <View style={styles.achievementItem}>
-          <FontAwesome name='fire' size={20} color='#FF6B35' />
+          <FontAwesome name="fire" size={20} color={styles.colors.orange} />
           <Text style={styles.achievementText}>1000 calorías quemadas</Text>
         </View>
         <View style={styles.achievementItem}>
-          <FontAwesome name='star' size={20} color='#4CAF50' />
+          <FontAwesome name="star" size={20} color={styles.colors.green} />
           <Text style={styles.achievementText}>Meta semanal cumplida</Text>
         </View>
       </View>
@@ -213,15 +256,35 @@ function ProgressScreen() {
 
   const renderStreaksAndAvg = () => (
     <View style={styles.statsGrid}>
-      {renderStatCard('Racha actual', `${summary?.CurrentStreakDays ?? 0} días`, undefined, 'bolt')}
-      {renderStatCard('Racha más larga', `${summary?.LongestStreakDays ?? 0} días`, undefined, 'trophy')}
+      {renderStatCard(
+        'Racha actual',
+        `${summary?.CurrentStreakDays ?? 0} días`,
+        undefined,
+        'bolt'
+      )}
+      {renderStatCard(
+        'Racha más larga',
+        `${summary?.LongestStreakDays ?? 0} días`,
+        undefined,
+        'trophy'
+      )}
     </View>
   );
 
   const renderAverages = () => (
     <View style={styles.statsGrid}>
-      {renderStatCard('Promedio sesión', `${summary?.AvgDurationMinutes ?? 0} min`, undefined, 'clock-o')}
-      {renderStatCard('Tiempo total', `${summary?.TotalDurationMinutes ?? 0} min`, undefined, 'hourglass-2')}
+      {renderStatCard(
+        'Promedio sesión',
+        `${summary?.AvgDurationMinutes ?? 0} min`,
+        undefined,
+        'clock-o'
+      )}
+      {renderStatCard(
+        'Tiempo total',
+        `${summary?.TotalDurationMinutes ?? 0} min`,
+        undefined,
+        'hourglass-2'
+      )}
     </View>
   );
 
@@ -231,15 +294,25 @@ function ProgressScreen() {
       {summary?.RoutineUsage?.length ? (
         summary.RoutineUsage.sort((a, b) => b.UsagePercent - a.UsagePercent)
           .slice(0, 5)
-          .map(item => (
+          .map((item) => (
             <View key={item.RoutineTemplateId} style={{ marginBottom: 12 }}>
-              <Text style={{ color: '#FFFFFF', marginBottom: 6 }} numberOfLines={1}>
+              <Text
+                style={{ color: styles.colors.text, marginBottom: 6 }}
+                numberOfLines={1}
+              >
                 {item.RoutineTemplateName}
               </Text>
               <View style={styles.chartBar}>
-                <View style={[styles.chartProgress, { width: `${Math.min(100, item.UsagePercent)}%` }]} />
+                <View
+                  style={[
+                    styles.chartProgress,
+                    { width: `${Math.min(100, item.UsagePercent)}%` },
+                  ]}
+                />
               </View>
-              <Text style={styles.chartLabel}>{item.UsagePercent.toFixed(0)}%</Text>
+              <Text style={styles.chartLabel}>
+                {item.UsagePercent.toFixed(0)}%
+              </Text>
             </View>
           ))
       ) : (
@@ -248,7 +321,8 @@ function ProgressScreen() {
     </View>
   );
 
-  const weekdayLabel = (d: number) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][d] || '';
+  const weekdayLabel = (d: number) =>
+    ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][d] || '';
 
   const renderWeekdayDiscipline = () => {
     const items = summary?.WeekdayDiscipline || [];
@@ -257,18 +331,39 @@ function ProgressScreen() {
       <View style={styles.chartCard}>
         <Text style={styles.chartTitle}>Días con más disciplina</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          {[0, 1, 2, 3, 4, 5, 6].map(wd => {
-            const it = items.find(x => x.Weekday === (wd as any));
+          {[0, 1, 2, 3, 4, 5, 6].map((wd) => {
+            const it = items.find((x) => x.Weekday === (wd as any));
             const v = it?.DaysTrained ?? 0;
             const h = max ? Math.max(4, (v / max) * 80) : 4;
             return (
               <View key={wd} style={{ alignItems: 'center' }}>
                 <View
-                  style={{ width: 10, height: 80, backgroundColor: '#333333', borderRadius: 6, overflow: 'hidden', justifyContent: 'flex-end' }}
+                  style={{
+                    width: 10,
+                    height: 80,
+                    backgroundColor: styles.colors.track,
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                    justifyContent: 'flex-end',
+                  }}
                 >
-                  <View style={{ width: '100%', height: h, backgroundColor: '#4CAF50' }} />
+                  <View
+                    style={{
+                      width: '100%',
+                      height: h,
+                      backgroundColor: styles.colors.green,
+                    }}
+                  />
                 </View>
-                <Text style={{ color: '#B0B0B0', marginTop: 6, fontSize: 12 }}>{weekdayLabel(wd)}</Text>
+                <Text
+                  style={{
+                    color: styles.colors.muted,
+                    marginTop: 6,
+                    fontSize: 12,
+                  }}
+                >
+                  {weekdayLabel(wd)}
+                </Text>
               </View>
             );
           })}
@@ -281,13 +376,21 @@ function ProgressScreen() {
     <View style={styles.chartCard}>
       <Text style={styles.chartTitle}>Sedes más visitadas</Text>
       {summary?.BranchAttendance?.length ? (
-        summary.BranchAttendance.map(b => (
+        summary.BranchAttendance.map((b) => (
           <View key={b.BranchId} style={{ marginBottom: 12 }}>
-            <Text style={{ color: '#FFFFFF', marginBottom: 6 }} numberOfLines={1}>
+            <Text
+              style={{ color: styles.colors.text, marginBottom: 6 }}
+              numberOfLines={1}
+            >
               {b.BranchName}
             </Text>
             <View style={styles.chartBar}>
-              <View style={[styles.chartProgress, { width: `${Math.min(100, b.Percent)}%` }]} />
+              <View
+                style={[
+                  styles.chartProgress,
+                  { width: `${Math.min(100, b.Percent)}%` },
+                ]}
+              />
             </View>
             <Text style={styles.chartLabel}>{b.Percent.toFixed(0)}%</Text>
           </View>
@@ -300,7 +403,10 @@ function ProgressScreen() {
 
   return (
     <ScreenWrapper headerTitle="Mi Progreso" showBackButton={false}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>Mi Progreso</Text>
           <Text style={styles.subtitle}>Seguimiento de tu evolución</Text>
@@ -309,8 +415,18 @@ function ProgressScreen() {
         {renderPeriodSelector()}
 
         <View style={styles.statsGrid}>
-          {renderStatCard('Días avanzados', summary?.DaysAdvanced ?? 0, summary?.DaysExpected ?? 0, 'dumbbell')}
-          {renderStatCard('Calorías', summary?.TotalCalories ?? 0, 6000, 'fire')}
+          {renderStatCard(
+            'Días avanzados',
+            summary?.DaysAdvanced ?? 0,
+            summary?.DaysExpected ?? 0,
+            'dumbbell'
+          )}
+          {renderStatCard(
+            'Calorías',
+            summary?.TotalCalories ?? 0,
+            6000,
+            'fire'
+          )}
         </View>
 
         {renderProgressChart()}
@@ -329,184 +445,3 @@ function ProgressScreen() {
 }
 
 export default withWebLayout(ProgressScreen, { defaultTab: 'progress' });
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-  },
-  periodContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#1E1E1E',
-    borderRadius: 25,
-    padding: 4,
-    marginBottom: 24,
-  },
-  periodButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  periodButtonActive: {
-    backgroundColor: '#FFFFFF',
-  },
-  periodText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#B0B0B0',
-  },
-  periodTextActive: {
-    color: '#121212',
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-    backgroundColor: '#1E1E1E',
-  },
-  statCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 16,
-    padding: 20,
-    width: (width - 60) / 2,
-  },
-  statHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    backgroundColor: '#1E1E1E',
-  },
-  statIcon: {
-    marginRight: 8,
-  },
-  statTitle: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    fontWeight: '600',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  statTarget: {
-    fontSize: 12,
-    color: '#B0B0B0',
-  },
-  statSubtitle: {
-    fontSize: 12,
-    color: '#B0B0B0',
-    marginTop: 4,
-  },
-  chartCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  chartContainer: {
-    marginBottom: 20,
-    backgroundColor: '#1E1E1E',
-  },
-  chartBar: {
-    height: 8,
-    backgroundColor: '#333333',
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  chartProgress: {
-    height: '100%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
-  },
-  chartLabel: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    backgroundColor: '#1E1E1E',
-  },
-  weightCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  weightHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  weightTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginLeft: 12,
-  },
-  weightValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  weightChange: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  weightChangeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  achievementsCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  achievementsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  achievementsList: {
-    gap: 12,
-  },
-  achievementItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  achievementText: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    marginLeft: 12,
-  },
-  footer: {
-    height: 100,
-  },
-});

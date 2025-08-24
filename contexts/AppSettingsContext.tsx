@@ -1,8 +1,14 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Platform, useColorScheme as rnUseColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { APP_CONFIG } from '@/constants/AppConfig';
-import { logger, setLoggerConfig } from '@/utils/logger';
+import { setLoggerConfig } from '@/utils/logger';
 import { isWithinQuietHours as _isWithinQuietHours } from '@/utils/quietHours';
 
 export type ThemePreference = 'system' | 'light' | 'dark';
@@ -12,7 +18,7 @@ export type LogLevel = 'off' | 'error' | 'warn' | 'info' | 'debug';
 export interface QuietHours {
   enabled: boolean;
   start: string; // HH:mm
-  end: string;   // HH:mm
+  end: string; // HH:mm
 }
 
 export interface AppSettings {
@@ -56,13 +62,19 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 type Ctx = {
   settings: AppSettings;
-  setSettings: (next: Partial<AppSettings> | ((prev: AppSettings) => AppSettings)) => Promise<void>;
+  setSettings: (
+    next: Partial<AppSettings> | ((prev: AppSettings) => AppSettings)
+  ) => Promise<void>;
   resolvedColorScheme: 'light' | 'dark';
 };
 
 const AppSettingsContext = createContext<Ctx | null>(null);
 
-export function AppSettingsProvider({ children }: { children: React.ReactNode }) {
+export function AppSettingsProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_SETTINGS);
   const systemScheme = rnUseColorScheme() ?? 'light';
 
@@ -71,10 +83,14 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
     let cancelled = false;
     (async () => {
       try {
-        const key = APP_CONFIG?.STORAGE_KEYS?.APP_PREFERENCES || '@app_preferences';
-        const raw = Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window
-          ? window.localStorage.getItem(key)
-          : await AsyncStorage.getItem(key);
+        const key =
+          APP_CONFIG?.STORAGE_KEYS?.APP_PREFERENCES || '@app_preferences';
+        const raw =
+          Platform.OS === 'web' &&
+          typeof window !== 'undefined' &&
+          'localStorage' in window
+            ? window.localStorage.getItem(key)
+            : await AsyncStorage.getItem(key);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (!cancelled) setSettingsState({ ...DEFAULT_SETTINGS, ...parsed });
@@ -83,7 +99,9 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
         // ignore
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Aplicar config de logger cuando cambie logLevel
@@ -94,16 +112,21 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
   const persist = async (val: AppSettings) => {
     const key = APP_CONFIG?.STORAGE_KEYS?.APP_PREFERENCES || '@app_preferences';
     const json = JSON.stringify(val);
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && 'localStorage' in window) {
+    if (
+      Platform.OS === 'web' &&
+      typeof window !== 'undefined' &&
+      'localStorage' in window
+    ) {
       window.localStorage.setItem(key, json);
     } else {
       await AsyncStorage.setItem(key, json);
     }
   };
 
-  const setSettings: Ctx['setSettings'] = async next => {
-    setSettingsState(prev => {
-      const merged = typeof next === 'function' ? (next as any)(prev) : { ...prev, ...next };
+  const setSettings: Ctx['setSettings'] = async (next) => {
+    setSettingsState((prev) => {
+      const merged =
+        typeof next === 'function' ? (next as any)(prev) : { ...prev, ...next };
       // best-effort persist
       persist(merged).catch(() => {});
       return merged;
@@ -111,20 +134,27 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
   };
 
   const resolvedColorScheme: 'light' | 'dark' = useMemo(() => {
-    if (settings.theme === 'system') return systemScheme === 'dark' ? 'dark' : 'light';
+    if (settings.theme === 'system')
+      return systemScheme === 'dark' ? 'dark' : 'light';
     return settings.theme;
   }, [settings.theme, systemScheme]);
 
-  const value = useMemo<Ctx>(() => ({ settings, setSettings, resolvedColorScheme }), [settings, resolvedColorScheme]);
+  const value = useMemo<Ctx>(
+    () => ({ settings, setSettings, resolvedColorScheme }),
+    [settings, resolvedColorScheme]
+  );
 
   return (
-    <AppSettingsContext.Provider value={value}>{children}</AppSettingsContext.Provider>
+    <AppSettingsContext.Provider value={value}>
+      {children}
+    </AppSettingsContext.Provider>
   );
 }
 
 export function useAppSettings() {
   const ctx = useContext(AppSettingsContext);
-  if (!ctx) throw new Error('useAppSettings must be used within AppSettingsProvider');
+  if (!ctx)
+    throw new Error('useAppSettings must be used within AppSettingsProvider');
   return ctx;
 }
 

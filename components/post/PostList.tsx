@@ -63,13 +63,13 @@ const PostList = React.memo(() => {
 
   return (
     <EntityList
-      title='Posts'
+      title="Posts"
       loadFunction={loadPosts}
       renderItem={renderPostItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay posts'
-      emptyMessage='No se encontraron posts'
-      loadingMessage='Cargando posts...'
+      emptyTitle="No hay posts"
+      emptyMessage="No se encontraron posts"
+      loadingMessage="Cargando posts..."
     />
   );
 });

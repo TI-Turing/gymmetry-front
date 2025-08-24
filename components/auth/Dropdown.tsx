@@ -5,12 +5,12 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
-  Alert,
 } from 'react-native';
 import { Text, View } from '../Themed';
 import { useColorScheme } from '../useColorScheme';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 
 interface DropdownProps {
   label: string;
@@ -32,12 +32,13 @@ export default function Dropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const colorScheme = useColorScheme();
+  const { showAlert, AlertComponent } = useCustomAlert();
 
   // Debug: agregar logs para verificar las opciones
   React.useEffect(() => {}, [options, value]);
 
   const filteredOptions = searchable
-    ? options.filter(option =>
+    ? options.filter((option) =>
         option.toLowerCase().includes(searchText.toLowerCase())
       )
     : options;
@@ -50,7 +51,8 @@ export default function Dropdown({
 
   const handleOpen = () => {
     if (options.length === 0) {
-      Alert.alert(
+      showAlert(
+        'info',
         'Sin opciones',
         'No hay opciones disponibles para seleccionar'
       );
@@ -88,13 +90,13 @@ export default function Dropdown({
         >
           {value || placeholder}
         </Text>
-  {/* icono de flecha removido para consistencia con catálogos */}
+        {/* icono de flecha removido para consistencia con catálogos */}
       </TouchableOpacity>
 
       <Modal
         visible={isOpen}
         transparent={true}
-        animationType='slide'
+        animationType="slide"
         onRequestClose={() => setIsOpen(false)}
       >
         <TouchableOpacity
@@ -123,7 +125,7 @@ export default function Dropdown({
                   style={styles.closeButton}
                 >
                   <FontAwesome
-                    name='times'
+                    name="times"
                     size={20}
                     color={Colors[colorScheme].text}
                   />
@@ -175,7 +177,7 @@ export default function Dropdown({
                     </Text>
                     {item === value && (
                       <FontAwesome
-                        name='check'
+                        name="check"
                         size={16}
                         color={Colors[colorScheme].tint}
                       />
@@ -188,6 +190,7 @@ export default function Dropdown({
           </View>
         </TouchableOpacity>
       </Modal>
+      <AlertComponent />
     </View>
   );
 }

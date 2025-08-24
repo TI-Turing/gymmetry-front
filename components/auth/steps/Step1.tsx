@@ -9,6 +9,8 @@ import { PasswordInput } from '../PasswordInput';
 import { PasswordRequirements } from '../PasswordRequirements';
 import { useStep1Form } from '../hooks/useStep1Form';
 import { useCustomAlert } from '@/components/common/CustomAlert';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeStep1Styles } from '../styles/step1';
 
 interface Step1Props {
   onNext: (data: Step1Data) => void;
@@ -25,6 +27,7 @@ const Step1 = memo<Step1Props>(
     showSuccess: externalShowSuccess,
   }) => {
     const colorScheme = useColorScheme();
+    const styles = useThemedStyles(makeStep1Styles);
     const {
       showError: internalShowError,
       showSuccess: internalShowSuccess,
@@ -56,56 +59,32 @@ const Step1 = memo<Step1Props>(
     return (
       <ScrollView contentContainerStyle={commonStyles.container}>
         <View style={commonStyles.headerStep1}>
-          <Text
-            style={[
-              commonStyles.title,
-              { color: Colors[colorScheme ?? 'light'].text },
-            ]}
-          >
+          <Text style={[commonStyles.title, styles.headerTitle]}>
             Crear tu cuenta
           </Text>
-          <Text
-            style={[
-              commonStyles.subtitle,
-              { color: Colors[colorScheme ?? 'light'].text },
-            ]}
-          >
+          <Text style={[commonStyles.subtitle, styles.headerSubtitle]}>
             Comencemos con tus credenciales de acceso
           </Text>
         </View>
 
         <View style={commonStyles.form}>
           <View style={commonStyles.inputContainer}>
-            <Text
-              style={[
-                commonStyles.label,
-                { color: Colors[colorScheme ?? 'light'].text },
-              ]}
-            >
-              Email *
-            </Text>
+            <Text style={[commonStyles.label, styles.label]}>Email *</Text>
             <TextInput
-              style={[
-                commonStyles.input,
-                {
-                  backgroundColor: Colors[colorScheme ?? 'light'].background,
-                  color: Colors[colorScheme ?? 'light'].text,
-                  borderColor: '#666',
-                },
-              ]}
+              style={[commonStyles.input, styles.input]}
               value={email}
               onChangeText={setEmail}
               placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
-              keyboardType='email-address'
-              autoCapitalize='none'
+              keyboardType="email-address"
+              autoCapitalize="none"
               autoCorrect={false}
-              accessibilityLabel='Campo de correo electrónico'
-              accessibilityRole='text'
+              accessibilityLabel="Campo de correo electrónico"
+              accessibilityRole="text"
             />
           </View>
 
           <PasswordInput
-            label='Contraseña *'
+            label="Contraseña *"
             value={password}
             onChangeText={setPassword}
             showPassword={showPassword}
@@ -117,7 +96,7 @@ const Step1 = memo<Step1Props>(
           </PasswordInput>
 
           <PasswordInput
-            label='Confirmar contraseña *'
+            label="Confirmar contraseña *"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             showPassword={showConfirmPassword}
@@ -145,7 +124,8 @@ const Step1 = memo<Step1Props>(
               <Text
                 style={[
                   commonStyles.requirement,
-                  { color: Colors[colorScheme ?? 'light'].tint, marginTop: 4 },
+                  styles.chipOk,
+                  { marginTop: 4 },
                 ]}
               >
                 • Las contraseñas coinciden ✓
@@ -161,8 +141,8 @@ const Step1 = memo<Step1Props>(
             ]}
             onPress={handleNext}
             disabled={isLoading || !isFormValid}
-            accessibilityLabel='Continuar al siguiente paso'
-            accessibilityRole='button'
+            accessibilityLabel="Continuar al siguiente paso"
+            accessibilityRole="button"
           >
             <Text style={commonStyles.buttonText}>
               {isLoading ? 'Creando cuenta...' : 'Continuar'}

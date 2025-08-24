@@ -36,7 +36,7 @@ export function FilterableModal<T>({
     <Modal
       visible={visible}
       transparent={true}
-      animationType='slide'
+      animationType="slide"
       onRequestClose={onClose}
     >
       <TouchableOpacity
@@ -127,9 +127,9 @@ export function FilterableModal<T>({
               placeholderTextColor={`${Colors[colorScheme].text}60`}
             />
             <FontAwesome
-              name='search'
+              name="search"
               size={16}
-              color='white'
+              color="white"
               style={{ marginLeft: 8 }}
             />
           </View>

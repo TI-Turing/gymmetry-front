@@ -18,9 +18,7 @@ export function EmployeeRegisterDailyDetail() {
     setError(null);
     try {
       const res =
-        await employeeRegisterDailyService.getEmployeeRegisterDailyById(
-          id
-        );
+        await employeeRegisterDailyService.getEmployeeRegisterDailyById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -32,8 +30,8 @@ export function EmployeeRegisterDailyDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>EmployeeRegisterDaily - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

@@ -5,12 +5,17 @@ import type { UpdateBranchRequest } from '@/dto/branch/UpdateBranchRequest';
 
 // Auto-generated service for Branch Azure Functions
 export const branchService = {
-  async addBranch(request: AddBranchRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/branch/add`, request);
+  async addBranch(
+    request: AddBranchRequest
+  ): Promise<ApiResponse<Branch | string>> {
+    const response = await apiService.post<Branch | string>(
+      `/branch/add`,
+      request
+    );
     return response;
   },
-  async deleteBranch(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/branch/${id}`);
+  async deleteBranch(id: string): Promise<ApiResponse<string | null>> {
+    const response = await apiService.delete<string | null>(`/branch/${id}`);
     return response;
   },
   async getBranchById(id: string): Promise<ApiResponse<Branch>> {
@@ -22,13 +27,15 @@ export const branchService = {
     return response;
   },
   async findBranchesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<Branch[]>> {
     const response = await apiService.post<Branch[]>(`/branches/find`, request);
     return response;
   },
-  async updateBranch(request: UpdateBranchRequest): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(`/branch/update`, request);
+  async updateBranch(
+    request: UpdateBranchRequest
+  ): Promise<ApiResponse<Branch>> {
+    const response = await apiService.put<Branch>(`/branch/update`, request);
     return response;
   },
 };

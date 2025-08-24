@@ -4,28 +4,38 @@ import { ERROR_MESSAGES } from '@/constants';
 /**
  * Handles API errors and returns user-friendly error messages
  */
-export const handleApiError = (error: any): string => {
+type AxiosLikeError = {
+  code?: string;
+  message?: string;
+  response?: {
+    status?: number;
+    data?: { message?: string; errors?: unknown } | undefined;
+  };
+};
+
+export const handleApiError = (error: unknown): string => {
+  const err = (error || {}) as AxiosLikeError;
   if (!error) {
     return ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR;
   }
 
   // Network errors
-  if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+  if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
     return ERROR_MESSAGES.NETWORK.CONNECTION_ERROR;
   }
 
   // Timeout errors
-  if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+  if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
     return ERROR_MESSAGES.NETWORK.TIMEOUT;
   }
 
   // HTTP status errors
-  if (error.response?.status) {
-    const status = error.response.status;
+  if (err.response?.status) {
+    const status = err.response.status;
 
     switch (status) {
       case 400:
-        return error.response.data?.message || 'Datos inválidos';
+        return err.response?.data?.message || 'Datos inválidos';
       case 401:
         return ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS;
       case 403:
@@ -33,11 +43,9 @@ export const handleApiError = (error: any): string => {
       case 404:
         return 'Recurso no encontrado';
       case 409:
-        return error.response.data?.message || 'Conflicto en los datos';
+        return err.response?.data?.message || 'Conflicto en los datos';
       case 422:
-        return (
-          error.response.data?.message || 'Datos de validación incorrectos'
-        );
+        return err.response?.data?.message || 'Datos de validación incorrectos';
       case 429:
         return 'Demasiadas solicitudes. Intenta más tarde';
       case 500:
@@ -45,18 +53,20 @@ export const handleApiError = (error: any): string => {
       case 503:
         return 'Servicio no disponible temporalmente';
       default:
-        return error.response.data?.message || ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR;
+        return (
+          err.response?.data?.message || ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR
+        );
     }
   }
 
   // Specific error messages from API
-  if (error.response?.data?.message) {
-    return error.response.data.message;
+  if (err.response?.data?.message) {
+    return err.response.data.message;
   }
 
   // Generic error message
-  if (error.message) {
-    return error.message;
+  if (err.message) {
+    return err.message;
   }
 
   return ERROR_MESSAGES.GENERIC.UNEXPECTED_ERROR;
@@ -69,7 +79,7 @@ export const createApiError = (
   message: string,
   status?: number,
   code?: string,
-  details?: any
+  details?: unknown
 ): ApiError => {
   const error = new Error(message) as ApiError;
   error.status = status;
@@ -81,55 +91,59 @@ export const createApiError = (
 /**
  * Validates if an error is a network error
  */
-export const isNetworkError = (error: any): boolean => {
+export const isNetworkError = (error: unknown): boolean => {
+  const err = (error || {}) as AxiosLikeError;
   return (
-    error.code === 'NETWORK_ERROR' ||
-    error.message === 'Network Error' ||
-    !error.response
+    err.code === 'NETWORK_ERROR' ||
+    err.message === 'Network Error' ||
+    !err.response
   );
 };
 
 /**
  * Validates if an error is an authentication error
  */
-export const isAuthError = (error: any): boolean => {
-  return error.response?.status === 401 || error.response?.status === 403;
+export const isAuthError = (error: unknown): boolean => {
+  const err = (error || {}) as AxiosLikeError;
+  return err.response?.status === 401 || err.response?.status === 403;
 };
 
 /**
  * Validates if an error is a validation error
  */
-export const isValidationError = (error: any): boolean => {
-  return error.response?.status === 400 || error.response?.status === 422;
+export const isValidationError = (error: unknown): boolean => {
+  const err = (error || {}) as AxiosLikeError;
+  return err.response?.status === 400 || err.response?.status === 422;
 };
 
 /**
  * Extracts validation errors from API response
  */
 export const extractValidationErrors = (
-  error: any
+  error: unknown
 ): Record<string, string[]> => {
-  if (!error.response?.data?.errors) {
+  const err = (error || {}) as AxiosLikeError;
+  if (!err.response?.data?.errors) {
     return {};
   }
 
-  const errors = error.response.data.errors;
+  const errors = err.response.data?.errors as unknown;
 
   if (Array.isArray(errors)) {
-    return { general: errors };
+    return { general: errors as string[] };
   }
 
   if (typeof errors === 'object') {
-    return errors;
+    return errors as Record<string, string[]>;
   }
 
-  return { general: [errors.toString()] };
+  return { general: [String(errors)] };
 };
 
 /**
  * Formats error message for display
  */
-export const formatErrorMessage = (error: any): string => {
+export const formatErrorMessage = (error: unknown): string => {
   const message = handleApiError(error);
 
   // Capitalize first letter
@@ -144,7 +158,7 @@ export const retryApiCall = async <T>(
   maxRetries: number = 3,
   delay: number = 1000
 ): Promise<T> => {
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -163,7 +177,7 @@ export const retryApiCall = async <T>(
       }
 
       // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, delay * attempt));
+      await new Promise((resolve) => setTimeout(resolve, delay * attempt));
     }
   }
 

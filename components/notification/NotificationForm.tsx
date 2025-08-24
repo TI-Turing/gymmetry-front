@@ -1,14 +1,53 @@
-import { TextInput, StyleSheet } from 'react-native';
+import { TextInput } from 'react-native';
 import React, { useState } from 'react';
 import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
 import { notificationService } from '@/services';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
+import Colors from '@/constants/Colors';
+import { useThemedStyles, ThemeMode } from '@/hooks/useThemedStyles';
+
+const makeStyles = (theme: ThemeMode) => {
+  const p = Colors[theme];
+  return {
+    container: { flex: 1, padding: 16 } as const,
+    title: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      marginBottom: 12,
+      color: p.text,
+    } as const,
+    error: { color: p.danger, marginVertical: 8 } as const,
+    info: { color: p.tint, marginTop: 8 } as const,
+    card: {
+      backgroundColor: p.card,
+      padding: 12,
+      borderRadius: 8,
+      marginVertical: 6,
+      borderWidth: 1,
+      borderColor: p.border,
+    } as const,
+    cardText: { fontSize: 12, color: p.text } as const,
+    label: { marginBottom: 6, color: p.text } as const,
+    textarea: {
+      borderWidth: 1,
+      borderColor: p.border,
+      padding: 8,
+      borderRadius: 6,
+      minHeight: 120,
+      textAlignVertical: 'top' as const,
+      marginBottom: 8,
+      color: p.text,
+      backgroundColor: theme === 'dark' ? p.background : p.background,
+    } as const,
+    row: { flexDirection: 'row' as const, gap: 8, marginVertical: 8 } as const,
+  };
+};
 
 export function NotificationForm() {
+  const styles = useThemedStyles(makeStyles);
   const { settings } = useAppSettings();
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
@@ -19,8 +58,8 @@ export function NotificationForm() {
     setLoading(true);
     setMsg(null);
     try {
-  const body = JSON.parse(payload);
-  const res = await notificationService.addNotification(body, { settings });
+      const body = JSON.parse(payload);
+      const res = await notificationService.addNotification(body, { settings });
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -68,11 +107,11 @@ export function NotificationForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (
@@ -82,28 +121,4 @@ export function NotificationForm() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
-  card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
-  },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
-});
-export default styles;
+export default NotificationForm;

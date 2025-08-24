@@ -1,3 +1,3 @@
 export interface FindAccessMethodTypesByFieldsRequest {
-  fields: { [key: string]: any };
+  fields: Record<string, unknown>;
 }

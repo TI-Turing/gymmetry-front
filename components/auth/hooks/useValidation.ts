@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { PasswordValidation } from '../types';
 import {
   getPasswordValidation,
   isValidEmail,

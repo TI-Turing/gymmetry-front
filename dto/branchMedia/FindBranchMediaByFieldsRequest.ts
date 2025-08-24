@@ -1,3 +1,3 @@
 export interface FindBranchMediaByFieldsRequest {
-  fields: { [key: string]: any };
+  fields: Record<string, unknown>;
 }

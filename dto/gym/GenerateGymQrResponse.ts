@@ -1,4 +1,4 @@
 export interface GenerateGymQrResponse {
   qrCode: string;
-  gymPlanSelectedType: any;
+  gymPlanSelectedType: unknown;
 }

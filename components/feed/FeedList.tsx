@@ -71,13 +71,13 @@ const FeedList = React.memo(() => {
 
   return (
     <EntityList
-      title='Feed de Publicaciones'
+      title="Feed de Publicaciones"
       loadFunction={loadFeeds}
       renderItem={renderFeedItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay publicaciones'
-      emptyMessage='No se encontraron publicaciones en el feed'
-      loadingMessage='Cargando feed...'
+      emptyTitle="No hay publicaciones"
+      emptyMessage="No se encontraron publicaciones en el feed"
+      loadingMessage="Cargando feed..."
     />
   );
 });

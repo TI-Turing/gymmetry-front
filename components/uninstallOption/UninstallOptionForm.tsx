@@ -18,8 +18,7 @@ export function UninstallOptionForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await uninstallOptionService.addUninstallOption(body);
+      const res = await uninstallOptionService.addUninstallOption(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -33,8 +32,7 @@ export function UninstallOptionForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await uninstallOptionService.updateUninstallOption(body);
+      const res = await uninstallOptionService.updateUninstallOption(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -47,8 +45,7 @@ export function UninstallOptionForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res =
-        await uninstallOptionService.deleteUninstallOption(id);
+      const res = await uninstallOptionService.deleteUninstallOption(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');
@@ -69,11 +66,11 @@ export function UninstallOptionForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

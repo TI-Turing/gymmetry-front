@@ -27,11 +27,11 @@ const CurrentOccupancyList = React.memo(() => {
 
   return (
     <EntityList
-      title='Current Occupancy'
+      title="Current Occupancy"
       loadFunction={loadCurrentOccupancies}
       renderItem={renderCurrentOccupancyItem}
-      keyExtractor={item => item.id?.toString() || Math.random().toString()}
-      emptyMessage='No current occupancies found'
+      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      emptyMessage="No current occupancies found"
     />
   );
 });
@@ -50,22 +50,22 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
-    elevation: 5
+    elevation: 5,
   },
   itemTitle: {
     fontSize: FONT_SIZES.md,
     fontWeight: 'bold',
     marginBottom: SPACING.xs,
-    color: '#333'
+    color: '#333',
   },
   itemSubtitle: {
     fontSize: FONT_SIZES.sm,
-    color: '#666'
-  }
+    color: '#666',
+  },
 });
 
 CurrentOccupancyList.displayName = 'CurrentOccupancyList';

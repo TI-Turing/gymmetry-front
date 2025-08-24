@@ -2,7 +2,7 @@
 export interface PostCreateRequestDto {
   UserId: string;
   Content: string | null;
-  Media: any[] | null;
+  Media: unknown[] | null;
   MediaType: string | null;
   FileName: string | null;
   Id: string;

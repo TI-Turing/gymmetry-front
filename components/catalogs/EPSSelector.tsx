@@ -7,12 +7,12 @@ export const EPSSelector = memo<EPSSelectorProps>(
   ({
     epsOptions,
     value,
-  onSelect,
-  disabled = false,
+    onSelect,
+    disabled = false,
     loading = false,
     required = false,
     error,
-  placeholder = 'Seleccione',
+    placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar EPS',
     accessibilityHint = 'Presiona para abrir la lista de EPS',
   }) => {
@@ -26,7 +26,7 @@ export const EPSSelector = memo<EPSSelectorProps>(
     return (
       <>
         <BaseCatalogSelector
-          label='EPS'
+          label="EPS"
           value={value}
           placeholder={placeholder}
           disabled={disabled}
@@ -41,14 +41,14 @@ export const EPSSelector = memo<EPSSelectorProps>(
 
         <SelectorModal
           visible={showModal}
-          title='Selecciona tu EPS'
+          title="Selecciona tu EPS"
           data={epsOptions}
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}
           loading={loading}
           selectedId={value}
           showSearch
-          searchPlaceholder='Buscar EPS...'
+          searchPlaceholder="Buscar EPS..."
         />
       </>
     );

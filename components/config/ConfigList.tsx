@@ -4,7 +4,6 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { configService } from '@/services';
 
 export function ConfigList() {
   const [items, setItems] = useState<any[]>([]);
@@ -43,7 +42,7 @@ export function ConfigList() {
           </View>
         )}
       />
-      <Button title='Refrescar' onPress={load} />
+      <Button title="Refrescar" onPress={load} />
     </View>
   );
 }

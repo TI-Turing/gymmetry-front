@@ -162,13 +162,13 @@ export const Button: React.FC<ButtonProps> = ({
       style={buttonStyles}
       disabled={isDisabled}
       activeOpacity={0.7}
-      accessibilityRole='button'
+      accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
       {...touchableProps}
     >
       {loading ? (
         <ActivityIndicator
-          size='small'
+          size="small"
           color={variant === 'primary' ? '#FFFFFF' : Colors[colorScheme].tint}
         />
       ) : (

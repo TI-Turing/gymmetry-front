@@ -1,502 +1,2502 @@
 [
-  { "id": 1, "text": "La disciplina es entrenar incluso cuando nadie te mira.", "tags": ["disciplina"] },
-  { "id": 2, "text": "Un pequeño progreso diario genera resultados extraordinarios.", "tags": ["consistencia","progreso"] },
-  { "id": 3, "text": "Tu cuerpo escucha lo que tu mente repite.", "tags": ["mente","fuerza"] },
-  { "id": 4, "text": "El esfuerzo que evitas hoy es el resultado que te faltará mañana.", "tags": ["esfuerzo","resultado"] },
-  { "id": 5, "text": "Hazlo con cansancio, pero hazlo.", "tags": ["cansancio","disciplina"] },
-  { "id": 6, "text": "La constancia vence al talento distraído.", "tags": ["consistencia","talento"] },
-  { "id": 7, "text": "Tu meta no te está esperando, se está alejando si te detienes.", "tags": ["objetivos","motivacion"] },
-  { "id": 8, "text": "El sudor es tu cuerpo aplaudiendo tu esfuerzo.", "tags": ["esfuerzo","sudor"] },
-  { "id": 9, "text": "Cada repetición consciente fortalece más que diez distraídas.", "tags": ["enfoque","calidad"] },
-  { "id": 10, "text": "Entrena tu voluntad igual que entrenas tus músculos.", "tags": ["voluntad","disciplina"] },
-  { "id": 11, "text": "No necesitas motivación infinita, sólo un compromiso renovado hoy.", "tags": ["compromiso","hoy"] },
-  { "id": 12, "text": "Tu futuro en forma ya empezó, no lo abandones a mitad.", "tags": ["futuro","consistencia"] },
-  { "id": 13, "text": "El músculo más difícil de construir es la constancia.", "tags": ["consistencia","metafora"] },
-  { "id": 14, "text": "Un día a la vez, pero cada día cuenta.", "tags": ["progreso","consistencia"] },
-  { "id": 15, "text": "Cuando se vuelve hábito, deja de ser pesado y empieza a ser parte de ti.", "tags": ["habito","disciplina"] },
-  { "id": 16, "text": "La excusa se gasta, el resultado permanece.", "tags": ["excusa","resultado"] },
-  { "id": 17, "text": "Tu nivel de esfuerzo define tu techo, eleva ambos.", "tags": ["esfuerzo","mejora"] },
-  { "id": 18, "text": "Entrena para ser fuerte también en los días débiles.", "tags": ["fuerza","resiliencia"] },
-  { "id": 19, "text": "La incomodidad temporal es inversión a largo plazo.", "tags": ["incomodidad","inversion"] },
-  { "id": 20, "text": "Tu cuerpo cambia cuando tu mente deja de negociar.", "tags": ["mente","cambio"] },
-  { "id": 21, "text": "Nunca te arrepentirás de haber entrenado, sí de no hacerlo.", "tags": ["entrenar","arrepentimiento"] },
-  { "id": 22, "text": "Los resultados son la huella de tu constancia.", "tags": ["resultados","consistencia"] },
-  { "id": 23, "text": "No existe atajo que sustituya la repetición consciente.", "tags": ["noAtajos","enfoque"] },
-  { "id": 24, "text": "Mejora un 1% hoy y repite la fórmula.", "tags": ["mejoraContinua","progreso"] },
-  { "id": 25, "text": "La fuerza mental sostiene la última repetición.", "tags": ["fuerza","mental"] },
-  { "id": 26, "text": "Tu mejor versión está detrás de varios 'no quiero' vencidos.", "tags": ["versionMejor","disciplina"] },
-  { "id": 27, "text": "Sin plan es deseo; con plan es objetivo.", "tags": ["plan","objetivo"] },
-  { "id": 28, "text": "Persiste hasta que lo normal sea verte avanzar.", "tags": ["persistencia","avance"] },
-  { "id": 29, "text": "El cansancio habla; tú decides si lo escuchas o lo trasciendes.", "tags": ["cansancio","resiliencia"] },
-  { "id": 30, "text": "Lo que hoy pesa mañana será tu calentamiento.", "tags": ["progreso","sobrecarga"] },
-  { "id": 31, "text": "Pequeñas decisiones repetidas construyen grandes cambios.", "tags": ["decisiones","cambio"] },
-  { "id": 32, "text": "Tu rutina te forma más que tus intenciones.", "tags": ["rutina","formacion"] },
-  { "id": 33, "text": "Sin constancia la motivación se fuga.", "tags": ["consistencia","motivacion"] },
-  { "id": 34, "text": "Llegarás lejos si aprendes a comenzar cada día.", "tags": ["comenzar","habito"] },
-  { "id": 35, "text": "La disciplina es amarte en futuro.", "tags": ["disciplina","autoamor"] },
-  { "id": 36, "text": "Tu progreso no necesita ser perfecto, sí continuo.", "tags": ["progreso","consistencia"] },
-  { "id": 37, "text": "La mente se rinde antes que el cuerpo; entrena la mente.", "tags": ["mente","resistencia"] },
-  { "id": 38, "text": "Renuncia a la prisa, abraza el proceso.", "tags": ["proceso","paciencia"] },
-  { "id": 39, "text": "Cada hábito saludable desplaza uno que te frenaba.", "tags": ["habitos","mejora"] },
-  { "id": 40, "text": "El sudor de hoy evita lágrimas mañana.", "tags": ["esfuerzo","futuro"] },
-  { "id": 41, "text": "Controla lo que puedes: tu esfuerzo y tu actitud.", "tags": ["actitud","esfuerzo"] },
-  { "id": 42, "text": "Apunta alto y entrena detallado.", "tags": ["objetivos","precision"] },
-  { "id": 43, "text": "La constancia transforma lo difícil en natural.", "tags": ["consistencia","transformacion"] },
-  { "id": 44, "text": "Entrena con propósito, no por inercia.", "tags": ["proposito","enfoque"] },
-  { "id": 45, "text": "Tu meta requiere la versión disciplinada de ti.", "tags": ["objetivo","disciplina"] },
-  { "id": 46, "text": "Errores ajustan el camino, no lo cancelan.", "tags": ["errores","aprendizaje"] },
-  { "id": 47, "text": "La diferencia entre 'algún día' y 'lo logré' es la constancia.", "tags": ["consistencia","logro"] },
-  { "id": 48, "text": "Sé paciente con los resultados, impaciente con las excusas.", "tags": ["paciencia","excusas"] },
-  { "id": 49, "text": "Cuando falles un día, evita fallar el siguiente.", "tags": ["consistencia","retorno"] },
-  { "id": 50, "text": "Tu progreso inspira a alguien que aún no conoces.", "tags": ["inspiracion","progreso"] },
-  { "id": 51, "text": "Despierta tu potencial entrenando tu constancia.", "tags": ["potencial","consistencia"] },
-  { "id": 52, "text": "Los cambios físicos siguen a los cambios de hábitos.", "tags": ["habitos","cambio"] },
-  { "id": 53, "text": "La grandeza diaria es cumplir tu plan.", "tags": ["plan","grandeza"] },
-  { "id": 54, "text": "Más vale ritmos sostenibles que picos fugaces.", "tags": ["ritmo","sostenible"] },
-  { "id": 55, "text": "No abandones por lentitud lo que vale por permanencia.", "tags": ["permanencia","paciencia"] },
-  { "id": 56, "text": "Tu yo futuro evaluará las decisiones de hoy.", "tags": ["futuro","decisiones"] },
-  { "id": 57, "text": "Fortalece la técnica antes que el ego.", "tags": ["tecnica","ego"] },
-  { "id": 58, "text": "Un reinicio disciplinado vence un inicio perfecto.", "tags": ["reinicio","disciplina"] },
-  { "id": 59, "text": "El progreso silencioso genera resultados ruidosos.", "tags": ["progreso","resultado"] },
-  { "id": 60, "text": "Sigue cuando se vaya la motivación; ahí nace la disciplina.", "tags": ["disciplina","motivacion"] },
-  { "id": 61, "text": "Lo difícil educa tu carácter físico y mental.", "tags": ["caracter","dificultad"] },
-  { "id": 62, "text": "Respeta el descanso como respetas el esfuerzo.", "tags": ["descanso","equilibrio"] },
-  { "id": 63, "text": "Tu energía mejora cuando tu cuerpo confía en tus hábitos.", "tags": ["energia","habitos"] },
-  { "id": 64, "text": "No hay fórmula secreta: hábito + tiempo + calidad.", "tags": ["formula","habito"] },
-  { "id": 65, "text": "Entrena con intención, alimenta con criterio, descansa con respeto.", "tags": ["intencion","equilibrio"] },
-  { "id": 66, "text": "Lo que se mide mejora; registra algo hoy.", "tags": ["medicion","mejora"] },
-  { "id": 67, "text": "Tu mejor excusa no quema calorías.", "tags": ["excusa","humor"] },
-  { "id": 68, "text": "No compitas contra otros, compite contra tu comodidad.", "tags": ["comodidad","competencia"] },
-  { "id": 69, "text": "El enfoque convierte minutos en progreso.", "tags": ["enfoque","progreso"] },
-  { "id": 70, "text": "La constancia hace visibles los resultados que hoy imaginas.", "tags": ["consistencia","visualizacion"] },
-  { "id": 71, "text": "Fracasar un intento no es fracasar el proceso.", "tags": ["proceso","fracaso"] },
-  { "id": 72, "text": "Tu entrenamiento no termina hasta que estires y registres.", "tags": ["cierre","habito"] },
-  { "id": 73, "text": "El compromiso se prueba en los días grises.", "tags": ["compromiso","diasDificiles"] },
-  { "id": 74, "text": "Construye fuerza que también mejore tu vida diaria.", "tags": ["fuerza","funcional"] },
-  { "id": 75, "text": "La mejora exige feedback: escucha a tu cuerpo.", "tags": ["feedback","cuerpo"] },
-  { "id": 76, "text": "Plan sin acción es decoración mental.", "tags": ["plan","accion"] },
-  { "id": 77, "text": "Tu constancia hoy es tu confianza mañana.", "tags": ["confianza","consistencia"] },
-  { "id": 78, "text": "Los límites percibidos suelen ser puntos de inicio real.", "tags": ["limites","creencias"] },
-  { "id": 79, "text": "Ajusta, no abandones.", "tags": ["ajuste","resiliencia"] },
-  { "id": 80, "text": "Tu identidad fitness se forja en elecciones pequeñas.", "tags": ["identidad","habitos"] },
-  { "id": 81, "text": "Lograrás consistencia cuando te organices para entrenar aun sin ganas.", "tags": ["organizacion","consistencia"] },
-  { "id": 82, "text": "La falta de resultados a veces es falta de tiempo acumulado.", "tags": ["paciencia","resultados"] },
-  { "id": 83, "text": "Reduce fricción: deja tu equipo listo la noche anterior.", "tags": ["preparacion","hack"] },
-  { "id": 84, "text": "La fuerza es adaptación; provoca la señal adecuada.", "tags": ["fuerza","adaptacion"] },
-  { "id": 85, "text": "Come para rendir, no sólo para llenar.", "tags": ["nutricion","rendimiento"] },
-  { "id": 86, "text": "Moverte es celebrar tu capacidad, no castigar tu cuerpo.", "tags": ["movimiento","mentalidad"] },
-  { "id": 87, "text": "La constancia reduce la ansiedad del progreso.", "tags": ["ansiedad","consistencia"] },
-  { "id": 88, "text": "Fortalece tus cimientos antes de añadir peso.", "tags": ["tecnica","bases"] },
-  { "id": 89, "text": "El inicio incómodo se vuelve ritual poderoso.", "tags": ["inicio","ritual"] },
-  { "id": 90, "text": "Sé terco con tu meta y flexible con tu método.", "tags": ["meta","metodo"] },
-  { "id": 91, "text": "Entrenar es un privilegio, aprovéchalo.", "tags": ["gratitud","entrenar"] },
-  { "id": 92, "text": "Repetir correcto supera repetir mucho.", "tags": ["calidad","tecnica"] },
-  { "id": 93, "text": "Tu progreso invisibiliza versiones pasadas de ti.", "tags": ["progreso","identidad"] },
-  { "id": 94, "text": "Sin descanso estratégico no hay crecimiento sostenido.", "tags": ["descanso","crecimiento"] },
-  { "id": 95, "text": "Cada semana pide una pequeña mejora respecto a la anterior.", "tags": ["mejoraContinua","semana"] },
-  { "id": 96, "text": "Entrenar cansado enseña eficiencia de movimiento.", "tags": ["cansancio","eficiencia"] },
-  { "id": 97, "text": "Tu entrenamiento empieza cuando deseas parar.", "tags": ["resiliencia","umbral"] },
-  { "id": 98, "text": "El enfoque ahorra repeticiones inútiles.", "tags": ["enfoque","eficiencia"] },
-  { "id": 99, "text": "Tu ambiente facilita o sabotea tu disciplina: ajústalo.", "tags": ["ambiente","disciplina"] },
-  { "id": 100, "text": "La constancia es el multiplicador silencioso del plan.", "tags": ["consistencia","plan"] },
-  { "id": 101, "text": "Quema dudas en el calentamiento.", "tags": ["mentalidad","calentamiento"] },
-  { "id": 102, "text": "Agradece tu punto de partida; no es tu destino.", "tags": ["gratitud","progreso"] },
-  { "id": 103, "text": "La disciplina responde cuando la motivación falla.", "tags": ["disciplina","motivacion"] },
-  { "id": 104, "text": "Cada sesión es un voto por la persona que quieres ser.", "tags": ["identidad","sesion"] },
-  { "id": 105, "text": "Si no mides nada, dependes de suposiciones.", "tags": ["medicion","datos"] },
-  { "id": 106, "text": "Tu diálogo interno debe entrenar, no sabotear.", "tags": ["mente","autoconversacion"] },
-  { "id": 107, "text": "Constancia no es nunca fallar, es retomar rápido.", "tags": ["retomar","consistencia"] },
-  { "id": 108, "text": "Construye fuerza alrededor de tus articulaciones, no sólo estética.", "tags": ["fuerza","salud"] },
-  { "id": 109, "text": "Planifica la comida con el mismo respeto que el entrenamiento.", "tags": ["nutricion","plan"] },
-  { "id": 110, "text": "Un cuerpo fuerte sostiene una mente clara.", "tags": ["fuerza","claridad"] },
-  { "id": 111, "text": "Renueva tu porqué cuando la rutina se vuelva monótona.", "tags": ["proposito","motivacion"] },
-  { "id": 112, "text": "La energía sigue a la acción, no al revés.", "tags": ["energia","accion"] },
-  { "id": 113, "text": "Celebra consistencia, no sólo hitos visibles.", "tags": ["celebracion","consistencia"] },
-  { "id": 114, "text": "Tu constancia redefine tus límites biológicos.", "tags": ["limites","consistencia"] },
-  { "id": 115, "text": "Mantén simple el plan; complica la ejecución con calidad.", "tags": ["simpleza","calidad"] },
-  { "id": 116, "text": "Sin dolor extremo: progreso inteligente, no castigo.", "tags": ["inteligente","prevencion"] },
-  { "id": 117, "text": "El progreso lento aún es progreso.", "tags": ["progreso","ritmo"] },
-  { "id": 118, "text": "Tu 'despacio' de hoy será tu 'rápido' mañana.", "tags": ["mejora","ritmo"] },
-  { "id": 119, "text": "Anota para aprender, ajusta para mejorar.", "tags": ["registro","ajuste"] },
-  { "id": 120, "text": "Cada repetición calibrada es una inversión técnica.", "tags": ["tecnica","inversion"] },
-  { "id": 121, "text": "Tu meta necesita fechas, no deseos.", "tags": ["objetivos","planificacion"] },
-  { "id": 122, "text": "Recuperar es construir, no detener.", "tags": ["recuperacion","crecimiento"] },
-  { "id": 123, "text": "Respira profundo: el control empieza ahí.", "tags": ["respiracion","control"] },
-  { "id": 124, "text": "Lo que no desafía no transforma.", "tags": ["desafio","transformacion"] },
-  { "id": 125, "text": "Tu atención es tu recurso escaso, protégela.", "tags": ["enfoque","atencion"] },
-  { "id": 126, "text": "Define el éxito de hoy antes de comenzar.", "tags": ["exito","plan"] },
-  { "id": 127, "text": "Tu cuerpo responde a la historia que repites sobre él.", "tags": ["mente","cuerpo"] },
-  { "id": 128, "text": "Sin pasión constante, la disciplina sostiene el proceso.", "tags": ["disciplina","proceso"] },
-  { "id": 129, "text": "El progreso real se siente más en energía que en espejo al inicio.", "tags": ["energia","progreso"] },
-  { "id": 130, "text": "Organiza la semana: la improvisación sabotea constancia.", "tags": ["organizacion","semana"] },
-  { "id": 131, "text": "Cada levantamiento limpio educa tu sistema nervioso.", "tags": ["tecnica","sistemaNervioso"] },
-  { "id": 132, "text": "No busques dolor, busca adaptación.", "tags": ["adaptacion","inteligente"] },
-  { "id": 133, "text": "Tu meta grande cabe en bloques pequeños calendarizados.", "tags": ["objetivo","planificacion"] },
-  { "id": 134, "text": "Haz difícil saltarte el entrenamiento y fácil cumplirlo.", "tags": ["habitos","diseño"] },
-  { "id": 135, "text": "Un mal día entrenado supera un día perfecto omitido.", "tags": ["consistencia","diaMalo"] },
-  { "id": 136, "text": "Tu conversación interna antes de rendirte define la serie.", "tags": ["mente","serie"] },
-  { "id": 137, "text": "Reduce ruido: menos distracción, más intensidad.", "tags": ["distraccion","intensidad"] },
-  { "id": 138, "text": "Construir hábito es ganar inercia positiva.", "tags": ["habito","inercia"] },
-  { "id": 139, "text": "Si fallas el horario, no falles el día completo.", "tags": ["flexibilidad","consistencia"] },
-  { "id": 140, "text": "Tu agenda revela tus prioridades reales.", "tags": ["prioridades","agenda"] },
-  { "id": 141, "text": "Mejora tu postura: suma fuerza gratis.", "tags": ["postura","eficiencia"] },
-  { "id": 142, "text": "Entrenar fuerza protege tu futuro movimiento.", "tags": ["fuerza","longevidad"] },
-  { "id": 143, "text": "La fatiga mal gestionada se vuelve retroceso.", "tags": ["fatiga","gestiona"] },
-  { "id": 144, "text": "Tu descanso nocturno es tu sesión cero.", "tags": ["sueño","recuperacion"] },
-  { "id": 145, "text": "La identidad se construye cumpliendo promesas privadas.", "tags": ["identidad","promesas"] },
-  { "id": 146, "text": "Repite, refina, progresa.", "tags": ["iteracion","progreso"] },
-  { "id": 147, "text": "Nada cambia si tú no cambias patrones.", "tags": ["patrones","cambio"] },
-  { "id": 148, "text": "Respeta el calentamiento: prepara, no pierde tiempo.", "tags": ["calentamiento","prevencion"] },
-  { "id": 149, "text": "Tu meta física exige higiene digital.", "tags": ["enfoque","digital"] },
-  { "id": 150, "text": "Entrena hoy para poder elegir mañana.", "tags": ["libertad","futuro"] },
-  { "id": 151, "text": "La ejecución mediocre repetida no crea excelencia.", "tags": ["excelencia","calidad"] },
-  { "id": 152, "text": "Reduce la fricción nutricional planificando.", "tags": ["nutricion","planificacion"] },
-  { "id": 153, "text": "Tu constancia se nota primero en energía estable.", "tags": ["energia","consistencia"] },
-  { "id": 154, "text": "Sé específico: 'mejorar fuerza' no es tan claro como 'añadir 5kg al press'.", "tags": ["especifico","objetivos"] },
-  { "id": 155, "text": "La paciencia agresiva: actúa diario, espera tranquilo.", "tags": ["paciencia","accion"] },
-  { "id": 156, "text": "Evita compararte; otros muestran resultados, no sacrificios.", "tags": ["comparacion","mentalidad"] },
-  { "id": 157, "text": "Haz check-ins semanales contigo.", "tags": ["revision","progreso"] },
-  { "id": 158, "text": "La sobrecarga progresiva es conversación con tu cuerpo.", "tags": ["sobrecarga","adaptacion"] },
-  { "id": 159, "text": "Si no puedes con la mente, el cuerpo no sigue.", "tags": ["mente","cuerpo"] },
-  { "id": 160, "text": "Tu nivel actual es feedback, no identidad fija.", "tags": ["feedback","identidad"] },
-  { "id": 161, "text": "Simplifica: elimina lo que no suma a tu objetivo físico.", "tags": ["simplificar","objetivo"] },
-  { "id": 162, "text": "Una buena técnica ahorra energía para crecer.", "tags": ["tecnica","eficiencia"] },
-  { "id": 163, "text": "Tu cuerpo aprende patrones antes que pesos altos.", "tags": ["patrones","aprendizaje"] },
-  { "id": 164, "text": "No te saltes el core: es tu transmisión de fuerza.", "tags": ["core","fuerza"] },
-  { "id": 165, "text": "Cada repetición controla tu narrativa interna.", "tags": ["mente","narrativa"] },
-  { "id": 166, "text": "Tu progreso necesita sistemas, no voluntad infinita.", "tags": ["sistemas","progreso"] },
-  { "id": 167, "text": "Hazlo obvio: deja la ropa lista, agenda la hora, elimina fricciones.", "tags": ["habitos","friccion"] },
-  { "id": 168, "text": "La perseverancia te vuelve inevitable.", "tags": ["perseverancia","inevitable"] },
-  { "id": 169, "text": "Domina las bases antes de buscar variantes exóticas.", "tags": ["bases","dominio"] },
-  { "id": 170, "text": "Tu motivación fluctúa; tu sistema debe sostenerte.", "tags": ["sistemas","motivacion"] },
-  { "id": 171, "text": "Entrena para sumar años activos a tu vida.", "tags": ["longevidad","futuro"] },
-  { "id": 172, "text": "La fuerza interior se refleja en la constancia exterior.", "tags": ["fuerza","constancia"] },
-  { "id": 173, "text": "Deja que el hábito decida por ti en días difíciles.", "tags": ["habitos","diasDificiles"] },
-  { "id": 174, "text": "Tu próxima versión exige decisiones distintas.", "tags": ["version","decisiones"] },
-  { "id": 175, "text": "Cuida movilidad: previene límites futuros.", "tags": ["movilidad","prevencion"] },
-  { "id": 176, "text": "Eliminar lo que resta es tan valioso como añadir lo que suma.", "tags": ["minimalismo","enfoque"] },
-  { "id": 177, "text": "Tu progreso escala cuando te vuelves predecible contigo mismo.", "tags": ["predecible","consistencia"] },
-  { "id": 178, "text": "Repite fundamentos hasta que sean automáticos.", "tags": ["fundamentos","automatizacion"] },
-  { "id": 179, "text": "Una sesión pésima enseñó algo si reflexionas.", "tags": ["reflexion","aprendizaje"] },
-  { "id": 180, "text": "La mente clara elige mejor bajo fatiga.", "tags": ["mente","fatiga"] },
-  { "id": 181, "text": "Tu entrenamiento termina cuando registras y planificas el siguiente.", "tags": ["planificacion","cierre"] },
-  { "id": 182, "text": "Fallar rápido, ajustar rápido, continuar largo.", "tags": ["iteracion","ajuste"] },
-  { "id": 183, "text": "La constancia es resistencia a la interrupción.", "tags": ["consistencia","resistencia"] },
-  { "id": 184, "text": "Tu respiración es tu metrónomo de control.", "tags": ["respiracion","control"] },
-  { "id": 185, "text": "La intensidad sin técnica es ruido fisiológico.", "tags": ["intensidad","tecnica"] },
-  { "id": 186, "text": "Construye fortaleza emocional a través del esfuerzo físico.", "tags": ["esfuerzo","emocional"] },
-  { "id": 187, "text": "Tu físico refleja consistencia más que genética.", "tags": ["consistencia","genetica"] },
-  { "id": 188, "text": "Cada mañana reinicia tu trayectoria disciplinada.", "tags": ["mañana","reinicio"] },
-  { "id": 189, "text": "No esperes el momento perfecto: créalo entrenando.", "tags": ["accion","momento"] },
-  { "id": 190, "text": "Si puedes registrar, puedes mejorar.", "tags": ["registro","mejora"] },
-  { "id": 191, "text": "Tu progreso acelera cuando simplificas decisiones.", "tags": ["simplificacion","progreso"] },
-  { "id": 192, "text": "Hidratarte es parte del entrenamiento, no extra.", "tags": ["hidratacion","basico"] },
-  { "id": 193, "text": "Un plan mediocre ejecutado supera un plan brillante ignorado.", "tags": ["ejecucion","plan"] },
-  { "id": 194, "text": "La autoexigencia sana busca mejora, no castigo.", "tags": ["autoexigencia","saludable"] },
-  { "id": 195, "text": "Tu mejor herramienta de motivación es ver evidencia de avance.", "tags": ["motivacion","evidencia"] },
-  { "id": 196, "text": "Progresar es elegir conscientemente hoy lo que otros posponen.", "tags": ["eleccion","progreso"] },
-  { "id": 197, "text": "Sin propósito claro, cualquier distracción gana.", "tags": ["proposito","distraccion"] },
-  { "id": 198, "text": "Tu disciplina diaria paga intereses compuesto.", "tags": ["interesCompuesto","disciplina"] },
-  { "id": 199, "text": "Lo extraordinario es lo ordinario hecho con excelencia sostenida.", "tags": ["excelencia","consistencia"] },
-  { "id": 200, "text": "Hoy también cuenta: hazlo valer.", "tags": ["hoy","valor"] },
-  { "id": 201, "text": "Empieza ligero, termina orgulloso.", "tags": ["inicio","orgullo"] },
-  { "id": 202, "text": "La magia ocurre cuando sigues tras el segundo bostezo.", "tags": ["disciplina","energia"] },
-  { "id": 203, "text": "Tu sudor de hoy es tu comodidad futura.", "tags": ["sudor","futuro"] },
-  { "id": 204, "text": "Entrena la paciencia como entrenas fuerza: progresivamente.", "tags": ["paciencia","fuerza"] },
-  { "id": 205, "text": "El espejo tarda; el rendimiento avisa antes.", "tags": ["rendimiento","progreso"] },
-  { "id": 206, "text": "Si puedes planear, puedes cumplir.", "tags": ["plan","cumplir"] },
-  { "id": 207, "text": "No abandones una meta por el tiempo que tomará; ese tiempo pasará igual.", "tags": ["tiempo","objetivos"] },
-  { "id": 208, "text": "La incomodidad es evidencia de adaptación en curso.", "tags": ["incomodidad","adaptacion"] },
-  { "id": 209, "text": "Tu próxima repetición disciplinada cambia la estadística de tu semana.", "tags": ["repeticion","semana"] },
-  { "id": 210, "text": "Las excusas pierden fuerza cuando agendas recordatorios.", "tags": ["excusas","sistemas"] },
-  { "id": 211, "text": "Respira profundo: estás construyendo resiliencia, no sólo fuerza.", "tags": ["resiliencia","respiracion"] },
-  { "id": 212, "text": "La condición física es un ahorro acumulado de elecciones diarias.", "tags": ["condicion","ahorro"] },
-  { "id": 213, "text": "Elimina un mal hábito y liberaste un espacio para uno potente.", "tags": ["habitos","optimizar"] },
-  { "id": 214, "text": "Lo que repites te programa.", "tags": ["repeticion","programacion"] },
-  { "id": 215, "text": "Levántate para no tener que volver a empezar desde cero.", "tags": ["constancia","inicio"] },
-  { "id": 216, "text": "Pausa no es renuncia; es estrategia.", "tags": ["pausa","estrategia"] },
-  { "id": 217, "text": "Tu lenguaje corporal cuenta la historia de tu disciplina.", "tags": ["lenguajeCorporal","disciplina"] },
-  { "id": 218, "text": "La fuerza útil es la que se integra a tu vida diaria.", "tags": ["fuerza","funcional"] },
-  { "id": 219, "text": "No colecciones rutinas, domina una y progresa.", "tags": ["enfoque","progreso"] },
-  { "id": 220, "text": "Minimiza decisiones previas y maximiza la energía para ejecutar.", "tags": ["decisiones","energia"] },
-  { "id": 221, "text": "Cerrar círculos aumenta tu confianza futura.", "tags": ["confianza","cierre"] },
-  { "id": 222, "text": "Eres tu propio estándar: elevalo gradualmente.", "tags": ["estandar","mejora"] },
-  { "id": 223, "text": "El compromiso contigo pesa más que el clima, el humor o la hora.", "tags": ["compromiso","prioridad"] },
-  { "id": 224, "text": "Una semana buena no te define; una cadena de semanas sí.", "tags": ["consistencia","semanas"] },
-  { "id": 225, "text": "Mejorar requiere datos, no suposiciones.", "tags": ["datos","mejora"] },
-  { "id": 226, "text": "Tu gimnasio interno abre antes que el externo: mentalidad primero.", "tags": ["mente","gimnasio"] },
-  { "id": 227, "text": "Lo que llamas sacrificio es inversión al revisarlo con distancia.", "tags": ["inversion","perspectiva"] },
-  { "id": 228, "text": "Encadena pequeños cumplimientos para generar impulso.", "tags": ["impulso","microhabitos"] },
-  { "id": 229, "text": "Cuando dudes, haz la versión mínima pero haz algo.", "tags": ["accionMinima","duda"] },
-  { "id": 230, "text": "Es mejor ajustar carga que saltar sesión.", "tags": ["ajuste","sesion"] },
-  { "id": 231, "text": "Tu trazabilidad hoy evita estancamiento mañana.", "tags": ["registro","estancamiento"] },
-  { "id": 232, "text": "La disciplina es antifrágil: crece con resistencia ligera y constante.", "tags": ["disciplina","antifragil"] },
-  { "id": 233, "text": "Entrenar temprano es votar por productividad el resto del día.", "tags": ["mañana","productividad"] },
-  { "id": 234, "text": "El progreso no grita, se acumula en silencio.", "tags": ["progreso","silencio"] },
-  { "id": 235, "text": "Haz check out mental de lo externo cuando calientas.", "tags": ["enfoque","calentamiento"] },
-  { "id": 236, "text": "La adaptación ocurre entre sesiones, protégela.", "tags": ["adaptacion","descanso"] },
-  { "id": 237, "text": "Construir fuerza es construir opciones.", "tags": ["fuerza","opciones"] },
-  { "id": 238, "text": "Sin propósito claro la constancia se erosiona.", "tags": ["proposito","consistencia"] },
-  { "id": 239, "text": "Tu proceso vale más que la opinión ocasional de terceros.", "tags": ["proceso","opinion"] },
-  { "id": 240, "text": "La autoeficacia crece cumpliendo bloques simples.", "tags": ["autoeficacia","bloques"] },
-  { "id": 241, "text": "Fallar un set no invalida la sesión.", "tags": ["set","sesion"] },
-  { "id": 242, "text": "Tu respiración consciente reduce el ruido mental.", "tags": ["respiracion","mente"] },
-  { "id": 243, "text": "El progreso se calibra en energía, movilidad y fuerza aplicada.", "tags": ["progreso","indicadores"] },
-  { "id": 244, "text": "Micromejora + repetición = macro resultado.", "tags": ["mejora","formula"] },
-  { "id": 245, "text": "Diseña rituales de entrada y salida; refuerzan identidad.", "tags": ["rituales","identidad"] },
-  { "id": 246, "text": "Tu plan semanal es un contrato contigo.", "tags": ["plan","contrato"] },
-  { "id": 247, "text": "El cansancio gestionado es progreso; el ignorado es lesión potencial.", "tags": ["cansancio","prevencion"] },
-  { "id": 248, "text": "Tu estado físico es la suma de microdecisiones energéticas.", "tags": ["microdecisiones","energia"] },
-  { "id": 249, "text": "El foco elimina repeticiones huecas.", "tags": ["enfoque","calidad"] },
-  { "id": 250, "text": "Avanza suficiente para que retroceder sea caro.", "tags": ["avance","compromiso"] },
-  { "id": 251, "text": "La autoconfianza se construye confirmando promesas pequeñas.", "tags": ["confianza","promesas"] },
-  { "id": 252, "text": "Lo urgente no desplace lo importante: entrena igual.", "tags": ["prioridades","importante"] },
-  { "id": 253, "text": "Tu cuerpo agradece constancia más que intensidad esporádica.", "tags": ["constancia","intensidad"] },
-  { "id": 254, "text": "Progresar es gestionar cansancio, no eliminarlo.", "tags": ["cansancio","gestion"] },
-  { "id": 255, "text": "Respira hondo: reencuadre mental instantáneo.", "tags": ["respiracion","mentalidad"] },
-  { "id": 256, "text": "Define métricas que importan y mira menos el resto.", "tags": ["metricas","enfoque"] },
-  { "id": 257, "text": "Una técnica limpia acelera la sobrecarga sin lesionarte.", "tags": ["tecnica","seguridad"] },
-  { "id": 258, "text": "Tu contexto cambia; tu ancla son tus hábitos.", "tags": ["habitos","contexto"] },
-  { "id": 259, "text": "La constancia es seguir apareciendo sin dramatizarlo.", "tags": ["constancia","simpleza"] },
-  { "id": 260, "text": "Levanta para vivir mejor fuera del gimnasio.", "tags": ["funcional","vida"] },
-  { "id": 261, "text": "Potencia tu mañana la noche anterior.", "tags": ["mañana","preparacion"] },
-  { "id": 262, "text": "Reduce fricción nutricional preparando en lotes.", "tags": ["nutricion","preparacion"] },
-  { "id": 263, "text": "Un registro honesto vale más que una memoria optimista.", "tags": ["registro","honestidad"] },
-  { "id": 264, "text": "Tu disciplina es un activo compuesto: protégelo de fugas.", "tags": ["disciplina","activo"] },
-  { "id": 265, "text": "Cada sesión es un voto visible por tu identidad atlética.", "tags": ["identidad","sesion"] },
-  { "id": 266, "text": "Divide metas grandes en entregables semanales.", "tags": ["metas","semanal"] },
-  { "id": 267, "text": "La constancia convierte aspiraciones en antecedentes.", "tags": ["aspiracion","historial"] },
-  { "id": 268, "text": "Tensión adecuada + descanso adecuado = crecimiento.", "tags": ["equilibrio","crecimiento"] },
-  { "id": 269, "text": "Tu alimentación es tu programación bioquímica.", "tags": ["nutricion","bioquimica"] },
-  { "id": 270, "text": "Pequeños rituales desencadenan grandes comportamientos.", "tags": ["rituales","comportamiento"] },
-  { "id": 271, "text": "Escribe la próxima sesión antes de cerrar la actual.", "tags": ["planificacion","proximo"] },
-  { "id": 272, "text": "La atención plena reduce repeticiones desperdiciadas.", "tags": ["atencion","eficiencia"] },
-  { "id": 273, "text": "Tú eliges: excusa narrativa o evidencia medible.", "tags": ["excusa","evidencia"] },
-  { "id": 274, "text": "La recuperación es parte del protocolo, no un premio.", "tags": ["recuperacion","protocolo"] },
-  { "id": 275, "text": "Entrenar consistentemente crea identidad de logro.", "tags": ["identidad","logro"] },
-  { "id": 276, "text": "Tu zona de confort se desplaza cuando te mueves.", "tags": ["zonaConfort","movimiento"] },
-  { "id": 277, "text": "Menos adornos, más básicos perfectos.", "tags": ["basicos","perfeccion"] },
-  { "id": 278, "text": "Lo que hoy es límite mañana será calentamiento.", "tags": ["limite","progreso"] },
-  { "id": 279, "text": "La constancia te hace inevitable estadísticamente.", "tags": ["constancia","inevitable"] },
-  { "id": 280, "text": "Tu mejor herramienta es aparecer incluso en días mediocres.", "tags": ["aparecer","diasMediocres"] },
-  { "id": 281, "text": "La perfección tarda; la ejecución consistente te acerca.", "tags": ["perfeccion","ejecucion"] },
-  { "id": 282, "text": "Más vale una serie enfocada que tres distraídas.", "tags": ["enfoque","series"] },
-  { "id": 283, "text": "Tu respiración rítmica es ancla bajo carga.", "tags": ["respiracion","carga"] },
-  { "id": 284, "text": "La fuerza real es repetir fundamentos sin aburrirte.", "tags": ["fuerza","fundamentos"] },
-  { "id": 285, "text": "Tu progreso necesita menos juicio y más análisis.", "tags": ["analisis","progreso"] },
-  { "id": 286, "text": "Construye una cadena de días ganados; protégela.", "tags": ["cadena","diasGanados"] },
-  { "id": 287, "text": "Cada vez que eliges comenzar, reduces fricción futura.", "tags": ["inicio","friccion"] },
-  { "id": 288, "text": "Entrenar puntual entrena tu identidad confiable.", "tags": ["puntualidad","identidad"] },
-  { "id": 289, "text": "El estancamiento a menudo es falta de registro honesto.", "tags": ["estancamiento","registro"] },
-  { "id": 290, "text": "Menos comparación social, más calibración personal.", "tags": ["comparacion","calibracion"] },
-  { "id": 291, "text": "El cuerpo responde a patrones, no a intenciones aisladas.", "tags": ["patrones","intencion"] },
-  { "id": 292, "text": "La repetición con atención crea maestría.", "tags": ["maestria","repeticion"] },
-  { "id": 293, "text": "Documentar convierte sensaciones en datos accionables.", "tags": ["documentar","datos"] },
-  { "id": 294, "text": "Entrenar hoy evita arrepentir mañana.", "tags": ["entrenar","arrepentimiento"] },
-  { "id": 295, "text": "Tu disciplina es tu ventaja injusta.", "tags": ["disciplina","ventaja"] },
-  { "id": 296, "text": "El impulso llega después de empezar, no antes.", "tags": ["impulso","accion"] },
-  { "id": 297, "text": "El avance se nota primero al subir escaleras sin jadear.", "tags": ["vidaDiaria","progreso"] },
-  { "id": 298, "text": "Rutinas sólidas reducen decisiones frágiles.", "tags": ["rutinas","decisiones"] },
-  { "id": 299, "text": "Tu cuerpo registra todo lo que tu mente intenta olvidar.", "tags": ["cuerpo","registro"] },
-  { "id": 300, "text": "La constancia diaria es tu algoritmo de transformación.", "tags": ["constancia","transformacion"] },
-  { "id": 301, "text": "Lo que hoy disciplinas mañana automatizas.", "tags": ["disciplina","automatizacion"] },
-  { "id": 302, "text": "Cada calentamiento consciente prepara una sesión efectiva.", "tags": ["calentamiento","efectividad"] },
-  { "id": 303, "text": "La adherencia gana a la perfección en el largo plazo.", "tags": ["adherencia","largoPlazo"] },
-  { "id": 304, "text": "Tu mejor versión física empieza por dormir mejor.", "tags": ["sueño","rendimiento"] },
-  { "id": 305, "text": "Entrenar es apilar decisiones alineadas con tu identidad futura.", "tags": ["identidad","futuro"] },
-  { "id": 306, "text": "La fuerza protege tus articulaciones cuando la técnica las respeta.", "tags": ["fuerza","tecnica"] },
-  { "id": 307, "text": "Cinco minutos invertidos hoy evitan retrocesos mañana.", "tags": ["minimoViable","retroceso"] },
-  { "id": 308, "text": "El progreso significativo rara vez es dramático.", "tags": ["progreso","realidad"] },
-  { "id": 309, "text": "Tu voluntad se fortalece cumpliendo microcompromisos.", "tags": ["voluntad","microhabitos"] },
-  { "id": 310, "text": "Apunta a la continuidad antes que a la espectacularidad.", "tags": ["continuidad","proceso"] },
-  { "id": 311, "text": "La repetición con intención crea arquitectura corporal.", "tags": ["intencion","estructura"] },
-  { "id": 312, "text": "Tu mente negocia; tus sistemas deciden.", "tags": ["sistemas","mente"] },
-  { "id": 313, "text": "Cada día que te presentas reduces la fricción del siguiente.", "tags": ["presentarse","friccion"] },
-  { "id": 314, "text": "El autocuidado es un macro-ciclo estratégico.", "tags": ["autocuidado","planificacion"] },
-  { "id": 315, "text": "Tu vascularidad cuenta historias de consistencia.", "tags": ["consistencia","fisico"] },
-  { "id": 316, "text": "Entrenar te entrena para resolver bajo presión.", "tags": ["presion","resolucion"] },
-  { "id": 317, "text": "Registra percepciones, no sólo números.", "tags": ["registro","percepcion"] },
-  { "id": 318, "text": "Modula intensidad para preservar continuidad.", "tags": ["intensidad","continuidad"] },
-  { "id": 319, "text": "Tu mayor progreso ocurre cuando ya casi renuncias.", "tags": ["progreso","resistencia"] },
-  { "id": 320, "text": "El músculo se construye fuera del gimnasio con hábitos que lo soportan.", "tags": ["musculo","habitos"] },
-  { "id": 321, "text": "La motivación se provoca ejecutando, no esperando sentirla.", "tags": ["motivacion","accion"] },
-  { "id": 322, "text": "Tu bitácora es tu entrenador silencioso.", "tags": ["bitacora","autoentrenamiento"] },
-  { "id": 323, "text": "Sudar es la tinta con la que escribes tu progreso.", "tags": ["sudor","progreso"] },
-  { "id": 324, "text": "Un mal set corrige técnica, un set omitido no enseña nada.", "tags": ["tecnica","aprendizaje"] },
-  { "id": 325, "text": "Tu objetivo físico necesita objetivos de proceso claros.", "tags": ["objetivo","proceso"] },
-  { "id": 326, "text": "Evita heroicidades aisladas; construye consistencia acumulada.", "tags": ["heroicidad","acumulacion"] },
-  { "id": 327, "text": "La disciplina filtra ruido y amplifica ejecución.", "tags": ["disciplina","ejecucion"] },
-  { "id": 328, "text": "Tu postura bajo fatiga revela tu base real.", "tags": ["postura","fatiga"] },
-  { "id": 329, "text": "Fortalece el agarre; libera potencia en todo el cuerpo.", "tags": ["agarre","fuerza"] },
-  { "id": 330, "text": "Sin paciencia el músculo no madura.", "tags": ["paciencia","musculo"] },
-  { "id": 331, "text": "Progresar es encadenar semanas buenas, no días perfectos.", "tags": ["semanas","progreso"] },
-  { "id": 332, "text": "Las piernas fuertes sostienen ambiciones altas.", "tags": ["piernas","ambicion"] },
-  { "id": 333, "text": "Tu checklist post-entreno consolida adaptaciones.", "tags": ["postEntreno","adaptacion"] },
-  { "id": 334, "text": "La identidad atlética nace cumpliendo cuando nadie espera que lo hagas.", "tags": ["identidad","privado"] },
-  { "id": 335, "text": "Haz de la hidratación un hábito reflejo.", "tags": ["hidratacion","habito"] },
-  { "id": 336, "text": "Tu energía basal se eleva con constancia invisible.", "tags": ["energia","basal"] },
-  { "id": 337, "text": "Ciclar intensidades previene estancamientos.", "tags": ["periodizacion","estancamiento"] },
-  { "id": 338, "text": "Un cuerpo coordinado vale más que uno sólo voluminoso.", "tags": ["coordinacion","equilibrio"] },
-  { "id": 339, "text": "La fatiga bien gestionada se llama progreso.", "tags": ["fatiga","gestion"] },
-  { "id": 340, "text": "La sesión que menos quieres hacer es la que más te forma.", "tags": ["sesion","formacion"] },
-  { "id": 341, "text": "Tu plan sin registro es intuición difusa.", "tags": ["plan","registro"] },
-  { "id": 342, "text": "Optimiza la salida de tu casa: reduce minutos improductivos.", "tags": ["logistica","optimizar"] },
-  { "id": 343, "text": "Pequeñas victorias repetidas generan identidad sólida.", "tags": ["victorias","identidad"] },
-  { "id": 344, "text": "La flexibilidad estratégica salva tu adherencia.", "tags": ["flexibilidad","adherencia"] },
-  { "id": 345, "text": "Tu core fuerte es transferencia pura de potencia.", "tags": ["core","potencia"] },
-  { "id": 346, "text": "El verdadero progreso se nota al cargar menos estrés en tareas diarias.", "tags": ["progreso","vidaDiaria"] },
-  { "id": 347, "text": "No subestimes el poder de un plan escrito a mano.", "tags": ["plan","escritura"] },
-  { "id": 348, "text": "La constancia reduce la ansiedad de resultados inmediatos.", "tags": ["consistencia","ansiedad"] },
-  { "id": 349, "text": "Entrenar fuerza es invertir en longevidad funcional.", "tags": ["longevidad","fuerza"] },
-  { "id": 350, "text": "Tu refuerzo positivo interno acelera adherencia.", "tags": ["refuerzo","adherencia"] },
-  { "id": 351, "text": "Cada comida alineada es un set invisible completado.", "tags": ["nutricion","alineacion"] },
-  { "id": 352, "text": "La resiliencia se teje con hilos de constancia.", "tags": ["resiliencia","constancia"] },
-  { "id": 353, "text": "El progreso 'lento' es simplemente progreso sostenible.", "tags": ["progreso","sostenible"] },
-  { "id": 354, "text": "Tu diálogo interno antes del fallo define el estímulo.", "tags": ["mente","estimulo"] },
-  { "id": 355, "text": "Menos ruido informativo, más ejecución programada.", "tags": ["informacion","ejecucion"] },
-  { "id": 356, "text": "La movilidad preserva futuros PRs.", "tags": ["movilidad","rendimiento"] },
-  { "id": 357, "text": "Levanta con intención, descansa con propósito.", "tags": ["intencion","proposito"] },
-  { "id": 358, "text": "Un plan claro reduce la fuerza de la pereza.", "tags": ["plan","pereza"] },
-  { "id": 359, "text": "Tu autodisciplina es una postura mental diaria.", "tags": ["autodisciplina","postura"] },
-  { "id": 360, "text": "La adherencia es la métrica reina del fitness.", "tags": ["adherencia","clave"] },
-  { "id": 361, "text": "La mente enfocada reduce el desperdicio neural bajo carga.", "tags": ["mente","eficiencia"] },
-  { "id": 362, "text": "Multiplica tu progreso dominando el descanso activo.", "tags": ["descansoActivo","progreso"] },
-  { "id": 363, "text": "Cada estiramiento consciente expande tu futuro rango.", "tags": ["estiramiento","rango"] },
-  { "id": 364, "text": "Tu bitácora te muestra si te estás repitiendo demasiado.", "tags": ["bitacora","variedad"] },
-  { "id": 365, "text": "El cortisol innecesario sabotea la recuperación; gestiona estrés.", "tags": ["estres","recuperacion"] },
-  { "id": 366, "text": "Una ejecución limpia hoy vale más que potencial bruto sin enfoque.", "tags": ["ejecucion","enfoque"] },
-  { "id": 367, "text": "La consistencia crea tendencias, no anécdotas.", "tags": ["tendencias","consistencia"] },
-  { "id": 368, "text": "Tu percepción de esfuerzo también se entrena.", "tags": ["esfuerzo","percepcion"] },
-  { "id": 369, "text": "La toma de decisiones previa al entrenamiento define la adherencia.", "tags": ["decisiones","adherencia"] },
-  { "id": 370, "text": "Planifica del revés: objetivo final → bloque mensual → semana → día.", "tags": ["planificacion","retro"] },
-  { "id": 371, "text": "El músculo entiende tensión mecánica y nutrición, no excusas.", "tags": ["tension","nutricion"] },
-  { "id": 372, "text": "El progreso se mantiene cuando aprendes a autoregular.", "tags": ["autoregular","progreso"] },
-  { "id": 373, "text": "Tu enfoque intra-serie marca la diferencia en adaptación.", "tags": ["enfoque","serie"] },
-  { "id": 374, "text": "Levantar pesado sin técnica es hipotecar articulaciones.", "tags": ["tecnica","prevencion"] },
-  { "id": 375, "text": "La motivación es variable; la estructura es estable.", "tags": ["estructura","motivacion"] },
-  { "id": 376, "text": "Diseña puntos de control semanales sin juicio, con ajuste.", "tags": ["checkpoints","ajuste"] },
-  { "id": 377, "text": "Tu constancia reduce la dependencia de la fuerza de voluntad.", "tags": ["constancia","voluntad"] },
-  { "id": 378, "text": "Entrenar es enseñar a tu cerebro a seguir empujando cuando quiere parar.", "tags": ["cerebro","resiliencia"] },
-  { "id": 379, "text": "Calidad de sueño hoy = rendimiento adaptativo mañana.", "tags": ["sueño","adaptacion"] },
-  { "id": 380, "text": "Tu frecuencia de entrenamiento forma tu línea base.", "tags": ["frecuencia","baseline"] },
-  { "id": 381, "text": "Un set concentrado vale más que tres distraídos.", "tags": ["set","concentracion"] },
-  { "id": 382, "text": "Procesa frustración como feedback, no como identidad.", "tags": ["frustracion","feedback"] },
-  { "id": 383, "text": "La constancia desactiva la ansiedad por resultados rápidos.", "tags": ["consistencia","ansiedad"] },
-  { "id": 384, "text": "Tu alimentación es tu programación hormonal diaria.", "tags": ["hormonas","nutricion"] },
-  { "id": 385, "text": "Mejora tu técnica antes de aumentar tu ego de carga.", "tags": ["tecnica","ego"] },
-  { "id": 386, "text": "El estancamiento suele indicar falta de variedad calculada.", "tags": ["estancamiento","variedad"] },
-  { "id": 387, "text": "Cada sesión honesta reduce tu brecha con la meta.", "tags": ["sesion","meta"] },
-  { "id": 388, "text": "Tu control respiratorio mitiga picos de estrés interno.", "tags": ["respiracion","estres"] },
-  { "id": 389, "text": "Entrenar no quita tiempo: reorganiza prioridades.", "tags": ["prioridades","tiempo"] },
-  { "id": 390, "text": "Autoconocimiento físico = programación más precisa.", "tags": ["autoconocimiento","programacion"] },
-  { "id": 391, "text": "La fatiga central requiere descanso mental, no sólo físico.", "tags": ["fatiga","mental"] },
-  { "id": 392, "text": "Minuto a minuto de enfoque suma calidad total.", "tags": ["enfoque","calidad"] },
-  { "id": 393, "text": "Tu progresión carga/volumen necesita paciencia estructurada.", "tags": ["progresion","paciencia"] },
-  { "id": 394, "text": "La identidad se refuerza al hacer lo correcto sin testigos.", "tags": ["identidad","integridad"] },
-  { "id": 395, "text": "Evita planear desde la emoción y ejecutar desde la excusa.", "tags": ["plan","ejecucion"] },
-  { "id": 396, "text": "Tu base aeróbica sostiene tu potencia anaeróbica.", "tags": ["aerobico","potencia"] },
-  { "id": 397, "text": "Errores medidos se convierten en iteraciones útiles.", "tags": ["errores","iteracion"] },
-  { "id": 398, "text": "Tu constancia convierte deseos en estadísticas.", "tags": ["constancia","estadisticas"] },
-  { "id": 399, "text": "Registra sensaciones de sueño y correlaciónalas con rendimiento.", "tags": ["sueño","rendimiento"] },
-  { "id": 400, "text": "El plan mínimo ejecutado supera el ideal postergado.", "tags": ["plan","ejecucion"] },
-  { "id": 401, "text": "Micropausas activas mantienen frescura neuromuscular.", "tags": ["pausas","frescura"] },
-  { "id": 402, "text": "Tu técnica bajo cargas submáximas es predictor de seguridad futura.", "tags": ["tecnica","seguridad"] },
-  { "id": 403, "text": "La sobrecarga progresiva es conversación, no monólogo.", "tags": ["sobrecarga","feedback"] },
-  { "id": 404, "text": "Tu sistema inmune agradece balance estrés-recuperación.", "tags": ["inmune","recuperacion"] },
-  { "id": 405, "text": "Hidratar es aceitar tu maquinaria metabólica.", "tags": ["hidratacion","metabolismo"] },
-  { "id": 406, "text": "Planifica el deload antes de que el cuerpo lo exija.", "tags": ["deload","prevencion"] },
-  { "id": 407, "text": "Tu agenda visible reduce autoengaño de disponibilidad.", "tags": ["agenda","claridad"] },
-  { "id": 408, "text": "La consistencia transforma esfuerzos aislados en curva ascendente.", "tags": ["consistencia","tendencia"] },
-  { "id": 409, "text": "El entrenamiento de hoy es la recuperación de mañana.", "tags": ["entrenamiento","recuperacion"] },
-  { "id": 410, "text": "Tu progresión requiere honestidad con tus repeticiones reales.", "tags": ["progresion","honestidad"] },
-  { "id": 411, "text": "Evalúa, ajusta, continúa: el triángulo del avance sostenible.", "tags": ["evaluar","ajustar"] },
-  { "id": 412, "text": "Tu energía matutina refleja higiene de hábitos nocturnos.", "tags": ["energia","habitos"] },
-  { "id": 413, "text": "La mente enfocada traduce tensión en adaptación, no en estrés.", "tags": ["enfoque","adaptacion"] },
-  { "id": 414, "text": "Tu movilidad torácica libera potencia en tus presses.", "tags": ["movilidad","press"] },
-  { "id": 415, "text": "El core estable libera extremidades eficientes.", "tags": ["core","estabilidad"] },
-  { "id": 416, "text": "Registra saltos de humor tras entrenar: biofeedback emocional.", "tags": ["humor","biofeedback"] },
-  { "id": 417, "text": "La constancia hace predecible tu línea de base emocional.", "tags": ["constancia","emocional"] },
-  { "id": 418, "text": "Tu plan semanal necesita un gatillo visual claro.", "tags": ["plan","gatillo"] },
-  { "id": 419, "text": "El calentamiento activo protege y potencia tu sesión.", "tags": ["calentamiento","proteccion"] },
-  { "id": 420, "text": "Cada comida consciente enseña autocontrol práctico.", "tags": ["nutricion","autocontrol"] },
-  { "id": 421, "text": "Tu sueño profundo consolida adaptaciones hormonales.", "tags": ["sueño","hormonas"] },
-  { "id": 422, "text": "Un check de movilidad matinal informa tu intensidad del día.", "tags": ["movilidad","intensidad"] },
-  { "id": 423, "text": "Tu respiración nasal mejora eficiencia energética.", "tags": ["respiracion","eficiencia"] },
-  { "id": 424, "text": "La sobrecarga progresiva respeta coordinación antes que carga.", "tags": ["sobrecarga","coordinacion"] },
-  { "id": 425, "text": "Tu hidratación regula volumen sanguíneo y rendimiento.", "tags": ["hidratacion","rendimiento"] },
-  { "id": 426, "text": "El descanso inteligente evita la fatiga acumulada silenciosa.", "tags": ["descanso","fatiga"] },
-  { "id": 427, "text": "Ajusta macros como ajustas repeticiones: con criterio.", "tags": ["macros","criterio"] },
-  { "id": 428, "text": "Tu bitácora gráfica acelera lectura de tendencias.", "tags": ["bitacora","tendencias"] },
-  { "id": 429, "text": "Cada sesión inicia realmente cuando apagas distracciones.", "tags": ["distraccion","inicio"] },
-  { "id": 430, "text": "Tu autoevaluación evitará meses de estancamiento inadvertido.", "tags": ["autoevaluacion","estancamiento"] },
-  { "id": 431, "text": "El músculo se construye bajo tensión suficiente + nutrición puntual.", "tags": ["tension","nutricion"] },
-  { "id": 432, "text": "Tu fuerza máxima mejora con técnica submáxima impecable.", "tags": ["fuerza","tecnica"] },
-  { "id": 433, "text": "El control excéntrico escribe adaptaciones densas.", "tags": ["excéntrico","adaptacion"] },
-  { "id": 434, "text": "Tu consistencia convierte objetivos en inevitables.", "tags": ["consistencia","inevitable"] },
-  { "id": 435, "text": "La prevención de lesiones es multiplicador de progreso.", "tags": ["prevencion","progreso"] },
-  { "id": 436, "text": "Tu balance empuje+tira cuida tu postura.", "tags": ["equilibrio","postura"] },
-  { "id": 437, "text": "La fatiga mental gestionada mantiene la motivación latente.", "tags": ["fatiga","motivacion"] },
-  { "id": 438, "text": "Tu disciplina es transferencia a todas las áreas de vida.", "tags": ["disciplina","transferencia"] },
-  { "id": 439, "text": "El ajuste de volumen salva la adherencia en semanas complejas.", "tags": ["volumen","ajuste"] },
-  { "id": 440, "text": "Tu protocolo pre-sueño incrementa eficiencia de recuperación.", "tags": ["sueño","protocolo"] },
-  { "id": 441, "text": "La claridad de métricas reduce frustración.", "tags": ["metricas","claridad"] },
-  { "id": 442, "text": "Tu respiración diafragmática estabiliza tu core profundo.", "tags": ["respiracion","core"] },
-  { "id": 443, "text": "El progreso invisible es el que sostiene el visible.", "tags": ["progreso","sustrato"] },
-  { "id": 444, "text": "Tu checklist de técnica evita degradación bajo fatiga.", "tags": ["tecnica","fatiga"] },
-  { "id": 445, "text": "Entrenar bajo lluvia entrena resiliencia psicológica.", "tags": ["resiliencia","contexto"] },
-  { "id": 446, "text": "Tu desayuno estratégico predispone glucógeno óptimo.", "tags": ["desayuno","energia"] },
-  { "id": 447, "text": "La sobrecarga aplica también a movilidad y estabilidad.", "tags": ["sobrecarga","movilidad"] },
-  { "id": 448, "text": "Tu control de descanso entre series moldea estímulo.", "tags": ["descanso","estimulo"] },
-  { "id": 449, "text": "El registro de RIR/RPE refinado mejora programación.", "tags": ["RPE","programacion"] },
-  { "id": 450, "text": "La repetición final honesta dicta la señal adaptativa.", "tags": ["repeticion","adaptacion"] },
-  { "id": 451, "text": "Tu ajuste nutricional pos-entreno acelera síntesis.", "tags": ["postEntreno","sintesis"] },
-  { "id": 452, "text": "El sueño fragmentado drena progresos silenciosos.", "tags": ["sueño","fragmentacion"] },
-  { "id": 453, "text": "Tu hidratación intra-entreno sostiene volumen total.", "tags": ["hidratacion","intra"] },
-  { "id": 454, "text": "El control escapular protege hombros y potencia presses.", "tags": ["escapulas","prevencion"] },
-  { "id": 455, "text": "Tu bitácora honesta evita repetir errores cíclicamente.", "tags": ["bitacora","errores"] },
-  { "id": 456, "text": "El pre-fatigue planificado refina conexión mente-músculo.", "tags": ["prefatiga","conexion"] },
-  { "id": 457, "text": "Tu consistencia alimenta tu autoimagen positiva.", "tags": ["consistencia","autoimagen"] },
-  { "id": 458, "text": "El calentamiento neural optimiza reclutamiento motor.", "tags": ["calentamiento","neural"] },
-  { "id": 459, "text": "Tu control excéntrico protege tendones.", "tags": ["excentrico","tendones"] },
-  { "id": 460, "text": "La exposición gradual a esfuerzo alto aumenta tolerancia mental.", "tags": ["gradual","tolerancia"] },
-  { "id": 461, "text": "Tu evaluación mensual detecta microestancamientos.", "tags": ["evaluacion","micro"] },
-  { "id": 462, "text": "El vaciado mental post-entreno mejora recuperación psicológica.", "tags": ["mental","recuperacion"] },
-  { "id": 463, "text": "Tu checklist pre-entreno reduce procrastinación.", "tags": ["checklist","procrastinacion"] },
-  { "id": 464, "text": "El control de la cadencia altera significativamente el estímulo.", "tags": ["cadencia","estimulo"] },
-  { "id": 465, "text": "Tu progresión fractal: días → semanas → bloques → fases.", "tags": ["progresion","estructura"] },
-  { "id": 466, "text": "El balance ACWR previene lesiones (carga aguda vs crónica).", "tags": ["carga","prevencion"] },
-  { "id": 467, "text": "Tu postura neutra bajo carga salvaguarda discos.", "tags": ["postura","columna"] },
-  { "id": 468, "text": "El pre-sueño sin pantallas mejora profundidad de descanso.", "tags": ["sueño","higiene"] },
-  { "id": 469, "text": "Tu consistencia crea adaptación metabólica eficiente.", "tags": ["metabolismo","consistencia"] },
-  { "id": 470, "text": "El control de estrés reduce inflamación sistémica.", "tags": ["estres","inflamacion"] },
-  { "id": 471, "text": "Tu preparación mental visualiza ejecución antes del set.", "tags": ["visualizacion","ejecucion"] },
-  { "id": 472, "text": "El tracking de pasos contextualiza tu NEAT.", "tags": ["NEAT","actividad"] },
-  { "id": 473, "text": "Tu programming ondulado evita adaptación prematura.", "tags": ["programacion","ondulacion"] },
-  { "id": 474, "text": "El control de la respiración abdominal estabiliza cargas.", "tags": ["respiracion","estabilidad"] },
-  { "id": 475, "text": "Tu ingesta proteica constante soporta síntesis continua.", "tags": ["proteina","sintesis"] },
-  { "id": 476, "text": "El ajuste de fibra alimentaria mejora saciedad y digestión.", "tags": ["fibra","nutricion"] },
-  { "id": 477, "text": "Tu movilidad de cadera libera potencia en sentadillas.", "tags": ["movilidad","sentadilla"] },
-  { "id": 478, "text": "El tempo controlado enseña eficiencia bajo carga.", "tags": ["tempo","eficiencia"] },
-  { "id": 479, "text": "Tu progresión mental es sostener enfoque pese a ruido interno.", "tags": ["enfoque","ruido"] },
-  { "id": 480, "text": "El chequeo de técnica en video recorta curvas de aprendizaje.", "tags": ["video","tecnica"] },
-  { "id": 481, "text": "Tu control glucémico estable mejora energía sostenida.", "tags": ["glucemia","energia"] },
-  { "id": 482, "text": "El enfoque sensorial (tacto, tensión) refina conexión neuromuscular.", "tags": ["sensorial","neuromuscular"] },
-  { "id": 483, "text": "Tu journaling de sensaciones reduce sesgo de memoria.", "tags": ["journaling","sesgo"] },
-  { "id": 484, "text": "El refuerzo inmediato (check ✓) ancla hábito.", "tags": ["refuerzo","habito"] },
-  { "id": 485, "text": "Tu consistencia hormonaliza procesos de recuperación.", "tags": ["hormonas","recuperacion"] },
-  { "id": 486, "text": "El volumen efectivo supera volumen bruto mal ejecutado.", "tags": ["volumen","efectivo"] },
-  { "id": 487, "text": "Tu entrenamiento cruzado previene desequilibrios.", "tags": ["cross","equilibrio"] },
-  { "id": 488, "text": "El control del sueño REM impacta memoria motora.", "tags": ["REM","memoria"] },
-  { "id": 489, "text": "Tu ingesta de agua es variable estratégica, no accidente.", "tags": ["agua","estrategia"] },
-  { "id": 490, "text": "El apoyo social refuerza adherencia silenciosamente.", "tags": ["apoyo","adherencia"] },
-  { "id": 491, "text": "Tu progresión parcial (ROM) prepara rangos completos.", "tags": ["ROM","progresion"] },
-  { "id": 492, "text": "El foco en calidad reduce riesgo acumulativo.", "tags": ["calidad","riesgo"] },
-  { "id": 493, "text": "Tu periodización nutricional alinea energía y demanda.", "tags": ["nutricion","periodizacion"] },
-  { "id": 494, "text": "El control mental bajo lactato entrena serenidad funcional.", "tags": ["lactato","serenidad"] },
-  { "id": 495, "text": "Tu consistencia diaria altera tu expresión genética funcional.", "tags": ["epigenetica","consistencia"] },
-  { "id": 496, "text": "El ajuste de postura neutraliza microtensiones crónicas.", "tags": ["postura","tension"] },
-  { "id": 497, "text": "Tu chequeo semanal de métricas evita deriva silenciosa.", "tags": ["metricas","deriva"] },
-  { "id": 498, "text": "El control de carga monotónica previene sobreuso.", "tags": ["carga","sobreuso"] },
-  { "id": 499, "text": "Tu adaptación cardiovascular mejora recuperación entre series.", "tags": ["cardio","recuperacion"] },
-  { "id": 500, "text": "El pilar es simple: tensión adecuada, nutrición suficiente, sueño profundo, repetido.", "tags": ["pilares","simplicidad"] }
+  {
+    "id": 1,
+    "text": "La disciplina es entrenar incluso cuando nadie te mira.",
+    "tags": ["disciplina"]
+  },
+  {
+    "id": 2,
+    "text": "Un pequeño progreso diario genera resultados extraordinarios.",
+    "tags": ["consistencia", "progreso"]
+  },
+  {
+    "id": 3,
+    "text": "Tu cuerpo escucha lo que tu mente repite.",
+    "tags": ["mente", "fuerza"]
+  },
+  {
+    "id": 4,
+    "text": "El esfuerzo que evitas hoy es el resultado que te faltará mañana.",
+    "tags": ["esfuerzo", "resultado"]
+  },
+  {
+    "id": 5,
+    "text": "Hazlo con cansancio, pero hazlo.",
+    "tags": ["cansancio", "disciplina"]
+  },
+  {
+    "id": 6,
+    "text": "La constancia vence al talento distraído.",
+    "tags": ["consistencia", "talento"]
+  },
+  {
+    "id": 7,
+    "text": "Tu meta no te está esperando, se está alejando si te detienes.",
+    "tags": ["objetivos", "motivacion"]
+  },
+  {
+    "id": 8,
+    "text": "El sudor es tu cuerpo aplaudiendo tu esfuerzo.",
+    "tags": ["esfuerzo", "sudor"]
+  },
+  {
+    "id": 9,
+    "text": "Cada repetición consciente fortalece más que diez distraídas.",
+    "tags": ["enfoque", "calidad"]
+  },
+  {
+    "id": 10,
+    "text": "Entrena tu voluntad igual que entrenas tus músculos.",
+    "tags": ["voluntad", "disciplina"]
+  },
+  {
+    "id": 11,
+    "text": "No necesitas motivación infinita, sólo un compromiso renovado hoy.",
+    "tags": ["compromiso", "hoy"]
+  },
+  {
+    "id": 12,
+    "text": "Tu futuro en forma ya empezó, no lo abandones a mitad.",
+    "tags": ["futuro", "consistencia"]
+  },
+  {
+    "id": 13,
+    "text": "El músculo más difícil de construir es la constancia.",
+    "tags": ["consistencia", "metafora"]
+  },
+  {
+    "id": 14,
+    "text": "Un día a la vez, pero cada día cuenta.",
+    "tags": ["progreso", "consistencia"]
+  },
+  {
+    "id": 15,
+    "text": "Cuando se vuelve hábito, deja de ser pesado y empieza a ser parte de ti.",
+    "tags": ["habito", "disciplina"]
+  },
+  {
+    "id": 16,
+    "text": "La excusa se gasta, el resultado permanece.",
+    "tags": ["excusa", "resultado"]
+  },
+  {
+    "id": 17,
+    "text": "Tu nivel de esfuerzo define tu techo, eleva ambos.",
+    "tags": ["esfuerzo", "mejora"]
+  },
+  {
+    "id": 18,
+    "text": "Entrena para ser fuerte también en los días débiles.",
+    "tags": ["fuerza", "resiliencia"]
+  },
+  {
+    "id": 19,
+    "text": "La incomodidad temporal es inversión a largo plazo.",
+    "tags": ["incomodidad", "inversion"]
+  },
+  {
+    "id": 20,
+    "text": "Tu cuerpo cambia cuando tu mente deja de negociar.",
+    "tags": ["mente", "cambio"]
+  },
+  {
+    "id": 21,
+    "text": "Nunca te arrepentirás de haber entrenado, sí de no hacerlo.",
+    "tags": ["entrenar", "arrepentimiento"]
+  },
+  {
+    "id": 22,
+    "text": "Los resultados son la huella de tu constancia.",
+    "tags": ["resultados", "consistencia"]
+  },
+  {
+    "id": 23,
+    "text": "No existe atajo que sustituya la repetición consciente.",
+    "tags": ["noAtajos", "enfoque"]
+  },
+  {
+    "id": 24,
+    "text": "Mejora un 1% hoy y repite la fórmula.",
+    "tags": ["mejoraContinua", "progreso"]
+  },
+  {
+    "id": 25,
+    "text": "La fuerza mental sostiene la última repetición.",
+    "tags": ["fuerza", "mental"]
+  },
+  {
+    "id": 26,
+    "text": "Tu mejor versión está detrás de varios 'no quiero' vencidos.",
+    "tags": ["versionMejor", "disciplina"]
+  },
+  {
+    "id": 27,
+    "text": "Sin plan es deseo; con plan es objetivo.",
+    "tags": ["plan", "objetivo"]
+  },
+  {
+    "id": 28,
+    "text": "Persiste hasta que lo normal sea verte avanzar.",
+    "tags": ["persistencia", "avance"]
+  },
+  {
+    "id": 29,
+    "text": "El cansancio habla; tú decides si lo escuchas o lo trasciendes.",
+    "tags": ["cansancio", "resiliencia"]
+  },
+  {
+    "id": 30,
+    "text": "Lo que hoy pesa mañana será tu calentamiento.",
+    "tags": ["progreso", "sobrecarga"]
+  },
+  {
+    "id": 31,
+    "text": "Pequeñas decisiones repetidas construyen grandes cambios.",
+    "tags": ["decisiones", "cambio"]
+  },
+  {
+    "id": 32,
+    "text": "Tu rutina te forma más que tus intenciones.",
+    "tags": ["rutina", "formacion"]
+  },
+  {
+    "id": 33,
+    "text": "Sin constancia la motivación se fuga.",
+    "tags": ["consistencia", "motivacion"]
+  },
+  {
+    "id": 34,
+    "text": "Llegarás lejos si aprendes a comenzar cada día.",
+    "tags": ["comenzar", "habito"]
+  },
+  {
+    "id": 35,
+    "text": "La disciplina es amarte en futuro.",
+    "tags": ["disciplina", "autoamor"]
+  },
+  {
+    "id": 36,
+    "text": "Tu progreso no necesita ser perfecto, sí continuo.",
+    "tags": ["progreso", "consistencia"]
+  },
+  {
+    "id": 37,
+    "text": "La mente se rinde antes que el cuerpo; entrena la mente.",
+    "tags": ["mente", "resistencia"]
+  },
+  {
+    "id": 38,
+    "text": "Renuncia a la prisa, abraza el proceso.",
+    "tags": ["proceso", "paciencia"]
+  },
+  {
+    "id": 39,
+    "text": "Cada hábito saludable desplaza uno que te frenaba.",
+    "tags": ["habitos", "mejora"]
+  },
+  {
+    "id": 40,
+    "text": "El sudor de hoy evita lágrimas mañana.",
+    "tags": ["esfuerzo", "futuro"]
+  },
+  {
+    "id": 41,
+    "text": "Controla lo que puedes: tu esfuerzo y tu actitud.",
+    "tags": ["actitud", "esfuerzo"]
+  },
+  {
+    "id": 42,
+    "text": "Apunta alto y entrena detallado.",
+    "tags": ["objetivos", "precision"]
+  },
+  {
+    "id": 43,
+    "text": "La constancia transforma lo difícil en natural.",
+    "tags": ["consistencia", "transformacion"]
+  },
+  {
+    "id": 44,
+    "text": "Entrena con propósito, no por inercia.",
+    "tags": ["proposito", "enfoque"]
+  },
+  {
+    "id": 45,
+    "text": "Tu meta requiere la versión disciplinada de ti.",
+    "tags": ["objetivo", "disciplina"]
+  },
+  {
+    "id": 46,
+    "text": "Errores ajustan el camino, no lo cancelan.",
+    "tags": ["errores", "aprendizaje"]
+  },
+  {
+    "id": 47,
+    "text": "La diferencia entre 'algún día' y 'lo logré' es la constancia.",
+    "tags": ["consistencia", "logro"]
+  },
+  {
+    "id": 48,
+    "text": "Sé paciente con los resultados, impaciente con las excusas.",
+    "tags": ["paciencia", "excusas"]
+  },
+  {
+    "id": 49,
+    "text": "Cuando falles un día, evita fallar el siguiente.",
+    "tags": ["consistencia", "retorno"]
+  },
+  {
+    "id": 50,
+    "text": "Tu progreso inspira a alguien que aún no conoces.",
+    "tags": ["inspiracion", "progreso"]
+  },
+  {
+    "id": 51,
+    "text": "Despierta tu potencial entrenando tu constancia.",
+    "tags": ["potencial", "consistencia"]
+  },
+  {
+    "id": 52,
+    "text": "Los cambios físicos siguen a los cambios de hábitos.",
+    "tags": ["habitos", "cambio"]
+  },
+  {
+    "id": 53,
+    "text": "La grandeza diaria es cumplir tu plan.",
+    "tags": ["plan", "grandeza"]
+  },
+  {
+    "id": 54,
+    "text": "Más vale ritmos sostenibles que picos fugaces.",
+    "tags": ["ritmo", "sostenible"]
+  },
+  {
+    "id": 55,
+    "text": "No abandones por lentitud lo que vale por permanencia.",
+    "tags": ["permanencia", "paciencia"]
+  },
+  {
+    "id": 56,
+    "text": "Tu yo futuro evaluará las decisiones de hoy.",
+    "tags": ["futuro", "decisiones"]
+  },
+  {
+    "id": 57,
+    "text": "Fortalece la técnica antes que el ego.",
+    "tags": ["tecnica", "ego"]
+  },
+  {
+    "id": 58,
+    "text": "Un reinicio disciplinado vence un inicio perfecto.",
+    "tags": ["reinicio", "disciplina"]
+  },
+  {
+    "id": 59,
+    "text": "El progreso silencioso genera resultados ruidosos.",
+    "tags": ["progreso", "resultado"]
+  },
+  {
+    "id": 60,
+    "text": "Sigue cuando se vaya la motivación; ahí nace la disciplina.",
+    "tags": ["disciplina", "motivacion"]
+  },
+  {
+    "id": 61,
+    "text": "Lo difícil educa tu carácter físico y mental.",
+    "tags": ["caracter", "dificultad"]
+  },
+  {
+    "id": 62,
+    "text": "Respeta el descanso como respetas el esfuerzo.",
+    "tags": ["descanso", "equilibrio"]
+  },
+  {
+    "id": 63,
+    "text": "Tu energía mejora cuando tu cuerpo confía en tus hábitos.",
+    "tags": ["energia", "habitos"]
+  },
+  {
+    "id": 64,
+    "text": "No hay fórmula secreta: hábito + tiempo + calidad.",
+    "tags": ["formula", "habito"]
+  },
+  {
+    "id": 65,
+    "text": "Entrena con intención, alimenta con criterio, descansa con respeto.",
+    "tags": ["intencion", "equilibrio"]
+  },
+  {
+    "id": 66,
+    "text": "Lo que se mide mejora; registra algo hoy.",
+    "tags": ["medicion", "mejora"]
+  },
+  {
+    "id": 67,
+    "text": "Tu mejor excusa no quema calorías.",
+    "tags": ["excusa", "humor"]
+  },
+  {
+    "id": 68,
+    "text": "No compitas contra otros, compite contra tu comodidad.",
+    "tags": ["comodidad", "competencia"]
+  },
+  {
+    "id": 69,
+    "text": "El enfoque convierte minutos en progreso.",
+    "tags": ["enfoque", "progreso"]
+  },
+  {
+    "id": 70,
+    "text": "La constancia hace visibles los resultados que hoy imaginas.",
+    "tags": ["consistencia", "visualizacion"]
+  },
+  {
+    "id": 71,
+    "text": "Fracasar un intento no es fracasar el proceso.",
+    "tags": ["proceso", "fracaso"]
+  },
+  {
+    "id": 72,
+    "text": "Tu entrenamiento no termina hasta que estires y registres.",
+    "tags": ["cierre", "habito"]
+  },
+  {
+    "id": 73,
+    "text": "El compromiso se prueba en los días grises.",
+    "tags": ["compromiso", "diasDificiles"]
+  },
+  {
+    "id": 74,
+    "text": "Construye fuerza que también mejore tu vida diaria.",
+    "tags": ["fuerza", "funcional"]
+  },
+  {
+    "id": 75,
+    "text": "La mejora exige feedback: escucha a tu cuerpo.",
+    "tags": ["feedback", "cuerpo"]
+  },
+  {
+    "id": 76,
+    "text": "Plan sin acción es decoración mental.",
+    "tags": ["plan", "accion"]
+  },
+  {
+    "id": 77,
+    "text": "Tu constancia hoy es tu confianza mañana.",
+    "tags": ["confianza", "consistencia"]
+  },
+  {
+    "id": 78,
+    "text": "Los límites percibidos suelen ser puntos de inicio real.",
+    "tags": ["limites", "creencias"]
+  },
+  {
+    "id": 79,
+    "text": "Ajusta, no abandones.",
+    "tags": ["ajuste", "resiliencia"]
+  },
+  {
+    "id": 80,
+    "text": "Tu identidad fitness se forja en elecciones pequeñas.",
+    "tags": ["identidad", "habitos"]
+  },
+  {
+    "id": 81,
+    "text": "Lograrás consistencia cuando te organices para entrenar aun sin ganas.",
+    "tags": ["organizacion", "consistencia"]
+  },
+  {
+    "id": 82,
+    "text": "La falta de resultados a veces es falta de tiempo acumulado.",
+    "tags": ["paciencia", "resultados"]
+  },
+  {
+    "id": 83,
+    "text": "Reduce fricción: deja tu equipo listo la noche anterior.",
+    "tags": ["preparacion", "hack"]
+  },
+  {
+    "id": 84,
+    "text": "La fuerza es adaptación; provoca la señal adecuada.",
+    "tags": ["fuerza", "adaptacion"]
+  },
+  {
+    "id": 85,
+    "text": "Come para rendir, no sólo para llenar.",
+    "tags": ["nutricion", "rendimiento"]
+  },
+  {
+    "id": 86,
+    "text": "Moverte es celebrar tu capacidad, no castigar tu cuerpo.",
+    "tags": ["movimiento", "mentalidad"]
+  },
+  {
+    "id": 87,
+    "text": "La constancia reduce la ansiedad del progreso.",
+    "tags": ["ansiedad", "consistencia"]
+  },
+  {
+    "id": 88,
+    "text": "Fortalece tus cimientos antes de añadir peso.",
+    "tags": ["tecnica", "bases"]
+  },
+  {
+    "id": 89,
+    "text": "El inicio incómodo se vuelve ritual poderoso.",
+    "tags": ["inicio", "ritual"]
+  },
+  {
+    "id": 90,
+    "text": "Sé terco con tu meta y flexible con tu método.",
+    "tags": ["meta", "metodo"]
+  },
+  {
+    "id": 91,
+    "text": "Entrenar es un privilegio, aprovéchalo.",
+    "tags": ["gratitud", "entrenar"]
+  },
+  {
+    "id": 92,
+    "text": "Repetir correcto supera repetir mucho.",
+    "tags": ["calidad", "tecnica"]
+  },
+  {
+    "id": 93,
+    "text": "Tu progreso invisibiliza versiones pasadas de ti.",
+    "tags": ["progreso", "identidad"]
+  },
+  {
+    "id": 94,
+    "text": "Sin descanso estratégico no hay crecimiento sostenido.",
+    "tags": ["descanso", "crecimiento"]
+  },
+  {
+    "id": 95,
+    "text": "Cada semana pide una pequeña mejora respecto a la anterior.",
+    "tags": ["mejoraContinua", "semana"]
+  },
+  {
+    "id": 96,
+    "text": "Entrenar cansado enseña eficiencia de movimiento.",
+    "tags": ["cansancio", "eficiencia"]
+  },
+  {
+    "id": 97,
+    "text": "Tu entrenamiento empieza cuando deseas parar.",
+    "tags": ["resiliencia", "umbral"]
+  },
+  {
+    "id": 98,
+    "text": "El enfoque ahorra repeticiones inútiles.",
+    "tags": ["enfoque", "eficiencia"]
+  },
+  {
+    "id": 99,
+    "text": "Tu ambiente facilita o sabotea tu disciplina: ajústalo.",
+    "tags": ["ambiente", "disciplina"]
+  },
+  {
+    "id": 100,
+    "text": "La constancia es el multiplicador silencioso del plan.",
+    "tags": ["consistencia", "plan"]
+  },
+  {
+    "id": 101,
+    "text": "Quema dudas en el calentamiento.",
+    "tags": ["mentalidad", "calentamiento"]
+  },
+  {
+    "id": 102,
+    "text": "Agradece tu punto de partida; no es tu destino.",
+    "tags": ["gratitud", "progreso"]
+  },
+  {
+    "id": 103,
+    "text": "La disciplina responde cuando la motivación falla.",
+    "tags": ["disciplina", "motivacion"]
+  },
+  {
+    "id": 104,
+    "text": "Cada sesión es un voto por la persona que quieres ser.",
+    "tags": ["identidad", "sesion"]
+  },
+  {
+    "id": 105,
+    "text": "Si no mides nada, dependes de suposiciones.",
+    "tags": ["medicion", "datos"]
+  },
+  {
+    "id": 106,
+    "text": "Tu diálogo interno debe entrenar, no sabotear.",
+    "tags": ["mente", "autoconversacion"]
+  },
+  {
+    "id": 107,
+    "text": "Constancia no es nunca fallar, es retomar rápido.",
+    "tags": ["retomar", "consistencia"]
+  },
+  {
+    "id": 108,
+    "text": "Construye fuerza alrededor de tus articulaciones, no sólo estética.",
+    "tags": ["fuerza", "salud"]
+  },
+  {
+    "id": 109,
+    "text": "Planifica la comida con el mismo respeto que el entrenamiento.",
+    "tags": ["nutricion", "plan"]
+  },
+  {
+    "id": 110,
+    "text": "Un cuerpo fuerte sostiene una mente clara.",
+    "tags": ["fuerza", "claridad"]
+  },
+  {
+    "id": 111,
+    "text": "Renueva tu porqué cuando la rutina se vuelva monótona.",
+    "tags": ["proposito", "motivacion"]
+  },
+  {
+    "id": 112,
+    "text": "La energía sigue a la acción, no al revés.",
+    "tags": ["energia", "accion"]
+  },
+  {
+    "id": 113,
+    "text": "Celebra consistencia, no sólo hitos visibles.",
+    "tags": ["celebracion", "consistencia"]
+  },
+  {
+    "id": 114,
+    "text": "Tu constancia redefine tus límites biológicos.",
+    "tags": ["limites", "consistencia"]
+  },
+  {
+    "id": 115,
+    "text": "Mantén simple el plan; complica la ejecución con calidad.",
+    "tags": ["simpleza", "calidad"]
+  },
+  {
+    "id": 116,
+    "text": "Sin dolor extremo: progreso inteligente, no castigo.",
+    "tags": ["inteligente", "prevencion"]
+  },
+  {
+    "id": 117,
+    "text": "El progreso lento aún es progreso.",
+    "tags": ["progreso", "ritmo"]
+  },
+  {
+    "id": 118,
+    "text": "Tu 'despacio' de hoy será tu 'rápido' mañana.",
+    "tags": ["mejora", "ritmo"]
+  },
+  {
+    "id": 119,
+    "text": "Anota para aprender, ajusta para mejorar.",
+    "tags": ["registro", "ajuste"]
+  },
+  {
+    "id": 120,
+    "text": "Cada repetición calibrada es una inversión técnica.",
+    "tags": ["tecnica", "inversion"]
+  },
+  {
+    "id": 121,
+    "text": "Tu meta necesita fechas, no deseos.",
+    "tags": ["objetivos", "planificacion"]
+  },
+  {
+    "id": 122,
+    "text": "Recuperar es construir, no detener.",
+    "tags": ["recuperacion", "crecimiento"]
+  },
+  {
+    "id": 123,
+    "text": "Respira profundo: el control empieza ahí.",
+    "tags": ["respiracion", "control"]
+  },
+  {
+    "id": 124,
+    "text": "Lo que no desafía no transforma.",
+    "tags": ["desafio", "transformacion"]
+  },
+  {
+    "id": 125,
+    "text": "Tu atención es tu recurso escaso, protégela.",
+    "tags": ["enfoque", "atencion"]
+  },
+  {
+    "id": 126,
+    "text": "Define el éxito de hoy antes de comenzar.",
+    "tags": ["exito", "plan"]
+  },
+  {
+    "id": 127,
+    "text": "Tu cuerpo responde a la historia que repites sobre él.",
+    "tags": ["mente", "cuerpo"]
+  },
+  {
+    "id": 128,
+    "text": "Sin pasión constante, la disciplina sostiene el proceso.",
+    "tags": ["disciplina", "proceso"]
+  },
+  {
+    "id": 129,
+    "text": "El progreso real se siente más en energía que en espejo al inicio.",
+    "tags": ["energia", "progreso"]
+  },
+  {
+    "id": 130,
+    "text": "Organiza la semana: la improvisación sabotea constancia.",
+    "tags": ["organizacion", "semana"]
+  },
+  {
+    "id": 131,
+    "text": "Cada levantamiento limpio educa tu sistema nervioso.",
+    "tags": ["tecnica", "sistemaNervioso"]
+  },
+  {
+    "id": 132,
+    "text": "No busques dolor, busca adaptación.",
+    "tags": ["adaptacion", "inteligente"]
+  },
+  {
+    "id": 133,
+    "text": "Tu meta grande cabe en bloques pequeños calendarizados.",
+    "tags": ["objetivo", "planificacion"]
+  },
+  {
+    "id": 134,
+    "text": "Haz difícil saltarte el entrenamiento y fácil cumplirlo.",
+    "tags": ["habitos", "diseño"]
+  },
+  {
+    "id": 135,
+    "text": "Un mal día entrenado supera un día perfecto omitido.",
+    "tags": ["consistencia", "diaMalo"]
+  },
+  {
+    "id": 136,
+    "text": "Tu conversación interna antes de rendirte define la serie.",
+    "tags": ["mente", "serie"]
+  },
+  {
+    "id": 137,
+    "text": "Reduce ruido: menos distracción, más intensidad.",
+    "tags": ["distraccion", "intensidad"]
+  },
+  {
+    "id": 138,
+    "text": "Construir hábito es ganar inercia positiva.",
+    "tags": ["habito", "inercia"]
+  },
+  {
+    "id": 139,
+    "text": "Si fallas el horario, no falles el día completo.",
+    "tags": ["flexibilidad", "consistencia"]
+  },
+  {
+    "id": 140,
+    "text": "Tu agenda revela tus prioridades reales.",
+    "tags": ["prioridades", "agenda"]
+  },
+  {
+    "id": 141,
+    "text": "Mejora tu postura: suma fuerza gratis.",
+    "tags": ["postura", "eficiencia"]
+  },
+  {
+    "id": 142,
+    "text": "Entrenar fuerza protege tu futuro movimiento.",
+    "tags": ["fuerza", "longevidad"]
+  },
+  {
+    "id": 143,
+    "text": "La fatiga mal gestionada se vuelve retroceso.",
+    "tags": ["fatiga", "gestiona"]
+  },
+  {
+    "id": 144,
+    "text": "Tu descanso nocturno es tu sesión cero.",
+    "tags": ["sueño", "recuperacion"]
+  },
+  {
+    "id": 145,
+    "text": "La identidad se construye cumpliendo promesas privadas.",
+    "tags": ["identidad", "promesas"]
+  },
+  {
+    "id": 146,
+    "text": "Repite, refina, progresa.",
+    "tags": ["iteracion", "progreso"]
+  },
+  {
+    "id": 147,
+    "text": "Nada cambia si tú no cambias patrones.",
+    "tags": ["patrones", "cambio"]
+  },
+  {
+    "id": 148,
+    "text": "Respeta el calentamiento: prepara, no pierde tiempo.",
+    "tags": ["calentamiento", "prevencion"]
+  },
+  {
+    "id": 149,
+    "text": "Tu meta física exige higiene digital.",
+    "tags": ["enfoque", "digital"]
+  },
+  {
+    "id": 150,
+    "text": "Entrena hoy para poder elegir mañana.",
+    "tags": ["libertad", "futuro"]
+  },
+  {
+    "id": 151,
+    "text": "La ejecución mediocre repetida no crea excelencia.",
+    "tags": ["excelencia", "calidad"]
+  },
+  {
+    "id": 152,
+    "text": "Reduce la fricción nutricional planificando.",
+    "tags": ["nutricion", "planificacion"]
+  },
+  {
+    "id": 153,
+    "text": "Tu constancia se nota primero en energía estable.",
+    "tags": ["energia", "consistencia"]
+  },
+  {
+    "id": 154,
+    "text": "Sé específico: 'mejorar fuerza' no es tan claro como 'añadir 5kg al press'.",
+    "tags": ["especifico", "objetivos"]
+  },
+  {
+    "id": 155,
+    "text": "La paciencia agresiva: actúa diario, espera tranquilo.",
+    "tags": ["paciencia", "accion"]
+  },
+  {
+    "id": 156,
+    "text": "Evita compararte; otros muestran resultados, no sacrificios.",
+    "tags": ["comparacion", "mentalidad"]
+  },
+  {
+    "id": 157,
+    "text": "Haz check-ins semanales contigo.",
+    "tags": ["revision", "progreso"]
+  },
+  {
+    "id": 158,
+    "text": "La sobrecarga progresiva es conversación con tu cuerpo.",
+    "tags": ["sobrecarga", "adaptacion"]
+  },
+  {
+    "id": 159,
+    "text": "Si no puedes con la mente, el cuerpo no sigue.",
+    "tags": ["mente", "cuerpo"]
+  },
+  {
+    "id": 160,
+    "text": "Tu nivel actual es feedback, no identidad fija.",
+    "tags": ["feedback", "identidad"]
+  },
+  {
+    "id": 161,
+    "text": "Simplifica: elimina lo que no suma a tu objetivo físico.",
+    "tags": ["simplificar", "objetivo"]
+  },
+  {
+    "id": 162,
+    "text": "Una buena técnica ahorra energía para crecer.",
+    "tags": ["tecnica", "eficiencia"]
+  },
+  {
+    "id": 163,
+    "text": "Tu cuerpo aprende patrones antes que pesos altos.",
+    "tags": ["patrones", "aprendizaje"]
+  },
+  {
+    "id": 164,
+    "text": "No te saltes el core: es tu transmisión de fuerza.",
+    "tags": ["core", "fuerza"]
+  },
+  {
+    "id": 165,
+    "text": "Cada repetición controla tu narrativa interna.",
+    "tags": ["mente", "narrativa"]
+  },
+  {
+    "id": 166,
+    "text": "Tu progreso necesita sistemas, no voluntad infinita.",
+    "tags": ["sistemas", "progreso"]
+  },
+  {
+    "id": 167,
+    "text": "Hazlo obvio: deja la ropa lista, agenda la hora, elimina fricciones.",
+    "tags": ["habitos", "friccion"]
+  },
+  {
+    "id": 168,
+    "text": "La perseverancia te vuelve inevitable.",
+    "tags": ["perseverancia", "inevitable"]
+  },
+  {
+    "id": 169,
+    "text": "Domina las bases antes de buscar variantes exóticas.",
+    "tags": ["bases", "dominio"]
+  },
+  {
+    "id": 170,
+    "text": "Tu motivación fluctúa; tu sistema debe sostenerte.",
+    "tags": ["sistemas", "motivacion"]
+  },
+  {
+    "id": 171,
+    "text": "Entrena para sumar años activos a tu vida.",
+    "tags": ["longevidad", "futuro"]
+  },
+  {
+    "id": 172,
+    "text": "La fuerza interior se refleja en la constancia exterior.",
+    "tags": ["fuerza", "constancia"]
+  },
+  {
+    "id": 173,
+    "text": "Deja que el hábito decida por ti en días difíciles.",
+    "tags": ["habitos", "diasDificiles"]
+  },
+  {
+    "id": 174,
+    "text": "Tu próxima versión exige decisiones distintas.",
+    "tags": ["version", "decisiones"]
+  },
+  {
+    "id": 175,
+    "text": "Cuida movilidad: previene límites futuros.",
+    "tags": ["movilidad", "prevencion"]
+  },
+  {
+    "id": 176,
+    "text": "Eliminar lo que resta es tan valioso como añadir lo que suma.",
+    "tags": ["minimalismo", "enfoque"]
+  },
+  {
+    "id": 177,
+    "text": "Tu progreso escala cuando te vuelves predecible contigo mismo.",
+    "tags": ["predecible", "consistencia"]
+  },
+  {
+    "id": 178,
+    "text": "Repite fundamentos hasta que sean automáticos.",
+    "tags": ["fundamentos", "automatizacion"]
+  },
+  {
+    "id": 179,
+    "text": "Una sesión pésima enseñó algo si reflexionas.",
+    "tags": ["reflexion", "aprendizaje"]
+  },
+  {
+    "id": 180,
+    "text": "La mente clara elige mejor bajo fatiga.",
+    "tags": ["mente", "fatiga"]
+  },
+  {
+    "id": 181,
+    "text": "Tu entrenamiento termina cuando registras y planificas el siguiente.",
+    "tags": ["planificacion", "cierre"]
+  },
+  {
+    "id": 182,
+    "text": "Fallar rápido, ajustar rápido, continuar largo.",
+    "tags": ["iteracion", "ajuste"]
+  },
+  {
+    "id": 183,
+    "text": "La constancia es resistencia a la interrupción.",
+    "tags": ["consistencia", "resistencia"]
+  },
+  {
+    "id": 184,
+    "text": "Tu respiración es tu metrónomo de control.",
+    "tags": ["respiracion", "control"]
+  },
+  {
+    "id": 185,
+    "text": "La intensidad sin técnica es ruido fisiológico.",
+    "tags": ["intensidad", "tecnica"]
+  },
+  {
+    "id": 186,
+    "text": "Construye fortaleza emocional a través del esfuerzo físico.",
+    "tags": ["esfuerzo", "emocional"]
+  },
+  {
+    "id": 187,
+    "text": "Tu físico refleja consistencia más que genética.",
+    "tags": ["consistencia", "genetica"]
+  },
+  {
+    "id": 188,
+    "text": "Cada mañana reinicia tu trayectoria disciplinada.",
+    "tags": ["mañana", "reinicio"]
+  },
+  {
+    "id": 189,
+    "text": "No esperes el momento perfecto: créalo entrenando.",
+    "tags": ["accion", "momento"]
+  },
+  {
+    "id": 190,
+    "text": "Si puedes registrar, puedes mejorar.",
+    "tags": ["registro", "mejora"]
+  },
+  {
+    "id": 191,
+    "text": "Tu progreso acelera cuando simplificas decisiones.",
+    "tags": ["simplificacion", "progreso"]
+  },
+  {
+    "id": 192,
+    "text": "Hidratarte es parte del entrenamiento, no extra.",
+    "tags": ["hidratacion", "basico"]
+  },
+  {
+    "id": 193,
+    "text": "Un plan mediocre ejecutado supera un plan brillante ignorado.",
+    "tags": ["ejecucion", "plan"]
+  },
+  {
+    "id": 194,
+    "text": "La autoexigencia sana busca mejora, no castigo.",
+    "tags": ["autoexigencia", "saludable"]
+  },
+  {
+    "id": 195,
+    "text": "Tu mejor herramienta de motivación es ver evidencia de avance.",
+    "tags": ["motivacion", "evidencia"]
+  },
+  {
+    "id": 196,
+    "text": "Progresar es elegir conscientemente hoy lo que otros posponen.",
+    "tags": ["eleccion", "progreso"]
+  },
+  {
+    "id": 197,
+    "text": "Sin propósito claro, cualquier distracción gana.",
+    "tags": ["proposito", "distraccion"]
+  },
+  {
+    "id": 198,
+    "text": "Tu disciplina diaria paga intereses compuesto.",
+    "tags": ["interesCompuesto", "disciplina"]
+  },
+  {
+    "id": 199,
+    "text": "Lo extraordinario es lo ordinario hecho con excelencia sostenida.",
+    "tags": ["excelencia", "consistencia"]
+  },
+  {
+    "id": 200,
+    "text": "Hoy también cuenta: hazlo valer.",
+    "tags": ["hoy", "valor"]
+  },
+  {
+    "id": 201,
+    "text": "Empieza ligero, termina orgulloso.",
+    "tags": ["inicio", "orgullo"]
+  },
+  {
+    "id": 202,
+    "text": "La magia ocurre cuando sigues tras el segundo bostezo.",
+    "tags": ["disciplina", "energia"]
+  },
+  {
+    "id": 203,
+    "text": "Tu sudor de hoy es tu comodidad futura.",
+    "tags": ["sudor", "futuro"]
+  },
+  {
+    "id": 204,
+    "text": "Entrena la paciencia como entrenas fuerza: progresivamente.",
+    "tags": ["paciencia", "fuerza"]
+  },
+  {
+    "id": 205,
+    "text": "El espejo tarda; el rendimiento avisa antes.",
+    "tags": ["rendimiento", "progreso"]
+  },
+  {
+    "id": 206,
+    "text": "Si puedes planear, puedes cumplir.",
+    "tags": ["plan", "cumplir"]
+  },
+  {
+    "id": 207,
+    "text": "No abandones una meta por el tiempo que tomará; ese tiempo pasará igual.",
+    "tags": ["tiempo", "objetivos"]
+  },
+  {
+    "id": 208,
+    "text": "La incomodidad es evidencia de adaptación en curso.",
+    "tags": ["incomodidad", "adaptacion"]
+  },
+  {
+    "id": 209,
+    "text": "Tu próxima repetición disciplinada cambia la estadística de tu semana.",
+    "tags": ["repeticion", "semana"]
+  },
+  {
+    "id": 210,
+    "text": "Las excusas pierden fuerza cuando agendas recordatorios.",
+    "tags": ["excusas", "sistemas"]
+  },
+  {
+    "id": 211,
+    "text": "Respira profundo: estás construyendo resiliencia, no sólo fuerza.",
+    "tags": ["resiliencia", "respiracion"]
+  },
+  {
+    "id": 212,
+    "text": "La condición física es un ahorro acumulado de elecciones diarias.",
+    "tags": ["condicion", "ahorro"]
+  },
+  {
+    "id": 213,
+    "text": "Elimina un mal hábito y liberaste un espacio para uno potente.",
+    "tags": ["habitos", "optimizar"]
+  },
+  {
+    "id": 214,
+    "text": "Lo que repites te programa.",
+    "tags": ["repeticion", "programacion"]
+  },
+  {
+    "id": 215,
+    "text": "Levántate para no tener que volver a empezar desde cero.",
+    "tags": ["constancia", "inicio"]
+  },
+  {
+    "id": 216,
+    "text": "Pausa no es renuncia; es estrategia.",
+    "tags": ["pausa", "estrategia"]
+  },
+  {
+    "id": 217,
+    "text": "Tu lenguaje corporal cuenta la historia de tu disciplina.",
+    "tags": ["lenguajeCorporal", "disciplina"]
+  },
+  {
+    "id": 218,
+    "text": "La fuerza útil es la que se integra a tu vida diaria.",
+    "tags": ["fuerza", "funcional"]
+  },
+  {
+    "id": 219,
+    "text": "No colecciones rutinas, domina una y progresa.",
+    "tags": ["enfoque", "progreso"]
+  },
+  {
+    "id": 220,
+    "text": "Minimiza decisiones previas y maximiza la energía para ejecutar.",
+    "tags": ["decisiones", "energia"]
+  },
+  {
+    "id": 221,
+    "text": "Cerrar círculos aumenta tu confianza futura.",
+    "tags": ["confianza", "cierre"]
+  },
+  {
+    "id": 222,
+    "text": "Eres tu propio estándar: elevalo gradualmente.",
+    "tags": ["estandar", "mejora"]
+  },
+  {
+    "id": 223,
+    "text": "El compromiso contigo pesa más que el clima, el humor o la hora.",
+    "tags": ["compromiso", "prioridad"]
+  },
+  {
+    "id": 224,
+    "text": "Una semana buena no te define; una cadena de semanas sí.",
+    "tags": ["consistencia", "semanas"]
+  },
+  {
+    "id": 225,
+    "text": "Mejorar requiere datos, no suposiciones.",
+    "tags": ["datos", "mejora"]
+  },
+  {
+    "id": 226,
+    "text": "Tu gimnasio interno abre antes que el externo: mentalidad primero.",
+    "tags": ["mente", "gimnasio"]
+  },
+  {
+    "id": 227,
+    "text": "Lo que llamas sacrificio es inversión al revisarlo con distancia.",
+    "tags": ["inversion", "perspectiva"]
+  },
+  {
+    "id": 228,
+    "text": "Encadena pequeños cumplimientos para generar impulso.",
+    "tags": ["impulso", "microhabitos"]
+  },
+  {
+    "id": 229,
+    "text": "Cuando dudes, haz la versión mínima pero haz algo.",
+    "tags": ["accionMinima", "duda"]
+  },
+  {
+    "id": 230,
+    "text": "Es mejor ajustar carga que saltar sesión.",
+    "tags": ["ajuste", "sesion"]
+  },
+  {
+    "id": 231,
+    "text": "Tu trazabilidad hoy evita estancamiento mañana.",
+    "tags": ["registro", "estancamiento"]
+  },
+  {
+    "id": 232,
+    "text": "La disciplina es antifrágil: crece con resistencia ligera y constante.",
+    "tags": ["disciplina", "antifragil"]
+  },
+  {
+    "id": 233,
+    "text": "Entrenar temprano es votar por productividad el resto del día.",
+    "tags": ["mañana", "productividad"]
+  },
+  {
+    "id": 234,
+    "text": "El progreso no grita, se acumula en silencio.",
+    "tags": ["progreso", "silencio"]
+  },
+  {
+    "id": 235,
+    "text": "Haz check out mental de lo externo cuando calientas.",
+    "tags": ["enfoque", "calentamiento"]
+  },
+  {
+    "id": 236,
+    "text": "La adaptación ocurre entre sesiones, protégela.",
+    "tags": ["adaptacion", "descanso"]
+  },
+  {
+    "id": 237,
+    "text": "Construir fuerza es construir opciones.",
+    "tags": ["fuerza", "opciones"]
+  },
+  {
+    "id": 238,
+    "text": "Sin propósito claro la constancia se erosiona.",
+    "tags": ["proposito", "consistencia"]
+  },
+  {
+    "id": 239,
+    "text": "Tu proceso vale más que la opinión ocasional de terceros.",
+    "tags": ["proceso", "opinion"]
+  },
+  {
+    "id": 240,
+    "text": "La autoeficacia crece cumpliendo bloques simples.",
+    "tags": ["autoeficacia", "bloques"]
+  },
+  {
+    "id": 241,
+    "text": "Fallar un set no invalida la sesión.",
+    "tags": ["set", "sesion"]
+  },
+  {
+    "id": 242,
+    "text": "Tu respiración consciente reduce el ruido mental.",
+    "tags": ["respiracion", "mente"]
+  },
+  {
+    "id": 243,
+    "text": "El progreso se calibra en energía, movilidad y fuerza aplicada.",
+    "tags": ["progreso", "indicadores"]
+  },
+  {
+    "id": 244,
+    "text": "Micromejora + repetición = macro resultado.",
+    "tags": ["mejora", "formula"]
+  },
+  {
+    "id": 245,
+    "text": "Diseña rituales de entrada y salida; refuerzan identidad.",
+    "tags": ["rituales", "identidad"]
+  },
+  {
+    "id": 246,
+    "text": "Tu plan semanal es un contrato contigo.",
+    "tags": ["plan", "contrato"]
+  },
+  {
+    "id": 247,
+    "text": "El cansancio gestionado es progreso; el ignorado es lesión potencial.",
+    "tags": ["cansancio", "prevencion"]
+  },
+  {
+    "id": 248,
+    "text": "Tu estado físico es la suma de microdecisiones energéticas.",
+    "tags": ["microdecisiones", "energia"]
+  },
+  {
+    "id": 249,
+    "text": "El foco elimina repeticiones huecas.",
+    "tags": ["enfoque", "calidad"]
+  },
+  {
+    "id": 250,
+    "text": "Avanza suficiente para que retroceder sea caro.",
+    "tags": ["avance", "compromiso"]
+  },
+  {
+    "id": 251,
+    "text": "La autoconfianza se construye confirmando promesas pequeñas.",
+    "tags": ["confianza", "promesas"]
+  },
+  {
+    "id": 252,
+    "text": "Lo urgente no desplace lo importante: entrena igual.",
+    "tags": ["prioridades", "importante"]
+  },
+  {
+    "id": 253,
+    "text": "Tu cuerpo agradece constancia más que intensidad esporádica.",
+    "tags": ["constancia", "intensidad"]
+  },
+  {
+    "id": 254,
+    "text": "Progresar es gestionar cansancio, no eliminarlo.",
+    "tags": ["cansancio", "gestion"]
+  },
+  {
+    "id": 255,
+    "text": "Respira hondo: reencuadre mental instantáneo.",
+    "tags": ["respiracion", "mentalidad"]
+  },
+  {
+    "id": 256,
+    "text": "Define métricas que importan y mira menos el resto.",
+    "tags": ["metricas", "enfoque"]
+  },
+  {
+    "id": 257,
+    "text": "Una técnica limpia acelera la sobrecarga sin lesionarte.",
+    "tags": ["tecnica", "seguridad"]
+  },
+  {
+    "id": 258,
+    "text": "Tu contexto cambia; tu ancla son tus hábitos.",
+    "tags": ["habitos", "contexto"]
+  },
+  {
+    "id": 259,
+    "text": "La constancia es seguir apareciendo sin dramatizarlo.",
+    "tags": ["constancia", "simpleza"]
+  },
+  {
+    "id": 260,
+    "text": "Levanta para vivir mejor fuera del gimnasio.",
+    "tags": ["funcional", "vida"]
+  },
+  {
+    "id": 261,
+    "text": "Potencia tu mañana la noche anterior.",
+    "tags": ["mañana", "preparacion"]
+  },
+  {
+    "id": 262,
+    "text": "Reduce fricción nutricional preparando en lotes.",
+    "tags": ["nutricion", "preparacion"]
+  },
+  {
+    "id": 263,
+    "text": "Un registro honesto vale más que una memoria optimista.",
+    "tags": ["registro", "honestidad"]
+  },
+  {
+    "id": 264,
+    "text": "Tu disciplina es un activo compuesto: protégelo de fugas.",
+    "tags": ["disciplina", "activo"]
+  },
+  {
+    "id": 265,
+    "text": "Cada sesión es un voto visible por tu identidad atlética.",
+    "tags": ["identidad", "sesion"]
+  },
+  {
+    "id": 266,
+    "text": "Divide metas grandes en entregables semanales.",
+    "tags": ["metas", "semanal"]
+  },
+  {
+    "id": 267,
+    "text": "La constancia convierte aspiraciones en antecedentes.",
+    "tags": ["aspiracion", "historial"]
+  },
+  {
+    "id": 268,
+    "text": "Tensión adecuada + descanso adecuado = crecimiento.",
+    "tags": ["equilibrio", "crecimiento"]
+  },
+  {
+    "id": 269,
+    "text": "Tu alimentación es tu programación bioquímica.",
+    "tags": ["nutricion", "bioquimica"]
+  },
+  {
+    "id": 270,
+    "text": "Pequeños rituales desencadenan grandes comportamientos.",
+    "tags": ["rituales", "comportamiento"]
+  },
+  {
+    "id": 271,
+    "text": "Escribe la próxima sesión antes de cerrar la actual.",
+    "tags": ["planificacion", "proximo"]
+  },
+  {
+    "id": 272,
+    "text": "La atención plena reduce repeticiones desperdiciadas.",
+    "tags": ["atencion", "eficiencia"]
+  },
+  {
+    "id": 273,
+    "text": "Tú eliges: excusa narrativa o evidencia medible.",
+    "tags": ["excusa", "evidencia"]
+  },
+  {
+    "id": 274,
+    "text": "La recuperación es parte del protocolo, no un premio.",
+    "tags": ["recuperacion", "protocolo"]
+  },
+  {
+    "id": 275,
+    "text": "Entrenar consistentemente crea identidad de logro.",
+    "tags": ["identidad", "logro"]
+  },
+  {
+    "id": 276,
+    "text": "Tu zona de confort se desplaza cuando te mueves.",
+    "tags": ["zonaConfort", "movimiento"]
+  },
+  {
+    "id": 277,
+    "text": "Menos adornos, más básicos perfectos.",
+    "tags": ["basicos", "perfeccion"]
+  },
+  {
+    "id": 278,
+    "text": "Lo que hoy es límite mañana será calentamiento.",
+    "tags": ["limite", "progreso"]
+  },
+  {
+    "id": 279,
+    "text": "La constancia te hace inevitable estadísticamente.",
+    "tags": ["constancia", "inevitable"]
+  },
+  {
+    "id": 280,
+    "text": "Tu mejor herramienta es aparecer incluso en días mediocres.",
+    "tags": ["aparecer", "diasMediocres"]
+  },
+  {
+    "id": 281,
+    "text": "La perfección tarda; la ejecución consistente te acerca.",
+    "tags": ["perfeccion", "ejecucion"]
+  },
+  {
+    "id": 282,
+    "text": "Más vale una serie enfocada que tres distraídas.",
+    "tags": ["enfoque", "series"]
+  },
+  {
+    "id": 283,
+    "text": "Tu respiración rítmica es ancla bajo carga.",
+    "tags": ["respiracion", "carga"]
+  },
+  {
+    "id": 284,
+    "text": "La fuerza real es repetir fundamentos sin aburrirte.",
+    "tags": ["fuerza", "fundamentos"]
+  },
+  {
+    "id": 285,
+    "text": "Tu progreso necesita menos juicio y más análisis.",
+    "tags": ["analisis", "progreso"]
+  },
+  {
+    "id": 286,
+    "text": "Construye una cadena de días ganados; protégela.",
+    "tags": ["cadena", "diasGanados"]
+  },
+  {
+    "id": 287,
+    "text": "Cada vez que eliges comenzar, reduces fricción futura.",
+    "tags": ["inicio", "friccion"]
+  },
+  {
+    "id": 288,
+    "text": "Entrenar puntual entrena tu identidad confiable.",
+    "tags": ["puntualidad", "identidad"]
+  },
+  {
+    "id": 289,
+    "text": "El estancamiento a menudo es falta de registro honesto.",
+    "tags": ["estancamiento", "registro"]
+  },
+  {
+    "id": 290,
+    "text": "Menos comparación social, más calibración personal.",
+    "tags": ["comparacion", "calibracion"]
+  },
+  {
+    "id": 291,
+    "text": "El cuerpo responde a patrones, no a intenciones aisladas.",
+    "tags": ["patrones", "intencion"]
+  },
+  {
+    "id": 292,
+    "text": "La repetición con atención crea maestría.",
+    "tags": ["maestria", "repeticion"]
+  },
+  {
+    "id": 293,
+    "text": "Documentar convierte sensaciones en datos accionables.",
+    "tags": ["documentar", "datos"]
+  },
+  {
+    "id": 294,
+    "text": "Entrenar hoy evita arrepentir mañana.",
+    "tags": ["entrenar", "arrepentimiento"]
+  },
+  {
+    "id": 295,
+    "text": "Tu disciplina es tu ventaja injusta.",
+    "tags": ["disciplina", "ventaja"]
+  },
+  {
+    "id": 296,
+    "text": "El impulso llega después de empezar, no antes.",
+    "tags": ["impulso", "accion"]
+  },
+  {
+    "id": 297,
+    "text": "El avance se nota primero al subir escaleras sin jadear.",
+    "tags": ["vidaDiaria", "progreso"]
+  },
+  {
+    "id": 298,
+    "text": "Rutinas sólidas reducen decisiones frágiles.",
+    "tags": ["rutinas", "decisiones"]
+  },
+  {
+    "id": 299,
+    "text": "Tu cuerpo registra todo lo que tu mente intenta olvidar.",
+    "tags": ["cuerpo", "registro"]
+  },
+  {
+    "id": 300,
+    "text": "La constancia diaria es tu algoritmo de transformación.",
+    "tags": ["constancia", "transformacion"]
+  },
+  {
+    "id": 301,
+    "text": "Lo que hoy disciplinas mañana automatizas.",
+    "tags": ["disciplina", "automatizacion"]
+  },
+  {
+    "id": 302,
+    "text": "Cada calentamiento consciente prepara una sesión efectiva.",
+    "tags": ["calentamiento", "efectividad"]
+  },
+  {
+    "id": 303,
+    "text": "La adherencia gana a la perfección en el largo plazo.",
+    "tags": ["adherencia", "largoPlazo"]
+  },
+  {
+    "id": 304,
+    "text": "Tu mejor versión física empieza por dormir mejor.",
+    "tags": ["sueño", "rendimiento"]
+  },
+  {
+    "id": 305,
+    "text": "Entrenar es apilar decisiones alineadas con tu identidad futura.",
+    "tags": ["identidad", "futuro"]
+  },
+  {
+    "id": 306,
+    "text": "La fuerza protege tus articulaciones cuando la técnica las respeta.",
+    "tags": ["fuerza", "tecnica"]
+  },
+  {
+    "id": 307,
+    "text": "Cinco minutos invertidos hoy evitan retrocesos mañana.",
+    "tags": ["minimoViable", "retroceso"]
+  },
+  {
+    "id": 308,
+    "text": "El progreso significativo rara vez es dramático.",
+    "tags": ["progreso", "realidad"]
+  },
+  {
+    "id": 309,
+    "text": "Tu voluntad se fortalece cumpliendo microcompromisos.",
+    "tags": ["voluntad", "microhabitos"]
+  },
+  {
+    "id": 310,
+    "text": "Apunta a la continuidad antes que a la espectacularidad.",
+    "tags": ["continuidad", "proceso"]
+  },
+  {
+    "id": 311,
+    "text": "La repetición con intención crea arquitectura corporal.",
+    "tags": ["intencion", "estructura"]
+  },
+  {
+    "id": 312,
+    "text": "Tu mente negocia; tus sistemas deciden.",
+    "tags": ["sistemas", "mente"]
+  },
+  {
+    "id": 313,
+    "text": "Cada día que te presentas reduces la fricción del siguiente.",
+    "tags": ["presentarse", "friccion"]
+  },
+  {
+    "id": 314,
+    "text": "El autocuidado es un macro-ciclo estratégico.",
+    "tags": ["autocuidado", "planificacion"]
+  },
+  {
+    "id": 315,
+    "text": "Tu vascularidad cuenta historias de consistencia.",
+    "tags": ["consistencia", "fisico"]
+  },
+  {
+    "id": 316,
+    "text": "Entrenar te entrena para resolver bajo presión.",
+    "tags": ["presion", "resolucion"]
+  },
+  {
+    "id": 317,
+    "text": "Registra percepciones, no sólo números.",
+    "tags": ["registro", "percepcion"]
+  },
+  {
+    "id": 318,
+    "text": "Modula intensidad para preservar continuidad.",
+    "tags": ["intensidad", "continuidad"]
+  },
+  {
+    "id": 319,
+    "text": "Tu mayor progreso ocurre cuando ya casi renuncias.",
+    "tags": ["progreso", "resistencia"]
+  },
+  {
+    "id": 320,
+    "text": "El músculo se construye fuera del gimnasio con hábitos que lo soportan.",
+    "tags": ["musculo", "habitos"]
+  },
+  {
+    "id": 321,
+    "text": "La motivación se provoca ejecutando, no esperando sentirla.",
+    "tags": ["motivacion", "accion"]
+  },
+  {
+    "id": 322,
+    "text": "Tu bitácora es tu entrenador silencioso.",
+    "tags": ["bitacora", "autoentrenamiento"]
+  },
+  {
+    "id": 323,
+    "text": "Sudar es la tinta con la que escribes tu progreso.",
+    "tags": ["sudor", "progreso"]
+  },
+  {
+    "id": 324,
+    "text": "Un mal set corrige técnica, un set omitido no enseña nada.",
+    "tags": ["tecnica", "aprendizaje"]
+  },
+  {
+    "id": 325,
+    "text": "Tu objetivo físico necesita objetivos de proceso claros.",
+    "tags": ["objetivo", "proceso"]
+  },
+  {
+    "id": 326,
+    "text": "Evita heroicidades aisladas; construye consistencia acumulada.",
+    "tags": ["heroicidad", "acumulacion"]
+  },
+  {
+    "id": 327,
+    "text": "La disciplina filtra ruido y amplifica ejecución.",
+    "tags": ["disciplina", "ejecucion"]
+  },
+  {
+    "id": 328,
+    "text": "Tu postura bajo fatiga revela tu base real.",
+    "tags": ["postura", "fatiga"]
+  },
+  {
+    "id": 329,
+    "text": "Fortalece el agarre; libera potencia en todo el cuerpo.",
+    "tags": ["agarre", "fuerza"]
+  },
+  {
+    "id": 330,
+    "text": "Sin paciencia el músculo no madura.",
+    "tags": ["paciencia", "musculo"]
+  },
+  {
+    "id": 331,
+    "text": "Progresar es encadenar semanas buenas, no días perfectos.",
+    "tags": ["semanas", "progreso"]
+  },
+  {
+    "id": 332,
+    "text": "Las piernas fuertes sostienen ambiciones altas.",
+    "tags": ["piernas", "ambicion"]
+  },
+  {
+    "id": 333,
+    "text": "Tu checklist post-entreno consolida adaptaciones.",
+    "tags": ["postEntreno", "adaptacion"]
+  },
+  {
+    "id": 334,
+    "text": "La identidad atlética nace cumpliendo cuando nadie espera que lo hagas.",
+    "tags": ["identidad", "privado"]
+  },
+  {
+    "id": 335,
+    "text": "Haz de la hidratación un hábito reflejo.",
+    "tags": ["hidratacion", "habito"]
+  },
+  {
+    "id": 336,
+    "text": "Tu energía basal se eleva con constancia invisible.",
+    "tags": ["energia", "basal"]
+  },
+  {
+    "id": 337,
+    "text": "Ciclar intensidades previene estancamientos.",
+    "tags": ["periodizacion", "estancamiento"]
+  },
+  {
+    "id": 338,
+    "text": "Un cuerpo coordinado vale más que uno sólo voluminoso.",
+    "tags": ["coordinacion", "equilibrio"]
+  },
+  {
+    "id": 339,
+    "text": "La fatiga bien gestionada se llama progreso.",
+    "tags": ["fatiga", "gestion"]
+  },
+  {
+    "id": 340,
+    "text": "La sesión que menos quieres hacer es la que más te forma.",
+    "tags": ["sesion", "formacion"]
+  },
+  {
+    "id": 341,
+    "text": "Tu plan sin registro es intuición difusa.",
+    "tags": ["plan", "registro"]
+  },
+  {
+    "id": 342,
+    "text": "Optimiza la salida de tu casa: reduce minutos improductivos.",
+    "tags": ["logistica", "optimizar"]
+  },
+  {
+    "id": 343,
+    "text": "Pequeñas victorias repetidas generan identidad sólida.",
+    "tags": ["victorias", "identidad"]
+  },
+  {
+    "id": 344,
+    "text": "La flexibilidad estratégica salva tu adherencia.",
+    "tags": ["flexibilidad", "adherencia"]
+  },
+  {
+    "id": 345,
+    "text": "Tu core fuerte es transferencia pura de potencia.",
+    "tags": ["core", "potencia"]
+  },
+  {
+    "id": 346,
+    "text": "El verdadero progreso se nota al cargar menos estrés en tareas diarias.",
+    "tags": ["progreso", "vidaDiaria"]
+  },
+  {
+    "id": 347,
+    "text": "No subestimes el poder de un plan escrito a mano.",
+    "tags": ["plan", "escritura"]
+  },
+  {
+    "id": 348,
+    "text": "La constancia reduce la ansiedad de resultados inmediatos.",
+    "tags": ["consistencia", "ansiedad"]
+  },
+  {
+    "id": 349,
+    "text": "Entrenar fuerza es invertir en longevidad funcional.",
+    "tags": ["longevidad", "fuerza"]
+  },
+  {
+    "id": 350,
+    "text": "Tu refuerzo positivo interno acelera adherencia.",
+    "tags": ["refuerzo", "adherencia"]
+  },
+  {
+    "id": 351,
+    "text": "Cada comida alineada es un set invisible completado.",
+    "tags": ["nutricion", "alineacion"]
+  },
+  {
+    "id": 352,
+    "text": "La resiliencia se teje con hilos de constancia.",
+    "tags": ["resiliencia", "constancia"]
+  },
+  {
+    "id": 353,
+    "text": "El progreso 'lento' es simplemente progreso sostenible.",
+    "tags": ["progreso", "sostenible"]
+  },
+  {
+    "id": 354,
+    "text": "Tu diálogo interno antes del fallo define el estímulo.",
+    "tags": ["mente", "estimulo"]
+  },
+  {
+    "id": 355,
+    "text": "Menos ruido informativo, más ejecución programada.",
+    "tags": ["informacion", "ejecucion"]
+  },
+  {
+    "id": 356,
+    "text": "La movilidad preserva futuros PRs.",
+    "tags": ["movilidad", "rendimiento"]
+  },
+  {
+    "id": 357,
+    "text": "Levanta con intención, descansa con propósito.",
+    "tags": ["intencion", "proposito"]
+  },
+  {
+    "id": 358,
+    "text": "Un plan claro reduce la fuerza de la pereza.",
+    "tags": ["plan", "pereza"]
+  },
+  {
+    "id": 359,
+    "text": "Tu autodisciplina es una postura mental diaria.",
+    "tags": ["autodisciplina", "postura"]
+  },
+  {
+    "id": 360,
+    "text": "La adherencia es la métrica reina del fitness.",
+    "tags": ["adherencia", "clave"]
+  },
+  {
+    "id": 361,
+    "text": "La mente enfocada reduce el desperdicio neural bajo carga.",
+    "tags": ["mente", "eficiencia"]
+  },
+  {
+    "id": 362,
+    "text": "Multiplica tu progreso dominando el descanso activo.",
+    "tags": ["descansoActivo", "progreso"]
+  },
+  {
+    "id": 363,
+    "text": "Cada estiramiento consciente expande tu futuro rango.",
+    "tags": ["estiramiento", "rango"]
+  },
+  {
+    "id": 364,
+    "text": "Tu bitácora te muestra si te estás repitiendo demasiado.",
+    "tags": ["bitacora", "variedad"]
+  },
+  {
+    "id": 365,
+    "text": "El cortisol innecesario sabotea la recuperación; gestiona estrés.",
+    "tags": ["estres", "recuperacion"]
+  },
+  {
+    "id": 366,
+    "text": "Una ejecución limpia hoy vale más que potencial bruto sin enfoque.",
+    "tags": ["ejecucion", "enfoque"]
+  },
+  {
+    "id": 367,
+    "text": "La consistencia crea tendencias, no anécdotas.",
+    "tags": ["tendencias", "consistencia"]
+  },
+  {
+    "id": 368,
+    "text": "Tu percepción de esfuerzo también se entrena.",
+    "tags": ["esfuerzo", "percepcion"]
+  },
+  {
+    "id": 369,
+    "text": "La toma de decisiones previa al entrenamiento define la adherencia.",
+    "tags": ["decisiones", "adherencia"]
+  },
+  {
+    "id": 370,
+    "text": "Planifica del revés: objetivo final → bloque mensual → semana → día.",
+    "tags": ["planificacion", "retro"]
+  },
+  {
+    "id": 371,
+    "text": "El músculo entiende tensión mecánica y nutrición, no excusas.",
+    "tags": ["tension", "nutricion"]
+  },
+  {
+    "id": 372,
+    "text": "El progreso se mantiene cuando aprendes a autoregular.",
+    "tags": ["autoregular", "progreso"]
+  },
+  {
+    "id": 373,
+    "text": "Tu enfoque intra-serie marca la diferencia en adaptación.",
+    "tags": ["enfoque", "serie"]
+  },
+  {
+    "id": 374,
+    "text": "Levantar pesado sin técnica es hipotecar articulaciones.",
+    "tags": ["tecnica", "prevencion"]
+  },
+  {
+    "id": 375,
+    "text": "La motivación es variable; la estructura es estable.",
+    "tags": ["estructura", "motivacion"]
+  },
+  {
+    "id": 376,
+    "text": "Diseña puntos de control semanales sin juicio, con ajuste.",
+    "tags": ["checkpoints", "ajuste"]
+  },
+  {
+    "id": 377,
+    "text": "Tu constancia reduce la dependencia de la fuerza de voluntad.",
+    "tags": ["constancia", "voluntad"]
+  },
+  {
+    "id": 378,
+    "text": "Entrenar es enseñar a tu cerebro a seguir empujando cuando quiere parar.",
+    "tags": ["cerebro", "resiliencia"]
+  },
+  {
+    "id": 379,
+    "text": "Calidad de sueño hoy = rendimiento adaptativo mañana.",
+    "tags": ["sueño", "adaptacion"]
+  },
+  {
+    "id": 380,
+    "text": "Tu frecuencia de entrenamiento forma tu línea base.",
+    "tags": ["frecuencia", "baseline"]
+  },
+  {
+    "id": 381,
+    "text": "Un set concentrado vale más que tres distraídos.",
+    "tags": ["set", "concentracion"]
+  },
+  {
+    "id": 382,
+    "text": "Procesa frustración como feedback, no como identidad.",
+    "tags": ["frustracion", "feedback"]
+  },
+  {
+    "id": 383,
+    "text": "La constancia desactiva la ansiedad por resultados rápidos.",
+    "tags": ["consistencia", "ansiedad"]
+  },
+  {
+    "id": 384,
+    "text": "Tu alimentación es tu programación hormonal diaria.",
+    "tags": ["hormonas", "nutricion"]
+  },
+  {
+    "id": 385,
+    "text": "Mejora tu técnica antes de aumentar tu ego de carga.",
+    "tags": ["tecnica", "ego"]
+  },
+  {
+    "id": 386,
+    "text": "El estancamiento suele indicar falta de variedad calculada.",
+    "tags": ["estancamiento", "variedad"]
+  },
+  {
+    "id": 387,
+    "text": "Cada sesión honesta reduce tu brecha con la meta.",
+    "tags": ["sesion", "meta"]
+  },
+  {
+    "id": 388,
+    "text": "Tu control respiratorio mitiga picos de estrés interno.",
+    "tags": ["respiracion", "estres"]
+  },
+  {
+    "id": 389,
+    "text": "Entrenar no quita tiempo: reorganiza prioridades.",
+    "tags": ["prioridades", "tiempo"]
+  },
+  {
+    "id": 390,
+    "text": "Autoconocimiento físico = programación más precisa.",
+    "tags": ["autoconocimiento", "programacion"]
+  },
+  {
+    "id": 391,
+    "text": "La fatiga central requiere descanso mental, no sólo físico.",
+    "tags": ["fatiga", "mental"]
+  },
+  {
+    "id": 392,
+    "text": "Minuto a minuto de enfoque suma calidad total.",
+    "tags": ["enfoque", "calidad"]
+  },
+  {
+    "id": 393,
+    "text": "Tu progresión carga/volumen necesita paciencia estructurada.",
+    "tags": ["progresion", "paciencia"]
+  },
+  {
+    "id": 394,
+    "text": "La identidad se refuerza al hacer lo correcto sin testigos.",
+    "tags": ["identidad", "integridad"]
+  },
+  {
+    "id": 395,
+    "text": "Evita planear desde la emoción y ejecutar desde la excusa.",
+    "tags": ["plan", "ejecucion"]
+  },
+  {
+    "id": 396,
+    "text": "Tu base aeróbica sostiene tu potencia anaeróbica.",
+    "tags": ["aerobico", "potencia"]
+  },
+  {
+    "id": 397,
+    "text": "Errores medidos se convierten en iteraciones útiles.",
+    "tags": ["errores", "iteracion"]
+  },
+  {
+    "id": 398,
+    "text": "Tu constancia convierte deseos en estadísticas.",
+    "tags": ["constancia", "estadisticas"]
+  },
+  {
+    "id": 399,
+    "text": "Registra sensaciones de sueño y correlaciónalas con rendimiento.",
+    "tags": ["sueño", "rendimiento"]
+  },
+  {
+    "id": 400,
+    "text": "El plan mínimo ejecutado supera el ideal postergado.",
+    "tags": ["plan", "ejecucion"]
+  },
+  {
+    "id": 401,
+    "text": "Micropausas activas mantienen frescura neuromuscular.",
+    "tags": ["pausas", "frescura"]
+  },
+  {
+    "id": 402,
+    "text": "Tu técnica bajo cargas submáximas es predictor de seguridad futura.",
+    "tags": ["tecnica", "seguridad"]
+  },
+  {
+    "id": 403,
+    "text": "La sobrecarga progresiva es conversación, no monólogo.",
+    "tags": ["sobrecarga", "feedback"]
+  },
+  {
+    "id": 404,
+    "text": "Tu sistema inmune agradece balance estrés-recuperación.",
+    "tags": ["inmune", "recuperacion"]
+  },
+  {
+    "id": 405,
+    "text": "Hidratar es aceitar tu maquinaria metabólica.",
+    "tags": ["hidratacion", "metabolismo"]
+  },
+  {
+    "id": 406,
+    "text": "Planifica el deload antes de que el cuerpo lo exija.",
+    "tags": ["deload", "prevencion"]
+  },
+  {
+    "id": 407,
+    "text": "Tu agenda visible reduce autoengaño de disponibilidad.",
+    "tags": ["agenda", "claridad"]
+  },
+  {
+    "id": 408,
+    "text": "La consistencia transforma esfuerzos aislados en curva ascendente.",
+    "tags": ["consistencia", "tendencia"]
+  },
+  {
+    "id": 409,
+    "text": "El entrenamiento de hoy es la recuperación de mañana.",
+    "tags": ["entrenamiento", "recuperacion"]
+  },
+  {
+    "id": 410,
+    "text": "Tu progresión requiere honestidad con tus repeticiones reales.",
+    "tags": ["progresion", "honestidad"]
+  },
+  {
+    "id": 411,
+    "text": "Evalúa, ajusta, continúa: el triángulo del avance sostenible.",
+    "tags": ["evaluar", "ajustar"]
+  },
+  {
+    "id": 412,
+    "text": "Tu energía matutina refleja higiene de hábitos nocturnos.",
+    "tags": ["energia", "habitos"]
+  },
+  {
+    "id": 413,
+    "text": "La mente enfocada traduce tensión en adaptación, no en estrés.",
+    "tags": ["enfoque", "adaptacion"]
+  },
+  {
+    "id": 414,
+    "text": "Tu movilidad torácica libera potencia en tus presses.",
+    "tags": ["movilidad", "press"]
+  },
+  {
+    "id": 415,
+    "text": "El core estable libera extremidades eficientes.",
+    "tags": ["core", "estabilidad"]
+  },
+  {
+    "id": 416,
+    "text": "Registra saltos de humor tras entrenar: biofeedback emocional.",
+    "tags": ["humor", "biofeedback"]
+  },
+  {
+    "id": 417,
+    "text": "La constancia hace predecible tu línea de base emocional.",
+    "tags": ["constancia", "emocional"]
+  },
+  {
+    "id": 418,
+    "text": "Tu plan semanal necesita un gatillo visual claro.",
+    "tags": ["plan", "gatillo"]
+  },
+  {
+    "id": 419,
+    "text": "El calentamiento activo protege y potencia tu sesión.",
+    "tags": ["calentamiento", "proteccion"]
+  },
+  {
+    "id": 420,
+    "text": "Cada comida consciente enseña autocontrol práctico.",
+    "tags": ["nutricion", "autocontrol"]
+  },
+  {
+    "id": 421,
+    "text": "Tu sueño profundo consolida adaptaciones hormonales.",
+    "tags": ["sueño", "hormonas"]
+  },
+  {
+    "id": 422,
+    "text": "Un check de movilidad matinal informa tu intensidad del día.",
+    "tags": ["movilidad", "intensidad"]
+  },
+  {
+    "id": 423,
+    "text": "Tu respiración nasal mejora eficiencia energética.",
+    "tags": ["respiracion", "eficiencia"]
+  },
+  {
+    "id": 424,
+    "text": "La sobrecarga progresiva respeta coordinación antes que carga.",
+    "tags": ["sobrecarga", "coordinacion"]
+  },
+  {
+    "id": 425,
+    "text": "Tu hidratación regula volumen sanguíneo y rendimiento.",
+    "tags": ["hidratacion", "rendimiento"]
+  },
+  {
+    "id": 426,
+    "text": "El descanso inteligente evita la fatiga acumulada silenciosa.",
+    "tags": ["descanso", "fatiga"]
+  },
+  {
+    "id": 427,
+    "text": "Ajusta macros como ajustas repeticiones: con criterio.",
+    "tags": ["macros", "criterio"]
+  },
+  {
+    "id": 428,
+    "text": "Tu bitácora gráfica acelera lectura de tendencias.",
+    "tags": ["bitacora", "tendencias"]
+  },
+  {
+    "id": 429,
+    "text": "Cada sesión inicia realmente cuando apagas distracciones.",
+    "tags": ["distraccion", "inicio"]
+  },
+  {
+    "id": 430,
+    "text": "Tu autoevaluación evitará meses de estancamiento inadvertido.",
+    "tags": ["autoevaluacion", "estancamiento"]
+  },
+  {
+    "id": 431,
+    "text": "El músculo se construye bajo tensión suficiente + nutrición puntual.",
+    "tags": ["tension", "nutricion"]
+  },
+  {
+    "id": 432,
+    "text": "Tu fuerza máxima mejora con técnica submáxima impecable.",
+    "tags": ["fuerza", "tecnica"]
+  },
+  {
+    "id": 433,
+    "text": "El control excéntrico escribe adaptaciones densas.",
+    "tags": ["excéntrico", "adaptacion"]
+  },
+  {
+    "id": 434,
+    "text": "Tu consistencia convierte objetivos en inevitables.",
+    "tags": ["consistencia", "inevitable"]
+  },
+  {
+    "id": 435,
+    "text": "La prevención de lesiones es multiplicador de progreso.",
+    "tags": ["prevencion", "progreso"]
+  },
+  {
+    "id": 436,
+    "text": "Tu balance empuje+tira cuida tu postura.",
+    "tags": ["equilibrio", "postura"]
+  },
+  {
+    "id": 437,
+    "text": "La fatiga mental gestionada mantiene la motivación latente.",
+    "tags": ["fatiga", "motivacion"]
+  },
+  {
+    "id": 438,
+    "text": "Tu disciplina es transferencia a todas las áreas de vida.",
+    "tags": ["disciplina", "transferencia"]
+  },
+  {
+    "id": 439,
+    "text": "El ajuste de volumen salva la adherencia en semanas complejas.",
+    "tags": ["volumen", "ajuste"]
+  },
+  {
+    "id": 440,
+    "text": "Tu protocolo pre-sueño incrementa eficiencia de recuperación.",
+    "tags": ["sueño", "protocolo"]
+  },
+  {
+    "id": 441,
+    "text": "La claridad de métricas reduce frustración.",
+    "tags": ["metricas", "claridad"]
+  },
+  {
+    "id": 442,
+    "text": "Tu respiración diafragmática estabiliza tu core profundo.",
+    "tags": ["respiracion", "core"]
+  },
+  {
+    "id": 443,
+    "text": "El progreso invisible es el que sostiene el visible.",
+    "tags": ["progreso", "sustrato"]
+  },
+  {
+    "id": 444,
+    "text": "Tu checklist de técnica evita degradación bajo fatiga.",
+    "tags": ["tecnica", "fatiga"]
+  },
+  {
+    "id": 445,
+    "text": "Entrenar bajo lluvia entrena resiliencia psicológica.",
+    "tags": ["resiliencia", "contexto"]
+  },
+  {
+    "id": 446,
+    "text": "Tu desayuno estratégico predispone glucógeno óptimo.",
+    "tags": ["desayuno", "energia"]
+  },
+  {
+    "id": 447,
+    "text": "La sobrecarga aplica también a movilidad y estabilidad.",
+    "tags": ["sobrecarga", "movilidad"]
+  },
+  {
+    "id": 448,
+    "text": "Tu control de descanso entre series moldea estímulo.",
+    "tags": ["descanso", "estimulo"]
+  },
+  {
+    "id": 449,
+    "text": "El registro de RIR/RPE refinado mejora programación.",
+    "tags": ["RPE", "programacion"]
+  },
+  {
+    "id": 450,
+    "text": "La repetición final honesta dicta la señal adaptativa.",
+    "tags": ["repeticion", "adaptacion"]
+  },
+  {
+    "id": 451,
+    "text": "Tu ajuste nutricional pos-entreno acelera síntesis.",
+    "tags": ["postEntreno", "sintesis"]
+  },
+  {
+    "id": 452,
+    "text": "El sueño fragmentado drena progresos silenciosos.",
+    "tags": ["sueño", "fragmentacion"]
+  },
+  {
+    "id": 453,
+    "text": "Tu hidratación intra-entreno sostiene volumen total.",
+    "tags": ["hidratacion", "intra"]
+  },
+  {
+    "id": 454,
+    "text": "El control escapular protege hombros y potencia presses.",
+    "tags": ["escapulas", "prevencion"]
+  },
+  {
+    "id": 455,
+    "text": "Tu bitácora honesta evita repetir errores cíclicamente.",
+    "tags": ["bitacora", "errores"]
+  },
+  {
+    "id": 456,
+    "text": "El pre-fatigue planificado refina conexión mente-músculo.",
+    "tags": ["prefatiga", "conexion"]
+  },
+  {
+    "id": 457,
+    "text": "Tu consistencia alimenta tu autoimagen positiva.",
+    "tags": ["consistencia", "autoimagen"]
+  },
+  {
+    "id": 458,
+    "text": "El calentamiento neural optimiza reclutamiento motor.",
+    "tags": ["calentamiento", "neural"]
+  },
+  {
+    "id": 459,
+    "text": "Tu control excéntrico protege tendones.",
+    "tags": ["excentrico", "tendones"]
+  },
+  {
+    "id": 460,
+    "text": "La exposición gradual a esfuerzo alto aumenta tolerancia mental.",
+    "tags": ["gradual", "tolerancia"]
+  },
+  {
+    "id": 461,
+    "text": "Tu evaluación mensual detecta microestancamientos.",
+    "tags": ["evaluacion", "micro"]
+  },
+  {
+    "id": 462,
+    "text": "El vaciado mental post-entreno mejora recuperación psicológica.",
+    "tags": ["mental", "recuperacion"]
+  },
+  {
+    "id": 463,
+    "text": "Tu checklist pre-entreno reduce procrastinación.",
+    "tags": ["checklist", "procrastinacion"]
+  },
+  {
+    "id": 464,
+    "text": "El control de la cadencia altera significativamente el estímulo.",
+    "tags": ["cadencia", "estimulo"]
+  },
+  {
+    "id": 465,
+    "text": "Tu progresión fractal: días → semanas → bloques → fases.",
+    "tags": ["progresion", "estructura"]
+  },
+  {
+    "id": 466,
+    "text": "El balance ACWR previene lesiones (carga aguda vs crónica).",
+    "tags": ["carga", "prevencion"]
+  },
+  {
+    "id": 467,
+    "text": "Tu postura neutra bajo carga salvaguarda discos.",
+    "tags": ["postura", "columna"]
+  },
+  {
+    "id": 468,
+    "text": "El pre-sueño sin pantallas mejora profundidad de descanso.",
+    "tags": ["sueño", "higiene"]
+  },
+  {
+    "id": 469,
+    "text": "Tu consistencia crea adaptación metabólica eficiente.",
+    "tags": ["metabolismo", "consistencia"]
+  },
+  {
+    "id": 470,
+    "text": "El control de estrés reduce inflamación sistémica.",
+    "tags": ["estres", "inflamacion"]
+  },
+  {
+    "id": 471,
+    "text": "Tu preparación mental visualiza ejecución antes del set.",
+    "tags": ["visualizacion", "ejecucion"]
+  },
+  {
+    "id": 472,
+    "text": "El tracking de pasos contextualiza tu NEAT.",
+    "tags": ["NEAT", "actividad"]
+  },
+  {
+    "id": 473,
+    "text": "Tu programming ondulado evita adaptación prematura.",
+    "tags": ["programacion", "ondulacion"]
+  },
+  {
+    "id": 474,
+    "text": "El control de la respiración abdominal estabiliza cargas.",
+    "tags": ["respiracion", "estabilidad"]
+  },
+  {
+    "id": 475,
+    "text": "Tu ingesta proteica constante soporta síntesis continua.",
+    "tags": ["proteina", "sintesis"]
+  },
+  {
+    "id": 476,
+    "text": "El ajuste de fibra alimentaria mejora saciedad y digestión.",
+    "tags": ["fibra", "nutricion"]
+  },
+  {
+    "id": 477,
+    "text": "Tu movilidad de cadera libera potencia en sentadillas.",
+    "tags": ["movilidad", "sentadilla"]
+  },
+  {
+    "id": 478,
+    "text": "El tempo controlado enseña eficiencia bajo carga.",
+    "tags": ["tempo", "eficiencia"]
+  },
+  {
+    "id": 479,
+    "text": "Tu progresión mental es sostener enfoque pese a ruido interno.",
+    "tags": ["enfoque", "ruido"]
+  },
+  {
+    "id": 480,
+    "text": "El chequeo de técnica en video recorta curvas de aprendizaje.",
+    "tags": ["video", "tecnica"]
+  },
+  {
+    "id": 481,
+    "text": "Tu control glucémico estable mejora energía sostenida.",
+    "tags": ["glucemia", "energia"]
+  },
+  {
+    "id": 482,
+    "text": "El enfoque sensorial (tacto, tensión) refina conexión neuromuscular.",
+    "tags": ["sensorial", "neuromuscular"]
+  },
+  {
+    "id": 483,
+    "text": "Tu journaling de sensaciones reduce sesgo de memoria.",
+    "tags": ["journaling", "sesgo"]
+  },
+  {
+    "id": 484,
+    "text": "El refuerzo inmediato (check ✓) ancla hábito.",
+    "tags": ["refuerzo", "habito"]
+  },
+  {
+    "id": 485,
+    "text": "Tu consistencia hormonaliza procesos de recuperación.",
+    "tags": ["hormonas", "recuperacion"]
+  },
+  {
+    "id": 486,
+    "text": "El volumen efectivo supera volumen bruto mal ejecutado.",
+    "tags": ["volumen", "efectivo"]
+  },
+  {
+    "id": 487,
+    "text": "Tu entrenamiento cruzado previene desequilibrios.",
+    "tags": ["cross", "equilibrio"]
+  },
+  {
+    "id": 488,
+    "text": "El control del sueño REM impacta memoria motora.",
+    "tags": ["REM", "memoria"]
+  },
+  {
+    "id": 489,
+    "text": "Tu ingesta de agua es variable estratégica, no accidente.",
+    "tags": ["agua", "estrategia"]
+  },
+  {
+    "id": 490,
+    "text": "El apoyo social refuerza adherencia silenciosamente.",
+    "tags": ["apoyo", "adherencia"]
+  },
+  {
+    "id": 491,
+    "text": "Tu progresión parcial (ROM) prepara rangos completos.",
+    "tags": ["ROM", "progresion"]
+  },
+  {
+    "id": 492,
+    "text": "El foco en calidad reduce riesgo acumulativo.",
+    "tags": ["calidad", "riesgo"]
+  },
+  {
+    "id": 493,
+    "text": "Tu periodización nutricional alinea energía y demanda.",
+    "tags": ["nutricion", "periodizacion"]
+  },
+  {
+    "id": 494,
+    "text": "El control mental bajo lactato entrena serenidad funcional.",
+    "tags": ["lactato", "serenidad"]
+  },
+  {
+    "id": 495,
+    "text": "Tu consistencia diaria altera tu expresión genética funcional.",
+    "tags": ["epigenetica", "consistencia"]
+  },
+  {
+    "id": 496,
+    "text": "El ajuste de postura neutraliza microtensiones crónicas.",
+    "tags": ["postura", "tension"]
+  },
+  {
+    "id": 497,
+    "text": "Tu chequeo semanal de métricas evita deriva silenciosa.",
+    "tags": ["metricas", "deriva"]
+  },
+  {
+    "id": 498,
+    "text": "El control de carga monotónica previene sobreuso.",
+    "tags": ["carga", "sobreuso"]
+  },
+  {
+    "id": 499,
+    "text": "Tu adaptación cardiovascular mejora recuperación entre series.",
+    "tags": ["cardio", "recuperacion"]
+  },
+  {
+    "id": 500,
+    "text": "El pilar es simple: tensión adecuada, nutrición suficiente, sueño profundo, repetido.",
+    "tags": ["pilares", "simplicidad"]
+  }
 ]

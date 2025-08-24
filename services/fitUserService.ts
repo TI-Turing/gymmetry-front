@@ -40,5 +40,5 @@ export const fitUserService = {
   // Alias para compatibilidad
   async getAllUsers(): Promise<ApiResponse<FitUser[]>> {
     return this.getAllFitUsers();
-  }
+  },
 };

@@ -22,6 +22,8 @@ import {
 import { commonStyles } from '../styles/common';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCustomAlert } from '@/components/common/CustomAlert';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeStep2Styles } from '../styles/step2';
 
 interface Step2Props {
   userId: string;
@@ -71,6 +73,7 @@ export default forwardRef(function Step2(
   const [phoneExists, setPhoneExists] = useState<boolean | null>(null);
 
   const colorScheme = useColorScheme();
+  const styles = useThemedStyles(makeStep2Styles);
 
   const handlePhoneChange = (text: string) => {
     const numericOnly = text.replace(/[^0-9]/g, '');
@@ -302,46 +305,24 @@ export default forwardRef(function Step2(
       <View style={commonStyles.form}>
         <View style={commonStyles.row}>
           <View style={[commonStyles.inputContainer, commonStyles.halfWidth]}>
-            <Text
-              style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-            >
-              Nombre
-            </Text>
+            <Text style={[commonStyles.label, styles.label]}>Nombre</Text>
             <TextInput
-              style={[
-                commonStyles.input,
-                {
-                  backgroundColor: Colors[colorScheme].background,
-                  color: Colors[colorScheme].text,
-                  borderColor: '#666',
-                },
-              ]}
+              style={[commonStyles.input, styles.input]}
               value={firstName}
               onChangeText={setFirstName}
               placeholderTextColor={`${Colors[colorScheme].text}60`}
-              autoCapitalize='words'
+              autoCapitalize="words"
             />
           </View>
 
           <View style={[commonStyles.inputContainer, commonStyles.halfWidth]}>
-            <Text
-              style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-            >
-              Apellido
-            </Text>
+            <Text style={[commonStyles.label, styles.label]}>Apellido</Text>
             <TextInput
-              style={[
-                commonStyles.input,
-                {
-                  backgroundColor: Colors[colorScheme].background,
-                  color: Colors[colorScheme].text,
-                  borderColor: '#666',
-                },
-              ]}
+              style={[commonStyles.input, styles.input]}
               value={lastName}
               onChangeText={setLastName}
               placeholderTextColor={`${Colors[colorScheme].text}60`}
-              autoCapitalize='words'
+              autoCapitalize="words"
             />
           </View>
         </View>
@@ -355,11 +336,7 @@ export default forwardRef(function Step2(
               marginBottom: 8,
             }}
           >
-            <Text
-              style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-            >
-              Teléfono
-            </Text>
+            <Text style={[commonStyles.label, styles.label]}>Teléfono</Text>
 
             {/* Botón de verificación pequeño al lado del label */}
             {phone.length >= 7 && (
@@ -380,7 +357,7 @@ export default forwardRef(function Step2(
                 <FontAwesome
                   name={phoneVerified ? 'check-circle' : 'phone'}
                   size={12}
-                  color='white'
+                  color="white"
                   style={{ marginRight: 4 }}
                 />
                 <Text
@@ -414,18 +391,16 @@ export default forwardRef(function Step2(
                     backgroundColor: phoneVerified
                       ? `${Colors[colorScheme].text}15`
                       : Colors[colorScheme].background,
-                    color: phoneVerified
-                      ? Colors[colorScheme].text
-                      : Colors[colorScheme].text,
+                    color: Colors[colorScheme].text,
                     borderColor: phoneVerified
                       ? `${Colors[colorScheme].text}40`
-                      : '#666',
+                      : (styles as any).input.borderColor,
                     paddingRight: phoneVerified ? 40 : 16,
                     opacity: phoneVerified ? 0.8 : 1,
                   },
                 ]}
                 value={phone}
-                keyboardType='number-pad'
+                keyboardType="number-pad"
                 onChangeText={handlePhoneChange}
                 placeholderTextColor={`${Colors[colorScheme].text}60`}
                 maxLength={10}
@@ -441,7 +416,7 @@ export default forwardRef(function Step2(
                   }}
                 >
                   <FontAwesome
-                    name='lock'
+                    name="lock"
                     size={16}
                     color={`${Colors[colorScheme].text}80`}
                   />
@@ -452,9 +427,7 @@ export default forwardRef(function Step2(
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, styles.label]}>
             Fecha de nacimiento
           </Text>
           <TouchableOpacity
@@ -462,7 +435,7 @@ export default forwardRef(function Step2(
               commonStyles.input,
               {
                 backgroundColor: Colors[colorScheme].background,
-                borderColor: '#666',
+                borderColor: (styles as any).input.borderColor,
                 justifyContent: 'center',
               },
             ]}
@@ -476,31 +449,27 @@ export default forwardRef(function Step2(
           {showDatePicker && (
             <DateTimePicker
               value={birthDate ? parseDisplayDate(birthDate) : new Date()}
-              mode='date'
-              display='default'
+              mode="date"
+              display="default"
               maximumDate={
                 new Date(new Date().setFullYear(new Date().getFullYear() - 10))
               }
               onChange={handleDateChange}
               themeVariant={colorScheme === 'dark' ? 'dark' : 'light'}
-              accentColor={Colors.dark.tint}
+              accentColor={Colors[colorScheme].tint}
             />
           )}
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
-            Género
-          </Text>
+          <Text style={[commonStyles.label, styles.label]}>Género</Text>
           {gendersLoading ? (
             <View
               style={[
                 commonStyles.input,
                 {
                   backgroundColor: Colors[colorScheme].background,
-                  borderColor: '#666',
+                  borderColor: (styles as any).input.borderColor,
                   justifyContent: 'center',
                 },
               ]}
@@ -515,7 +484,7 @@ export default forwardRef(function Step2(
                 commonStyles.input,
                 {
                   backgroundColor: Colors[colorScheme].background,
-                  borderColor: '#666',
+                  borderColor: (styles as any).input.borderColor,
                   justifyContent: 'center',
                 },
               ]}
@@ -529,7 +498,7 @@ export default forwardRef(function Step2(
                 }}
               >
                 {selectedGender
-                  ? genders.find(g => g.Id === selectedGender)?.Nombre ||
+                  ? genders.find((g) => g.Id === selectedGender)?.Nombre ||
                     'Género seleccionado'
                   : 'Selecciona tu género'}
               </Text>
@@ -541,13 +510,13 @@ export default forwardRef(function Step2(
         <Modal
           visible={showGenderModal}
           transparent={true}
-          animationType='slide'
+          animationType="slide"
           onRequestClose={() => setShowGenderModal(false)}
         >
           <TouchableOpacity
             style={{
               flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: Colors[colorScheme].overlay,
               justifyContent: 'center',
               alignItems: 'center',
               padding: 20,
@@ -680,7 +649,7 @@ export default forwardRef(function Step2(
       <Modal
         visible={showVerificationModal}
         transparent={true}
-        animationType='slide'
+        animationType="slide"
         onRequestClose={closeVerificationModal}
       >
         <TouchableOpacity
@@ -749,7 +718,7 @@ export default forwardRef(function Step2(
             {verificationStep === 'checking' ? (
               <View style={{ alignItems: 'center', paddingVertical: 20 }}>
                 <FontAwesome
-                  name='spinner'
+                  name="spinner"
                   size={32}
                   color={Colors[colorScheme].tint}
                   style={{ marginBottom: 16 }}
@@ -767,9 +736,9 @@ export default forwardRef(function Step2(
             ) : verificationStep === 'error' ? (
               <View style={{ alignItems: 'center', paddingVertical: 20 }}>
                 <FontAwesome
-                  name='exclamation-triangle'
+                  name="exclamation-triangle"
                   size={32}
-                  color='#FF6B6B'
+                  color="#FF6B6B"
                   style={{ marginBottom: 16 }}
                 />
                 <Text
@@ -825,9 +794,9 @@ export default forwardRef(function Step2(
                   disabled={isVerificationLoading}
                 >
                   <FontAwesome
-                    name='whatsapp'
+                    name="whatsapp"
                     size={20}
-                    color='white'
+                    color="white"
                     style={{ marginRight: 10 }}
                   />
                   <Text
@@ -852,9 +821,9 @@ export default forwardRef(function Step2(
                   disabled={isVerificationLoading}
                 >
                   <FontAwesome
-                    name='comment'
+                    name="comment"
                     size={20}
-                    color='white'
+                    color="white"
                     style={{ marginRight: 10 }}
                   />
                   <Text
@@ -896,7 +865,7 @@ export default forwardRef(function Step2(
                   value={otpCode}
                   onChangeText={setOtpCode}
                   placeholderTextColor={`${Colors[colorScheme].text}60`}
-                  keyboardType='number-pad'
+                  keyboardType="number-pad"
                   maxLength={6}
                 />
 

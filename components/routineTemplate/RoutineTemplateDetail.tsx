@@ -3,10 +3,11 @@ import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { routineTemplateService } from '@/services';
-import { styles } from './styles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineTemplateStyles } from './styles.themed';
 
 export function RoutineTemplateDetail() {
+  const styles = useThemedStyles(makeRoutineTemplateStyles);
   const [id, setId] = useState('');
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -27,8 +28,8 @@ export function RoutineTemplateDetail() {
   return (
     <View style={styles.formContainer}>
       <Text style={styles.formTitle}>RoutineTemplate - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

@@ -1,5 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, View as RNView } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  View as RNView,
+} from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
@@ -22,7 +27,8 @@ interface ExerciseListProps {
 
 const normalizeExercises = (list: any[]) => {
   return list.map((e: any) => {
-    const category = e.category || e.Category || e.CategoryName || e.CategoryExercise?.Name;
+    const category =
+      e.category || e.Category || e.CategoryName || e.CategoryExercise?.Name;
     return {
       _original: e,
       id: e.id || e.Id || e.ID || e.exerciseId || undefined,
@@ -83,14 +89,17 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
         if (findFunction) {
           rawList = await findFunction(term);
         } else if ((exerciseService as any).findExercisesByFields) {
-          const res: any = await (exerciseService as any).findExercisesByFields({ Name: term });
+          const res: any = await (exerciseService as any).findExercisesByFields(
+            { Name: term }
+          );
           if (res?.Success && res.Data) {
             const data: any = res.Data as any;
-            rawList = Array.isArray(data) ? data : (data?.$values || []);
+            rawList = Array.isArray(data) ? data : data?.$values || [];
           }
         }
         let normalized = normalizeExercises(rawList || []);
-        if (limit && normalized.length > limit) normalized = normalized.slice(0, limit);
+        if (limit && normalized.length > limit)
+          normalized = normalized.slice(0, limit);
         if (!cancelled) setSuggestions(normalized);
       } catch (e) {
         if (!cancelled) setError('Error al buscar');
@@ -103,7 +112,14 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [internalQuery, remoteSearch, suggestionStyle, remoteMinChars, findFunction, limit]);
+  }, [
+    internalQuery,
+    remoteSearch,
+    suggestionStyle,
+    remoteMinChars,
+    findFunction,
+    limit,
+  ]);
 
   const loadExercises = useCallback(async () => {
     // Modo remoto: sólo buscar cuando hay suficientes caracteres
@@ -115,22 +131,27 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
         if (findFunction) {
           rawList = await findFunction(term);
         } else if ((exerciseService as any).findExercisesByFields) {
-          const res: any = await (exerciseService as any).findExercisesByFields({ Name: term });
+          const res: any = await (exerciseService as any).findExercisesByFields(
+            { Name: term }
+          );
           if (res?.Success && res.Data) {
             const data: any = res.Data as any;
-            rawList = Array.isArray(data) ? data : (data?.$values || []);
+            rawList = Array.isArray(data) ? data : data?.$values || [];
           }
         } else {
           const res = await exerciseService.getAllExercises();
           if (res?.Success) {
             const raw = res.Data;
             const anyRaw: any = raw as any;
-            rawList = Array.isArray(anyRaw) ? anyRaw : (anyRaw?.$values || []);
+            rawList = Array.isArray(anyRaw) ? anyRaw : anyRaw?.$values || [];
           }
-          rawList = rawList.filter((e: any) => (e.Name || e.name || '').toLowerCase().includes(term.toLowerCase()));
+          rawList = rawList.filter((e: any) =>
+            (e.Name || e.name || '').toLowerCase().includes(term.toLowerCase())
+          );
         }
         let normalized = normalizeExercises(rawList || []);
-        if (limit && normalized.length > limit) normalized = normalized.slice(0, limit);
+        if (limit && normalized.length > limit)
+          normalized = normalized.slice(0, limit);
         return normalized;
       } catch (e) {
         return [];
@@ -140,14 +161,15 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
     // Modo local (eager): cargar todos y filtrar
     const response = await exerciseService.getAllExercises();
     const raw: any = response.Success ? response.Data : [];
-    let list: any[] = Array.isArray(raw) ? raw : (raw?.$values || []);
+    let list: any[] = Array.isArray(raw) ? raw : raw?.$values || [];
     if (!Array.isArray(list)) list = [];
     let normalized = normalizeExercises(list);
     if (internalQuery.trim()) {
       const q = internalQuery.trim().toLowerCase();
-      normalized = normalized.filter(n => n.name.toLowerCase().includes(q));
+      normalized = normalized.filter((n) => n.name.toLowerCase().includes(q));
     }
-    if (limit && normalized.length > limit) normalized = normalized.slice(0, limit);
+    if (limit && normalized.length > limit)
+      normalized = normalized.slice(0, limit);
     return normalized;
   }, [remoteSearch, internalQuery, remoteMinChars, findFunction, limit]);
 
@@ -183,14 +205,14 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
             <Text style={styles.label}>Duración:</Text>
             <Text style={styles.value}>{data.duration}</Text>
           </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Calorías:</Text>
-              <Text style={styles.value}>{data.caloriesBurned} kcal/min</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Usado en:</Text>
-              <Text style={styles.value}>{data.routineCount} rutinas</Text>
-            </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Calorías:</Text>
+            <Text style={styles.value}>{data.caloriesBurned} kcal/min</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Usado en:</Text>
+            <Text style={styles.value}>{data.routineCount} rutinas</Text>
+          </View>
         </Wrapper>
       );
     },
@@ -198,16 +220,25 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
   );
 
   const keyExtractor = useCallback((item: any, index?: number) => {
-    const id = item.id || item.Id || item.ID || (item._original && (item._original.Id || item._original.id));
+    const id =
+      item.id ||
+      item.Id ||
+      item.ID ||
+      (item._original && (item._original.Id || item._original.id));
     return id ? String(id) : `idx_${index}`;
   }, []);
 
-  const minCharsNotMet = remoteSearch && internalQuery.trim().length < remoteMinChars;
+  const minCharsNotMet =
+    remoteSearch && internalQuery.trim().length < remoteMinChars;
 
   const searchBox = enableSearch ? (
     <RNView style={styles.searchContainer}>
       <TextInput
-        placeholder={remoteSearch ? `Buscar ejercicio... (min ${remoteMinChars})` : 'Buscar ejercicio...'}
+        placeholder={
+          remoteSearch
+            ? `Buscar ejercicio... (min ${remoteMinChars})`
+            : 'Buscar ejercicio...'
+        }
         placeholderTextColor={dark ? '#888' : '#666'}
         style={[styles.searchInput, dark && styles.searchInputDark]}
         value={query}
@@ -229,17 +260,25 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
     return (
       <RNView style={containerStyle}>
         {searchBox}
-        {error && <Text style={{ color: '#FF6B35', marginBottom: 8 }}>{error}</Text>}
+        {error && (
+          <Text style={{ color: '#FF6B35', marginBottom: 8 }}>{error}</Text>
+        )}
         {minCharsNotMet ? (
-          <Text style={styles.helperText}>{`Escribe al menos ${remoteMinChars} caracteres`}</Text>
+          <Text
+            style={styles.helperText}
+          >{`Escribe al menos ${remoteMinChars} caracteres`}</Text>
         ) : loading ? (
           <Text style={styles.helperText}>Buscando...</Text>
         ) : suggestions.length > 0 ? (
           <RNView style={styles.suggestionsCard}>
             {suggestions.map((ex, idx) => {
-              const id = ex.id || (ex._original && (ex._original.id || ex._original.Id)) || idx;
+              const id =
+                ex.id ||
+                (ex._original && (ex._original.id || ex._original.Id)) ||
+                idx;
               const name = ex.name;
-              const category = (ex._original?.CategoryExercise?.Name) || ex.category;
+              const category =
+                ex._original?.CategoryExercise?.Name || ex.category;
               return (
                 <TouchableOpacity
                   key={id}
@@ -251,7 +290,9 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
                   }}
                 >
                   <Text style={styles.suggestionTitle}>{name}</Text>
-                  {category ? <Text style={styles.suggestionSub}>{category}</Text> : null}
+                  {category ? (
+                    <Text style={styles.suggestionSub}>{category}</Text>
+                  ) : null}
                 </TouchableOpacity>
               );
             })}
@@ -267,12 +308,12 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
     <RNView style={containerStyle}>
       {searchBox}
       <EntityList
-        title='Ejercicios'
+        title="Ejercicios"
         loadFunction={loadExercises}
         renderItem={renderExerciseItem}
         keyExtractor={keyExtractor}
         emptyTitle={minCharsNotMet ? 'Ingresa texto' : 'Sin resultados'}
-        loadingMessage='Buscando ejercicios...'
+        loadingMessage="Buscando ejercicios..."
         dependencies={[internalQuery, limit, remoteSearch]}
         showRefreshButton={false}
         useFlatList={!staticRender}
@@ -290,23 +331,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   cardDark: {
-    backgroundColor: '#262626'
+    backgroundColor: '#262626',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -315,38 +356,47 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   descriptionDark: {
-    color: '#B0B0B0'
+    color: '#B0B0B0',
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 100
+    minWidth: 100,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
-
+    flex: 1,
   },
   searchContainer: { marginBottom: SPACING.sm },
-  searchInput: { backgroundColor: '#EFEFEF', borderRadius: BORDER_RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: 8, color: '#000' },
+  searchInput: {
+    backgroundColor: '#EFEFEF',
+    borderRadius: BORDER_RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 8,
+    color: '#000',
+  },
   searchInputDark: { backgroundColor: '#262626', color: '#FFF' },
-  helperText: { marginTop: 4, fontSize: FONT_SIZES.xs, color: Colors.light.tabIconDefault },
+  helperText: {
+    marginTop: 4,
+    fontSize: FONT_SIZES.xs,
+    color: Colors.light.tabIconDefault,
+  },
   // estilos de sugerencias (similar a ExerciseDetailScreen dark variant)
   suggestionsCard: {
     backgroundColor: '#1E1E1E',
@@ -355,13 +405,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 4,
     marginBottom: 12,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   suggestionRow: {
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2A2A'
+    borderBottomColor: '#2A2A2A',
   },
   suggestionTitle: { color: '#FFF', fontWeight: '600' },
   suggestionSub: { color: '#AAA', fontSize: 12, marginTop: 2 },

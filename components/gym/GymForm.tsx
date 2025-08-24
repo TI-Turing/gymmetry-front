@@ -1,13 +1,15 @@
-import { TextInput, StyleSheet } from 'react-native';
+import { TextInput } from 'react-native';
 import React, { useState } from 'react';
 import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
 import { gymService } from '@/services';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymCrudStyles } from './styles/gymCrud';
 
 export function GymForm() {
+  const { styles } = useThemedStyles(makeGymCrudStyles);
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -66,11 +68,11 @@ export function GymForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (
@@ -79,29 +81,4 @@ export function GymForm() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
-  card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
-  },
-  cardText: { fontSize: 12 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
-});
-export default styles;
+export default {};

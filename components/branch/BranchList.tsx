@@ -121,13 +121,13 @@ const BranchList = React.memo(() => {
 
   return (
     <EntityList
-      title='Sucursales'
+      title="Sucursales"
       loadFunction={loadBranches}
       renderItem={renderBranchItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay sucursales'
-      emptyMessage='No se encontraron sucursales'
-      loadingMessage='Cargando sucursales...'
+      emptyTitle="No hay sucursales"
+      emptyMessage="No se encontraron sucursales"
+      loadingMessage="Cargando sucursales..."
     />
   );
 });

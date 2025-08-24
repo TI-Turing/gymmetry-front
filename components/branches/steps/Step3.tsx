@@ -37,7 +37,7 @@ export default function Step3({ branchId, onMediaUpload }: Step3Props) {
           style={styles.uploadOption}
           onPress={handleSelectImages}
         >
-          <FontAwesome name='image' size={32} color={Colors.dark.tint} />
+          <FontAwesome name="image" size={32} color={Colors.dark.tint} />
           <Text style={styles.uploadOptionTitle}>Seleccionar Imágenes</Text>
           <Text style={styles.uploadOptionDescription}>
             Galería de fotos del dispositivo
@@ -45,7 +45,7 @@ export default function Step3({ branchId, onMediaUpload }: Step3Props) {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.uploadOption} onPress={handleTakePhoto}>
-          <FontAwesome name='camera' size={32} color={Colors.dark.tint} />
+          <FontAwesome name="camera" size={32} color={Colors.dark.tint} />
           <Text style={styles.uploadOptionTitle}>Tomar Foto</Text>
           <Text style={styles.uploadOptionDescription}>
             Capturar nueva imagen
@@ -56,7 +56,7 @@ export default function Step3({ branchId, onMediaUpload }: Step3Props) {
           style={styles.uploadOption}
           onPress={handleSelectVideos}
         >
-          <FontAwesome name='video-camera' size={32} color={Colors.dark.tint} />
+          <FontAwesome name="video-camera" size={32} color={Colors.dark.tint} />
           <Text style={styles.uploadOptionTitle}>Seleccionar Videos</Text>
           <Text style={styles.uploadOptionDescription}>
             Videos del dispositivo
@@ -66,7 +66,7 @@ export default function Step3({ branchId, onMediaUpload }: Step3Props) {
 
       {/* Información sobre los archivos */}
       <View style={styles.infoContainer}>
-        <FontAwesome name='info-circle' size={16} color='#FFA726' />
+        <FontAwesome name="info-circle" size={16} color="#FFA726" />
         <Text style={styles.infoText}>
           Puedes saltarte este paso y agregar imágenes más tarde desde la
           configuración de la sede.
@@ -77,7 +77,7 @@ export default function Step3({ branchId, onMediaUpload }: Step3Props) {
       <View style={styles.previewContainer}>
         <Text style={styles.previewTitle}>Archivos seleccionados</Text>
         <View style={styles.placeholderPreview}>
-          <FontAwesome name='file-image-o' size={24} color='#666666' />
+          <FontAwesome name="file-image-o" size={24} color="#666666" />
           <Text style={styles.placeholderText}>
             Los archivos seleccionados aparecerán aquí
           </Text>

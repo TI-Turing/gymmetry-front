@@ -38,7 +38,7 @@ export default function WelcomeScreen({
               { backgroundColor: Colors[colorScheme].tint },
             ]}
           >
-            <FontAwesome name='check-circle' size={60} color='white' />
+            <FontAwesome name="check-circle" size={60} color="white" />
           </View>
 
           <Text
@@ -74,7 +74,7 @@ export default function WelcomeScreen({
           <View style={styles.infoList}>
             <View style={styles.infoItem}>
               <FontAwesome
-                name='envelope'
+                name="envelope"
                 size={16}
                 color={Colors[colorScheme].tint}
               />
@@ -88,7 +88,7 @@ export default function WelcomeScreen({
             {userData?.firstName && (
               <View style={styles.infoItem}>
                 <FontAwesome
-                  name='user'
+                  name="user"
                   size={16}
                   color={Colors[colorScheme].tint}
                 />
@@ -103,7 +103,7 @@ export default function WelcomeScreen({
             {userData?.username && (
               <View style={styles.infoItem}>
                 <FontAwesome
-                  name='at'
+                  name="at"
                   size={16}
                   color={Colors[colorScheme].tint}
                 />
@@ -128,7 +128,7 @@ export default function WelcomeScreen({
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
               <FontAwesome
-                name='calendar'
+                name="calendar"
                 size={20}
                 color={Colors[colorScheme].tint}
               />
@@ -144,7 +144,7 @@ export default function WelcomeScreen({
 
             <View style={styles.featureItem}>
               <FontAwesome
-                name='line-chart'
+                name="line-chart"
                 size={20}
                 color={Colors[colorScheme].tint}
               />
@@ -160,7 +160,7 @@ export default function WelcomeScreen({
 
             <View style={styles.featureItem}>
               <FontAwesome
-                name='users'
+                name="users"
                 size={20}
                 color={Colors[colorScheme].tint}
               />
@@ -188,9 +188,9 @@ export default function WelcomeScreen({
         >
           <Text style={styles.continueButtonText}>Comenzar mi experiencia</Text>
           <FontAwesome
-            name='arrow-right'
+            name="arrow-right"
             size={18}
-            color='white'
+            color="white"
             style={styles.buttonIcon}
           />
         </TouchableOpacity>

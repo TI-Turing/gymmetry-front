@@ -1,11 +1,5 @@
 import { useState, useCallback } from 'react';
-import {
-  Country as CountryType,
-  Region,
-  City,
-  EPS,
-  DocumentType,
-} from '@/dto/common';
+import { Region, City, EPS, DocumentType } from '@/dto/common';
 
 interface UseStep3FormResult {
   // Form data

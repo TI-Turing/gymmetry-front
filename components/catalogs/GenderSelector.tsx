@@ -7,12 +7,12 @@ export const GenderSelector = memo<GenderSelectorProps>(
   ({
     genders,
     value,
-  onSelect,
-  disabled = false,
+    onSelect,
+    disabled = false,
     loading = false,
     required = false,
     error,
-  placeholder = 'Seleccione',
+    placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar género',
     accessibilityHint = 'Presiona para abrir la lista de géneros',
   }) => {
@@ -26,7 +26,7 @@ export const GenderSelector = memo<GenderSelectorProps>(
     return (
       <>
         <BaseCatalogSelector
-          label='Género'
+          label="Género"
           value={value}
           placeholder={placeholder}
           disabled={disabled}
@@ -41,7 +41,7 @@ export const GenderSelector = memo<GenderSelectorProps>(
 
         <SelectorModal
           visible={showModal}
-          title='Selecciona tu género'
+          title="Selecciona tu género"
           data={genders}
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}

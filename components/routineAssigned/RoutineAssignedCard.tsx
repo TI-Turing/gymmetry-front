@@ -4,13 +4,21 @@ import { View, Text } from '@/components/Themed';
 import type { RoutineAssigned } from '@/models/RoutineAssigned';
 import { styles } from './styles';
 
-interface Props { assignment: RoutineAssigned; onPress?: () => void; }
+interface Props {
+  assignment: RoutineAssigned;
+  onPress?: () => void;
+}
 
 const RoutineAssignedCard: React.FC<Props> = ({ assignment, onPress }) => {
   // Backend a veces devuelve la plantilla como "RoutineTemplate" (objeto) o como
   // colección "RoutineTemplates" (array). Fallback al primer elemento si existe.
-  const template: any = assignment.RoutineTemplate || (assignment as any)?.RoutineTemplates?.[0] || null;
-  const createdAtDate = assignment?.CreatedAt ? new Date(assignment.CreatedAt) : null;
+  const template: any =
+    assignment.RoutineTemplate ||
+    (assignment as any)?.RoutineTemplates?.[0] ||
+    null;
+  const createdAtDate = assignment?.CreatedAt
+    ? new Date(assignment.CreatedAt)
+    : null;
   const Wrapper: React.ComponentType<any> = onPress ? TouchableOpacity : View;
   return (
     <Wrapper
@@ -33,11 +41,19 @@ const RoutineAssignedCard: React.FC<Props> = ({ assignment, onPress }) => {
         )}
       </View>
       {createdAtDate && (
-        <Text style={styles.text}>Asignada el {createdAtDate.toLocaleDateString()}</Text>
+        <Text style={styles.text}>
+          Asignada el {createdAtDate.toLocaleDateString()}
+        </Text>
       )}
-      <Text style={styles.status}>Estado: {assignment.IsActive ? 'Activa' : 'Inactiva'}</Text>
+      <Text style={styles.status}>
+        Estado: {assignment.IsActive ? 'Activa' : 'Inactiva'}
+      </Text>
       {onPress && (
-        <Text style={[styles.status, { marginTop: 8, fontSize: 12, opacity: 0.8 }]}>Tocar para ver rutina de hoy</Text>
+        <Text
+          style={[styles.status, { marginTop: 8, fontSize: 12, opacity: 0.8 }]}
+        >
+          Tocar para ver rutina de hoy
+        </Text>
       )}
     </Wrapper>
   );

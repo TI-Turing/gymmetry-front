@@ -17,8 +17,7 @@ export function GymPlanSelectedDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await gymPlanSelectedService.getGymPlanSelectedById(id);
+      const res = await gymPlanSelectedService.getGymPlanSelectedById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function GymPlanSelectedDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>GymPlanSelected - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

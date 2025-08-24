@@ -19,20 +19,20 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 5
+    elevation: 5,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.md
+    marginBottom: SPACING.md,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.dark.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -41,13 +41,13 @@ export const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
     backgroundColor: Colors.dark.tint,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   content: {
     fontSize: FONT_SIZES.md,
     color: '#B0B0B0',
     marginBottom: SPACING.md,
-    lineHeight: 22
+    lineHeight: 22,
   },
   authorSection: {
     flexDirection: 'row',
@@ -56,16 +56,16 @@ export const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     paddingTop: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: '#333333'
+    borderTopColor: '#333333',
   },
   author: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.tint,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   date: {
     fontSize: FONT_SIZES.sm,
-    color: '#888888'
+    color: '#888888',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -74,47 +74,47 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: '#333333',
-    backgroundColor: '#0F0F0F'
+    backgroundColor: '#0F0F0F',
   },
   statItem: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   statLabel: {
     fontSize: FONT_SIZES.xs,
     color: '#888888',
-    marginBottom: 4
+    marginBottom: 4,
   },
   statValue: {
     fontSize: FONT_SIZES.md,
     color: Colors.dark.text,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   tagsContainer: {
-    marginTop: SPACING.md
+    marginTop: SPACING.md,
   },
   tags: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.tint,
-    fontStyle: 'italic'
+    fontStyle: 'italic',
   },
 
   // Feed Form styles
   formContainer: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg
+    padding: SPACING.lg,
   },
   formTitle: {
     fontSize: FONT_SIZES.xl,
     fontWeight: '600',
     color: Colors.dark.text,
-    marginBottom: SPACING.lg
+    marginBottom: SPACING.lg,
   },
   formLabel: {
     fontSize: FONT_SIZES.md,
     fontWeight: '500',
     color: Colors.dark.text,
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   textarea: {
     borderWidth: 1,
@@ -126,29 +126,29 @@ export const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: 'top',
     marginBottom: SPACING.md,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   formRow: {
     flexDirection: 'row',
     gap: SPACING.md,
-    marginVertical: SPACING.md
+    marginVertical: SPACING.md,
   },
   info: {
     color: Colors.dark.tint,
     marginTop: SPACING.md,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   error: {
     color: '#ff6b6b',
     marginVertical: SPACING.sm,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
 
   // Feed Detail styles
   detailContainer: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg
+    padding: SPACING.lg,
   },
   detailCard: {
     backgroundColor: '#1A1A1A',
@@ -156,12 +156,12 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.xl,
     marginVertical: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
   detailText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
     fontFamily: 'monospace',
-    lineHeight: 18
-  }
+    lineHeight: 18,
+  },
 });

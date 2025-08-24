@@ -13,9 +13,11 @@ export function getObjectiveLevel(value: number): 'bajo' | 'medio' | 'alto' {
 /**
  * Parsea el JSON de TagsObjectives de manera segura
  */
-export function parseTagsObjectives(tagsObjectives: string | null): Record<string, number> {
+export function parseTagsObjectives(
+  tagsObjectives: string | null
+): Record<string, number> {
   if (!tagsObjectives) return {};
-  
+
   try {
     const parsed = JSON.parse(tagsObjectives);
     return typeof parsed === 'object' && parsed !== null ? parsed : {};
@@ -31,7 +33,7 @@ export function applyRoutineFilters(
   routines: RoutineTemplate[],
   filters: FilterState
 ): RoutineTemplate[] {
-  return routines.filter(routine => {
+  return routines.filter((routine) => {
     // Filtro de requiere equipos
     if (filters.requiereEquipos !== null) {
       const routineRequiresEquipment = Boolean(routine.RequiresEquipment);
@@ -50,16 +52,18 @@ export function applyRoutineFilters(
 
     // Filtros de objetivos
     const objectives = parseTagsObjectives(routine.TagsObjectives);
-    
-    for (const [objectiveKey, requiredLevel] of Object.entries(filters.objectives)) {
+
+    for (const [objectiveKey, requiredLevel] of Object.entries(
+      filters.objectives
+    )) {
       if (requiredLevel === null) continue;
-      
+
       const objectiveValue = objectives[objectiveKey];
       if (objectiveValue === undefined) {
         // Si el objetivo no existe en la rutina, no cumple el filtro
         return false;
       }
-      
+
       const routineLevel = getObjectiveLevel(objectiveValue);
       if (routineLevel !== requiredLevel) {
         return false;
@@ -75,12 +79,14 @@ export function applyRoutineFilters(
  */
 export function getActiveFiltersCount(filters: FilterState): number {
   let count = 0;
-  
+
   if (filters.requiereEquipos !== null) count++;
   if (filters.calistenia !== null) count++;
-  
-  count += Object.values(filters.objectives).filter(val => val !== null).length;
-  
+
+  count += Object.values(filters.objectives).filter(
+    (val) => val !== null
+  ).length;
+
   return count;
 }
 

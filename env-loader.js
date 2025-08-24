@@ -45,10 +45,12 @@ function setupEnvironmentFile() {
       // Add non-prefixed versions for Node.js compatibility
       const lines = envContent.split('\n');
       const additionalLines = [];
-      lines.forEach(line => {
+      lines.forEach((line) => {
         if (line.startsWith('EXPO_PUBLIC_')) {
           const unprefixed = line.replace('EXPO_PUBLIC_', '');
-          if (!lines.some(l => l.startsWith(unprefixed.split('=')[0] + '='))) {
+          if (
+            !lines.some((l) => l.startsWith(unprefixed.split('=')[0] + '='))
+          ) {
             additionalLines.push(unprefixed);
           }
         }
@@ -70,8 +72,8 @@ function setupEnvironmentFile() {
     try {
       const files = fs.readdirSync(envPath);
       files
-        .filter(f => f.startsWith('.env'))
-        .forEach(f => {
+        .filter((f) => f.startsWith('.env'))
+        .forEach((f) => {
           console.warn(`  - ${f}`);
         });
     } catch (err) {

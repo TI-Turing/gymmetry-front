@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Platform,
   TouchableOpacity,
   Modal,
@@ -14,6 +13,8 @@ import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 import { useI18n } from '@/i18n';
+import { makeMobileHeaderStyles } from './styles/mobileHeader';
+import { useColorScheme } from '../useColorScheme';
 
 export interface MenuOption {
   key: string;
@@ -43,6 +44,8 @@ export default function MobileHeader({
 }: MobileHeaderProps) {
   const { t } = useI18n();
   const { logout } = useAuth();
+  const colorScheme = useColorScheme();
+  const styles = makeMobileHeaderStyles(colorScheme);
   const [showMenu, setShowMenu] = useState(false);
   const [slideAnim] = useState(
     new Animated.Value(Dimensions.get('window').width)
@@ -183,7 +186,11 @@ export default function MobileHeader({
               style={styles.backButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <FontAwesome name='chevron-left' size={20} color={Colors.dark.text} />
+              <FontAwesome
+                name="chevron-left"
+                size={20}
+                color={Colors[colorScheme].text}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -203,9 +210,13 @@ export default function MobileHeader({
               style={styles.menuButton}
               onPress={openMenu}
               accessibilityLabel={t('menu_open')}
-              accessibilityRole='button'
+              accessibilityRole="button"
             >
-              <FontAwesome name='bars' size={24} color='#FFFFFF' />
+              <FontAwesome
+                name="bars"
+                size={24}
+                color={Colors[colorScheme].text}
+              />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -215,7 +226,7 @@ export default function MobileHeader({
       <Modal
         visible={showMenu}
         transparent={true}
-        animationType='none'
+        animationType="none"
         onRequestClose={closeMenu}
       >
         {/* Overlay oscuro */}
@@ -240,15 +251,19 @@ export default function MobileHeader({
                 style={styles.closeButton}
                 onPress={closeMenu}
                 accessibilityLabel={t('menu_close')}
-                accessibilityRole='button'
+                accessibilityRole="button"
               >
-                <FontAwesome name='times' size={24} color='#FFFFFF' />
+                <FontAwesome
+                  name="times"
+                  size={24}
+                  color={Colors[colorScheme].text}
+                />
               </TouchableOpacity>
             </View>
 
             {/* Opciones del menú */}
             <View style={styles.menuOptions}>
-              {currentMenuOptions.map(option => (
+              {currentMenuOptions.map((option) => (
                 <TouchableOpacity
                   key={option.key}
                   style={[
@@ -257,12 +272,12 @@ export default function MobileHeader({
                   ]}
                   onPress={option.action}
                   accessibilityLabel={option.label}
-                  accessibilityRole='button'
+                  accessibilityRole="button"
                 >
                   <FontAwesome
                     name={option.icon as any}
                     size={20}
-                    color={option.key === 'logout' ? '#FF6B6B' : '#B0B0B0'}
+                    color={Colors[colorScheme].text}
                     style={styles.menuIcon}
                   />
                   <Text
@@ -282,112 +297,3 @@ export default function MobileHeader({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#1A1A1A',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#333333',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    minHeight: 38,
-    overflow: 'hidden', // Evitar elementos decorativos
-    zIndex: 1000, // Asegurar que esté por encima de otros elementos
-    height: 55,
-  },
-  leftSlot: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  rightSlot: {
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-  },
-  centerBlock: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.dark.tint,
-  },
-  subtitle: {
-    marginTop: 1,
-    fontSize: 10,
-    color: '#B0B0B0',
-  },
-  backButton: {
-    padding: 4,
-    borderRadius: 20,
-  },
-  menuButton: {
-    padding: 6,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-start',
-  },
-  menuContainer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#121212',
-  },
-  menuHeader: {
-    height: 100,
-    backgroundColor: '#1A1A1A',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 54 : 30,
-  },
-  menuTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  menuOptions: {
-    flex: 1,
-    paddingTop: 20,
-  },
-  menuOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  logoutOption: {
-    borderBottomWidth: 0,
-    marginTop: 'auto',
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
-  },
-  menuIcon: {
-    marginRight: 20,
-    width: 24,
-    textAlign: 'center',
-  },
-  menuText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  logoutText: {
-    color: '#FF6B6B',
-  },
-});

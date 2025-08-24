@@ -27,11 +27,11 @@ export function DailyExerciseHistoryList() {
 
   return (
     <EntityList
-      title='Daily Exercise History'
+      title="Daily Exercise History"
       loadFunction={loadDailyExerciseHistories}
       renderItem={renderDailyExerciseHistoryItem}
-      keyExtractor={item => item.id?.toString() || Math.random().toString()}
-      emptyMessage='No daily exercise histories found'
+      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      emptyMessage="No daily exercise histories found"
     />
   );
 }

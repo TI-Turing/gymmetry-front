@@ -28,8 +28,8 @@ export function FeedDetail() {
   return (
     <View style={styles.detailContainer}>
       <Text style={styles.formTitle}>Feed - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

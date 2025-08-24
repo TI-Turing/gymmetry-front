@@ -169,7 +169,7 @@ class UserSessionService {
     // Buscar por código ISO primero
     if (detectedCountry.code) {
       const byCode = catalogCountries.find(
-        country =>
+        (country) =>
           country.CodigoISO?.toUpperCase() ===
           detectedCountry.code.toUpperCase()
       );
@@ -180,7 +180,7 @@ class UserSessionService {
 
     // Buscar por nombre (coincidencia exacta)
     const byExactName = catalogCountries.find(
-      country =>
+      (country) =>
         country.Nombre.toLowerCase() === detectedCountry.name.toLowerCase()
     );
     if (byExactName) {
@@ -189,7 +189,7 @@ class UserSessionService {
 
     // Buscar por nombre (coincidencia parcial)
     const byPartialName = catalogCountries.find(
-      country =>
+      (country) =>
         country.Nombre.toLowerCase().includes(
           detectedCountry.name.toLowerCase()
         ) ||

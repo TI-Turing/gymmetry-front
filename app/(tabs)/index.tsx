@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import DisciplineConsistency from '@/components/home/DisciplineConsistency';
@@ -10,10 +10,13 @@ import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { router } from 'expo-router';
 import Button from '@/components/common/Button';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeHomeStyles } from './styles/home';
 
 type DayStatus = 'completed' | 'failed' | 'rest';
 
 function HomeScreen() {
+  const styles = useThemedStyles(makeHomeStyles);
   const { showSuccess, AlertComponent } = useCustomAlert();
 
   // Datos de prueba para disciplina y consistencia
@@ -70,11 +73,11 @@ function HomeScreen() {
 
   // Calcular porcentaje de cumplimiento
   const totalWorkoutDays = disciplineData.reduce((acc, week) => {
-    return acc + week.days.filter(day => day.status !== 'rest').length;
+    return acc + week.days.filter((day) => day.status !== 'rest').length;
   }, 0);
 
   const completedDays = disciplineData.reduce((acc, week) => {
-    return acc + week.days.filter(day => day.status === 'completed').length;
+    return acc + week.days.filter((day) => day.status === 'completed').length;
   }, 0);
 
   const completionPercentage = Math.round(
@@ -108,14 +111,15 @@ function HomeScreen() {
   };
 
   const headerSubtitle = useMemo(() => {
-    return todayRoutine.routineName ? `Hoy: ${todayRoutine.routineName}` : undefined;
+    return todayRoutine.routineName
+      ? `Hoy: ${todayRoutine.routineName}`
+      : undefined;
   }, [todayRoutine.routineName]);
 
   return (
     <ScreenWrapper
-      headerTitle="Rutina"
-      headerSubtitle={headerSubtitle}
-      backgroundColor="#121212"
+      headerTitle="Gymmetry"
+      backgroundColor={styles.colors.background}
     >
       <ScrollView
         style={styles.scrollView}
@@ -145,12 +149,13 @@ function HomeScreen() {
         />
 
         {/* Acceso directo a RoutineExercise - Detalle */}
-    <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-          <Text style={{ color: '#B0B0B0', marginBottom: 8 }}>
-            Navegación de depuración
-          </Text>
+        <View style={styles.debugSection}>
+          <Text style={styles.debugLabel}>Navegación de depuración</Text>
           <View style={{ flexDirection: 'row', gap: 12 }}>
-      <Button title='Abrir RoutineExercise - Detalle' onPress={handleOpenRoutineExerciseDetail} />
+            <Button
+              title="Abrir RoutineExercise - Detalle"
+              onPress={handleOpenRoutineExerciseDetail}
+            />
           </View>
         </View>
 
@@ -161,11 +166,11 @@ function HomeScreen() {
       {/* Botón Flotante */}
       <FloatingActionButton
         onPress={handleFloatingButtonPress}
-        icon='play'
-        backgroundColor='#FF6B35'
+        icon="play"
+        backgroundColor={styles.colors.tint}
       />
 
-  {/* Fin navegación de depuración */}
+      {/* Fin navegación de depuración */}
 
       {/* Componente de Alertas */}
       <AlertComponent />
@@ -174,19 +179,3 @@ function HomeScreen() {
 }
 
 export default withWebLayout(HomeScreen, { defaultTab: 'index' });
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
-  spacer: {
-    height: 80, // Espacio para el botón flotante
-  },
-});

@@ -1,3 +1,3 @@
 export interface FindUsersByFieldsRequest {
-  fields: { [key: string]: any };
+  fields: Record<string, unknown>;
 }

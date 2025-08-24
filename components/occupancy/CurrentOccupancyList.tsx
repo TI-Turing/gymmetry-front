@@ -14,8 +14,9 @@ const CurrentOccupancyList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
 
   const renderCurrentOccupancyItem = useCallback(
@@ -34,8 +35,8 @@ const CurrentOccupancyList = React.memo(() => {
                     ? '#FF6B35'
                     : item.occupancyLevel === 'medium'
                       ? '#ffa726'
-                      : '#ff6300'
-  },
+                      : '#ff6300',
+              },
             ]}
           >
             {item.occupancyLevel === 'high'
@@ -61,8 +62,8 @@ const CurrentOccupancyList = React.memo(() => {
                     ? '#FF6B35'
                     : item.currentOccupancy / item.maxCapacity > 0.6
                       ? '#ffa726'
-                      : '#ff6300'
-  },
+                      : '#ff6300',
+              },
             ]}
           >
             {item.currentOccupancy || '0'} / {item.maxCapacity || '0'} personas
@@ -80,8 +81,8 @@ const CurrentOccupancyList = React.memo(() => {
                     ? '#FF6B35'
                     : (item.currentOccupancy / item.maxCapacity) * 100 > 60
                       ? '#ffa726'
-                      : '#ff6300'
-  },
+                      : '#ff6300',
+              },
             ]}
           >
             {item.maxCapacity
@@ -119,7 +120,7 @@ const CurrentOccupancyList = React.memo(() => {
             {item.lastUpdate
               ? new Date(item.lastUpdate).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })
               : 'Hace unos momentos'}
           </Text>
@@ -131,8 +132,8 @@ const CurrentOccupancyList = React.memo(() => {
             style={[
               styles.value,
               {
-                color: item.isOpen ? '#ff6300' : '#FF6B35'
-  },
+                color: item.isOpen ? '#ff6300' : '#FF6B35',
+              },
             ]}
           >
             {item.isOpen ? '🟢 Abierto' : '🔴 Cerrado'}
@@ -229,13 +230,13 @@ const CurrentOccupancyList = React.memo(() => {
 
   return (
     <EntityList
-      title='Ocupación Actual'
+      title="Ocupación Actual"
       loadFunction={loadCurrentOccupancy}
       renderItem={renderCurrentOccupancyItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay datos de ocupación'
-      emptyMessage='No se encontraron datos de ocupación actual'
-      loadingMessage='Cargando ocupación actual...'
+      emptyTitle="No hay datos de ocupación"
+      emptyMessage="No se encontraron datos de ocupación actual"
+      loadingMessage="Cargando ocupación actual..."
     />
   );
 });
@@ -249,20 +250,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -270,29 +271,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 160
+    minWidth: 160,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   restrictionsSection: {
     marginTop: SPACING.sm,
@@ -301,40 +302,41 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.light.tabIconDefault + '20',
     backgroundColor: '#fff3cd',
     padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm
+    borderRadius: BORDER_RADIUS.sm,
   },
   restrictionsLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#856404',
     fontWeight: '600',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   restrictionsList: {
-    gap: SPACING.xs
+    gap: SPACING.xs,
   },
   restriction: {
     fontSize: FONT_SIZES.sm,
     color: '#856404',
-    marginLeft: SPACING.sm
+    marginLeft: SPACING.sm,
   },
   recommendationsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   recommendationsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   recommendationsText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     fontStyle: 'italic',
     lineHeight: 18,
-}});
+  },
+});
 
 CurrentOccupancyList.displayName = 'CurrentOccupancyList';
 

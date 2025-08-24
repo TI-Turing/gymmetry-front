@@ -2,6 +2,8 @@ import React from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MobileHeader, { type MenuOption } from './MobileHeader';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/components/useColorScheme';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -32,8 +34,10 @@ export default function ScreenWrapper({
   menuOptions,
   // SafeArea defaults
   useSafeArea = true,
-  backgroundColor = '#121212',
+  backgroundColor,
 }: ScreenWrapperProps) {
+  const theme = useColorScheme();
+  const bg = backgroundColor || Colors[theme].background;
   const content = (
     <>
       {Platform.OS !== 'web' && showHeader && (
@@ -53,15 +57,11 @@ export default function ScreenWrapper({
 
   if (useSafeArea) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor, marginBottom: 16 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: bg, marginBottom: 16 }}>
         {content}
       </SafeAreaView>
     );
   }
 
-  return (
-    <View style={{ flex: 1, backgroundColor }}>
-      {content}
-    </View>
-  );
+  return <View style={{ flex: 1, backgroundColor: bg }}>{content}</View>;
 }

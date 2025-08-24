@@ -1,8 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../../Themed';
 import { useColorScheme } from '../../useColorScheme';
-import Colors from '@/constants/Colors';
 import CountryCodePicker, { DEFAULT_COUNTRY } from '../CountryCodePicker';
 import { userService } from '@/services/userService';
 import { catalogService } from '@/services/catalogService';
@@ -24,6 +29,8 @@ import { RegionSelector } from '@/components/catalogs/RegionSelector';
 import { CitySelector } from '@/components/catalogs/CitySelector';
 import { DocumentTypeSelector } from '@/components/catalogs/DocumentTypeSelector';
 import { EPSSelector } from '@/components/catalogs/EPSSelector';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeStep3Styles } from '../styles/step3';
 
 interface Step3Props {
   userId: string;
@@ -48,6 +55,7 @@ export default forwardRef(function Step3(
   const colorScheme = useColorScheme();
   const { showError, AlertComponent } = useCustomAlert();
   const formData = useStep3Form(initialData);
+  const styles = useThemedStyles(makeStep3Styles);
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country>(
@@ -84,7 +92,7 @@ export default forwardRef(function Step3(
     setCountriesLoading(true);
     try {
       const data = await catalogService.getCountries();
-      setCatalogData(prev => ({ ...prev, countries: data }));
+      setCatalogData((prev) => ({ ...prev, countries: data }));
     } catch {
     } finally {
       setCountriesLoading(false);
@@ -100,7 +108,7 @@ export default forwardRef(function Step3(
       setRegionsLoading(true);
       try {
         const data = await catalogService.getRegionsByCountry(countryId);
-        setCatalogData(prev => ({ ...prev, regions: data, cities: [] }));
+        setCatalogData((prev) => ({ ...prev, regions: data, cities: [] }));
       } catch {
       } finally {
         setRegionsLoading(false);
@@ -118,7 +126,7 @@ export default forwardRef(function Step3(
       setCitiesLoading(true);
       try {
         const data = await catalogService.getCitiesByRegion(regionId);
-        setCatalogData(prev => ({ ...prev, cities: data }));
+        setCatalogData((prev) => ({ ...prev, cities: data }));
       } catch {
       } finally {
         setCitiesLoading(false);
@@ -135,7 +143,7 @@ export default forwardRef(function Step3(
     setEpsLoading(true);
     try {
       const data = await catalogService.getEPS();
-      setCatalogData(prev => ({ ...prev, epsOptions: data }));
+      setCatalogData((prev) => ({ ...prev, epsOptions: data }));
     } catch {
     } finally {
       setEpsLoading(false);
@@ -153,7 +161,7 @@ export default forwardRef(function Step3(
         const data = countryId
           ? await catalogService.getDocumentTypesByCountry(countryId)
           : await catalogService.getDocumentTypes();
-        setCatalogData(prev => ({ ...prev, documentTypes: data }));
+        setCatalogData((prev) => ({ ...prev, documentTypes: data }));
       } catch {
       } finally {
         setDocumentTypesLoading(false);
@@ -166,7 +174,7 @@ export default forwardRef(function Step3(
     try {
       const sessionData = userSessionService.getUserCountryData();
       if (sessionData) {
-        setCatalogData(prev => ({ ...prev, userCountryData: sessionData }));
+        setCatalogData((prev) => ({ ...prev, userCountryData: sessionData }));
       }
     } catch {}
   }, []);
@@ -291,7 +299,7 @@ export default forwardRef(function Step3(
   // Handlers al usar componentes de catálogos reutilizables
   const onRegionSelect = useCallback(
     (id: string) => {
-      const item = catalogData.regions.find(r => r.Id === id);
+      const item = catalogData.regions.find((r) => r.Id === id);
       if (item) {
         formData.setRegion(item.Nombre);
         formData.setSelectedRegionId(item.Id);
@@ -303,7 +311,7 @@ export default forwardRef(function Step3(
 
   const onCitySelect = useCallback(
     (id: string) => {
-      const item = catalogData.cities.find(c => c.Id === id);
+      const item = catalogData.cities.find((c) => c.Id === id);
       if (item) {
         formData.setCity(item.Nombre);
         formData.setSelectedCityId(item.Id);
@@ -314,7 +322,7 @@ export default forwardRef(function Step3(
 
   const onDocumentTypeSelect = useCallback(
     (id: string) => {
-      const item = catalogData.documentTypes.find(d => d.Id === id);
+      const item = catalogData.documentTypes.find((d) => d.Id === id);
       if (item) {
         formData.setDocumentType(item.Nombre);
         formData.setSelectedDocumentTypeId(item.Id);
@@ -325,7 +333,7 @@ export default forwardRef(function Step3(
 
   const onEpsSelect = useCallback(
     (id: string) => {
-      const item = catalogData.epsOptions.find(e => e.Id === id);
+      const item = catalogData.epsOptions.find((e) => e.Id === id);
       if (item) {
         formData.setEps(item.Nombre);
         formData.setSelectedEpsId(item.Id);
@@ -337,12 +345,10 @@ export default forwardRef(function Step3(
   return (
     <ScrollView contentContainerStyle={commonStyles.container}>
       <View style={commonStyles.header}>
-        <Text style={[commonStyles.title, { color: Colors[colorScheme].text }]}>
+        <Text style={[commonStyles.title, { color: styles.colors.text }]}>
           Información personal
         </Text>
-        <Text
-          style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}
-        >
+        <Text style={[commonStyles.subtitle, { color: styles.colors.text }]}>
           Datos adicionales para tu perfil (opcional)
         </Text>
       </View>
@@ -350,26 +356,15 @@ export default forwardRef(function Step3(
       <View style={commonStyles.form}>
         {/* País (no editable) */}
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             País
           </Text>
-          <View
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: `${Colors[colorScheme].text}05`,
-                borderColor: '#666',
-                justifyContent: 'center',
-              },
-            ]}
-          >
+          <View style={[commonStyles.input, styles.inputDisabled]}>
             <Text
               style={{
                 color: formData.country
-                  ? Colors[colorScheme].text
-                  : `${Colors[colorScheme].text}60`,
+                  ? styles.colors.text
+                  : styles.colors.placeholder,
               }}
             >
               {formData.country || 'Cargando país...'}
@@ -408,25 +403,16 @@ export default forwardRef(function Step3(
 
         {/* Número de documento */}
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             Número de documento
           </Text>
           <TextInput
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
+            style={[commonStyles.input, styles.input]}
             value={formData.documentNumber}
             onChangeText={formData.handleDocumentNumberChange}
-            placeholder='Ingresa tu número de documento'
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-            keyboardType='number-pad'
+            placeholder="Ingresa tu número de documento"
+            placeholderTextColor={styles.colors.placeholder}
+            keyboardType="number-pad"
             maxLength={20}
           />
         </View>
@@ -441,33 +427,22 @@ export default forwardRef(function Step3(
 
         {/* Contacto de emergencia */}
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             Contacto de emergencia
           </Text>
           <TextInput
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
+            style={[commonStyles.input, styles.input]}
             value={formData.emergencyContact}
             onChangeText={formData.setEmergencyContact}
-            placeholder='Nombre del contacto'
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
-            autoCapitalize='words'
+            placeholder="Nombre del contacto"
+            placeholderTextColor={styles.colors.placeholder}
+            autoCapitalize="words"
           />
         </View>
 
         {/* Teléfono de emergencia */}
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             Teléfono de emergencia
           </Text>
           <View style={commonStyles.phoneRow}>
@@ -479,19 +454,12 @@ export default forwardRef(function Step3(
             </View>
             <View style={commonStyles.phoneContainer}>
               <TextInput
-                style={[
-                  commonStyles.input,
-                  {
-                    backgroundColor: Colors[colorScheme].background,
-                    color: Colors[colorScheme].text,
-                    borderColor: '#666',
-                  },
-                ]}
+                style={[commonStyles.input, styles.input]}
                 value={formData.emergencyPhone}
-                keyboardType='number-pad'
+                keyboardType="number-pad"
                 onChangeText={formData.handleEmergencyPhoneChange}
-                placeholder='3001234567'
-                placeholderTextColor={`${Colors[colorScheme].text}60`}
+                placeholder="3001234567"
+                placeholderTextColor={styles.colors.placeholder}
                 maxLength={10}
               />
             </View>
@@ -500,24 +468,15 @@ export default forwardRef(function Step3(
 
         {/* Dirección */}
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, { color: styles.colors.text }]}>
             Dirección
           </Text>
           <TextInput
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: '#666',
-              },
-            ]}
+            style={[commonStyles.input, styles.input]}
             value={formData.address}
             onChangeText={formData.setAddress}
-            placeholder='Ingresa tu dirección'
-            placeholderTextColor={`${Colors[colorScheme].text}60`}
+            placeholder="Ingresa tu dirección"
+            placeholderTextColor={styles.colors.placeholder}
             multiline
             numberOfLines={2}
           />
@@ -526,9 +485,7 @@ export default forwardRef(function Step3(
         <TouchableOpacity
           style={[
             commonStyles.button,
-            {
-              backgroundColor: Colors[colorScheme].tint,
-            },
+            styles.button,
             isLoading && commonStyles.buttonDisabled,
           ]}
           onPress={handleNext}
@@ -540,7 +497,7 @@ export default forwardRef(function Step3(
         </TouchableOpacity>
       </View>
 
-  {/* Modals propios removidos: usando componentes de catálogos reutilizables */}
+      {/* Modals propios removidos: usando componentes de catálogos reutilizables */}
 
       {/* Componente de alertas personalizado */}
       <AlertComponent />

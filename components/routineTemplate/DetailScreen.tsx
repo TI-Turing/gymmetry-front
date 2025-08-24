@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ScrollView, View as RNView, ActivityIndicator, TouchableOpacity, TextInput } from 'react-native';
+import {
+  ScrollView,
+  View as RNView,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { View, Text } from '@/components/Themed';
+import { Text } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import type { RoutineTemplate } from '@/models/RoutineTemplate';
 import { routineTemplateService } from '@/services';
@@ -21,7 +26,9 @@ export default function RoutineTemplateDetailScreen() {
   const [authorName, setAuthorName] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState<RoutineTemplate[]>([]);
-  const [debounceId, setDebounceId] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [debounceId, setDebounceId] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   const loadTemplate = useCallback(async () => {
     if (!templateId) {
@@ -34,7 +41,8 @@ export default function RoutineTemplateDetailScreen() {
     try {
       // Traer detalle directo por ID
       const res = await routineTemplateService.getRoutineTemplate(templateId);
-      const found = res?.Success && res.Data ? (res.Data as RoutineTemplate) : null;
+      const found =
+        res?.Success && res.Data ? (res.Data as RoutineTemplate) : null;
       setTemplate(found);
 
       // Gym name
@@ -42,7 +50,7 @@ export default function RoutineTemplateDetailScreen() {
       if (gymId) {
         try {
           const g = await gymService.getGymById(gymId);
-          if (g?.Success && g.Data) setGymName(g.Data.Name || g.Data.name || 'Gimnasio');
+          if (g?.Success && g.Data) setGymName(g.Data.Name || 'Gimnasio');
           else setGymName(null);
         } catch {
           setGymName(null);
@@ -56,7 +64,9 @@ export default function RoutineTemplateDetailScreen() {
         try {
           const u = await userService.getUserById(authorId);
           if (u?.Success && u.Data) {
-            setAuthorName(u.Data.UserName || u.Data.Name || `Usuario ${authorId}`);
+            setAuthorName(
+              u.Data.UserName || u.Data.Name || `Usuario ${authorId}`
+            );
           } else {
             setAuthorName(null);
           }
@@ -86,7 +96,9 @@ export default function RoutineTemplateDetailScreen() {
     }
     const t = setTimeout(async () => {
       try {
-        const res = await routineTemplateService.findRoutineTemplatesByFields({ Name: search.trim() } as any);
+        const res = await routineTemplateService.findRoutineTemplatesByFields({
+          Name: search.trim(),
+        } as any);
         let arr: any[] = [];
         if (res?.Success && res.Data) {
           if (Array.isArray(res.Data)) arr = res.Data;
@@ -103,7 +115,13 @@ export default function RoutineTemplateDetailScreen() {
 
   const objectives = useMemo(() => {
     const raw = (template as any)?.TagsObjectives as string | null | undefined;
-    if (!raw) return [] as Array<{ key: string; label: string; pct: number; score: number }>;
+    if (!raw)
+      return [] as {
+        key: string;
+        label: string;
+        pct: number;
+        score: number;
+      }[];
     let parsed: Record<string, number> | null = null;
     try {
       parsed = JSON.parse(raw);
@@ -118,11 +136,16 @@ export default function RoutineTemplateDetailScreen() {
         .replace(/_/g, ' ')
         .split(' ')
         .filter(Boolean)
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ');
     return entries.map(([key, val]) => {
       const clamped = Math.max(0, Math.min(1, Number(val) || 0));
-      return { key, label: fmt(key), pct: clamped * 100, score: Math.round(clamped * 10) };
+      return {
+        key,
+        label: fmt(key),
+        pct: clamped * 100,
+        score: Math.round(clamped * 10),
+      };
     });
   }, [template?.TagsObjectives]);
 
@@ -136,27 +159,45 @@ export default function RoutineTemplateDetailScreen() {
       backgroundColor="#1A1A1A"
     >
       {loading ? (
-        <ScrollView style={{ paddingHorizontal: 16 }} contentContainerStyle={{ paddingBottom: 24 }}>
+        <ScrollView
+          style={{ paddingHorizontal: 16 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
+        >
           {/* Búsqueda por nombre */}
           <RNView style={{ marginTop: 12, marginBottom: 8 }}>
-            <Text style={{ color: '#B0B0B0', marginBottom: 6 }}>Buscar plantilla</Text>
+            <Text style={{ color: '#B0B0B0', marginBottom: 6 }}>
+              Buscar plantilla
+            </Text>
             <TextInput
               value={search}
               onChangeText={setSearch}
               placeholder="Nombre de la plantilla"
               placeholderTextColor="#888"
-              style={{ backgroundColor: '#1E1E1E', color: '#FFF', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: '#333' }}
+              style={{
+                backgroundColor: '#1E1E1E',
+                color: '#FFF',
+                borderRadius: 10,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                borderWidth: 1,
+                borderColor: '#333',
+              }}
             />
           </RNView>
 
           {searchResults.length > 0 && (
             <RNView style={{ marginBottom: 12 }}>
-              <Text style={{ color: '#AAA', marginBottom: 8 }}>Resultados ({searchResults.length})</Text>
-              {searchResults.map(rt => (
+              <Text style={{ color: '#AAA', marginBottom: 8 }}>
+                Resultados ({searchResults.length})
+              </Text>
+              {searchResults.map((rt) => (
                 <TouchableOpacity
                   key={rt.Id}
                   onPress={() => {
-                    router.replace({ pathname: '/routine-template-detail', params: { templateId: String(rt.Id) } });
+                    router.replace({
+                      pathname: '/routine-template-detail',
+                      params: { templateId: String(rt.Id) },
+                    });
                     setSearch('');
                     setSearchResults([]);
                   }}
@@ -181,7 +222,10 @@ export default function RoutineTemplateDetailScreen() {
             {/* Objetivos barras */}
             <RNView style={{ marginTop: 10, gap: 10 }}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <RNView key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <RNView
+                  key={i}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+                >
                   <Skeleton width={160} height={14} />
                   <RNView style={{ flex: 1 }}>
                     <Skeleton width="100%" height={14} />
@@ -201,17 +245,29 @@ export default function RoutineTemplateDetailScreen() {
           <Text style={{ color: '#B0B0B0' }}>No se encontró la rutina.</Text>
         </RNView>
       ) : (
-        <ScrollView style={{ paddingHorizontal: 16 }} contentContainerStyle={{ paddingBottom: 24 }}>
+        <ScrollView
+          style={{ paddingHorizontal: 16 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
+        >
           {/* Nombre y comentarios */}
-          <Text style={{ fontSize: 18, fontWeight: '600', color: '#FFFFFF', marginTop: 12 }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: '#FFFFFF',
+              marginTop: 12,
+            }}
+          >
             {template.Name}
           </Text>
           {!!template.Comments && (
-            <Text style={{ color: '#B0B0B0', marginTop: 6 }}>{template.Comments}</Text>
+            <Text style={{ color: '#B0B0B0', marginTop: 6 }}>
+              {template.Comments}
+            </Text>
           )}
 
           {/* Autor */}
-          {((template as any)?.Author_UserId) ? (
+          {(template as any)?.Author_UserId ? (
             <TouchableOpacity
               onPress={() => {
                 // TODO: navegar al perfil del usuario con id (template as any).Author_UserId
@@ -224,7 +280,9 @@ export default function RoutineTemplateDetailScreen() {
               </Text>
             </TouchableOpacity>
           ) : (
-            <Text style={{ color: '#B0B0B0', marginTop: 12, fontStyle: 'italic' }}>
+            <Text
+              style={{ color: '#B0B0B0', marginTop: 12, fontStyle: 'italic' }}
+            >
               Plantilla prediseñada por Gymmetry
             </Text>
           )}
@@ -232,7 +290,12 @@ export default function RoutineTemplateDetailScreen() {
           {/* Gym si aplica */}
           {!!(template as any)?.GymId && (
             <TouchableOpacity
-              onPress={() => router.push({ pathname: '/(tabs)/gym', params: { gymId: (template as any).GymId } })}
+              onPress={() =>
+                router.push({
+                  pathname: '/(tabs)/gym',
+                  params: { gymId: (template as any).GymId },
+                })
+              }
               style={{ marginTop: 8 }}
             >
               <Text style={{ color: '#FF6B35', fontWeight: '600' }}>
@@ -244,23 +307,72 @@ export default function RoutineTemplateDetailScreen() {
           {/* Objetivos */}
           {objectives.length > 0 && (
             <RNView style={{ marginTop: 16 }}>
-              <RNView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text style={{ color: '#FFFFFF', fontWeight: '600' }}>Objetivos</Text>
-                <Text style={{ color: '#AAAAAA', fontSize: 12 }}>(Calculado por IA)</Text>
+              <RNView
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 8,
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontWeight: '600' }}>
+                  Objetivos
+                </Text>
+                <Text style={{ color: '#AAAAAA', fontSize: 12 }}>
+                  (Calculado por IA)
+                </Text>
               </RNView>
-              <RNView style={{ borderWidth: 1, borderColor: '#333', borderRadius: 8, padding: 12 }}>
+              <RNView
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#333',
+                  borderRadius: 8,
+                  padding: 12,
+                }}
+              >
                 <RNView style={{ gap: 10 }}>
-                  {objectives.map(item => (
-                    <RNView key={item.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Text style={{ color: '#CCCCCC', width: 160 }} numberOfLines={1}>
+                  {objectives.map((item) => (
+                    <RNView
+                      key={item.key}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <Text
+                        style={{ color: '#CCCCCC', width: 160 }}
+                        numberOfLines={1}
+                      >
                         {item.label}
                       </Text>
                       <RNView style={{ flex: 1 }}>
-                        <RNView style={{ height: 14, backgroundColor: '#2A2A2A', borderRadius: 999, overflow: 'hidden' }}>
-                          <RNView style={{ width: `${item.pct}%`, height: '100%', backgroundColor: '#FF6B35' }} />
+                        <RNView
+                          style={{
+                            height: 14,
+                            backgroundColor: '#2A2A2A',
+                            borderRadius: 999,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <RNView
+                            style={{
+                              width: `${item.pct}%`,
+                              height: '100%',
+                              backgroundColor: '#FF6B35',
+                            }}
+                          />
                         </RNView>
                       </RNView>
-                      <Text style={{ color: '#FFFFFF', width: 28, textAlign: 'right' }}>{item.score}</Text>
+                      <Text
+                        style={{
+                          color: '#FFFFFF',
+                          width: 28,
+                          textAlign: 'right',
+                        }}
+                      >
+                        {item.score}
+                      </Text>
                     </RNView>
                   ))}
                 </RNView>
@@ -273,7 +385,12 @@ export default function RoutineTemplateDetailScreen() {
             <RNView style={{ marginTop: 20 }}>
               <Button
                 title="Ver días de la rutina"
-                onPress={() => router.push({ pathname: '/routine-template-days', params: { templateId } })}
+                onPress={() =>
+                  router.push({
+                    pathname: '/routine-template-days',
+                    params: { templateId },
+                  })
+                }
               />
             </RNView>
           )}

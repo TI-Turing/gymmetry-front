@@ -19,20 +19,20 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 5
+    elevation: 5,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.md
+    marginBottom: SPACING.md,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.dark.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   difficulty: {
     fontSize: FONT_SIZES.sm,
@@ -40,22 +40,22 @@ export const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
   },
   difficultyEasy: {
-    backgroundColor: '#4CAF50'
+    backgroundColor: '#4CAF50',
   },
   difficultyMedium: {
-    backgroundColor: Colors.dark.tint
+    backgroundColor: Colors.dark.tint,
   },
   difficultyHard: {
-    backgroundColor: '#f44336'
+    backgroundColor: '#f44336',
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: '#B0B0B0',
     marginBottom: SPACING.md,
-    lineHeight: 22
+    lineHeight: 22,
   },
   categorySection: {
     flexDirection: 'row',
@@ -63,48 +63,48 @@ export const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     paddingTop: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: '#333333'
+    borderTopColor: '#333333',
   },
   categoryLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#888888',
     fontWeight: '500',
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   categoryTag: {
     backgroundColor: '#333333',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.md
+    borderRadius: BORDER_RADIUS.md,
   },
   categoryText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    fontWeight: '500'
+    fontWeight: '500',
   },
   equipmentContainer: {
-    marginTop: SPACING.md
+    marginTop: SPACING.md,
   },
   equipmentTitle: {
     fontSize: FONT_SIZES.sm,
     color: '#888888',
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   equipmentList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: SPACING.xs
+    gap: SPACING.xs,
   },
   equipmentItem: {
     backgroundColor: '#333333',
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.sm
+    borderRadius: BORDER_RADIUS.sm,
   },
   equipmentText: {
     fontSize: FONT_SIZES.xs,
-    color: Colors.dark.text
+    color: Colors.dark.text,
   },
   metricsContainer: {
     flexDirection: 'row',
@@ -113,39 +113,39 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#333333',
     backgroundColor: '#0F0F0F',
-    marginTop: SPACING.md
+    marginTop: SPACING.md,
   },
   metricItem: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   metricLabel: {
     fontSize: FONT_SIZES.xs,
     color: '#888888',
-    marginBottom: 4
+    marginBottom: 4,
   },
   metricValue: {
     fontSize: FONT_SIZES.md,
     color: Colors.dark.text,
-    fontWeight: '600'
+    fontWeight: '600',
   },
 
   // Exercise Form styles
   formContainer: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg
+    padding: SPACING.lg,
   },
   formTitle: {
     fontSize: FONT_SIZES.xl,
     fontWeight: '600',
     color: Colors.dark.text,
-    marginBottom: SPACING.lg
+    marginBottom: SPACING.lg,
   },
   formLabel: {
     fontSize: FONT_SIZES.md,
     fontWeight: '500',
     color: Colors.dark.text,
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   textarea: {
     borderWidth: 1,
@@ -157,29 +157,29 @@ export const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: 'top',
     marginBottom: SPACING.md,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   formRow: {
     flexDirection: 'row',
     gap: SPACING.md,
-    marginVertical: SPACING.md
+    marginVertical: SPACING.md,
   },
   info: {
     color: Colors.dark.tint,
     marginTop: SPACING.md,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
   error: {
     color: '#ff6b6b',
     marginVertical: SPACING.sm,
-    fontSize: FONT_SIZES.md
+    fontSize: FONT_SIZES.md,
   },
 
   // Exercise Detail styles
   detailContainer: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-    padding: SPACING.lg
+    padding: SPACING.lg,
   },
   detailCard: {
     backgroundColor: '#1A1A1A',
@@ -187,13 +187,13 @@ export const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.xl,
     marginVertical: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
   detailText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
     fontFamily: 'monospace',
-    lineHeight: 18
+    lineHeight: 18,
   },
 
   // Exercise execution styles
@@ -203,24 +203,24 @@ export const styles = StyleSheet.create({
     padding: SPACING.lg,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#333333'
+    borderColor: '#333333',
   },
   executionTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.dark.text,
     marginBottom: SPACING.md,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   timerDisplay: {
     fontSize: FONT_SIZES.huge,
     fontWeight: 'bold',
     color: Colors.dark.tint,
     textAlign: 'center',
-    marginBottom: SPACING.lg
+    marginBottom: SPACING.lg,
   },
   setsContainer: {
-    marginTop: SPACING.md
+    marginTop: SPACING.md,
   },
   setRow: {
     flexDirection: 'row',
@@ -229,30 +229,30 @@ export const styles = StyleSheet.create({
     backgroundColor: '#333333',
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   setText: {
     fontSize: FONT_SIZES.md,
     color: Colors.dark.text,
-    fontWeight: '500'
+    fontWeight: '500',
   },
   setComplete: {
-    backgroundColor: Colors.dark.tint
+    backgroundColor: Colors.dark.tint,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: '#888888',
     fontWeight: '500',
-    minWidth: 100
+    minWidth: 100,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.dark.text,
-    flex: 1
-  }
+    flex: 1,
+  },
 });

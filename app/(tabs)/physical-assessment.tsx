@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, ScrollView, View as RNView, TextInput, Platform } from 'react-native';
+import { ScrollView, View as RNView, TextInput, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import Button from '@/components/common/Button';
 import { physicalAssessmentService, authService } from '@/services';
 import type { PhysicalAssessment } from '@/models/PhysicalAssessment';
-import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import Svg, { Polyline, Circle } from 'react-native-svg';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makePhysicalAssessmentStyles } from './styles/physicalAssessment';
 
 function daysBetween(a: Date, b: Date) {
   const ms = Math.abs(b.getTime() - a.getTime());
@@ -29,7 +30,10 @@ function computeBmi(weightKgStr: string, heightCmStr: string) {
   return (w / (hm * hm)).toFixed(1);
 }
 
-function computeBmiNumber(weightKgStr: string, heightCmStr: string): number | null {
+function computeBmiNumber(
+  weightKgStr: string,
+  heightCmStr: string
+): number | null {
   const w = parseFloat(String(weightKgStr).replace(',', '.'));
   const hcm = parseFloat(String(heightCmStr).replace(',', '.'));
   if (!isFinite(w) || !isFinite(hcm) || hcm <= 0 || w <= 0) return null;
@@ -59,7 +63,7 @@ function TrendChart({
 
   const width = 100;
   const height = 40;
-  const values = data.map(p => p.y).filter(v => isFinite(v));
+  const values = data.map((p) => p.y).filter((v) => isFinite(v));
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
@@ -74,8 +78,13 @@ function TrendChart({
   return (
     <View style={{ marginBottom: 12 }}>
       <Text style={{ fontWeight: '600', marginBottom: 6 }}>{title}</Text>
-      <Svg width='100%' height={height} viewBox={`0 0 ${width} ${height}`}>
-        <Polyline points={points.join(' ')} fill='none' stroke={color} strokeWidth={1.5} />
+      <Svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`}>
+        <Polyline
+          points={points.join(' ')}
+          fill="none"
+          stroke={color}
+          strokeWidth={1.5}
+        />
         {data.length <= 24 &&
           data.map((p, i) => {
             const x = i * stepX;
@@ -90,11 +99,14 @@ function TrendChart({
 
 function PhysicalAssessmentScreen() {
   const colorScheme = useColorScheme();
+  const styles = useThemedStyles(makePhysicalAssessmentStyles);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<PhysicalAssessment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'last6Months' | 'lastYear' | 'last2Years'>('all');
+  const [filter, setFilter] = useState<
+    'all' | 'last6Months' | 'lastYear' | 'last2Years'
+  >('all');
 
   // Simple form state (subset de campos clave)
   const [height, setHeight] = useState(''); // cm
@@ -150,7 +162,8 @@ function PhysicalAssessmentScreen() {
     if (s.startsWith('.')) s = '0' + s;
     return s;
   };
-  const onChangeNumeric = (setter: (v: string) => void) => (text: string) => setter(sanitizeNumericInput(text));
+  const onChangeNumeric = (setter: (v: string) => void) => (text: string) =>
+    setter(sanitizeNumericInput(text));
   const fromZeroToEmpty = (s?: string | null) => {
     if (s == null) return '';
     const n = parseFloat(String(s).replace(',', '.'));
@@ -174,15 +187,18 @@ function PhysicalAssessmentScreen() {
       perMin: 10,
       perMax: 200,
     };
-  // Opcionales con rangos si vienen
-  if (h != null && h !== 0 && (h < 80 || h > 250)) errs.Height = 'Entre 80 y 250 cm';
-  if (w != null && w !== 0 && (w < 20 || w > 400)) errs.Weight = 'Entre 20 y 400 kg';
+    // Opcionales con rangos si vienen
+    if (h != null && h !== 0 && (h < 80 || h > 250))
+      errs.Height = 'Entre 80 y 250 cm';
+    if (w != null && w !== 0 && (w < 20 || w > 400))
+      errs.Weight = 'Entre 20 y 400 kg';
     // % grasa opcional
-    if (bf != null && (bf < 3 || bf > 70)) errs.BodyFatPercentage = 'Entre 3% y 70%';
+    if (bf != null && (bf < 3 || bf > 70))
+      errs.BodyFatPercentage = 'Entre 3% y 70%';
     // masa muscular opcional (solo no-negativa y razonable <= 100 si es %)
     if (mm != null && (mm < 0 || mm > 100)) errs.MuscleMass = '0 a 100';
     // Perímetros opcionales
-    const perimeters: Array<[string, string]> = [
+    const perimeters: [string, string][] = [
       ['Waist', waist],
       ['Chest', chest],
       ['Hips', hips],
@@ -203,7 +219,7 @@ function PhysicalAssessmentScreen() {
     ];
     perimeters.forEach(([key, val]) => {
       const n = toNum(val);
-  if (n != null && n !== 0 && (n < bounds.perMin || n > bounds.perMax)) {
+      if (n != null && n !== 0 && (n < bounds.perMin || n > bounds.perMax)) {
         errs[key] = `${bounds.perMin} a ${bounds.perMax} cm`;
       }
     });
@@ -214,7 +230,9 @@ function PhysicalAssessmentScreen() {
   const latest = useMemo(() => {
     if (!items || items.length === 0) return null as PhysicalAssessment | null;
     // Tomar el más reciente por CreatedAt
-  const sorted = [...items].sort((a, b) => (getTimeSafe(b.CreatedAt) - getTimeSafe(a.CreatedAt)));
+    const sorted = [...items].sort(
+      (a, b) => getTimeSafe(b.CreatedAt) - getTimeSafe(a.CreatedAt)
+    );
     return sorted[0];
   }, [items]);
 
@@ -223,20 +241,24 @@ function PhysicalAssessmentScreen() {
   const filteredItems = useMemo(() => items, [items]);
   const sortedItems = useMemo(() => {
     const arr = Array.isArray(filteredItems) ? [...filteredItems] : [];
-  arr.sort((a, b) => getTimeSafe(b.CreatedAt) - getTimeSafe(a.CreatedAt));
+    arr.sort((a, b) => getTimeSafe(b.CreatedAt) - getTimeSafe(a.CreatedAt));
     return arr;
   }, [filteredItems]);
 
-  const [collapsedYears, setCollapsedYears] = useState<Record<string, boolean>>({});
+  const [collapsedYears, setCollapsedYears] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     // Inicializar colapsado por año: año más reciente abierto, otros cerrados
-  const years = Array.from(new Set(sortedItems.map(it => getYearLabel(it.CreatedAt))));
+    const years = Array.from(
+      new Set(sortedItems.map((it) => getYearLabel(it.CreatedAt)))
+    );
     if (years.length === 0) return;
     const mostRecent = years[0]; // sortedItems ya viene descendente, el primero es el más reciente
-    setCollapsedYears(prev => {
+    setCollapsedYears((prev) => {
       const next: Record<string, boolean> = {};
-      years.forEach(y => {
+      years.forEach((y) => {
         next[y] = y !== mostRecent; // abrir más reciente, colapsar otros
       });
       return next;
@@ -273,11 +295,14 @@ function PhysicalAssessmentScreen() {
         body.CreatedAtFrom = start.toISOString();
         body.CreatedAtTo = end.toISOString();
       }
-      const resp = await physicalAssessmentService.findPhysicalAssessmentsByFields(body as any);
+      const resp =
+        await physicalAssessmentService.findPhysicalAssessmentsByFields(
+          body as any
+        );
       let arr: any[] = [];
       if (resp?.Success && resp.Data) {
         const raw: any = resp.Data as any;
-        arr = Array.isArray(raw) ? raw : (raw?.$values || []);
+        arr = Array.isArray(raw) ? raw : raw?.$values || [];
       }
       setItems(arr as PhysicalAssessment[]);
     } catch {
@@ -317,11 +342,27 @@ function PhysicalAssessmentScreen() {
       setWrist(fromZeroToEmpty(latest.Wrist));
       setMuscleMass(fromZeroToEmpty(latest.MuscleMass));
     } else {
-  setHeight(''); setWeight(''); setBodyFat(''); setWaist(''); setChest(''); setHips('');
-  setLeftArm(''); setRighArm(''); setLeftForearm(''); setRightForearm('');
-  setLeftThigh(''); setRightThigh(''); setLeftCalf(''); setRightCalf('');
-  setAbdomen(''); setUpperBack(''); setLowerBack(''); setNeck('');
-  setShoulders(''); setWrist(''); setMuscleMass('');
+      setHeight('');
+      setWeight('');
+      setBodyFat('');
+      setWaist('');
+      setChest('');
+      setHips('');
+      setLeftArm('');
+      setRighArm('');
+      setLeftForearm('');
+      setRightForearm('');
+      setLeftThigh('');
+      setRightThigh('');
+      setLeftCalf('');
+      setRightCalf('');
+      setAbdomen('');
+      setUpperBack('');
+      setLowerBack('');
+      setNeck('');
+      setShoulders('');
+      setWrist('');
+      setMuscleMass('');
     }
     setFormOpen(true);
   };
@@ -379,32 +420,67 @@ function PhysicalAssessmentScreen() {
 
   const renderSummary = () => {
     if (loading && items.length === 0) {
-      return <Text style={{ color: Colors[colorScheme].text + 'B3' }}>Cargando...</Text>;
+      return <Text style={{ color: styles.colors.muted }}>Cargando...</Text>;
     }
     if (!latest) {
       return (
-        <View style={[styles.card, { borderColor: Colors[colorScheme].text + '22', borderWidth: 1 }] }>
-          <Text style={[styles.emptyTitle, { color: Colors[colorScheme].text }]}>Aún no tienes datos</Text>
-          <Text style={{ color: Colors[colorScheme].text + 'B3', marginBottom: 8 }}>Registra tu evaluación física por primera vez.</Text>
-          <Button title='Registrar evaluación' onPress={openForm} />
+        <View style={styles.card}>
+          <Text style={styles.emptyTitle}>Aún no tienes datos</Text>
+          <Text style={[{ marginBottom: 8 }, { color: styles.colors.muted }]}>
+            Registra tu evaluación física por primera vez.
+          </Text>
+          <Button title="Registrar evaluación" onPress={openForm} />
         </View>
       );
     }
 
     return (
-      <View style={[styles.card, { borderColor: Colors[colorScheme].text + '22', borderWidth: 1 }]}>
-        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>Resumen</Text>
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Resumen</Text>
         <RNView style={styles.grid}>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>Peso</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{displayNum(latest.Weight)} kg</Text></View>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>Altura</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{displayNum(latest.Height)} cm</Text></View>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>Grasa</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{displayNum(latest.BodyFatPercentage)} %</Text></View>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>IMC</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{(() => { const raw = latest.Bmi || computeBmi(latest.Weight || '', latest.Height || ''); return isZeroOrEmpty(raw) ? '—' : raw; })()}</Text></View>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>Cintura</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{displayNum(latest.Waist)} cm</Text></View>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>Pecho</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{displayNum(latest.Chest)} cm</Text></View>
-          <View style={styles.item}><Text style={[styles.label, { color: Colors[colorScheme].text + 'B3' }]}>Cadera</Text><Text style={[styles.value, { color: Colors[colorScheme].text }]}>{displayNum(latest.Hips)} cm</Text></View>
+          <View style={styles.item}>
+            <Text style={styles.label}>Peso</Text>
+            <Text style={styles.value}>{displayNum(latest.Weight)} kg</Text>
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.label}>Altura</Text>
+            <Text style={styles.value}>{displayNum(latest.Height)} cm</Text>
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.label}>Grasa</Text>
+            <Text style={styles.value}>
+              {displayNum(latest.BodyFatPercentage)} %
+            </Text>
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.label}>IMC</Text>
+            <Text style={styles.value}>
+              {(() => {
+                const raw =
+                  latest.Bmi ||
+                  computeBmi(latest.Weight || '', latest.Height || '');
+                return isZeroOrEmpty(raw) ? '—' : raw;
+              })()}
+            </Text>
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.label}>Cintura</Text>
+            <Text style={styles.value}>{displayNum(latest.Waist)} cm</Text>
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.label}>Pecho</Text>
+            <Text style={styles.value}>{displayNum(latest.Chest)} cm</Text>
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.label}>Cadera</Text>
+            <Text style={styles.value}>{displayNum(latest.Hips)} cm</Text>
+          </View>
         </RNView>
-  <Text style={[styles.updatedAt, { color: Colors[colorScheme].text + 'B3' }]}>Última actualización: {formatDate(latest.UpdatedAt ?? latest.CreatedAt)}</Text>
-  <Button title='Actualizar evaluación' onPress={openForm} />
+        <Text style={styles.updatedAt}>
+          Última actualización:{' '}
+          {formatDate(latest.UpdatedAt ?? latest.CreatedAt)}
+        </Text>
+        <Button title="Actualizar evaluación" onPress={openForm} />
       </View>
     );
   };
@@ -413,84 +489,252 @@ function PhysicalAssessmentScreen() {
     if (!formOpen) return null;
     const errs = fieldErrors;
     const hasErrors = Object.keys(errs).length > 0;
-  const requiredMissing = false;
+    const requiredMissing = false;
     return (
-      <View style={[styles.formCard, { borderColor: Colors[colorScheme].text + '22', borderWidth: 1 }]}>
-        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>Evaluación física</Text>
+      <View style={styles.formCard}>
+        <Text style={styles.sectionTitle}>Evaluación física</Text>
         {/* Línea 1 */}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Peso (kg)</Text>
-  <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={weight} onChangeText={onChangeNumeric(setWeight)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Weight ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Weight}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Altura (cm)</Text>
-  <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={height} onChangeText={onChangeNumeric(setHeight)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Height ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Height}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Grasa corporal (%)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={bodyFat} onChangeText={onChangeNumeric(setBodyFat)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.BodyFatPercentage ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.BodyFatPercentage}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Masa muscular</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={muscleMass} onChangeText={onChangeNumeric(setMuscleMass)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.MuscleMass ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.MuscleMass}</Text> : null}
+        <Text style={styles.inputLabel}>Peso (kg)</Text>
+        <TextInput
+          style={styles.input}
+          value={weight}
+          onChangeText={onChangeNumeric(setWeight)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Weight ? (
+          <Text style={styles.errorText}>{errs.Weight}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Altura (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={height}
+          onChangeText={onChangeNumeric(setHeight)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Height ? (
+          <Text style={styles.errorText}>{errs.Height}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Grasa corporal (%)</Text>
+        <TextInput
+          style={styles.input}
+          value={bodyFat}
+          onChangeText={onChangeNumeric(setBodyFat)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.BodyFatPercentage ? (
+          <Text style={styles.errorText}>{errs.BodyFatPercentage}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Masa muscular</Text>
+        <TextInput
+          style={styles.input}
+          value={muscleMass}
+          onChangeText={onChangeNumeric(setMuscleMass)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.MuscleMass ? (
+          <Text style={styles.errorText}>{errs.MuscleMass}</Text>
+        ) : null}
         {/* Línea 2 */}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Cintura (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={waist} onChangeText={onChangeNumeric(setWaist)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Waist ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Waist}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Pecho (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={chest} onChangeText={onChangeNumeric(setChest)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Chest ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Chest}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Cadera (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={hips} onChangeText={onChangeNumeric(setHips)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Hips ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Hips}</Text> : null}
+        <Text style={styles.inputLabel}>Cintura (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={waist}
+          onChangeText={onChangeNumeric(setWaist)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Waist ? <Text style={styles.errorText}>{errs.Waist}</Text> : null}
+        <Text style={styles.inputLabel}>Pecho (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={chest}
+          onChangeText={onChangeNumeric(setChest)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Chest ? <Text style={styles.errorText}>{errs.Chest}</Text> : null}
+        <Text style={styles.inputLabel}>Cadera (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={hips}
+          onChangeText={onChangeNumeric(setHips)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Hips ? <Text style={styles.errorText}>{errs.Hips}</Text> : null}
         {/* Brazos */}
-        <Text style={[styles.sectionTitleSm, { color: Colors[colorScheme].text, marginTop: 12 }]}>Brazos</Text>
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Brazo izquierdo (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={leftArm} onChangeText={onChangeNumeric(setLeftArm)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.LeftArm ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.LeftArm}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Brazo derecho (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={righArm} onChangeText={onChangeNumeric(setRighArm)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.RighArm ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.RighArm}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Antebrazo izquierdo (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={leftForearm} onChangeText={onChangeNumeric(setLeftForearm)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.LeftForearm ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.LeftForearm}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Antebrazo derecho (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={rightForearm} onChangeText={onChangeNumeric(setRightForearm)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.RightForearm ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.RightForearm}</Text> : null}
+        <Text style={[styles.sectionTitleSm, { marginTop: 12 }]}>Brazos</Text>
+        <Text style={styles.inputLabel}>Brazo izquierdo (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={leftArm}
+          onChangeText={onChangeNumeric(setLeftArm)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.LeftArm ? (
+          <Text style={styles.errorText}>{errs.LeftArm}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Brazo derecho (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={righArm}
+          onChangeText={onChangeNumeric(setRighArm)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.RighArm ? (
+          <Text style={styles.errorText}>{errs.RighArm}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Antebrazo izquierdo (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={leftForearm}
+          onChangeText={onChangeNumeric(setLeftForearm)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.LeftForearm ? (
+          <Text style={styles.errorText}>{errs.LeftForearm}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Antebrazo derecho (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={rightForearm}
+          onChangeText={onChangeNumeric(setRightForearm)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.RightForearm ? (
+          <Text style={styles.errorText}>{errs.RightForearm}</Text>
+        ) : null}
         {/* Piernas */}
-        <Text style={[styles.sectionTitleSm, { color: Colors[colorScheme].text, marginTop: 12 }]}>Piernas</Text>
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Muslo izquierdo (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={leftThigh} onChangeText={onChangeNumeric(setLeftThigh)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.LeftThigh ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.LeftThigh}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Muslo derecho (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={rightThigh} onChangeText={onChangeNumeric(setRightThigh)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.RightThigh ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.RightThigh}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Pantorrilla izquierda (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={leftCalf} onChangeText={onChangeNumeric(setLeftCalf)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.LeftCalf ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.LeftCalf}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Pantorrilla derecha (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={rightCalf} onChangeText={onChangeNumeric(setRightCalf)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.RightCalf ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.RightCalf}</Text> : null}
+        <Text style={[styles.sectionTitleSm, { marginTop: 12 }]}>Piernas</Text>
+        <Text style={styles.inputLabel}>Muslo izquierdo (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={leftThigh}
+          onChangeText={onChangeNumeric(setLeftThigh)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.LeftThigh ? (
+          <Text style={styles.errorText}>{errs.LeftThigh}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Muslo derecho (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={rightThigh}
+          onChangeText={onChangeNumeric(setRightThigh)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.RightThigh ? (
+          <Text style={styles.errorText}>{errs.RightThigh}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Pantorrilla izquierda (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={leftCalf}
+          onChangeText={onChangeNumeric(setLeftCalf)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.LeftCalf ? (
+          <Text style={styles.errorText}>{errs.LeftCalf}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Pantorrilla derecha (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={rightCalf}
+          onChangeText={onChangeNumeric(setRightCalf)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.RightCalf ? (
+          <Text style={styles.errorText}>{errs.RightCalf}</Text>
+        ) : null}
         {/* Espalda y otros */}
-        <Text style={[styles.sectionTitleSm, { color: Colors[colorScheme].text, marginTop: 12 }]}>Espalda y otros</Text>
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Abdomen (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={abdomen} onChangeText={onChangeNumeric(setAbdomen)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Abdomen ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Abdomen}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Espalda alta (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={upperBack} onChangeText={onChangeNumeric(setUpperBack)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.UpperBack ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.UpperBack}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Espalda baja (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={lowerBack} onChangeText={onChangeNumeric(setLowerBack)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.LowerBack ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.LowerBack}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Cuello (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={neck} onChangeText={onChangeNumeric(setNeck)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Neck ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Neck}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Hombros (cm)</Text>
-     <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={shoulders} onChangeText={onChangeNumeric(setShoulders)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Shoulders ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Shoulders}</Text> : null}
-        <Text style={[styles.inputLabel, { color: Colors[colorScheme].text + 'B3' }]}>Muñeca (cm)</Text>
-        <TextInput style={[styles.input, { backgroundColor: Colors[colorScheme].background, color: Colors[colorScheme].text }]} value={wrist} onChangeText={onChangeNumeric(setWrist)} onBlur={validateForm} keyboardType='decimal-pad' />
-        {errs.Wrist ? <Text style={[styles.errorText, { color: Colors[colorScheme].tint }]}>{errs.Wrist}</Text> : null}
-        <RNView style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
-          <Button title='Guardar' onPress={submitForm} disabled={loading || hasErrors || requiredMissing} />
-          <Button title='Cancelar' onPress={() => setFormOpen(false)} variant='secondary' />
+        <Text style={[styles.sectionTitleSm, { marginTop: 12 }]}>
+          Espalda y otros
+        </Text>
+        <Text style={styles.inputLabel}>Abdomen (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={abdomen}
+          onChangeText={onChangeNumeric(setAbdomen)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Abdomen ? (
+          <Text style={styles.errorText}>{errs.Abdomen}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Espalda alta (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={upperBack}
+          onChangeText={onChangeNumeric(setUpperBack)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.UpperBack ? (
+          <Text style={styles.errorText}>{errs.UpperBack}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Espalda baja (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={lowerBack}
+          onChangeText={onChangeNumeric(setLowerBack)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.LowerBack ? (
+          <Text style={styles.errorText}>{errs.LowerBack}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Cuello (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={neck}
+          onChangeText={onChangeNumeric(setNeck)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Neck ? <Text style={styles.errorText}>{errs.Neck}</Text> : null}
+        <Text style={styles.inputLabel}>Hombros (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={shoulders}
+          onChangeText={onChangeNumeric(setShoulders)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Shoulders ? (
+          <Text style={styles.errorText}>{errs.Shoulders}</Text>
+        ) : null}
+        <Text style={styles.inputLabel}>Muñeca (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={wrist}
+          onChangeText={onChangeNumeric(setWrist)}
+          onBlur={validateForm}
+          keyboardType="decimal-pad"
+        />
+        {errs.Wrist ? <Text style={styles.errorText}>{errs.Wrist}</Text> : null}
+        <RNView style={styles.actionsRow}>
+          <Button
+            title="Guardar"
+            onPress={submitForm}
+            disabled={loading || hasErrors || requiredMissing}
+          />
+          <Button
+            title="Cancelar"
+            onPress={() => setFormOpen(false)}
+            variant="secondary"
+          />
         </RNView>
       </View>
     );
@@ -500,58 +744,136 @@ function PhysicalAssessmentScreen() {
     if (!items.length) return null;
     // Construir series de tendencia usando sortedItems (aplica filtros actuales)
     const weightSeries: TrendPoint[] = sortedItems
-      .map(it => { const t = getTimeSafe(it.CreatedAt); const y = parseFloat(String(it.Weight || '').replace(',', '.')); return t && isFinite(y) && y > 0 ? { x: new Date(t), y } : null; })
+      .map((it) => {
+        const t = getTimeSafe(it.CreatedAt);
+        const y = parseFloat(String(it.Weight || '').replace(',', '.'));
+        return t && isFinite(y) && y > 0 ? { x: new Date(t), y } : null;
+      })
       .filter((p): p is TrendPoint => !!p);
     const bmiSeries: TrendPoint[] = sortedItems
-      .map(it => {
-  const n = computeBmiNumber(it.Weight || '', it.Height || '');
-    const t = getTimeSafe(it.CreatedAt);
-    return n && t ? { x: new Date(t), y: n } : null;
+      .map((it) => {
+        const n = computeBmiNumber(it.Weight || '', it.Height || '');
+        const t = getTimeSafe(it.CreatedAt);
+        return n && t ? { x: new Date(t), y: n } : null;
       })
       .filter((p): p is TrendPoint => !!p);
     // Agrupar por año
-  const groups = sortedItems.reduce((acc: Record<string, PhysicalAssessment[]>, it) => {
-  const y = getYearLabel(it.CreatedAt);
-      (acc[y] ||= []).push(it);
-      return acc;
-    }, {});
+    const groups = sortedItems.reduce(
+      (acc: Record<string, PhysicalAssessment[]>, it) => {
+        const y = getYearLabel(it.CreatedAt);
+        (acc[y] ||= []).push(it);
+        return acc;
+      },
+      {}
+    );
 
     const years = Object.keys(groups).sort((a, b) => Number(b) - Number(a));
 
     return (
-      <View style={[styles.card, { borderColor: Colors[colorScheme].text + '22', borderWidth: 1 }]}>
-        <RNView style={{ flexDirection: 'row', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-          <Button title='Todos' variant={filter === 'all' ? 'primary' : 'outline'} onPress={() => setFilter('all')} size='small' />
-          <Button title='Últimos 6 meses' variant={filter === 'last6Months' ? 'primary' : 'outline'} onPress={() => setFilter('last6Months')} size='small' />
-          <Button title='Último año' variant={filter === 'lastYear' ? 'primary' : 'outline'} onPress={() => setFilter('lastYear')} size='small' />
-          <Button title='Últimos 2 años' variant={filter === 'last2Years' ? 'primary' : 'outline'} onPress={() => setFilter('last2Years')} size='small' />
+      <View style={styles.card}>
+        <RNView
+          style={{
+            flexDirection: 'row',
+            gap: 8,
+            marginBottom: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <Button
+            title="Todos"
+            variant={filter === 'all' ? 'primary' : 'outline'}
+            onPress={() => setFilter('all')}
+            size="small"
+          />
+          <Button
+            title="Últimos 6 meses"
+            variant={filter === 'last6Months' ? 'primary' : 'outline'}
+            onPress={() => setFilter('last6Months')}
+            size="small"
+          />
+          <Button
+            title="Último año"
+            variant={filter === 'lastYear' ? 'primary' : 'outline'}
+            onPress={() => setFilter('lastYear')}
+            size="small"
+          />
+          <Button
+            title="Últimos 2 años"
+            variant={filter === 'last2Years' ? 'primary' : 'outline'}
+            onPress={() => setFilter('last2Years')}
+            size="small"
+          />
         </RNView>
-        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>Historial</Text>
-        <View style={[styles.trendCard, { borderColor: Colors[colorScheme].text + '22', borderWidth: 1 }]}>
-          <TrendChart title='Tendencia de peso (kg)' data={weightSeries} color={Colors[colorScheme].tint} />
-          <TrendChart title='Tendencia de IMC' data={bmiSeries} color={Colors[colorScheme].text} />
+        <Text style={styles.sectionTitle}>Historial</Text>
+        <View style={styles.trendCard}>
+          <TrendChart
+            title="Tendencia de peso (kg)"
+            data={weightSeries}
+            color={styles.colors.tint}
+          />
+          <TrendChart
+            title="Tendencia de IMC"
+            data={bmiSeries}
+            color={styles.colors.text}
+          />
         </View>
-        {years.map(year => {
+        {years.map((year) => {
           const isCollapsed = !!collapsedYears[year];
           const list = groups[year] || [];
           return (
             <View key={year} style={{ marginBottom: 8 }}>
-              <RNView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ color: Colors[colorScheme].text, fontWeight: '700', fontSize: 16 }}>{year} <Text style={{ color: Colors[colorScheme].text + '80', fontWeight: '400' }}>({list.length})</Text></Text>
+              <RNView
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text
+                  style={{
+                    color: styles.colors.text,
+                    fontWeight: '700',
+                    fontSize: 16,
+                  }}
+                >
+                  {year}{' '}
+                  <Text
+                    style={{ color: styles.colors.muted, fontWeight: '400' }}
+                  >
+                    ({list.length})
+                  </Text>
+                </Text>
                 <Button
                   title={isCollapsed ? 'Mostrar' : 'Ocultar'}
-                  variant='outline'
-                  size='small'
-                  onPress={() => setCollapsedYears(prev => ({ ...prev, [year]: !isCollapsed }))}
+                  variant="outline"
+                  size="small"
+                  onPress={() =>
+                    setCollapsedYears((prev) => ({
+                      ...prev,
+                      [year]: !isCollapsed,
+                    }))
+                  }
                 />
               </RNView>
               {!isCollapsed && (
                 <View>
                   {list.map((it, idx) => (
-                    <View key={it.Id || idx} style={[styles.historyRow, { borderColor: Colors[colorScheme].text + '22' }]}>
-                      <Text style={{ color: Colors[colorScheme].text, fontWeight: '600' }}>{formatDate(it.CreatedAt)}</Text>
-                      <Text style={{ color: Colors[colorScheme].text + 'B3' }}>
-                        Peso {displayNum(it.Weight)} kg · Grasa {displayNum(it.BodyFatPercentage)}% · Cintura {displayNum(it.Waist)} cm · IMC {(() => { const raw = it.Bmi || computeBmi(it.Weight || '', it.Height || ''); return isZeroOrEmpty(raw) ? '—' : raw; })()}
+                    <View key={it.Id || idx} style={styles.historyRow}>
+                      <Text
+                        style={{ color: styles.colors.text, fontWeight: '600' }}
+                      >
+                        {formatDate(it.CreatedAt)}
+                      </Text>
+                      <Text style={{ color: styles.colors.muted }}>
+                        Peso {displayNum(it.Weight)} kg · Grasa{' '}
+                        {displayNum(it.BodyFatPercentage)}% · Cintura{' '}
+                        {displayNum(it.Waist)} cm · IMC{' '}
+                        {(() => {
+                          const raw =
+                            it.Bmi ||
+                            computeBmi(it.Weight || '', it.Height || '');
+                          return isZeroOrEmpty(raw) ? '—' : raw;
+                        })()}
                       </Text>
                     </View>
                   ))}
@@ -565,13 +887,24 @@ function PhysicalAssessmentScreen() {
   };
 
   return (
-    <ScreenWrapper headerTitle='Estado físico' showBackButton={false}>
-      <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
-        <View style={{ paddingTop: Platform.OS === 'web' ? 24 : 0, paddingBottom: 16 }}>
-          <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Estado físico</Text>
-          <Text style={[styles.subtitle, { color: Colors[colorScheme].text + 'B3' }]}>Consulta y actualiza tus medidas corporales</Text>
+    <ScreenWrapper headerTitle="Estado físico" showBackButton={false}>
+      <ScrollView style={styles.scroll}>
+        <View
+          style={[
+            styles.header,
+            { paddingTop: Platform.OS === 'web' ? 24 : 0 },
+          ]}
+        >
+          <Text style={styles.title}>Estado físico</Text>
+          <Text style={styles.subtitle}>
+            Consulta y actualiza tus medidas corporales
+          </Text>
         </View>
-        {error && <Text style={{ color: Colors[colorScheme].tint, marginBottom: 12 }}>{error}</Text>}
+        {error && (
+          <Text style={{ color: styles.colors.tint, marginBottom: 12 }}>
+            {error}
+          </Text>
+        )}
         {renderSummary()}
         {renderForm()}
         {renderHistory()}
@@ -582,23 +915,3 @@ function PhysicalAssessmentScreen() {
 }
 
 export default PhysicalAssessmentScreen;
-
-const styles = StyleSheet.create({
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 6 },
-  subtitle: { fontSize: 14 },
-  card: { backgroundColor: '#1E1E1E', borderRadius: 16, padding: 16, marginBottom: 16 },
-  emptyTitle: { fontWeight: '600', fontSize: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 12 },
-  sectionTitleSm: { fontSize: 14, fontWeight: '600' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
-  item: { width: '50%', marginBottom: 10 },
-  label: { fontSize: 12 },
-  value: { fontSize: 16, fontWeight: '600' },
-  updatedAt: { fontSize: 12, marginTop: 8, marginBottom: 12 },
-  formCard: { backgroundColor: '#1E1E1E', borderRadius: 16, padding: 16, marginTop: 8 },
-  inputLabel: { fontSize: 12, marginTop: 8 },
-  input: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, marginTop: 6 },
-  errorText: { fontSize: 12, marginTop: 4 },
-  historyRow: { paddingVertical: 10, borderTopWidth: 1 },
-  trendCard: { backgroundColor: '#1E1E1E', borderRadius: 12, padding: 12, marginBottom: 12 },
-});

@@ -8,12 +8,12 @@ export const CitySelector = memo<CitySelectorProps>(
     cities,
     regionId,
     value,
-  onSelect,
-  disabled = false,
+    onSelect,
+    disabled = false,
     loading = false,
     required = false,
     error,
-  placeholder = 'Seleccione',
+    placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar ciudad',
     accessibilityHint = 'Presiona para abrir la lista de ciudades',
   }) => {
@@ -23,7 +23,7 @@ export const CitySelector = memo<CitySelectorProps>(
       if (!regionId) {
         return [];
       }
-      return cities.filter(city => city.RegionId === regionId);
+      return cities.filter((city) => city.RegionId === regionId);
     }, [cities, regionId]);
 
     // Normaliza visualmente: solo la primera letra en mayúscula, resto minúsculas
@@ -33,7 +33,7 @@ export const CitySelector = memo<CitySelectorProps>(
         if (!t) return t;
         return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
       };
-      return filteredCities.map(c => ({
+      return filteredCities.map((c) => ({
         ...c,
         Nombre: capitalizeFirst(c.Nombre),
       }));
@@ -49,7 +49,7 @@ export const CitySelector = memo<CitySelectorProps>(
     return (
       <>
         <BaseCatalogSelector
-          label='Ciudad'
+          label="Ciudad"
           value={value}
           placeholder={placeholder}
           disabled={isDisabled}
@@ -64,14 +64,14 @@ export const CitySelector = memo<CitySelectorProps>(
 
         <SelectorModal
           visible={showModal}
-          title='Selecciona tu ciudad'
+          title="Selecciona tu ciudad"
           data={displayCities}
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}
           loading={loading}
           selectedId={value}
           showSearch
-          searchPlaceholder='Buscar ciudad...'
+          searchPlaceholder="Buscar ciudad..."
         />
       </>
     );

@@ -14,8 +14,9 @@ const OtpList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
 
   const renderOtpItem = useCallback(
@@ -31,8 +32,8 @@ const OtpList = React.memo(() => {
                   ? '#ff6b6b'
                   : item.isExpired
                     ? '#ffa726'
-                    : Colors.light.tabIconSelected
-  },
+                    : Colors.light.tabIconSelected,
+              },
             ]}
           >
             {item.isUsed ? 'Usado' : item.isExpired ? 'Expirado' : 'Activo'}
@@ -91,8 +92,8 @@ const OtpList = React.memo(() => {
             style={[
               styles.value,
               {
-                color: item.isExpired ? '#ff6b6b' : Colors.light.text
-  },
+                color: item.isExpired ? '#ff6b6b' : Colors.light.text,
+              },
             ]}
           >
             {item.expiresAt ? new Date(item.expiresAt).toLocaleString() : 'N/A'}
@@ -105,8 +106,8 @@ const OtpList = React.memo(() => {
             style={[
               styles.value,
               {
-                color: item.attempts >= 3 ? '#ff6b6b' : Colors.light.text
-  },
+                color: item.attempts >= 3 ? '#ff6b6b' : Colors.light.text,
+              },
             ]}
           >
             {item.attempts || 0} / {item.maxAttempts || 3}
@@ -138,13 +139,13 @@ const OtpList = React.memo(() => {
 
   return (
     <EntityList
-      title='Códigos OTP'
+      title="Códigos OTP"
       loadFunction={loadOtps}
       renderItem={renderOtpItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay códigos'
-      emptyMessage='No se encontraron códigos OTP'
-      loadingMessage='Cargando códigos OTP...'
+      emptyTitle="No hay códigos"
+      emptyMessage="No se encontraron códigos OTP"
+      loadingMessage="Cargando códigos OTP..."
     />
   );
 });
@@ -158,13 +159,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
     flex: 1,
     marginRight: SPACING.sm,
-    fontFamily: 'monospace'
+    fontFamily: 'monospace',
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -180,48 +181,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 100
+    minWidth: 100,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   usageSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   usageLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   usageDate: {
     fontSize: FONT_SIZES.sm,
     color: '#ff6b6b',
-    fontWeight: '600'
-
-}});
+    fontWeight: '600',
+  },
+});
 
 OtpList.displayName = 'OtpList';
 

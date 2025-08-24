@@ -32,7 +32,7 @@ export default function Dropdown({
   const colorScheme = useColorScheme();
 
   const filteredOptions = searchable
-    ? options.filter(option =>
+    ? options.filter((option) =>
         option.toLowerCase().includes(searchText.toLowerCase())
       )
     : options;
@@ -92,7 +92,7 @@ export default function Dropdown({
 
       <Modal
         visible={isModalVisible}
-        animationType='slide'
+        animationType="slide"
         transparent={true}
         onRequestClose={() => setIsModalVisible(false)}
       >

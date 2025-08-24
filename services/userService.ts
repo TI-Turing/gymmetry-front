@@ -82,12 +82,16 @@ export const userService = {
 
   // Métodos adicionales para compatibilidad
   async checkEmailExists(email: string): Promise<ApiResponse<boolean>> {
-    const response = await apiService.get<boolean>(`/user/check-email/${email}`);
+    const response = await apiService.get<boolean>(
+      `/user/check-email/${email}`
+    );
     return response;
   },
 
   async checkPhoneExists(phone: string): Promise<ApiResponse<boolean>> {
-    const response = await apiService.get<boolean>(`/user/check-phone/${phone}`);
+    const response = await apiService.get<boolean>(
+      `/user/check-phone/${phone}`
+    );
     return response;
   },
 
@@ -97,12 +101,15 @@ export const userService = {
   },
 
   async validateOtp(request: any): Promise<ApiResponse<boolean>> {
-    const response = await apiService.post<boolean>(`/user/validate-otp`, request);
+    const response = await apiService.post<boolean>(
+      `/user/validate-otp`,
+      request
+    );
     return response;
   },
 
   async getUsersByGym(gymId: string): Promise<ApiResponse<User[]>> {
     const response = await apiService.get<User[]>(`/user/by-gym/${gymId}`);
     return response;
-  }
+  },
 };

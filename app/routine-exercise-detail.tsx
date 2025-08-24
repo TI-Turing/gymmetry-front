@@ -1,9 +1,26 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { RoutineExerciseDetail } from '@/components/routineExercise/RoutineExerciseDetail';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import Colors from '@/constants/Colors';
+
+const makeRoutineExerciseDetailScreenStyles = (theme: 'light' | 'dark') => {
+  const palette = Colors[theme];
+  return {
+    container: { flex: 1, backgroundColor: palette.background } as const,
+    header: { padding: 12 } as const,
+    title: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: palette.text,
+    } as const,
+    content: { flex: 1, paddingHorizontal: 12 } as const,
+  };
+};
 
 export default function RoutineExerciseDetailScreen() {
+  const styles = useThemedStyles(makeRoutineExerciseDetailScreenStyles);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -15,10 +32,3 @@ export default function RoutineExerciseDetailScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { padding: 12 },
-  title: { fontSize: 18, fontWeight: '600' },
-  content: { flex: 1, paddingHorizontal: 12 },
-});

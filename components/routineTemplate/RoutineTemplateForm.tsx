@@ -5,9 +5,11 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { routineTemplateService } from '@/services';
-import { styles } from './styles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineTemplateStyles } from './styles.themed';
 
 export function RoutineTemplateForm() {
+  const styles = useThemedStyles(makeRoutineTemplateStyles);
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,8 +20,7 @@ export function RoutineTemplateForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await routineTemplateService.addRoutineTemplate(body);
+      const res = await routineTemplateService.addRoutineTemplate(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -33,8 +34,7 @@ export function RoutineTemplateForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await routineTemplateService.updateRoutineTemplate(body);
+      const res = await routineTemplateService.updateRoutineTemplate(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -47,8 +47,7 @@ export function RoutineTemplateForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res =
-        await routineTemplateService.deleteRoutineTemplate(id);
+      const res = await routineTemplateService.deleteRoutineTemplate(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');
@@ -70,11 +69,11 @@ export function RoutineTemplateForm() {
         placeholderTextColor="#666666"
       />
       <View style={styles.formRow}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

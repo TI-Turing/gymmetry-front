@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Platform,
   TextInput,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useScreenWidth } from './useScreenWidth';
 import Colors from '@/constants/Colors';
 import { router } from 'expo-router';
 import SmartImage from '@/components/common/SmartImage';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeWebHeaderStyles } from './styles/webHeader';
+import { useColorScheme } from '@/components/useColorScheme';
 
 interface WebHeaderProps {
   userName?: string;
@@ -27,6 +28,8 @@ export default function WebHeader({
   const [searchText, setSearchText] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const screenWidth = useScreenWidth();
+  const styles = useThemedStyles(makeWebHeaderStyles);
+  const theme = useColorScheme();
 
   if (Platform.OS !== 'web') {
     return null;
@@ -52,7 +55,7 @@ export default function WebHeader({
         router.push('/routine-templates');
         break;
       case 'settings':
-  router.push('/settings');
+        router.push('/settings');
         break;
       case 'physical-assessment':
         router.push('/physical-assessment');
@@ -149,14 +152,13 @@ export default function WebHeader({
           ]}
         >
           <FontAwesome
-            name='search'
+            name="search"
             size={16}
-            color='#B0B0B0'
-            style={styles.searchIcon}
+            style={[styles.searchIcon, styles.subtleIcon]}
           />
           <TextInput
             style={styles.searchInput}
-            placeholderTextColor='#B0B0B0'
+            placeholderTextColor={Colors[theme].tabIconDefault}
             value={searchText}
             onChangeText={setSearchText}
             onFocus={() => setIsSearchFocused(true)}
@@ -172,24 +174,32 @@ export default function WebHeader({
           onPress={handleUserMenuToggle}
         >
           {userAvatar ? (
-            <SmartImage uri={userAvatar} style={styles.userAvatar} deferOnDataSaver={false} />
+            <SmartImage
+              uri={userAvatar}
+              style={styles.userAvatar}
+              deferOnDataSaver={false}
+            />
           ) : (
             <View style={styles.defaultAvatar}>
-              <FontAwesome name='user' size={20} color='#FFFFFF' />
+              <FontAwesome
+                name="user"
+                size={20}
+                color={Colors[theme].background}
+              />
             </View>
           )}
           <Text style={styles.userName}>{userName}</Text>
           <FontAwesome
             name={showUserMenu ? 'chevron-up' : 'chevron-down'}
             size={12}
-            color='#B0B0B0'
+            style={styles.subtleIcon}
           />
         </TouchableOpacity>
 
         {/* Menú desplegable */}
         {showUserMenu && (
           <View style={styles.userMenu}>
-            {userMenuOptions.map(option => (
+            {userMenuOptions.map((option) => (
               <TouchableOpacity
                 key={option.key}
                 style={[
@@ -201,8 +211,12 @@ export default function WebHeader({
                 <FontAwesome
                   name={option.icon as any}
                   size={14}
-                  color={option.key === 'logout' ? '#FF6B6B' : '#B0B0B0'}
-                  style={styles.menuIcon}
+                  style={[
+                    styles.menuIcon,
+                    option.key === 'logout'
+                      ? styles.logoutIcon
+                      : styles.subtleIcon,
+                  ]}
                 />
                 <Text
                   style={[
@@ -230,143 +244,4 @@ export default function WebHeader({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    height: 60,
-    backgroundColor: '#1A1A1A',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 1000,
-  },
-  leftSpacer: {
-    width: 250, // Mismo ancho que el menú lateral
-  },
-  logoContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.dark.tint,
-    textAlign: 'center',
-  },
-  logoCompact: {
-    fontSize: 24,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  searchContainer: {
-    width: 400, // Ancho fijo más compacto
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#121212', // Mismo color del fondo principal
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    height: 40,
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    color: '#FFFFFF',
-    fontSize: 14,
-    borderWidth: 0,
-    outlineWidth: 0,
-    backgroundColor: 'transparent',
-  },
-  searchContainerFocused: {
-    borderWidth: 2,
-    borderColor: Colors.dark.tint,
-    shadowColor: Colors.dark.tint,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  userContainer: {
-    position: 'relative',
-  },
-  userButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#121212', // Mismo color del fondo principal
-  },
-  userAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  defaultAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.dark.tint,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  userName: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '500',
-    marginRight: 8,
-  },
-  userMenu: {
-    position: 'absolute',
-    top: '100%',
-    right: 0,
-    backgroundColor: '#121212', // Mismo color del fondo principal
-    borderRadius: 8,
-    marginTop: 8,
-    minWidth: 200,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-    zIndex: 1001,
-  },
-  menuOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  logoutOption: {
-    borderBottomWidth: 0,
-  },
-  menuIcon: {
-    marginRight: 12,
-    width: 16,
-  },
-  menuText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-  },
-  logoutText: {
-    color: '#FF6B6B',
-  },
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 999,
-  },
-});
+// styles via makeWebHeaderStyles

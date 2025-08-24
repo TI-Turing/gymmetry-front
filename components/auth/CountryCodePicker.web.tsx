@@ -40,7 +40,7 @@ const COUNTRIES: Country[] = [
 ];
 
 export const DEFAULT_COUNTRY =
-  COUNTRIES.find(c => c.code === 'CO') || COUNTRIES[0];
+  COUNTRIES.find((c) => c.code === 'CO') || COUNTRIES[0];
 
 interface CountryCodePickerProps {
   selectedCountry: Country;
@@ -56,7 +56,7 @@ export default function CountryCodePicker({
   const colorScheme = useColorScheme();
 
   const filteredCountries = COUNTRIES.filter(
-    country =>
+    (country) =>
       country.name.toLowerCase().includes(searchText.toLowerCase()) ||
       country.dialCode.includes(searchText)
   );
@@ -112,7 +112,7 @@ export default function CountryCodePicker({
 
       <Modal
         visible={isModalVisible}
-        animationType='slide'
+        animationType="slide"
         transparent={true}
         onRequestClose={() => setIsModalVisible(false)}
       >
@@ -167,7 +167,7 @@ export default function CountryCodePicker({
             <FlatList
               data={filteredCountries}
               renderItem={renderCountryItem}
-              keyExtractor={item => item.code}
+              keyExtractor={(item) => item.code}
               style={[
                 styles.countryList,
                 Platform.OS === 'web' && styles.countryListWeb,

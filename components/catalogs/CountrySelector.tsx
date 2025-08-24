@@ -7,12 +7,12 @@ export const CountrySelector = memo<CountrySelectorProps>(
   ({
     countries,
     value,
-  onSelect,
-  disabled = false,
+    onSelect,
+    disabled = false,
     loading = false,
     required = false,
     error,
-  placeholder = 'Seleccione',
+    placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar país',
     accessibilityHint = 'Presiona para abrir la lista de países',
   }) => {
@@ -26,7 +26,7 @@ export const CountrySelector = memo<CountrySelectorProps>(
     return (
       <>
         <BaseCatalogSelector
-          label='País'
+          label="País"
           value={value}
           placeholder={placeholder}
           disabled={disabled}
@@ -41,7 +41,7 @@ export const CountrySelector = memo<CountrySelectorProps>(
 
         <SelectorModal
           visible={showModal}
-          title='Selecciona tu país'
+          title="Selecciona tu país"
           data={countries}
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}

@@ -8,12 +8,12 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
     documentTypes,
     countryId,
     value,
-  onSelect,
-  disabled = false,
+    onSelect,
+    disabled = false,
     loading = false,
     required = false,
     error,
-  placeholder = 'Seleccione',
+    placeholder = 'Seleccione',
     accessibilityLabel = 'Seleccionar tipo de documento',
     accessibilityHint = 'Presiona para abrir la lista de tipos de documento',
   }) => {
@@ -23,7 +23,7 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
       if (!countryId) {
         return [];
       }
-      return documentTypes.filter(docType => docType.PaisId === countryId);
+      return documentTypes.filter((docType) => docType.PaisId === countryId);
     }, [documentTypes, countryId]);
 
     const isDisabled = disabled || !countryId;
@@ -36,7 +36,7 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
     return (
       <>
         <BaseCatalogSelector
-          label='Tipo de documento'
+          label="Tipo de documento"
           value={value}
           placeholder={placeholder}
           disabled={isDisabled}
@@ -51,14 +51,14 @@ export const DocumentTypeSelector = memo<DocumentTypeSelectorProps>(
 
         <SelectorModal
           visible={showModal}
-          title='Selecciona el tipo de documento'
+          title="Selecciona el tipo de documento"
           data={filteredDocumentTypes}
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}
           loading={loading}
           selectedId={value}
           showSearch
-          searchPlaceholder='Buscar tipo de documento...'
+          searchPlaceholder="Buscar tipo de documento..."
         />
       </>
     );

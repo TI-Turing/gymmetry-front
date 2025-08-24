@@ -17,8 +17,7 @@ export function NotificationOptionDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await notificationOptionService.getNotificationOptionById(id);
+      const res = await notificationOptionService.getNotificationOptionById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function NotificationOptionDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>NotificationOption - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

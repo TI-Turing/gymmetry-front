@@ -5,9 +5,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import Button from '@/components/common/Button';
 import { GymStepProps, GymStep5Data } from '../types';
 import { GymService } from '@/services/gymService';
-import { GymStyles } from '../styles/GymStyles';
-import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from '../styles/gymSteps';
 
 export default function GymStep5({
   gymId,
@@ -16,6 +16,7 @@ export default function GymStep5({
   initialData,
 }: GymStepProps<GymStep5Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
+  const { styles, colors } = useThemedStyles(makeGymStepsStyles);
   const [formData] = useState<GymStep5Data>({
     Id: gymId,
     logo: initialData?.logo || null,
@@ -72,66 +73,60 @@ export default function GymStep5({
   };
 
   return (
-    <ScrollView
-      style={GymStyles.container}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={GymStyles.step5Header}>
-        <FontAwesome name='camera' size={40} color={Colors.dark.tint} />
-        <Text style={GymStyles.step5Title}>Multimedia</Text>
-        <Text style={GymStyles.step5Subtitle}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.step5Header}>
+        <FontAwesome name="camera" size={40} color={colors.tint} />
+        <Text style={styles.step5Title}>Multimedia</Text>
+        <Text style={styles.step5Subtitle}>
           Agrega imágenes y videos para mostrar tu gimnasio (opcional)
         </Text>
       </View>
 
-      <View style={GymStyles.step5Form}>
+      <View style={styles.step5Form}>
         {/* Logo */}
-        <View style={GymStyles.step5Section}>
-          <Text style={GymStyles.step5SectionTitle}>Logo del Gimnasio</Text>
-          <TouchableOpacity
-            style={GymStyles.uploadBox}
-            onPress={handleSelectLogo}
-          >
+        <View style={styles.step5Section}>
+          <Text style={styles.step5SectionTitle}>Logo del Gimnasio</Text>
+          <TouchableOpacity style={styles.uploadBox} onPress={handleSelectLogo}>
             {formData.logo ? (
-              <View style={GymStyles.uploadedItem}>
+              <View style={styles.uploadedItem}>
                 <FontAwesome
-                  name='check-circle'
+                  name="check-circle"
                   size={24}
-                  color={Colors.dark.tint}
+                  color={colors.tint}
                 />
-                <Text style={GymStyles.uploadedText}>Logo seleccionado</Text>
+                <Text style={styles.uploadedText}>Logo seleccionado</Text>
               </View>
             ) : (
-              <View style={GymStyles.uploadPlaceholder}>
-                <FontAwesome name='plus' size={24} color={Colors.dark.tint} />
-                <Text style={GymStyles.uploadText}>Seleccionar Logo</Text>
+              <View style={styles.uploadPlaceholder}>
+                <FontAwesome name="plus" size={24} color={colors.tint} />
+                <Text style={styles.uploadText}>Seleccionar Logo</Text>
               </View>
             )}
           </TouchableOpacity>
         </View>
 
         {/* Imagen de Portada */}
-        <View style={GymStyles.step5Section}>
-          <Text style={GymStyles.step5SectionTitle}>Imagen de Portada</Text>
+        <View style={styles.step5Section}>
+          <Text style={styles.step5SectionTitle}>Imagen de Portada</Text>
           <TouchableOpacity
-            style={GymStyles.uploadBox}
+            style={styles.uploadBox}
             onPress={handleSelectCoverImage}
           >
             {formData.coverImage ? (
-              <View style={GymStyles.uploadedItem}>
+              <View style={styles.uploadedItem}>
                 <FontAwesome
-                  name='check-circle'
+                  name="check-circle"
                   size={24}
-                  color={Colors.dark.tint}
+                  color={colors.tint}
                 />
-                <Text style={GymStyles.uploadedText}>
+                <Text style={styles.uploadedText}>
                   Imagen de portada seleccionada
                 </Text>
               </View>
             ) : (
-              <View style={GymStyles.uploadPlaceholder}>
-                <FontAwesome name='plus' size={24} color={Colors.dark.tint} />
-                <Text style={GymStyles.uploadText}>
+              <View style={styles.uploadPlaceholder}>
+                <FontAwesome name="plus" size={24} color={colors.tint} />
+                <Text style={styles.uploadText}>
                   Seleccionar Imagen de Portada
                 </Text>
               </View>
@@ -140,19 +135,15 @@ export default function GymStep5({
         </View>
 
         {/* Galería de Imágenes */}
-        <View style={GymStyles.step5Section}>
-          <Text style={GymStyles.step5SectionTitle}>Galería de Imágenes</Text>
+        <View style={styles.step5Section}>
+          <Text style={styles.step5SectionTitle}>Galería de Imágenes</Text>
           <TouchableOpacity
-            style={GymStyles.uploadBox}
+            style={styles.uploadBox}
             onPress={handleAddGalleryImage}
           >
-            <View style={GymStyles.uploadPlaceholder}>
-              <FontAwesome
-                name='picture-o'
-                size={24}
-                color={Colors.dark.tint}
-              />
-              <Text style={GymStyles.uploadText}>
+            <View style={styles.uploadPlaceholder}>
+              <FontAwesome name="picture-o" size={24} color={colors.tint} />
+              <Text style={styles.uploadText}>
                 Agregar Imágenes ({formData.galleryImages.length})
               </Text>
             </View>
@@ -160,40 +151,33 @@ export default function GymStep5({
         </View>
 
         {/* Videos */}
-        <View style={GymStyles.step5Section}>
-          <Text style={GymStyles.step5SectionTitle}>Videos</Text>
-          <TouchableOpacity
-            style={GymStyles.uploadBox}
-            onPress={handleAddVideo}
-          >
-            <View style={GymStyles.uploadPlaceholder}>
-              <FontAwesome
-                name='video-camera'
-                size={24}
-                color={Colors.dark.tint}
-              />
-              <Text style={GymStyles.uploadText}>
+        <View style={styles.step5Section}>
+          <Text style={styles.step5SectionTitle}>Videos</Text>
+          <TouchableOpacity style={styles.uploadBox} onPress={handleAddVideo}>
+            <View style={styles.uploadPlaceholder}>
+              <FontAwesome name="video-camera" size={24} color={colors.tint} />
+              <Text style={styles.uploadText}>
                 Agregar Videos ({formData.videos.length})
               </Text>
             </View>
           </TouchableOpacity>
         </View>
 
-        <View style={GymStyles.step5InfoContainer}>
-          <FontAwesome name='info-circle' size={16} color='#B0B0B0' />
-          <Text style={GymStyles.step5InfoText}>
+        <View style={styles.step5InfoContainer}>
+          <FontAwesome name="info-circle" size={16} color={colors.muted} />
+          <Text style={styles.step5InfoText}>
             Todos los archivos multimedia son opcionales. Podrás agregarlos más
             tarde desde tu perfil.
           </Text>
         </View>
       </View>
 
-      <View style={GymStyles.step5ButtonContainer}>
+      <View style={styles.step5ButtonContainer}>
         <Button
-          title='Finalizar Registro'
+          title="Finalizar Registro"
           onPress={handleFinish}
           loading={isLoading}
-          style={GymStyles.finishButton}
+          style={styles.finishButton}
         />
       </View>
       <AlertComponent />

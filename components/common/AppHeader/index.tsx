@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appHeaderStyles as styles } from './styles';
+import { makeAppHeaderStyles } from './styles';
+import { useColorScheme } from '@/components/useColorScheme';
 import { useI18n } from '@/i18n';
 
 interface AppHeaderProps {
@@ -22,6 +23,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   containerStyle,
 }) => {
   const { t } = useI18n();
+  const colorScheme = useColorScheme();
+  const styles = makeAppHeaderStyles(colorScheme);
   const Wrapper: any = Platform.OS === 'web' ? View : SafeAreaView;
 
   return (
@@ -46,7 +49,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             <Image
               source={require('@/assets/images/icon.png')}
               style={styles.logo}
-              resizeMode='contain'
+              resizeMode="contain"
             />
           </View>
           {title ? <Text style={styles.title}>{title}</Text> : null}

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import StepsBar from '@/components/auth/steps/StepsBar';
 import GymStep1 from './steps/GymStep1';
@@ -7,6 +6,8 @@ import GymStep2 from './steps/GymStep2';
 import GymStep3 from './steps/GymStep3';
 import GymStep4 from './steps/GymStep4';
 import GymStep5 from './steps/GymStep5';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from './styles/gymSteps';
 import {
   GymRegistrationStepsProps,
   GymCompleteData,
@@ -30,6 +31,7 @@ export default function GymRegistrationSteps({
   onComplete,
   onCancel,
 }: GymRegistrationStepsProps) {
+  const { styles } = useThemedStyles(makeGymStepsStyles);
   const [currentStep, setCurrentStep] = useState(0);
   const [gymData, setGymData] = useState<Partial<GymCompleteData>>({});
   const [gymId, setGymId] = useState<string>('');
@@ -38,22 +40,22 @@ export default function GymRegistrationSteps({
     if (data.gymId) {
       setGymId(data.gymId);
     }
-    setGymData(prev => ({ ...prev, ...data }));
+    setGymData((prev) => ({ ...prev, ...data }));
     setCurrentStep(1);
   };
 
   const handleStep2Complete = (data: GymStep2Data) => {
-    setGymData(prev => ({ ...prev, ...data }));
+    setGymData((prev) => ({ ...prev, ...data }));
     setCurrentStep(2);
   };
 
   const handleStep3Complete = (data: GymStep3Data) => {
-    setGymData(prev => ({ ...prev, ...data }));
+    setGymData((prev) => ({ ...prev, ...data }));
     setCurrentStep(3);
   };
 
   const handleStep4Complete = (data: GymStep4Data) => {
-    setGymData(prev => ({ ...prev, ...data }));
+    setGymData((prev) => ({ ...prev, ...data }));
     setCurrentStep(4);
   };
 
@@ -133,23 +135,7 @@ export default function GymRegistrationSteps({
       </View>
 
       {/* Contenido del paso actual */}
-      <View style={styles.stepContent}>{renderCurrentStep()}</View>
+      <View style={{ flex: 1 }}>{renderCurrentStep()}</View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  stepsContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  stepContent: {
-    flex: 1,
-  },
-});

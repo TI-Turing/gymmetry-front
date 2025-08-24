@@ -95,8 +95,8 @@ const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
           { backgroundColor: Colors[colorScheme].tint },
         ]}
         onPress={onRetry}
-        accessibilityRole='button'
-        accessibilityLabel='Reintentar'
+        accessibilityRole="button"
+        accessibilityLabel="Reintentar"
       >
         <Text style={styles.retryButtonText}>Reintentar</Text>
       </TouchableOpacity>

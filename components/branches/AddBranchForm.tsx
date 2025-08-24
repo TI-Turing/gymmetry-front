@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
-import { UI_CONSTANTS } from '@/constants/AppConstants';
 import {
   BranchApiService as BranchService,
   CreateBranchRequest,
 } from '@/services/branchServiceNew';
 import { authService } from '@/services/authService';
 import { Step1, Step2, Step3 } from './steps';
+import { useCustomAlert } from '@/components/common/CustomAlert';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from '@/components/gym/styles/gymSteps';
 
 interface AddBranchFormProps {
   onComplete: (branchId: string) => void;
@@ -26,6 +21,9 @@ export default function AddBranchForm({
   onComplete,
   onCancel,
 }: AddBranchFormProps) {
+  const { styles, colors } = useThemedStyles(makeGymStepsStyles);
+  const { showAlert, showError, showSuccess, AlertComponent } =
+    useCustomAlert();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [branchId, setBranchId] = useState<string>('');
@@ -43,10 +41,10 @@ export default function AddBranchForm({
   });
 
   const handleFormDataChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -76,8 +74,9 @@ export default function AddBranchForm({
   const handleNextStep = async () => {
     if (currentStep === 1) {
       if (!validateStep1()) {
-        Alert.alert(
-          'Error',
+        showAlert(
+          'warning',
+          'Formulario incompleto',
           'Por favor completa todos los campos obligatorios'
         );
         return;
@@ -107,12 +106,12 @@ export default function AddBranchForm({
       if (response.Success) {
         setBranchId(response.Data || '');
         setCurrentStep(2);
-        Alert.alert('Éxito', 'Sede creada correctamente');
+        showSuccess('Sede creada correctamente');
       } else {
-        Alert.alert('Error', response.Message || 'Error al crear la sede');
+        showError(response.Message || 'Error al crear la sede');
       }
     } catch {
-      Alert.alert('Error', 'Error al crear la sede');
+      showError('Error al crear la sede');
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +125,7 @@ export default function AddBranchForm({
 
   const renderStepIndicator = () => (
     <View style={styles.stepIndicator}>
-      {[1, 2, 3].map(step => (
+      {[1, 2, 3].map((step) => (
         <View key={step} style={styles.stepIndicatorContainer}>
           <View
             style={[
@@ -184,16 +183,16 @@ export default function AddBranchForm({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
-          <FontAwesome name='times' size={24} color='#FFFFFF' />
+        <TouchableOpacity onPress={onCancel} style={{ padding: 8 }}>
+          <FontAwesome name="times" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Agregar Sede</Text>
-        <View style={styles.placeholder} />
+        <View style={{ width: 40 }} />
       </View>
 
       {renderStepIndicator()}
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         {renderCurrentStep()}
       </ScrollView>
 
@@ -205,7 +204,7 @@ export default function AddBranchForm({
         )}
 
         <TouchableOpacity
-          style={[styles.nextButton, isLoading && styles.nextButtonDisabled]}
+          style={[styles.nextButton, isLoading && { opacity: 0.6 }]}
           onPress={handleNextStep}
           disabled={isLoading}
         >
@@ -214,110 +213,9 @@ export default function AddBranchForm({
           </Text>
         </TouchableOpacity>
       </View>
+      <AlertComponent />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: UI_CONSTANTS.SPACING.LG,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  cancelButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  placeholder: {
-    width: 40,
-  },
-  stepIndicator: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: UI_CONSTANTS.SPACING.LG,
-    paddingHorizontal: UI_CONSTANTS.SPACING.XL,
-  },
-  stepIndicatorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  stepCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#333333',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#555555',
-  },
-  stepCircleActive: {
-    backgroundColor: Colors.dark.tint,
-    borderColor: Colors.dark.tint,
-  },
-  stepNumber: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#888888',
-  },
-  stepNumberActive: {
-    color: '#FFFFFF',
-  },
-  stepLine: {
-    width: 40,
-    height: 2,
-    backgroundColor: '#333333',
-    marginHorizontal: 8,
-  },
-  stepLineActive: {
-    backgroundColor: Colors.dark.tint,
-  },
-  content: {
-    flex: 1,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: UI_CONSTANTS.SPACING.LG,
-    borderTopWidth: 1,
-    borderTopColor: '#333333',
-  },
-  backButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#555555',
-  },
-  backButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  nextButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: Colors.dark.tint,
-  },
-  nextButtonDisabled: {
-    backgroundColor: '#555555',
-  },
-  nextButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+// Reutilizamos la fábrica de estilos de los pasos del gimnasio para consistencia visual
+// y soporte claro/oscuro.

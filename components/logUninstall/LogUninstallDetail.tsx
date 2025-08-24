@@ -29,8 +29,8 @@ export function LogUninstallDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>LogUninstall - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

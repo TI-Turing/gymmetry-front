@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { I18nManager, Platform } from 'react-native';
+import { I18nManager } from 'react-native';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 type Dict = Record<string, string>;
@@ -66,7 +66,8 @@ const es: Dict = {
   // Alerts/messages
   fill_all_fields: 'Por favor completa todos los campos',
   unknown_error: 'Error desconocido',
-  connection_error: 'Error de conexión. Verifica tu conexión a internet e intenta nuevamente.',
+  connection_error:
+    'Error de conexión. Verifica tu conexión a internet e intenta nuevamente.',
   incorrect_credentials: 'Credenciales incorrectas',
   server_error: 'Error del servidor. Intenta más tarde.',
   get_user_error: 'Error al obtener los datos del usuario',
@@ -157,10 +158,17 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const { settings } = useAppSettings();
 
   const lang = useMemo(() => {
-    if (settings.language === 'es' || settings.language === 'en') return settings.language;
+    if (settings.language === 'es' || settings.language === 'en')
+      return settings.language;
     // auto: intenta por locale del dispositivo
     try {
-      const nav = (typeof navigator !== 'undefined' ? (navigator as any) : null);
+      const nav =
+        typeof navigator !== 'undefined'
+          ? (navigator as unknown as {
+              language?: string;
+              userLanguage?: string;
+            })
+          : null;
       const locale = (nav?.language || nav?.userLanguage || '').toLowerCase();
       if (locale.startsWith('es')) return 'es';
       return 'en';
@@ -169,22 +177,23 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     }
   }, [settings.language]);
 
-  const value = useMemo<I18nCtx>(() => ({
-    lang,
-    t: (key: string) => {
-      const d = dicts[lang] || es;
-      return d[key] ?? key;
-    },
-  }), [lang]);
+  const value = useMemo<I18nCtx>(
+    () => ({
+      lang,
+      t: (key: string) => {
+        const d = dicts[lang] || es;
+        return d[key] ?? key;
+      },
+    }),
+    [lang]
+  );
 
   // LTR/RTL si se expandiera a idiomas RTL en el futuro
   useMemo(() => {
     I18nManager.allowRTL(false);
-  }, [lang]);
+  }, []);
 
-  return (
-    <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
-  );
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n() {

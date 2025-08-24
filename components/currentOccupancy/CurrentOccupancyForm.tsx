@@ -18,8 +18,7 @@ export function CurrentOccupancyForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await currentOccupancyService.addCurrentOccupancy(body);
+      const res = await currentOccupancyService.addCurrentOccupancy(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -33,8 +32,7 @@ export function CurrentOccupancyForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await currentOccupancyService.updateCurrentOccupancy(body);
+      const res = await currentOccupancyService.updateCurrentOccupancy(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -47,8 +45,7 @@ export function CurrentOccupancyForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res =
-        await currentOccupancyService.deleteCurrentOccupancy(id);
+      const res = await currentOccupancyService.deleteCurrentOccupancy(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');
@@ -69,11 +66,11 @@ export function CurrentOccupancyForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

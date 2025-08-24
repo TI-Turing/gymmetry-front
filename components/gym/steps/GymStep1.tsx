@@ -8,8 +8,8 @@ import Button from '@/components/common/Button';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { GymStep1Data, GymStepProps } from '../types';
 import { GymService } from '@/services/gymService';
-import Colors from '@/constants/Colors';
-import { GymStyles } from '../styles/GymStyles';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from '../styles/gymSteps';
 
 export default function GymStep1({
   onNext,
@@ -18,6 +18,7 @@ export default function GymStep1({
   isLoading = false,
 }: GymStepProps<GymStep1Data>) {
   const { showError, AlertComponent } = useCustomAlert();
+  const { styles, colors } = useThemedStyles(makeGymStepsStyles);
 
   const [formData, setFormData] = useState<GymStep1Data>({
     name: initialData?.name || '',
@@ -31,13 +32,13 @@ export default function GymStep1({
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field: keyof GymStep1Data, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
     // Limpiar error cuando el usuario empiece a escribir
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [field]: '',
       }));
@@ -76,7 +77,13 @@ export default function GymStep1({
       // Obtener userId del almacenamiento local
       const userId = (await AsyncStorage.getItem('@user_id')) || '';
       // Registrar gimnasio inicial y obtener ID
-      const payload = { ...formData, owner_UserId: userId };
+      const payload = {
+        Name: formData.name,
+        Email: formData.email,
+        Nit: formData.nit,
+        CountryId: 'CO',
+        Owner_UserId: userId,
+      };
       const response = await GymService.registerGym(payload);
       if (response.Success && response.Data) {
         // Pasar los datos junto con gymId y owner_UserId al siguiente paso
@@ -98,64 +105,60 @@ export default function GymStep1({
   return (
     <>
       <KeyboardAvoidingView
-        style={GymStyles.container}
+        style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          style={GymStyles.scrollView}
+          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={GymStyles.scrollContent}
+          contentContainerStyle={styles.scrollContent}
         >
           {/* Header */}
-          <View style={GymStyles.header}>
-            <Text style={GymStyles.headerTitle}>Información Básica</Text>
-            <Text style={GymStyles.headerSubtitle}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Información Básica</Text>
+            <Text style={styles.headerSubtitle}>
               Comencemos con los datos principales de tu gimnasio
             </Text>
           </View>
 
           {/* Formulario */}
-          <View style={GymStyles.form}>
+          <View style={styles.form}>
             <FormInput
-              label='Nombre del Gimnasio *'
+              label="Nombre del Gimnasio *"
               value={formData.name}
-              onChangeText={value => handleInputChange('name', value)}
+              onChangeText={(value) => handleInputChange('name', value)}
               error={errors.name}
             />
 
             <FormInput
-              label='Email Corporativo *'
+              label="Email Corporativo *"
               value={formData.email}
-              onChangeText={value => handleInputChange('email', value)}
-              keyboardType='email-address'
-              autoCapitalize='none'
+              onChangeText={(value) => handleInputChange('email', value)}
+              keyboardType="email-address"
+              autoCapitalize="none"
               error={errors.email}
             />
 
             <FormInput
-              label='Teléfono Principal *'
+              label="Teléfono Principal *"
               value={formData.phone}
-              onChangeText={value => handleInputChange('phone', value)}
-              keyboardType='phone-pad'
+              onChangeText={(value) => handleInputChange('phone', value)}
+              keyboardType="phone-pad"
               error={errors.phone}
             />
 
             <FormInput
-              label='NIT o Identificación Tributaria *'
+              label="NIT o Identificación Tributaria *"
               value={formData.nit}
-              onChangeText={value => handleInputChange('nit', value)}
+              onChangeText={(value) => handleInputChange('nit', value)}
               error={errors.nit}
             />
           </View>
 
           {/* Info Card */}
-          <View style={GymStyles.infoCard}>
-            <FontAwesome
-              name='info-circle'
-              size={20}
-              color={Colors.dark.tint}
-            />
-            <Text style={GymStyles.infoText}>
+          <View style={styles.infoCard}>
+            <FontAwesome name="info-circle" size={20} color={colors.tint} />
+            <Text style={styles.infoText}>
               Esta información será verificada por nuestro equipo. Asegúrate de
               que sea correcta y esté actualizada.
             </Text>
@@ -163,12 +166,12 @@ export default function GymStep1({
         </ScrollView>
 
         {/* Botones */}
-        <View style={GymStyles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <Button
             title={loading ? 'Registrando...' : 'Continuar'}
             onPress={handleNext}
             disabled={loading || isLoading}
-            style={GymStyles.nextButton}
+            style={styles.nextButton}
           />
         </View>
       </KeyboardAvoidingView>

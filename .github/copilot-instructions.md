@@ -3,6 +3,7 @@
 Conciso, accionable y específico al proyecto. Usa este documento como guía operativa.
 
 ## 1. Panorama Arquitectónico
+
 - App React Native + Expo Router (carpeta `app/`) con routing basado en archivos.
 - Capa de presentación: componentes en `components/**` organizados por dominio (auth, plan, routineDay, gym, etc.).
 - Capa de servicios HTTP en `services/` usando `apiService.ts` (Axios con interceptores, manejo de auth y funciones Azure).
@@ -14,6 +15,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Siempre evitar usar el Alert nativo, ya se tiene un componente llamado CustomAlert para todo lo relacionado a las alertas.
 
 ## 2. Flujos Clave de Desarrollo
+
 - Iniciar dev: `npm run start:local` (carga `.env.local` vía `env-loader.js`).
 - Type check antes de PR: `npm run type-check` (strict, sin emitir). Mantener 0 errores.
 - Formato: `npm run format` / `format-check` (Prettier). No introducir estilo propio; extender siguiendo el existente.
@@ -21,6 +23,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Añadir nueva entidad: (1) modelo en `models/`, (2) DTOs request/response en `dto/<Entity>/`, (3) servicio en `services/<entity>Service.ts` exportado por `services/index.ts`, (4) lista/pantallas usando patrón EntityList si aplica.
 
 ## 3. Patrones y Convenciones Específicas
+
 - Listas: centralizar lógica de carga/paginación/empty states siguiendo ejemplos en `components/*/*List.tsx` (e.g. `MachineList.tsx`). No reinventar layout.
 - Servicios: métodos CRUD nombrados `add<Entity>`, `update<Entity>`, `delete<Entity>`, `get<Entity>ById`, `find<Entities>ByFields`; POST de búsquedas usa `/plural/find`. El metodo `find<Entities>ByFields` debe aceptar un objeto con los campos a buscar, se creo para poder filtrar por cualquier campo de esa entidad, en el body siempre debe ir el nombre del campo (iniciando con mayuscula) como llave y el valor de este como valor a filtrar, este siempre retornara un array de datos ya sea con uno o muchos valores.
 - Respuesta API unificada: interfaz `ApiResponse<T>` con campos `{ Success, Message, Data, StatusCode }`. Siempre verificar `resp?.Success` antes de acceder a `Data`.
@@ -31,20 +34,23 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Colores: usar `Colors` (p.ej. `Colors.dark.tint`) en lugar de hardcoded #FF6B35 salvo que se esté migrando.
 
 ## 4. Integraciones Externas
+
 - API principal + Azure Functions: base URLs y keys vienen de variables `EXPO_PUBLIC_*` cargadas al inicio.
 - Autenticación: `authService.getUserData()` retorna objeto con `id`; token se inyecta en `apiService` (ver interceptores si necesitas headers nuevos).
 - Multimedia: animaciones Lottie en `assets/animations/`; imágenes en `assets/images/`; no hardcodear rutas, usar imports estáticos.
 
 ## 5. Errores y Manejo Especial
+
 - Siempre envolver llamadas a servicios en try/catch y degradar en UI con mensajes amigables (ver ejemplos de `RoutineDayScreen.tsx`).
 - Arrays `$values`: util pattern:
   ```ts
   const raw = resp.Data as any;
-  const items = Array.isArray(raw) ? raw : (raw?.$values || []);
+  const items = Array.isArray(raw) ? raw : raw?.$values || [];
   ```
 - Evitar warnings de React por actualizaciones en render: usar `setTimeout` diferido (ejemplo en `ExerciseModal.commitFinishSet`).
 
 ## 6. Añadir Nuevas Funciones
+
 1. Identifica dominio existente o crea carpeta en `components/<dominio>/`.
 2. Define modelo/DTO si es nuevo; respeta nombres exactos backend.
 3. Crea servicio siguiendo naming y exporta en `services/index.ts`.
@@ -53,35 +59,44 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 6. Ejecuta `npm run type-check` y corrige.
 
 ## 7. Testing Manual Rápido
+
 - Ruta ejercicio del día: abrir pantalla rutina, completar sets, finalizar → verifica creación de Daily (network) y limpieza de claves `@daily_start_*`.
 - Temporizador: crear ejercicio con reps tipo "30s por lado" → validar 2 ciclos y fase `PREPÁRATE`.
 
 ## 8. Anti‑Patrones a Evitar
+
 - No duplicar lógica de normalización de arrays; extraer helper si se repite.
 - No llamar a servicios en cada render/entrada si depende de acción del usuario.
 - No introducir dependencias pesadas sin justificación (mantener footprint de Expo).
 - No usar `any` salvo envolturas de respuestas backend heterogéneas.
 
 ## 9. Ejemplos Rápidos
+
 - Petición típica:
   ```ts
   const resp = await dailyService.addDaily(req);
-  if (resp?.Success) { /* usar resp.Data */ }
+  if (resp?.Success) {
+    /* usar resp.Data */
+  }
   ```
 - Lectura reps guardadas:
   ```ts
   const key = `exercise_${id}_reps`;
-  const raw = Platform.OS==='web'?window.localStorage.getItem(key):await AsyncStorage.getItem(key);
+  const raw =
+    Platform.OS === 'web'
+      ? window.localStorage.getItem(key)
+      : await AsyncStorage.getItem(key);
   ```
 
 ## 10. Revisión Final Antes de Commit
+
 - TypeScript sin errores.
 - Sin hardcodes de URLs/keys; usar config.
 - Limpieza de timers/intervalos en efectos.
 - Ajustes de color migrados a theme si tocaste UI.
 
 Actualiza este documento si:
+
 - Se añade un nuevo patrón cross-cutting.
 - Cambia la forma de crear Dailies o registrar ejercicios.
 - Se altera la carga multi-entorno.
-

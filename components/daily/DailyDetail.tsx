@@ -14,7 +14,9 @@ export function DailyDetail() {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
-  const [debounceId, setDebounceId] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [debounceId, setDebounceId] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   const fetchOne = async () => {
     setLoading(true);
@@ -40,7 +42,9 @@ export function DailyDetail() {
       setLoading(true);
       setError(null);
       try {
-        const res = await dailyService.findDailiesByFields({ Name: query.trim() } as any);
+        const res = await dailyService.findDailiesByFields({
+          Name: query.trim(),
+        } as any);
         let arr: any[] = [];
         if (res?.Success && res.Data) {
           if (Array.isArray(res.Data)) arr = res.Data;
@@ -60,22 +64,41 @@ export function DailyDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Daily - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
 
       {/* Búsqueda por nombre (contains) */}
       <Text style={{ marginTop: 8 }}>Buscar por nombre</Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
-        placeholder='Nombre'
+        placeholder="Nombre"
         placeholderTextColor={'#888'}
-        style={{ borderWidth: 1, borderColor: '#333', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, color: '#fff', backgroundColor: '#1E1E1E', marginTop: 6 }}
+        style={{
+          borderWidth: 1,
+          borderColor: '#333',
+          paddingHorizontal: 10,
+          paddingVertical: 8,
+          borderRadius: 8,
+          color: '#fff',
+          backgroundColor: '#1E1E1E',
+          marginTop: 6,
+        }}
       />
       {results.length > 0 && (
         <View style={{ marginTop: 8 }}>
-          {results.map(r => (
-            <Button key={r.Id} title={r.Name || r.Id} variant='secondary' onPress={() => { setItem(r); setResults([]); setQuery(''); }} style={{ marginBottom: 8 }} />
+          {results.map((r) => (
+            <Button
+              key={r.Id}
+              title={r.Name || r.Id}
+              variant="secondary"
+              onPress={() => {
+                setItem(r);
+                setResults([]);
+                setQuery('');
+              }}
+              style={{ marginBottom: 8 }}
+            />
           ))}
         </View>
       )}

@@ -18,8 +18,7 @@ export function GymPlanSelectedForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await gymPlanSelectedService.addGymPlanSelected(body);
+      const res = await gymPlanSelectedService.addGymPlanSelected(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -33,8 +32,7 @@ export function GymPlanSelectedForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await gymPlanSelectedService.updateGymPlanSelected(body);
+      const res = await gymPlanSelectedService.updateGymPlanSelected(body);
       setMsg(res.Message || 'Actualizado');
     } catch {
       setMsg('Error al actualizar');
@@ -47,8 +45,7 @@ export function GymPlanSelectedForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res =
-        await gymPlanSelectedService.deleteGymPlanSelected(id);
+      const res = await gymPlanSelectedService.deleteGymPlanSelected(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');
@@ -69,11 +66,11 @@ export function GymPlanSelectedForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (

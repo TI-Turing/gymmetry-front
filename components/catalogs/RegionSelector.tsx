@@ -8,7 +8,7 @@ export const RegionSelector = memo<RegionSelectorProps>(
     regions,
     countryId,
     value,
-  onSelect,
+    onSelect,
     disabled = false,
     loading = false,
     required = false,
@@ -22,7 +22,7 @@ export const RegionSelector = memo<RegionSelectorProps>(
       if (!countryId) {
         return [];
       }
-      return regions.filter(region => region.PaisId === countryId);
+      return regions.filter((region) => region.PaisId === countryId);
     }, [regions, countryId]);
 
     const isDisabled = disabled || !countryId;
@@ -35,7 +35,7 @@ export const RegionSelector = memo<RegionSelectorProps>(
     return (
       <>
         <BaseCatalogSelector
-          label='Región/Estado'
+          label="Región/Estado"
           value={value}
           disabled={isDisabled}
           loading={loading}
@@ -49,14 +49,14 @@ export const RegionSelector = memo<RegionSelectorProps>(
 
         <SelectorModal
           visible={showModal}
-          title='Selecciona tu región/estado'
+          title="Selecciona tu región/estado"
           data={filteredRegions}
           onSelect={handleSelect}
           onClose={() => setShowModal(false)}
           loading={loading}
           selectedId={value}
           showSearch
-          searchPlaceholder='Buscar región...'
+          searchPlaceholder="Buscar región..."
         />
       </>
     );

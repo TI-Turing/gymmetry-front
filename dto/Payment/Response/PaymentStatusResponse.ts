@@ -1,6 +1,6 @@
 // Auto-generated from C# DTO PaymentStatusResponse. Do not edit manually.
 export interface PaymentStatusResponse {
-  Status: any;
+  Status: unknown;
   ExternalId: string;
   Gateway: string;
   Message: string;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCustomAlert } from '@/components/common/CustomAlert';
@@ -7,6 +7,8 @@ import QRScannerOption from './QRScannerOption';
 import SearchGymsOption from './SearchGymsOption';
 import RegisterGymOption from './RegisterGymOption';
 import GymSearchModal from './GymSearchModal';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeNoGymViewStyles } from './styles/noGymView';
 
 interface NoGymViewProps {
   onConnect: (connected: boolean) => void;
@@ -19,6 +21,7 @@ export default function NoGymView({
 }: NoGymViewProps) {
   const { showSuccess } = useCustomAlert();
   const [showGymSearchModal, setShowGymSearchModal] = useState(false);
+  const styles = useThemedStyles(makeNoGymViewStyles);
 
   const handleScanQR = () => {
     showSuccess('Escáner QR', {
@@ -71,7 +74,7 @@ export default function NoGymView({
 
       {/* Info Card */}
       <View style={styles.infoCard}>
-        <FontAwesome name='info-circle' size={24} color='#2196F3' />
+        <FontAwesome name="info-circle" size={24} color={styles.colors.info} />
         <Text style={styles.infoText}>
           Una vez vinculado, podrás ver información en tiempo real del gimnasio,
           horarios, ocupación y mucho más.
@@ -87,51 +90,3 @@ export default function NoGymView({
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 10,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  infoCard: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3.84,
-    elevation: 8,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#B0B0B0',
-    lineHeight: 20,
-    marginLeft: 12,
-  },
-});

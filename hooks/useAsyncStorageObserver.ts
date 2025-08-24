@@ -33,7 +33,7 @@ export function useAsyncStorageObserver(
       import('@react-native-async-storage/async-storage').then(
         ({ default: AsyncStorage }) => {
           AsyncStorage.getItem(key)
-            .then(storedValue => {
+            .then((storedValue) => {
               setValue(storedValue);
               setIsInitialized(true);
             })
@@ -55,13 +55,13 @@ export function useAsyncStorageObserver(
 export function useGymDataObserver() {
   const GYM_DATA_KEY = '@gym_data';
   const [gymDataString] = useAsyncStorageObserver(GYM_DATA_KEY);
-  const [gymData, setGymData] = useState<any>(null);
+  const [gymData, setGymData] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (gymDataString) {
       try {
-        const parsedData = JSON.parse(gymDataString);
+        const parsedData: unknown = JSON.parse(gymDataString);
         setGymData(parsedData);
         setError(null);
       } catch (_parseError) {

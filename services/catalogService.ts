@@ -13,8 +13,8 @@ import {
 class CatalogService {
   private catalogsAPI: AxiosInstance;
   // Caché en memoria por clave (endpoint+parámetros)
-  private cache = new Map<string, { timestamp: number; data: any }>();
-  private inFlight = new Map<string, Promise<any>>();
+  private cache = new Map<string, { timestamp: number; data: unknown }>();
+  private inFlight = new Map<string, Promise<unknown>>();
   private readonly TTL_MS = 10 * 60 * 1000; // 10 minutos
 
   constructor() {
@@ -27,9 +27,10 @@ class CatalogService {
     });
 
     this.catalogsAPI.interceptors.request.use(
-      config => {
+      (config) => {
         if (!config.headers) {
-          config.headers = {} as any;
+          // Normalizar a AxiosHeaders para manipularlos de forma segura
+          config.headers = axios.AxiosHeaders.from({});
         }
 
         if (!config.headers['x-functions-key']) {
@@ -38,24 +39,25 @@ class CatalogService {
 
         if (Environment.DEBUG) {
           const fullUrl = `${config.baseURL}${config.url}`;
-          const curlCommand = this.generateCurlCommand(
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const _curlCommand = this.generateCurlCommand(
             config.method?.toUpperCase() || 'GET',
             fullUrl,
-            config.headers,
-            config.data
+            config.headers as unknown as Record<string, unknown>,
+            config.data as unknown
           );
         }
 
         return config;
       },
-      error => {
+      (error) => {
         return Promise.reject(error);
       }
     );
 
     this.catalogsAPI.interceptors.response.use(
-      response => response,
-      error => {
+      (response) => response,
+      (error) => {
         // Error logging para depuración en desarrollo
         if (__DEV__) {
           // En producción usaríamos un servicio de logging como Sentry
@@ -80,7 +82,10 @@ class CatalogService {
     this.cache.set(key, { timestamp: Date.now(), data });
   }
 
-  private async getOrFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  private async getOrFetch<T>(
+    key: string,
+    fetcher: () => Promise<T>
+  ): Promise<T> {
     const cached = this.getFromCache<T>(key);
     if (cached !== undefined) return cached;
 
@@ -104,20 +109,21 @@ class CatalogService {
   private generateCurlCommand(
     method: string,
     url: string,
-    headers: any = {},
-    data?: any
+    headers: Record<string, unknown> = {},
+    data?: unknown
   ): string {
     let curlCommand = `curl -X ${method}`;
 
-    Object.keys(headers || {}).forEach(key => {
-      if (headers[key] && key !== 'common') {
-        const headerValue = String(headers[key]).replace(/"/g, '\\"');
+    Object.keys(headers || {}).forEach((key) => {
+      const value = headers[key as keyof typeof headers];
+      if (value && key !== 'common') {
+        const headerValue = String(value).replace(/"/g, '\\"');
         curlCommand += ` ^
   -H "${key}: ${headerValue}"`;
       }
     });
 
-    if (data) {
+    if (data !== undefined) {
       const jsonData = JSON.stringify(data).replace(/"/g, '\\"');
       curlCommand += ` ^
   -d "${jsonData}"`;
@@ -229,47 +235,47 @@ class CatalogService {
   }
 
   // Métodos placeholder para servicios específicos
-  async getAllDiets(): Promise<any[]> {
+  async getAllDiets(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllEmployeeRegisterDaily(): Promise<any[]> {
+  async getAllEmployeeRegisterDaily(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllEmployeeTypes(): Promise<any[]> {
+  async getAllEmployeeTypes(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllEmployeeUsers(): Promise<any[]> {
+  async getAllEmployeeUsers(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllEquipment(): Promise<any[]> {
+  async getAllEquipment(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllExercises(): Promise<any[]> {
+  async getAllExercises(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllFeeds(): Promise<any[]> {
+  async getAllFeeds(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllGymImages(): Promise<any[]> {
+  async getAllGymImages(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }
 
-  async getAllPaymentMethods(): Promise<any[]> {
+  async getAllPaymentMethods(): Promise<unknown[]> {
     // Placeholder - implementar cuando el endpoint esté disponible
     return [];
   }

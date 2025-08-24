@@ -5,7 +5,6 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
-import { submoduleService } from '@/services';
 
 export function SubModuleDetail() {
   const [id, setId] = useState('');
@@ -28,8 +27,8 @@ export function SubModuleDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SubModule - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

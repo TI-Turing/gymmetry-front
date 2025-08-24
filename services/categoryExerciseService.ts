@@ -7,15 +7,19 @@ import type { UpdateCategoryExerciseRequest } from '@/dto/CategoryExercise/Reque
 export const categoryExerciseService = {
   async addCategoryExercise(
     request: AddCategoryExerciseRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(
+  ): Promise<ApiResponse<CategoryExercise | string>> {
+    const response = await apiService.post<CategoryExercise | string>(
       `/categoryexercise/add`,
       request
     );
     return response;
   },
-  async deleteCategoryExercise(id: string): Promise<ApiResponse<any>> {
-    const response = await apiService.delete<any>(`/categoryexercise/${id}`);
+  async deleteCategoryExercise(
+    id: string
+  ): Promise<ApiResponse<string | null>> {
+    const response = await apiService.delete<string | null>(
+      `/categoryexercise/${id}`
+    );
     return response;
   },
   async getCategoryExerciseById(
@@ -32,7 +36,7 @@ export const categoryExerciseService = {
     return response;
   },
   async findCategoryExercisesByFields(
-    request: Record<string, any>
+    request: Record<string, unknown>
   ): Promise<ApiResponse<CategoryExercise[]>> {
     const response = await apiService.post<CategoryExercise[]>(
       `/categoryexercises/find`,
@@ -42,8 +46,8 @@ export const categoryExerciseService = {
   },
   async updateCategoryExercise(
     request: UpdateCategoryExerciseRequest
-  ): Promise<ApiResponse<any>> {
-    const response = await apiService.put<any>(
+  ): Promise<ApiResponse<CategoryExercise>> {
+    const response = await apiService.put<CategoryExercise>(
       `/categoryexercise/update`,
       request
     );

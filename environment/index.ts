@@ -1,17 +1,3 @@
-type EnvironmentType = 'local' | 'development' | 'production';
-
-const getEnvironmentFromProcess = (): EnvironmentType => {
-  const envVar = process.env.EXPO_PUBLIC_ENV || process.env.NODE_ENV;
-  switch (envVar) {
-    case 'local':
-    case 'development':
-    case 'production':
-      return envVar as EnvironmentType;
-    default:
-      return 'local';
-  }
-};
-
 const createConfig = () => {
   const apiBaseUrl =
     process.env.EXPO_PUBLIC_API_BASE_URL ||
@@ -32,7 +18,8 @@ const createConfig = () => {
     process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY ||
     process.env.API_MAIN_FUNCTIONS_KEY ||
     '';
-  const payCardInApp = (process.env.EXPO_PUBLIC_PAY_CARD_INAPP || 'true') === 'true';
+  const payCardInApp =
+    (process.env.EXPO_PUBLIC_PAY_CARD_INAPP || 'true') === 'true';
   const mpPublicKey = process.env.EXPO_PUBLIC_MP_PUBLIC_KEY || '';
 
   return {
@@ -42,13 +29,10 @@ const createConfig = () => {
     DEBUG: debug,
     API_FUNCTIONS_KEY: apiFunctionsKey,
     API_MAIN_FUNCTIONS_KEY: apiMainFunctionsKey,
-  PAY_CARD_INAPP: payCardInApp,
-  MP_PUBLIC_KEY: mpPublicKey,
+    PAY_CARD_INAPP: payCardInApp,
+    MP_PUBLIC_KEY: mpPublicKey,
   };
 };
-
-// Seleccionar el entorno actual
-const CURRENT_ENV: EnvironmentType = getEnvironmentFromProcess();
 
 // Create and export the configuration
 const config = createConfig();

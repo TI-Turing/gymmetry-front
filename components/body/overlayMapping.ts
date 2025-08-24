@@ -35,7 +35,9 @@ const TAG_TO_OVERLAY_KEY: Record<string, string> = {
   triceps: 'back-triceps',
 };
 
-export function mapTagsToOverlayOpacities(tags: Record<string, number>): Record<string, number> {
+export function mapTagsToOverlayOpacities(
+  tags: Record<string, number>
+): Record<string, number> {
   const result: Record<string, number> = {};
   for (const [rawKey, value] of Object.entries(tags || {})) {
     const k = normalize(rawKey);

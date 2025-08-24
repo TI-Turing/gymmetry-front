@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
@@ -9,11 +8,11 @@ import {
 } from 'react-native';
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
-import { UI_CONSTANTS } from '@/constants/AppConstants';
 import { userService } from '@/services/userService';
 import type { UserBasicInfo } from '@/dto/user/UserBasicInfo';
 import { authService } from '@/services/authService';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymAdminDropdownStyles } from './styles/gymAdminDropdown';
 
 interface GymAdminDropdownProps {
   value?: string;
@@ -32,6 +31,7 @@ export default function GymAdminDropdown({
   required = false,
   label = 'Administrador principal',
 }: GymAdminDropdownProps) {
+  const { styles, colors } = useThemedStyles(makeGymAdminDropdownStyles);
   const [isOpen, setIsOpen] = useState(false);
   const [employees, setEmployees] = useState<UserBasicInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,9 +68,9 @@ export default function GymAdminDropdown({
       if (response.Success) {
         //TODO: filtrar por empleados del gym.
         const items = response.Data || [];
-        
+
         // Mapear User a UserBasicInfo
-        const mappedUsers = items.map(user => ({
+        const mappedUsers = items.map((user) => ({
           id: user.Id,
           name: user.Name || '',
           lastName: user.LastName || '',
@@ -79,7 +79,7 @@ export default function GymAdminDropdown({
           gymId: user.GymId || undefined,
           userTypeId: user.UserTypeId || undefined,
         }));
-        
+
         setEmployees(mappedUsers);
 
         // Si solo hay un empleado, seleccionarlo automáticamente y deshabilitar
@@ -105,7 +105,7 @@ export default function GymAdminDropdown({
     // Filtrar por texto de búsqueda si hay alguno
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
-      filtered = employees.filter(employee => {
+      filtered = employees.filter((employee) => {
         const fullName = `${employee.name} ${employee.lastName}`.toLowerCase();
         const email = employee.email?.toLowerCase() || '';
         const userName = employee.userName?.toLowerCase() || '';
@@ -126,7 +126,7 @@ export default function GymAdminDropdown({
     });
   }, [employees, searchText]);
 
-  const selectedEmployee = employees.find(employee => employee.id === value);
+  const selectedEmployee = employees.find((employee) => employee.id === value);
   const isDisabledState = disabled || employees.length <= 1;
 
   const handleSelect = (employeeId: string) => {
@@ -145,7 +145,7 @@ export default function GymAdminDropdown({
           </Text>
         )}
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size='small' color={Colors.dark.tint} />
+          <ActivityIndicator size="small" color={colors.tint} />
           <Text style={styles.loadingText}>Cargando empleados...</Text>
         </View>
       </View>
@@ -162,7 +162,11 @@ export default function GymAdminDropdown({
           </Text>
         )}
         <View style={styles.errorContainer}>
-          <FontAwesome name='exclamation-triangle' size={16} color='#FF6B6B' />
+          <FontAwesome
+            name="exclamation-triangle"
+            size={16}
+            color={colors.danger}
+          />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity
             onPress={loadGymEmployees}
@@ -208,7 +212,7 @@ export default function GymAdminDropdown({
         <FontAwesome
           name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={16}
-          color={isDisabledState ? '#666666' : '#B0B0B0'}
+          color={isDisabledState ? colors.disabled : colors.muted}
         />
       </TouchableOpacity>
 
@@ -223,17 +227,17 @@ export default function GymAdminDropdown({
           {/* Campo de búsqueda */}
           <View style={styles.searchContainer}>
             <FontAwesome
-              name='search'
+              name="search"
               size={16}
-              color='#B0B0B0'
+              color={colors.muted}
               style={styles.searchIcon}
             />
             <TextInput
               style={styles.searchInput}
-              placeholderTextColor='#B0B0B0'
+              placeholderTextColor={colors.muted}
               value={searchText}
               onChangeText={setSearchText}
-              autoCapitalize='none'
+              autoCapitalize="none"
               autoCorrect={false}
             />
             {searchText.length > 0 && (
@@ -241,7 +245,7 @@ export default function GymAdminDropdown({
                 onPress={() => setSearchText('')}
                 style={styles.clearButton}
               >
-                <FontAwesome name='times' size={14} color='#B0B0B0' />
+                <FontAwesome name="times" size={14} color={colors.muted} />
               </TouchableOpacity>
             )}
           </View>
@@ -260,7 +264,7 @@ export default function GymAdminDropdown({
                 </Text>
               </View>
             ) : (
-              filteredAndSortedEmployees.map(employee => (
+              filteredAndSortedEmployees.map((employee) => (
                 <TouchableOpacity
                   key={employee.id}
                   style={[
@@ -301,11 +305,7 @@ export default function GymAdminDropdown({
                     )}
                   </View>
                   {value === employee.id && (
-                    <FontAwesome
-                      name='check'
-                      size={16}
-                      color={Colors.dark.tint}
-                    />
+                    <FontAwesome name="check" size={16} color={colors.tint} />
                   )}
                 </TouchableOpacity>
               ))
@@ -316,178 +316,3 @@ export default function GymAdminDropdown({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: UI_CONSTANTS.SPACING.MD,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: UI_CONSTANTS.SPACING.SM,
-  },
-  required: {
-    color: '#FF6B6B',
-  },
-  dropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 48,
-  },
-  dropdownDisabled: {
-    backgroundColor: '#2A2A2A',
-    borderColor: '#444444',
-  },
-  dropdownOpen: {
-    borderColor: Colors.dark.tint,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    flex: 1,
-  },
-  placeholderText: {
-    color: '#B0B0B0',
-  },
-  disabledText: {
-    color: '#666666',
-  },
-  helpText: {
-    fontSize: 12,
-    color: '#B0B0B0',
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
-  dropdownList: {
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: Colors.dark.tint,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    maxHeight: 250,
-    position: 'relative',
-    zIndex: 1000,
-  },
-  scrollView: {
-    maxHeight: 250,
-  },
-  dropdownItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  dropdownItemSelected: {
-    backgroundColor: Colors.dark.tint + '20',
-  },
-  employeeInfoItem: {
-    flex: 1,
-  },
-  dropdownItemText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-  },
-  dropdownItemTextSelected: {
-    color: Colors.dark.tint,
-    fontWeight: '600',
-  },
-  employeeEmailItem: {
-    fontSize: 12,
-    color: '#B0B0B0',
-    marginTop: 2,
-  },
-  employeeNameItem: {
-    fontSize: 12,
-    color: '#888888',
-    marginTop: 1,
-  },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  loadingText: {
-    color: '#B0B0B0',
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2A1A1A',
-    borderWidth: 1,
-    borderColor: '#FF6B6B',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  errorText: {
-    color: '#FF6B6B',
-    fontSize: 14,
-    flex: 1,
-    marginLeft: 8,
-  },
-  retryButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  retryText: {
-    color: Colors.dark.tint,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2A2A2A',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    margin: 4,
-    borderRadius: 6,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    color: '#FFFFFF',
-    fontSize: 14,
-    paddingVertical: 4,
-  },
-  clearButton: {
-    padding: 4,
-    marginLeft: 4,
-  },
-  noResultsContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-  },
-  noResultsText: {
-    color: '#B0B0B0',
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
-});

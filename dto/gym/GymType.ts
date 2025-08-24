@@ -7,5 +7,5 @@ export interface GymType {
   DeletedAt: string | null;
   Ip: string | null;
   IsActive: boolean;
-  Gyms: any[];
+  Gyms: unknown[];
 }

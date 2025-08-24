@@ -14,8 +14,9 @@ const JourneyEmployeeList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
 
   const renderJourneyEmployeeItem = useCallback(
@@ -86,8 +87,8 @@ const JourneyEmployeeList = React.memo(() => {
             style={[
               styles.value,
               {
-                color: item.overtimeHours > 0 ? '#ffa726' : Colors.light.text
-  },
+                color: item.overtimeHours > 0 ? '#ffa726' : Colors.light.text,
+              },
             ]}
           >
             {item.overtimeHours ? `${item.overtimeHours.toFixed(1)}h` : '0h'}
@@ -149,13 +150,13 @@ const JourneyEmployeeList = React.memo(() => {
 
   return (
     <EntityList
-      title='Jornadas de Empleados'
+      title="Jornadas de Empleados"
       loadFunction={loadJourneyEmployees}
       renderItem={renderJourneyEmployeeItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay jornadas'
-      emptyMessage='No se encontraron jornadas de empleados'
-      loadingMessage='Cargando jornadas...'
+      emptyTitle="No hay jornadas"
+      emptyMessage="No se encontraron jornadas de empleados"
+      loadingMessage="Cargando jornadas..."
     />
   );
 });
@@ -169,20 +170,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -191,41 +192,41 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 120
+    minWidth: 120,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   notesSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   notesLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   notes: {
     fontSize: FONT_SIZES.sm,
@@ -233,35 +234,35 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     backgroundColor: Colors.light.tabIconDefault + '10',
     padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm
+    borderRadius: BORDER_RADIUS.sm,
   },
   tasksSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   tasksLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   tasksList: {
-    gap: SPACING.xs
+    gap: SPACING.xs,
   },
   task: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    marginLeft: SPACING.sm
+    marginLeft: SPACING.sm,
   },
   moreTasks: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
     fontStyle: 'italic',
-    marginLeft: SPACING.sm
-
-}});
+    marginLeft: SPACING.sm,
+  },
+});
 
 JourneyEmployeeList.displayName = 'JourneyEmployeeList';
 

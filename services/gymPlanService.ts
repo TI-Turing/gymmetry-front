@@ -29,7 +29,7 @@ class GymPlanService {
    * Obtiene el plan actual de un gimnasio específico
    */
   async getCurrentGymPlan(
-    gymId: string
+    _gymId: string
   ): Promise<ApiResponse<GymPlanSelected | null>> {
     try {
       // TODO: Implementar cuando el backend tenga este endpoint

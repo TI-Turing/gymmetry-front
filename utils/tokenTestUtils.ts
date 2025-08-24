@@ -90,5 +90,5 @@ export const tokenTestUtils = {
 
 // Función global para usar en la consola del navegador (solo desarrollo)
 if (__DEV__) {
-  (global as any).tokenTest = tokenTestUtils;
+  (globalThis as unknown as Record<string, unknown>).tokenTest = tokenTestUtils;
 }

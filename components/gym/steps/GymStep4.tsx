@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '@/components/common/FormInput';
 import Button from '@/components/common/Button';
 import { GymStepProps, GymStep4Data } from '../types';
 import { GymService } from '@/services/gymService';
-import Colors from '@/constants/Colors';
 import { useCustomAlert } from '@/components/common/CustomAlert';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymStepsStyles } from '../styles/gymSteps';
 
 export default function GymStep4({
   gymId,
@@ -16,6 +17,7 @@ export default function GymStep4({
   initialData,
 }: GymStepProps<GymStep4Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
+  const { styles, colors } = useThemedStyles(makeGymStepsStyles);
   const [formData, setFormData] = useState<GymStep4Data>({
     Id: gymId,
     website: initialData?.website || '',
@@ -26,7 +28,7 @@ export default function GymStep4({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field: keyof GymStep4Data, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const validateUrl = (url: string): boolean => {
@@ -82,7 +84,7 @@ export default function GymStep4({
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <FontAwesome name='globe' size={40} color={Colors.dark.tint} />
+        <FontAwesome name="globe" size={40} color={colors.tint} />
         <Text style={styles.title}>Presencia Digital</Text>
         <Text style={styles.subtitle}>
           Agrega los enlaces a tus redes sociales y sitio web (opcional)
@@ -91,38 +93,34 @@ export default function GymStep4({
 
       <View style={styles.form}>
         <FormInput
-          label='Sitio Web'
+          label="Sitio Web"
           value={formData.website}
-          onChangeText={value => handleInputChange('website', value)}
-          keyboardType='url'
-          autoCapitalize='none'
-          icon={<FontAwesome name='globe' size={20} color={Colors.dark.tint} />}
+          onChangeText={(value) => handleInputChange('website', value)}
+          keyboardType="url"
+          autoCapitalize="none"
+          icon={<FontAwesome name="globe" size={20} color={colors.tint} />}
         />
 
         <FormInput
-          label='Instagram'
+          label="Instagram"
           value={formData.instagram}
-          onChangeText={value => handleInputChange('instagram', value)}
-          keyboardType='url'
-          autoCapitalize='none'
-          icon={
-            <FontAwesome name='instagram' size={20} color={Colors.dark.tint} />
-          }
+          onChangeText={(value) => handleInputChange('instagram', value)}
+          keyboardType="url"
+          autoCapitalize="none"
+          icon={<FontAwesome name="instagram" size={20} color={colors.tint} />}
         />
 
         <FormInput
-          label='Facebook'
+          label="Facebook"
           value={formData.facebook}
-          onChangeText={value => handleInputChange('facebook', value)}
-          keyboardType='url'
-          autoCapitalize='none'
-          icon={
-            <FontAwesome name='facebook' size={20} color={Colors.dark.tint} />
-          }
+          onChangeText={(value) => handleInputChange('facebook', value)}
+          keyboardType="url"
+          autoCapitalize="none"
+          icon={<FontAwesome name="facebook" size={20} color={colors.tint} />}
         />
 
         <View style={styles.infoContainer}>
-          <FontAwesome name='info-circle' size={16} color={Colors.dark.tint} />
+          <FontAwesome name="info-circle" size={16} color={colors.tint} />
           <Text style={styles.infoText}>
             Todos los campos son opcionales. Puedes agregarlos más tarde.
           </Text>
@@ -131,7 +129,7 @@ export default function GymStep4({
 
       <View style={styles.buttonContainer}>
         <Button
-          title='Continuar'
+          title="Continuar"
           onPress={handleNext}
           loading={isLoading}
           style={styles.nextButton}
@@ -141,63 +139,3 @@ export default function GymStep4({
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  header: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginTop: 15,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    marginTop: 10,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  form: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: '#1E1E1E',
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.dark.tint,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    marginLeft: 10,
-    flex: 1,
-    lineHeight: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 30,
-    gap: 15,
-  },
-  backButton: {
-    flex: 1,
-  },
-  nextButton: {
-    flex: 2,
-  },
-});

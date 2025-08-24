@@ -42,7 +42,7 @@ export const FallbackLoadingAnimation: React.FC<LoadingAnimationProps> = ({
           height: size,
           borderRadius: size / 2,
           borderWidth: 3,
-          borderColor: Colors.dark.tint,
+          borderColor: Colors.light.tint,
           borderTopColor: 'transparent',
           backgroundColor: 'transparent',
         },

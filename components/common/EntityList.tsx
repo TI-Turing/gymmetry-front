@@ -53,7 +53,7 @@ export function EntityList<T>({
       <EmptyState
         title={emptyTitle}
         message={emptyMessage}
-        actionText='Reintentar'
+        actionText="Reintentar"
         onAction={refreshItems}
       />
     ),
@@ -69,9 +69,7 @@ export function EntityList<T>({
       {extraContent}
 
       {loading && useSkeletonLoading && skeletonComponent ? (
-        <View style={{ flex: 1 }}>
-          {skeletonComponent}
-        </View>
+        <View style={{ flex: 1 }}>{skeletonComponent}</View>
       ) : useFlatList ? (
         <FlatList
           data={items}
@@ -84,16 +82,28 @@ export function EntityList<T>({
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <View style={(!items || items.length === 0) ? styles.emptyContainer : undefined}>
-          {(!items || items.length === 0) && !loading ? (
-            renderEmptyState()
-          ) : items ? (
-            items.map((it, idx) => {
-              const element = (renderItem as any)({ item: it, index: idx, separators: { highlight() {}, unhighlight() {}, updateProps() {} } });
-              const key = keyExtractor(it as any, idx);
-              return <React.Fragment key={key}>{element}</React.Fragment>;
-            })
-          ) : null}
+        <View
+          style={
+            !items || items.length === 0 ? styles.emptyContainer : undefined
+          }
+        >
+          {(!items || items.length === 0) && !loading
+            ? renderEmptyState()
+            : items
+              ? items.map((it, idx) => {
+                  const element = (renderItem as any)({
+                    item: it,
+                    index: idx,
+                    separators: {
+                      highlight() {},
+                      unhighlight() {},
+                      updateProps() {},
+                    },
+                  });
+                  const key = keyExtractor(it as any, idx);
+                  return <React.Fragment key={key}>{element}</React.Fragment>;
+                })
+              : null}
         </View>
       )}
 

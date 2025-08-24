@@ -10,6 +10,7 @@ import type { UserExerciseMax } from '@/models/UserExerciseMax';
 import { authService, userExerciseMaxService } from '@/services';
 import ExercisePickerModal from '@/components/routineBuilder/ExercisePickerModal';
 import UserExerciseMaxModal from './UserExerciseMaxModal';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
 
 function formatDate(iso?: string | null) {
   if (!iso) return '—';
@@ -19,6 +20,34 @@ function formatDate(iso?: string | null) {
 
 const UserExerciseMaxScreen: React.FC = () => {
   const colorScheme = useColorScheme();
+  const p = Colors[colorScheme];
+  const styles = useThemedStyles((theme) => {
+    const pal = Colors[theme];
+    return StyleSheet.create({
+      screen: { flex: 1 },
+      headerWrap: { paddingTop: 12, paddingBottom: 12 },
+      headerTitle: { fontSize: 24, fontWeight: 'bold', color: pal.text },
+      headerSub: { color: pal.text + 'B3' },
+      error: { color: pal.tint, marginBottom: 12 },
+      actions: {
+        flexDirection: 'row',
+        gap: 8,
+        marginBottom: 12,
+        flexWrap: 'wrap' as const,
+      },
+      card: {
+        backgroundColor: pal.card,
+        borderRadius: 12,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: pal.border,
+      },
+      row: { paddingVertical: 10, borderTopWidth: 1, borderColor: pal.border },
+      rowText: { color: pal.text },
+      rowWeight: { color: pal.text, fontWeight: '700' },
+      subtle: { color: pal.text + 'B3' },
+    });
+  });
   const [items, setItems] = useState<UserExerciseMax[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,11 +62,12 @@ const UserExerciseMaxScreen: React.FC = () => {
       const user = await authService.getUserData();
       const body: any = { UserId: user?.id || '' };
       if (exerciseId) body.ExerciseId = exerciseId;
-      const resp = await userExerciseMaxService.findUserExerciseMaxesByFields(body);
+      const resp =
+        await userExerciseMaxService.findUserExerciseMaxesByFields(body);
       let arr: any[] = [];
       if (resp?.Success && resp.Data) {
         const raw: any = resp.Data as any;
-        arr = Array.isArray(raw) ? raw : (raw?.$values || []);
+        arr = Array.isArray(raw) ? raw : raw?.$values || [];
       }
       arr.sort((a: UserExerciseMax, b: UserExerciseMax) => {
         const ta = new Date(a.AchievedAt || a.CreatedAt).getTime();
@@ -52,53 +82,82 @@ const UserExerciseMaxScreen: React.FC = () => {
     }
   };
 
-  useEffect(() => { loadData(exercise?.Id); }, [exercise?.Id]);
+  useEffect(() => {
+    loadData(exercise?.Id);
+  }, [exercise?.Id]);
 
   const openCreate = () => {
-    if (!exercise) { setPickerOpen(true); return; }
+    if (!exercise) {
+      setPickerOpen(true);
+      return;
+    }
     setModalOpen(true);
   };
 
   return (
-    <ScreenWrapper headerTitle='RM' showBackButton={false}>
+    <ScreenWrapper headerTitle="RM" showBackButton={false}>
       <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
-        <View style={{ paddingTop: 12, paddingBottom: 12 }}>
-          <Text style={{ fontSize: 24, fontWeight: 'bold', color: Colors[colorScheme].text }}>Tus RM</Text>
-          <Text style={{ color: Colors[colorScheme].text + 'B3' }}>Registra y consulta tus pesos máximos por ejercicio</Text>
+        <View style={styles.headerWrap}>
+          <Text style={styles.headerTitle}>Tus RM</Text>
+          <Text style={styles.headerSub}>
+            Registra y consulta tus pesos máximos por ejercicio
+          </Text>
         </View>
-        {error && <Text style={{ color: Colors[colorScheme].tint, marginBottom: 12 }}>{error}</Text>}
-        <RNView style={{ flexDirection: 'row', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-          <Button title={exercise ? `Filtro: ${exercise.Name}` : 'Filtrar por ejercicio'} variant='outline' onPress={() => setPickerOpen(true)} size='small' />
-          {exercise && <Button title='Quitar filtro' variant='secondary' size='small' onPress={() => setExercise(null)} />}
-          <Button title='Registrar RM' onPress={openCreate} />
-        </RNView>
-        <View style={[styles.card, { borderColor: Colors[colorScheme].text + '22', borderWidth: 1 }]}>
-          {loading && <Text style={{ color: Colors[colorScheme].text + 'B3' }}>Cargando...</Text>}
-          {!loading && items.length === 0 && (
-            <Text style={{ color: Colors[colorScheme].text + 'B3' }}>Sin registros</Text>
+        {error && <Text style={styles.error}>{error}</Text>}
+        <RNView style={styles.actions}>
+          <Button
+            title={
+              exercise ? `Filtro: ${exercise.Name}` : 'Filtrar por ejercicio'
+            }
+            variant="outline"
+            onPress={() => setPickerOpen(true)}
+            size="small"
+          />
+          {exercise && (
+            <Button
+              title="Quitar filtro"
+              variant="secondary"
+              size="small"
+              onPress={() => setExercise(null)}
+            />
           )}
-          {!loading && items.map((it) => (
-            <View key={it.Id} style={[styles.row, { borderColor: Colors[colorScheme].text + '22' }]}>
-              <Text style={{ color: Colors[colorScheme].text }}>
-                {formatDate(it.AchievedAt || it.CreatedAt)} · {(it as any).Exercise?.Name || exercise?.Name || 'Ejercicio'}
-              </Text>
-              <Text style={{ color: Colors[colorScheme].text, fontWeight: '700' }}>{it.WeightKg} kg</Text>
-            </View>
-          ))}
+          <Button title="Registrar RM" onPress={openCreate} />
+        </RNView>
+        <View style={styles.card}>
+          {loading && <Text style={styles.subtle}>Cargando...</Text>}
+          {!loading && items.length === 0 && (
+            <Text style={styles.subtle}>Sin registros</Text>
+          )}
+          {!loading &&
+            items.map((it) => (
+              <View key={it.Id} style={styles.row}>
+                <Text style={styles.rowText}>
+                  {formatDate(it.AchievedAt || it.CreatedAt)} ·{' '}
+                  {(it as any).Exercise?.Name || exercise?.Name || 'Ejercicio'}
+                </Text>
+                <Text style={styles.rowWeight}>{it.WeightKg} kg</Text>
+              </View>
+            ))}
         </View>
         <View style={{ height: 80 }} />
       </ScrollView>
       <ExercisePickerModal
         visible={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        onSelect={(ex) => { setExercise(ex); setPickerOpen(false); }}
+        onSelect={(ex) => {
+          setExercise(ex);
+          setPickerOpen(false);
+        }}
       />
       {exercise && (
         <UserExerciseMaxModal
           visible={modalOpen}
           onClose={() => setModalOpen(false)}
           exercise={exercise}
-          onSaved={() => { setModalOpen(false); loadData(exercise.Id); }}
+          onSaved={() => {
+            setModalOpen(false);
+            loadData(exercise.Id);
+          }}
         />
       )}
     </ScreenWrapper>
@@ -107,7 +166,4 @@ const UserExerciseMaxScreen: React.FC = () => {
 
 export default UserExerciseMaxScreen;
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#1E1E1E', borderRadius: 12, padding: 12 },
-  row: { paddingVertical: 10, borderTopWidth: 1 },
-});
+const styles = StyleSheet.create({});

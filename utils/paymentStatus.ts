@@ -1,4 +1,12 @@
-export type PaymentLifecycleStatus = 'idle' | 'polling' | 'pending' | 'approved' | 'rejected' | 'cancelled' | 'expired' | 'error';
+export type PaymentLifecycleStatus =
+  | 'idle'
+  | 'polling'
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'cancelled'
+  | 'expired'
+  | 'error';
 
 export function normalizePaymentStatus(s?: string): PaymentLifecycleStatus {
   if (!s) return 'pending';
@@ -11,7 +19,10 @@ export function normalizePaymentStatus(s?: string): PaymentLifecycleStatus {
   return 'pending';
 }
 
-export function isExpired(expiresAt?: string | null, now: number = Date.now()): boolean {
+export function isExpired(
+  expiresAt?: string | null,
+  now: number = Date.now()
+): boolean {
   if (!expiresAt) return false;
   const ts = new Date(expiresAt).getTime();
   if (Number.isNaN(ts)) return false;

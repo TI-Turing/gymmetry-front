@@ -50,13 +50,13 @@ export function BillList() {
 
   return (
     <EntityList
-      title='Facturas'
+      title="Facturas"
       loadFunction={loadBills}
       renderItem={renderBillItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay facturas'
-      emptyMessage='No se encontraron facturas registradas'
-      loadingMessage='Cargando facturas...'
+      emptyTitle="No hay facturas"
+      emptyMessage="No se encontraron facturas registradas"
+      loadingMessage="Cargando facturas..."
     />
   );
 }

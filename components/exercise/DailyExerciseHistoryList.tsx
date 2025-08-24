@@ -14,8 +14,9 @@ const DailyExerciseHistoryList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
 
   const renderDailyExerciseHistoryItem = useCallback(
@@ -108,8 +109,8 @@ const DailyExerciseHistoryList = React.memo(() => {
                     ? '#ff6b6b'
                     : item.difficulty === 'medium'
                       ? '#ffa726'
-                      : '#4caf50'
-  },
+                      : '#4caf50',
+              },
             ]}
           >
             {item.difficulty === 'hard'
@@ -147,8 +148,8 @@ const DailyExerciseHistoryList = React.memo(() => {
                       ? '#8bc34a'
                       : item.technique === 'average'
                         ? '#ffa726'
-                        : '#ff6b6b'
-  },
+                        : '#ff6b6b',
+              },
             ]}
           >
             {item.technique === 'excellent'
@@ -167,7 +168,7 @@ const DailyExerciseHistoryList = React.memo(() => {
             {item.startTime
               ? new Date(item.startTime).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })
               : 'N/A'}
           </Text>
@@ -179,8 +180,8 @@ const DailyExerciseHistoryList = React.memo(() => {
             {item.endTime
               ? new Date(item.endTime).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
-                  minute: '2-digit'
-})
+                  minute: '2-digit',
+                })
               : 'No finalizado'}
           </Text>
         </View>
@@ -231,13 +232,13 @@ const DailyExerciseHistoryList = React.memo(() => {
 
   return (
     <EntityList
-      title='Historial de Ejercicios Diarios'
+      title="Historial de Ejercicios Diarios"
       loadFunction={loadDailyExerciseHistory}
       renderItem={renderDailyExerciseHistoryItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay historial'
-      emptyMessage='No se encontró historial de ejercicios'
-      loadingMessage='Cargando historial de ejercicios...'
+      emptyTitle="No hay historial"
+      emptyMessage="No se encontró historial de ejercicios"
+      loadingMessage="Cargando historial de ejercicios..."
     />
   );
 });
@@ -251,20 +252,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -273,29 +274,29 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 140
+    minWidth: 140,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   recordSection: {
     marginTop: SPACING.sm,
@@ -304,37 +305,37 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.light.tabIconDefault + '20',
     backgroundColor: '#f0f9ff',
     padding: SPACING.sm,
-    borderRadius: BORDER_RADIUS.sm
+    borderRadius: BORDER_RADIUS.sm,
   },
   recordLabel: {
     fontSize: FONT_SIZES.sm,
     color: '#0066cc',
     fontWeight: '600',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   recordText: {
     fontSize: FONT_SIZES.sm,
     color: '#0066cc',
-    fontWeight: '500'
+    fontWeight: '500',
   },
   notesSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   notesLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   notesText: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
     fontStyle: 'italic',
-    lineHeight: 18
-  }
+    lineHeight: 18,
+  },
 });
 
 DailyExerciseHistoryList.displayName = 'DailyExerciseHistoryList';

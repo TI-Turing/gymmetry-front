@@ -55,7 +55,7 @@ export const PasswordInput = memo<PasswordInputProps>(
             placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
             secureTextEntry={!showPassword}
             accessibilityLabel={label}
-            accessibilityRole='text'
+            accessibilityRole="text"
           />
           <TouchableOpacity
             style={commonStyles.eyeButton}
@@ -63,7 +63,7 @@ export const PasswordInput = memo<PasswordInputProps>(
             accessibilityLabel={
               showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
             }
-            accessibilityRole='button'
+            accessibilityRole="button"
           >
             <FontAwesome
               name={showPassword ? 'eye-slash' : 'eye'}

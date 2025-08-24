@@ -4,12 +4,14 @@ import { useAsyncState } from './useAsyncState';
 /**
  * Hook reutilizable para manejo de listas de entidades con operaciones CRUD básicas
  */
+type UseEntityListOptions = {
+  autoLoad?: boolean;
+  dependencies?: readonly unknown[];
+};
+
 export function useEntityList<T>(
   loadFunction: () => Promise<T[]>,
-  options?: {
-    autoLoad?: boolean;
-    dependencies?: any[];
-  }
+  options?: UseEntityListOptions
 ) {
   const { autoLoad = true, dependencies = [] } = options || {};
 

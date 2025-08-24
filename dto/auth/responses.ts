@@ -20,7 +20,7 @@ export interface LoginResponse {
 
 export interface RegisterResponseData {
   // Define the actual registration response data structure here
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface RegisterResponse {

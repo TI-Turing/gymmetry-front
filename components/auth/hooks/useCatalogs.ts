@@ -27,7 +27,7 @@ export const useCatalogs = () => {
 
   const loadCatalogs = async () => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
+      setState((prev) => ({ ...prev, loading: true, error: null }));
 
       const [gendersResponse, countriesResponse, epsResponse] =
         await Promise.allSettled([
@@ -49,7 +49,7 @@ export const useCatalogs = () => {
           : Promise.resolve([]),
       ]);
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         genders:
           gendersResponse.status === 'fulfilled' ? gendersResponse.value : [],
@@ -65,7 +65,7 @@ export const useCatalogs = () => {
         loading: false,
       }));
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         loading: false,
         error:
@@ -79,7 +79,7 @@ export const useCatalogs = () => {
   const loadRegionsByCountry = async (countryId: string) => {
     try {
       const regions = await catalogService.getRegionsByCountry(countryId);
-      setState(prev => ({ ...prev, regions }));
+      setState((prev) => ({ ...prev, regions }));
       return regions;
     } catch (error) {
       return [];
@@ -89,7 +89,7 @@ export const useCatalogs = () => {
   const loadCitiesByRegion = async (regionId: string) => {
     try {
       const cities = await catalogService.getCitiesByRegion(regionId);
-      setState(prev => ({ ...prev, cities }));
+      setState((prev) => ({ ...prev, cities }));
       return cities;
     } catch (error) {
       return [];
@@ -99,7 +99,7 @@ export const useCatalogs = () => {
   const loadDocumentTypesByCountry = async (countryId: string) => {
     try {
       const documentTypes = await catalogService.getDocumentTypes(countryId);
-      setState(prev => ({ ...prev, documentTypes }));
+      setState((prev) => ({ ...prev, documentTypes }));
       return documentTypes;
     } catch (error) {
       return [];

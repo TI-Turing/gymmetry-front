@@ -1,16 +1,17 @@
 import React, { useCallback } from 'react';
-import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { EntityList } from '@/components/common';
-import { Colors } from '@/constants';
-import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { paymentMethodService } from '@/services';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makePaymentMethodStyles } from './styles.themed';
 
 const PaymentMethodList = React.memo(() => {
   const loadPaymentMethods = useCallback(async () => {
     const response = await paymentMethodService.getAllPaymentMethods();
     return response || [];
   }, []);
+
+  const styles = useThemedStyles(makePaymentMethodStyles);
 
   const renderPaymentMethodItem = useCallback(
     ({ item }: { item: any }) => (
@@ -69,7 +70,7 @@ const PaymentMethodList = React.memo(() => {
         )}
       </View>
     ),
-    []
+    [styles]
   );
 
   const keyExtractor = useCallback(
@@ -79,73 +80,16 @@ const PaymentMethodList = React.memo(() => {
 
   return (
     <EntityList
-      title='Métodos de Pago'
+      title="Métodos de Pago"
       loadFunction={loadPaymentMethods}
       renderItem={renderPaymentMethodItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay métodos de pago'
-      emptyMessage='No se encontraron métodos de pago configurados'
-      loadingMessage='Cargando métodos de pago...'
+      emptyTitle="No hay métodos de pago"
+      emptyMessage="No se encontraron métodos de pago configurados"
+      loadingMessage="Cargando métodos de pago..."
     />
   );
 });
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.light.background,
-    padding: SPACING.md,
-    marginVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.sm
-  },
-  title: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
-    color: Colors.light.text,
-    flex: 1,
-    marginRight: SPACING.sm
-  },
-  statusText: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.sm,
-    backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
-  },
-  description: {
-    fontSize: FONT_SIZES.md,
-    color: Colors.light.tabIconDefault,
-    marginBottom: SPACING.sm,
-    lineHeight: 20
-  },
-  row: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-    marginVertical: SPACING.xs
-  },
-  label: {
-    fontSize: FONT_SIZES.sm,
-    color: Colors.light.tabIconDefault,
-    fontWeight: '500',
-    minWidth: 100
-  },
-  value: {
-    fontSize: FONT_SIZES.sm,
-    color: Colors.light.text,
-    flex: 1
-
-}});
 
 PaymentMethodList.displayName = 'PaymentMethodList';
 

@@ -14,7 +14,10 @@ export const dailyExerciseService = {
   async addDailyExercises(
     request: AddDailyExerciseRequest[]
   ): Promise<ApiResponse<any>> {
-    const response = await apiService.post<any>(`/dailyexercises/addbulk`, request);
+    const response = await apiService.post<any>(
+      `/dailyexercises/addbulk`,
+      request
+    );
     return response;
   },
   async deleteDailyExercise(id: string): Promise<ApiResponse<any>> {

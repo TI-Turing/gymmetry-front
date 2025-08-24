@@ -1,3 +1,3 @@
 export interface FindPlanTypesByFieldsRequest {
-  fields: { [key: string]: any };
+  fields: Record<string, unknown>;
 }

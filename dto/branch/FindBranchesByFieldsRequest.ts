@@ -1,3 +1,3 @@
 export interface FindBranchesByFieldsRequest {
-  fields: { [key: string]: any };
+  fields: Record<string, unknown>;
 }

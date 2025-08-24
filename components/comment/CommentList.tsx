@@ -228,13 +228,13 @@ const CommentList = React.memo(() => {
 
   return (
     <EntityList
-      title='Comentarios'
+      title="Comentarios"
       loadFunction={loadComments}
       renderItem={renderCommentItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay comentarios'
-      emptyMessage='No se encontraron comentarios'
-      loadingMessage='Cargando comentarios...'
+      emptyTitle="No hay comentarios"
+      emptyMessage="No se encontraron comentarios"
+      loadingMessage="Cargando comentarios..."
     />
   );
 });

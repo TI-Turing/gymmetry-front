@@ -44,7 +44,7 @@ export function DailyList() {
           </View>
         )}
       />
-      <Button title='Refrescar' onPress={load} />
+      <Button title="Refrescar" onPress={load} />
     </View>
   );
 }

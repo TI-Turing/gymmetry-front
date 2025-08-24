@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
-  StyleSheet,
   Modal,
   TouchableOpacity,
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Image,
 } from 'react-native';
 import { Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
 import { gymServiceExtensions } from '@/services/gymService';
 import type { FindGymsByNameResponse } from '@/dto/gym/FindGymsByNameResponse';
 import { authService } from '@/services/authService';
 import GymInfoView from './GymInfoView';
 import SmartImage from '@/components/common/SmartImage';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymSearchModalStyles } from './styles/gymSearchModal';
 
 interface GymSearchModalProps {
   visible: boolean;
@@ -29,6 +28,7 @@ export default function GymSearchModal({
   onClose,
   onGymSelected,
 }: GymSearchModalProps) {
+  const styles = useThemedStyles(makeGymSearchModalStyles);
   const [searchText, setSearchText] = useState('');
   const [gyms, setGyms] = useState<FindGymsByNameResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -145,10 +145,18 @@ export default function GymSearchModal({
           {/* TODO: Mostrar imagen del gym cuando el backend la retorne */}
           <View style={styles.gymImageContainer}>
             {gym.LogoUrl ? (
-              <SmartImage uri={gym.LogoUrl} style={styles.gymImage} deferOnDataSaver />
+              <SmartImage
+                uri={gym.LogoUrl}
+                style={styles.gymImage}
+                deferOnDataSaver
+              />
             ) : (
               <View style={styles.gymImagePlaceholder}>
-                <FontAwesome name='building' size={24} color='#B0B0B0' />
+                <FontAwesome
+                  name="building"
+                  size={24}
+                  color={styles.colors.muted}
+                />
               </View>
             )}
           </View>
@@ -164,13 +172,21 @@ export default function GymSearchModal({
 
             {gym.IsVerified && (
               <View style={styles.verifiedBadge}>
-                <FontAwesome name='check-circle' size={12} color='#4CAF50' />
+                <FontAwesome
+                  name="check-circle"
+                  size={12}
+                  color={styles.colors.success}
+                />
                 <Text style={styles.verifiedText}>Verificado</Text>
               </View>
             )}
           </View>
 
-          <FontAwesome name='chevron-right' size={16} color='#B0B0B0' />
+          <FontAwesome
+            name="chevron-right"
+            size={16}
+            color={styles.colors.muted}
+          />
         </View>
       </TouchableOpacity>
     );
@@ -184,8 +200,8 @@ export default function GymSearchModal({
     return (
       <Modal
         visible={visible}
-        animationType='slide'
-        presentationStyle='pageSheet'
+        animationType="slide"
+        presentationStyle="pageSheet"
         onRequestClose={handleBackFromGymInfo}
       >
         <View style={styles.gymInfoContainer}>
@@ -195,9 +211,9 @@ export default function GymSearchModal({
               style={styles.backButton}
             >
               <FontAwesome
-                name='arrow-left'
+                name="arrow-left"
                 size={20}
-                color={Colors.dark.tint}
+                color={styles.colors.tint}
               />
               <Text style={styles.backButtonText}>Buscar Gyms</Text>
             </TouchableOpacity>
@@ -253,7 +269,11 @@ export default function GymSearchModal({
                 style={styles.connectButton}
                 onPress={() => handleConnectToGym(selectedGym.Id)}
               >
-                <FontAwesome name='plus' size={18} color='#FFFFFF' />
+                <FontAwesome
+                  name="plus"
+                  size={18}
+                  color={styles.colors.onTint}
+                />
                 <Text style={styles.connectButtonText}>Conectar</Text>
               </TouchableOpacity>
             </View>
@@ -261,7 +281,11 @@ export default function GymSearchModal({
 
           {isCurrentGym && (
             <View style={styles.currentGymContainer}>
-              <FontAwesome name='check-circle' size={20} color='#4CAF50' />
+              <FontAwesome
+                name="check-circle"
+                size={20}
+                color={styles.colors.success}
+              />
               <Text style={styles.currentGymText}>
                 Ya estás conectado a este gym
               </Text>
@@ -275,8 +299,8 @@ export default function GymSearchModal({
   return (
     <Modal
       visible={visible}
-      animationType='slide'
-      presentationStyle='pageSheet'
+      animationType="slide"
+      presentationStyle="pageSheet"
       onRequestClose={handleCloseModal}
     >
       <View style={styles.container}>
@@ -286,7 +310,7 @@ export default function GymSearchModal({
             onPress={handleCloseModal}
             style={styles.closeButton}
           >
-            <FontAwesome name='times' size={24} color={Colors.dark.tint} />
+            <FontAwesome name="times" size={24} color={styles.colors.tint} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Buscar Gimnasios</Text>
           <View style={styles.placeholder} />
@@ -295,17 +319,17 @@ export default function GymSearchModal({
         {/* Search Input */}
         <View style={styles.searchContainer}>
           <FontAwesome
-            name='search'
+            name="search"
             size={16}
-            color='#B0B0B0'
+            color={styles.colors.muted}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
-            placeholderTextColor='#B0B0B0'
+            placeholderTextColor={styles.colors.muted}
             value={searchText}
             onChangeText={setSearchText}
-            autoCapitalize='none'
+            autoCapitalize="none"
             autoCorrect={false}
             autoFocus={true}
           />
@@ -314,7 +338,7 @@ export default function GymSearchModal({
               onPress={() => setSearchText('')}
               style={styles.clearButton}
             >
-              <FontAwesome name='times' size={14} color='#B0B0B0' />
+              <FontAwesome name="times" size={14} color={styles.colors.muted} />
             </TouchableOpacity>
           )}
         </View>
@@ -323,12 +347,12 @@ export default function GymSearchModal({
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps='handled'
+          keyboardShouldPersistTaps="handled"
         >
           {/* Loading State */}
           {isLoading && (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size='large' color={Colors.dark.tint} />
+              <ActivityIndicator size="large" color={styles.colors.tint} />
               <Text style={styles.loadingText}>Buscando gimnasios...</Text>
             </View>
           )}
@@ -337,9 +361,9 @@ export default function GymSearchModal({
           {error && !isLoading && (
             <View style={styles.errorContainer}>
               <FontAwesome
-                name='exclamation-triangle'
+                name="exclamation-triangle"
                 size={24}
-                color='#FF6B6B'
+                color={styles.colors.danger}
               />
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity
@@ -357,7 +381,11 @@ export default function GymSearchModal({
             searchText.length >= 2 &&
             gyms.length === 0 && (
               <View style={styles.emptyContainer}>
-                <FontAwesome name='search' size={48} color='#666666' />
+                <FontAwesome
+                  name="search"
+                  size={48}
+                  color={styles.colors.dim}
+                />
                 <Text style={styles.emptyTitle}>
                   No se encontraron gimnasios
                 </Text>
@@ -370,7 +398,7 @@ export default function GymSearchModal({
           {/* Initial State */}
           {!isLoading && !error && searchText.length < 2 && (
             <View style={styles.initialContainer}>
-              <FontAwesome name='search' size={48} color='#666666' />
+              <FontAwesome name="search" size={48} color={styles.colors.dim} />
               <Text style={styles.initialTitle}>Buscar Gimnasios</Text>
               <Text style={styles.initialSubtitle}>
                 Escribe al menos 2 caracteres para comenzar la búsqueda
@@ -394,246 +422,4 @@ export default function GymSearchModal({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 60,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  placeholder: {
-    width: 40,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    marginHorizontal: 20,
-    marginVertical: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#333333',
-  },
-  searchIcon: {
-    marginRight: 12,
-  },
-  searchInput: {
-    flex: 1,
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  clearButton: {
-    padding: 4,
-    marginLeft: 8,
-  },
-  content: {
-    flex: 1,
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  loadingText: {
-    color: '#B0B0B0',
-    fontSize: 16,
-    marginTop: 12,
-  },
-  errorContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
-  errorText: {
-    color: '#FF6B6B',
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 12,
-  },
-  retryButton: {
-    backgroundColor: Colors.dark.tint,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  retryText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 16,
-  },
-  emptySubtitle: {
-    color: '#B0B0B0',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  initialContainer: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  initialTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 16,
-  },
-  initialSubtitle: {
-    color: '#B0B0B0',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  resultsContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  resultsHeader: {
-    color: '#B0B0B0',
-    fontSize: 14,
-    marginBottom: 16,
-    fontWeight: '500',
-  },
-  gymItem: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#333333',
-  },
-  gymItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  gymImageContainer: {
-    marginRight: 16,
-  },
-  gymImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-  },
-  gymImagePlaceholder: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: '#2A2A2A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#333333',
-  },
-  gymDetails: {
-    flex: 1,
-  },
-  gymName: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  gymLocation: {
-    color: '#B0B0B0',
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  gymDistance: {
-    color: '#B0B0B0',
-    fontSize: 14,
-    marginBottom: 6,
-  },
-  verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-  },
-  verifiedText: {
-    color: '#4CAF50',
-    fontSize: 12,
-    marginLeft: 4,
-    fontWeight: '500',
-  },
-  gymInfoContainer: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
-  gymInfoHeader: {
-    paddingTop: 60,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    color: Colors.dark.tint,
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  connectButtonContainer: {
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#333333',
-  },
-  connectButton: {
-    backgroundColor: Colors.dark.tint,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-  },
-  connectButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  currentGymContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#333333',
-  },
-  currentGymText: {
-    color: '#4CAF50',
-    fontSize: 16,
-    marginLeft: 8,
-    fontWeight: '500',
-  },
-});
+// styles come from themed factory

@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View as RNView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
-import { View, Text } from '@/components/Themed';
+import { Text } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { RoutineDay } from '@/models/RoutineDay';
 import { routineDayService } from '@/services';
 
 function getWeekdayNameEs(dayNum: number) {
-  const names = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const names = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+  ];
   return names[(dayNum - 1) % 7];
 }
 
@@ -32,16 +40,24 @@ export default function RoutineTemplateDaysScreen() {
     setLoading(true);
     setError(null);
     try {
-      const body = { RoutineTemplateId: templateId, DayNumber: dayNumber } as any;
+      const body = {
+        RoutineTemplateId: templateId,
+        DayNumber: dayNumber,
+      } as any;
       const resp = await routineDayService.findRoutineDaysByFields(body);
       let extracted: any[] = [];
       if (resp?.Success && resp?.Data) {
         if (Array.isArray(resp.Data)) extracted = resp.Data;
-        else if ((resp.Data as any).$values && Array.isArray((resp.Data as any).$values))
+        else if (
+          (resp.Data as any).$values &&
+          Array.isArray((resp.Data as any).$values)
+        )
           extracted = (resp.Data as any).$values;
       }
-      const filtered = (extracted as RoutineDay[]).filter(d => Number((d as any).DayNumber) === dayNumber);
-      setDataByDay(prev => ({ ...prev, [dayNumber]: filtered }));
+      const filtered = (extracted as RoutineDay[]).filter(
+        (d) => Number((d as any).DayNumber) === dayNumber
+      );
+      setDataByDay((prev) => ({ ...prev, [dayNumber]: filtered }));
     } catch (e) {
       setError('No se pudo cargar los ejercicios del día');
     } finally {
@@ -49,7 +65,7 @@ export default function RoutineTemplateDaysScreen() {
     }
   };
 
-  const days = [1,2,3,4,5,6,7];
+  const days = [1, 2, 3, 4, 5, 6, 7];
   const exercises = dataByDay[selectedDay] || [];
 
   return (
@@ -59,14 +75,25 @@ export default function RoutineTemplateDaysScreen() {
       onPressBack={() => router.back()}
       backgroundColor="#1A1A1A"
     >
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} style={{ paddingHorizontal: 16 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }} contentContainerStyle={{ gap: 8 }}>
-          {days.map(d => {
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 24 }}
+        style={{ paddingHorizontal: 16 }}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ marginTop: 12 }}
+          contentContainerStyle={{ gap: 8 }}
+        >
+          {days.map((d) => {
             const active = d === selectedDay;
             return (
               <TouchableOpacity
                 key={d}
-                onPress={() => { setSelectedDay(d); if (!dataByDay[d]) fetchDay(d); }}
+                onPress={() => {
+                  setSelectedDay(d);
+                  if (!dataByDay[d]) fetchDay(d);
+                }}
                 style={{
                   paddingVertical: 6,
                   paddingHorizontal: 10,
@@ -76,7 +103,16 @@ export default function RoutineTemplateDaysScreen() {
                   borderColor: active ? '#FF6B35' : '#333',
                 }}
               >
-                <Text style={{ color: active ? '#FFF' : '#AAA', fontSize: 13, fontWeight: '600', letterSpacing: 0.5 }}>{['L','M','X','J','V','S','D'][d-1]}</Text>
+                <Text
+                  style={{
+                    color: active ? '#FFF' : '#AAA',
+                    fontSize: 13,
+                    fontWeight: '600',
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {['L', 'M', 'X', 'J', 'V', 'S', 'D'][d - 1]}
+                </Text>
               </TouchableOpacity>
             );
           })}
@@ -88,20 +124,38 @@ export default function RoutineTemplateDaysScreen() {
           ) : error ? (
             <Text style={{ color: '#FF6B35' }}>{error}</Text>
           ) : exercises.length === 0 ? (
-            <Text style={{ color: '#B0B0B0' }}>Sin ejercicios configurados para {getWeekdayNameEs(selectedDay)}.</Text>
+            <Text style={{ color: '#B0B0B0' }}>
+              Sin ejercicios configurados para {getWeekdayNameEs(selectedDay)}.
+            </Text>
           ) : (
             <RNView>
-              {exercises.map(ex => (
+              {exercises.map((ex) => (
                 <TouchableOpacity
                   key={ex.Id}
                   onPress={() => {
-                    const eid = (ex as any).ExerciseId || (ex as any).Exercise?.Id;
-                    if (eid) router.push({ pathname: '/exercise-detail', params: { exerciseId: String(eid) } });
+                    const eid =
+                      (ex as any).ExerciseId || (ex as any).Exercise?.Id;
+                    if (eid)
+                      router.push({
+                        pathname: '/exercise-detail',
+                        params: { exerciseId: String(eid) },
+                      });
                   }}
-                  style={{ backgroundColor: '#1D1D1D', borderRadius: 12, padding: 12, marginBottom: 12 }}
+                  style={{
+                    backgroundColor: '#1D1D1D',
+                    borderRadius: 12,
+                    padding: 12,
+                    marginBottom: 12,
+                  }}
                 >
-                  <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '600' }}>{ex.Exercise?.Name || ex.Name}</Text>
-                  <Text style={{ color: '#B0B0B0', marginTop: 6 }}>Reps: {ex.Repetitions} • Sets: {ex.Sets}</Text>
+                  <Text
+                    style={{ color: '#FFF', fontSize: 16, fontWeight: '600' }}
+                  >
+                    {ex.Exercise?.Name || ex.Name}
+                  </Text>
+                  <Text style={{ color: '#B0B0B0', marginTop: 6 }}>
+                    Reps: {ex.Repetitions} • Sets: {ex.Sets}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </RNView>
@@ -112,7 +166,12 @@ export default function RoutineTemplateDaysScreen() {
           <Button
             title={`Ir a ${getWeekdayNameEs(selectedDay)} en Rutina de Hoy`}
             variant="secondary"
-            onPress={() => router.push({ pathname: '/routine-day', params: { day: String(selectedDay) } })}
+            onPress={() =>
+              router.push({
+                pathname: '/routine-day',
+                params: { day: String(selectedDay) },
+              })
+            }
           />
         </RNView>
       </ScrollView>

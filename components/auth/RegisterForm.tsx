@@ -16,6 +16,8 @@ import Step5 from './steps/Step5';
 import { WelcomeScreen } from '../home';
 import { useAuthContext } from '@/components/auth/AuthContext';
 import { commonStyles } from './styles/common';
+import { makeRegisterFormStyles } from './styles/registerForm';
+import { useColorScheme } from '../useColorScheme';
 import { useRegisterForm } from './hooks/useRegisterForm';
 import { SkipButton } from './SkipButton';
 import { useCustomAlert } from '@/components/common/CustomAlert';
@@ -35,13 +37,14 @@ const stepTitles = [
 
 const RegisterForm = memo<RegisterFormProps>(
   ({ onRegister, onSwitchToLogin }) => {
-  // Refs para snapshots de cada paso
-  const step2Ref = useRef<any>(null);
-  const step3Ref = useRef<any>(null);
-  const step4Ref = useRef<any>(null);
-  const step5Ref = useRef<any>(null);
+    // Refs para snapshots de cada paso
+    const step2Ref = useRef<any>(null);
+    const step3Ref = useRef<any>(null);
+    const step4Ref = useRef<any>(null);
+    const step5Ref = useRef<any>(null);
 
-    // const colorScheme = useColorScheme();
+    const colorScheme = useColorScheme();
+    const rStyles = makeRegisterFormStyles(colorScheme);
     const authContext = useAuthContext();
     const { showError, showSuccess, AlertComponent } = useCustomAlert();
 
@@ -50,7 +53,7 @@ const RegisterForm = memo<RegisterFormProps>(
       showWelcomeScreen,
       registrationData,
       // setCurrentStep,
-    patchRegistrationData,
+      patchRegistrationData,
       handleSkipToWelcome,
       handleStep1Next,
       handleStep2Next,
@@ -232,19 +235,27 @@ const RegisterForm = memo<RegisterFormProps>(
               {currentStep === 0 && (
                 <TouchableOpacity
                   onPress={onSwitchToLogin}
-                  accessibilityLabel='Volver'
-                  accessibilityRole='button'
+                  accessibilityLabel="Volver"
+                  accessibilityRole="button"
                 >
-                  <Text style={[commonStyles.headerButtonText, { color: 'white' }]}>Atrás</Text>
+                  <Text
+                    style={[commonStyles.headerButtonText, rStyles.headerText]}
+                  >
+                    Atrás
+                  </Text>
                 </TouchableOpacity>
               )}
               {currentStep >= 2 && (
                 <TouchableOpacity
                   onPress={handleBackPreservingState}
-                  accessibilityLabel='Volver al paso anterior'
-                  accessibilityRole='button'
+                  accessibilityLabel="Volver al paso anterior"
+                  accessibilityRole="button"
                 >
-                  <Text style={[commonStyles.headerButtonText, { color: 'white' }]}>Atrás</Text>
+                  <Text
+                    style={[commonStyles.headerButtonText, rStyles.headerText]}
+                  >
+                    Atrás
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>

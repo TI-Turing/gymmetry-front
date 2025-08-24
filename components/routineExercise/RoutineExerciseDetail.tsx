@@ -1,25 +1,28 @@
 import React, { useMemo, useState } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import FormInput from '../common/FormInput';
 import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Colors from '@/constants/Colors';
-import { routineexerciseService, exerciseService } from '@/services';
+import { exerciseService } from '@/services';
 import BodyMusclesDiagram from '@/components/body/BodyMusclesDiagram';
 
 import { mapTagsToOverlayOpacities } from '@/components/body/overlayMapping';
 import type { Exercise } from '@/models/Exercise';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeRoutineExerciseDetailStyles } from './styles/routineExerciseDetail';
 
 export function RoutineExerciseDetail() {
+  const styles = useThemedStyles(makeRoutineExerciseDetailStyles);
   const [id, setId] = useState('');
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [overlayOpacities, setOverlayOpacities] = useState<Record<string, number>>({});
+  const [overlayOpacities, setOverlayOpacities] = useState<
+    Record<string, number>
+  >({});
   // Nuevos: mantener los tags crudos (0..1) para el gráfico 0..10
   const [muscleTags01, setMuscleTags01] = useState<Record<string, number>>({});
-
 
   const DEFAULT_EXERCISE_ID = 'C1A5BC8E-E264-4B32-A902-D25EEECF35B9';
 
@@ -28,8 +31,8 @@ export function RoutineExerciseDetail() {
     setError(null);
     try {
       const targetId = id?.trim() || DEFAULT_EXERCISE_ID;
-  const res = await exerciseService.getExerciseById(targetId);
-  const exercise = res.Data as Exercise | null;
+      const res = await exerciseService.getExerciseById(targetId);
+      const exercise = res.Data as Exercise | null;
       setItem(exercise);
       let tags: Record<string, number> = {};
       if (exercise?.TagsMuscle) {
@@ -64,27 +67,34 @@ export function RoutineExerciseDetail() {
       if (n > 1 && n <= 10) return Math.max(0, Math.min(1, n / 10));
       return Math.max(0, Math.min(1, n));
     };
-    const mapped = entries.map(([label, v]) => {
-      const v01 = normalize01(v);
-      return { label, value01: v01, value10: v01 * 10 };
-    }).filter(d => d.value10 > 0);
+    const mapped = entries
+      .map(([label, v]) => {
+        const v01 = normalize01(v);
+        return { label, value01: v01, value10: v01 * 10 };
+      })
+      .filter((d) => d.value10 > 0);
     mapped.sort((a, b) => b.value10 - a.value10);
     return mapped;
   }, [muscleTags01]);
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 24 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.title}>RoutineExercise - Detalle</Text>
-        <FormInput label='Id' value={id} onChangeText={setId} />
-        <Button title='Consultar' onPress={fetchOne} />
+        <FormInput label="Id" value={id} onChangeText={setId} />
+        <Button title="Consultar" onPress={fetchOne} />
         {loading ? (
           <LoadingSpinner />
         ) : (
           <>
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {!item && !error ? (
-              <Text style={styles.error}>Ejercicio no encontrado o sin datos</Text>
+              <Text style={styles.error}>
+                Ejercicio no encontrado o sin datos
+              </Text>
             ) : null}
             {item ? (
               <View style={styles.card}>
@@ -97,12 +107,19 @@ export function RoutineExerciseDetail() {
 
             {/* Diagrama de músculos arriba */}
             <View style={{ height: 420, marginTop: 12 }}>
-              <BodyMusclesDiagram palette="mono" width="100%" height="100%" overlayOpacities={overlayOpacities} />
+              <BodyMusclesDiagram
+                palette="mono"
+                width="100%"
+                height="100%"
+                overlayOpacities={overlayOpacities}
+              />
             </View>
 
             {/* Gráfico 0–10 por músculo debajo del diagrama */}
             <View style={styles.chartCard}>
-              <Text style={styles.sectionTitle}>Enfoque por músculo (0–10)</Text>
+              <Text style={styles.sectionTitle}>
+                Enfoque por músculo (0–10)
+              </Text>
               {muscleChartData.length === 0 ? (
                 <Text style={styles.muted}>Sin datos para mostrar.</Text>
               ) : (
@@ -113,64 +130,28 @@ export function RoutineExerciseDetail() {
                       <Text style={styles.barValue}>{Math.round(value10)}</Text>
                     </View>
                     <View style={styles.barTrack}>
-                      <View style={[styles.barFill, { width: `${(value10 / 10) * 100}%` }]} />
+                      <View
+                        style={[
+                          styles.barFill,
+                          { width: `${(value10 / 10) * 100}%` },
+                        ]}
+                      />
                     </View>
                   </View>
                 ))
               )}
               <View style={styles.scaleRow}>
                 {[0, 2, 4, 6, 8, 10].map((tick) => (
-                  <Text key={tick} style={styles.scaleTick}>{tick}</Text>
+                  <Text key={tick} style={styles.scaleTick}>
+                    {tick}
+                  </Text>
                 ))}
               </View>
             </View>
-
           </>
         )}
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-  error: { color: 'red', marginVertical: 8 },
-  info: { color: Colors.tint, marginTop: 8 },
-  card: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 6,
-  },
-  exerciseName: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  exerciseDesc: { fontSize: 14, opacity: 0.9 },
-  label: { marginBottom: 6, color: Colors.text },
-  textarea: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginVertical: 8 },
-  chartCard: {
-    backgroundColor: '#fff2',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
-  muted: { opacity: 0.7 },
-  barRow: { marginBottom: 10 },
-  barHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  barLabel: { fontSize: 14 },
-  barValue: { fontSize: 14, fontWeight: '600' },
-  barTrack: { height: 10, backgroundColor: '#ffffff33', borderRadius: 6, overflow: 'hidden' },
-  barFill: { height: '100%', backgroundColor: Colors.tint, borderRadius: 6 },
-  scaleRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-  scaleTick: { fontSize: 12, opacity: 0.8 },
-});
-export default styles;
+// styles provided by makeRoutineExerciseDetailStyles via useThemedStyles

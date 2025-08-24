@@ -10,5 +10,5 @@ export interface GymPlanSelectedType {
   price: number | null;
   usdPrice: number | null;
   description: string;
-  gymPlanSelecteds: any[];
+  gymPlanSelecteds: unknown[];
 }

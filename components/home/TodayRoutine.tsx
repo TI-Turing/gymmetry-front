@@ -1,7 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/components/useColorScheme';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeTodayRoutineStyles } from './styles/todayRoutine';
 
 interface TodayRoutineProps {
   routineName: string;
@@ -20,9 +24,10 @@ const TodayRoutine: React.FC<TodayRoutineProps> = ({
     return hasAttended ? 'check-circle' : 'clock-o';
   };
 
-  const getStatusColor = () => {
-    return hasAttended ? '#ff6300' : '#FF9800';
-  };
+  const theme = useColorScheme();
+  const palette = Colors[theme];
+  const styles = useThemedStyles(makeTodayRoutineStyles);
+  const getStatusColor = () => (hasAttended ? palette.tint : palette.warning);
 
   const getStatusText = () => {
     return hasAttended ? 'Completado' : 'Pendiente';
@@ -55,66 +60,17 @@ const TodayRoutine: React.FC<TodayRoutineProps> = ({
         </View>
 
         <View style={styles.arrowContainer}>
-          <FontAwesome name='chevron-right' size={16} color='#B0B0B0' />
+          <FontAwesome
+            name="chevron-right"
+            size={16}
+            color={palette.textMuted}
+          />
         </View>
       </View>
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 3.84,
-    elevation: 8,
-  },
-  completedContainer: {
-    backgroundColor: '#1E2E1E',
-    borderLeftWidth: 4,
-    borderLeftColor: '#ff6300',
-  },
-  pendingContainer: {
-    backgroundColor: '#2E2E1E',
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF9800',
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  iconContainer: {
-    marginRight: 16,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    marginBottom: 4,
-  },
-  routineName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  status: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  arrowContainer: {
-    marginLeft: 12,
-  },
-});
+// estilos ahora provienen de styles/todayRoutine.ts
 
 export default TodayRoutine;

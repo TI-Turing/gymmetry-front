@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { Modal, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Modal, View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/Themed';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makePaymentModalStyles } from './styles';
 
 type Props = {
   visible: boolean;
@@ -12,7 +14,15 @@ type Props = {
   amount?: number | null;
 };
 
-export default function CardPaymentModalWeb({ visible, onClose, onToken, publicKey, buyerEmail, amount }: Props) {
+export default function CardPaymentModalWeb({
+  visible,
+  onClose,
+  onToken,
+  publicKey,
+  buyerEmail,
+  amount,
+}: Props) {
+  const styles = useThemedStyles(makePaymentModalStyles);
   useEffect(() => {
     if (visible && publicKey) {
       // Inicializar SDK React
@@ -50,16 +60,26 @@ export default function CardPaymentModalWeb({ visible, onClose, onToken, publicK
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
           <View style={styles.header}>
             <Text style={styles.title}>Tarjeta (web)</Text>
-            <TouchableOpacity onPress={onClose}><Text style={styles.close}>Cerrar</Text></TouchableOpacity>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.close}>Cerrar</Text>
+            </TouchableOpacity>
           </View>
           {!publicKey ? (
             <View style={{ padding: 12 }}>
-              <Text>Falta la clave pública de Mercado Pago. Configura EXPO_PUBLIC_MP_PUBLIC_KEY.</Text>
+              <Text>
+                Falta la clave pública de Mercado Pago. Configura
+                EXPO_PUBLIC_MP_PUBLIC_KEY.
+              </Text>
             </View>
           ) : (
             <View style={{ flex: 1, padding: 16 }}>
@@ -76,11 +96,4 @@ export default function CardPaymentModalWeb({ visible, onClose, onToken, publicK
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  sheet: { height: '80%', backgroundColor: '#1a1a1a', borderTopLeftRadius: 16, borderTopRightRadius: 16, overflow: 'hidden' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#333' },
-  title: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  close: { color: '#ff6b35', fontWeight: '600' },
-});
+// styles via makePaymentModalStyles

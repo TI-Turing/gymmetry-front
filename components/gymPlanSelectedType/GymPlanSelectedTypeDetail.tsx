@@ -29,8 +29,8 @@ export function GymPlanSelectedTypeDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>GymPlanSelectedType - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

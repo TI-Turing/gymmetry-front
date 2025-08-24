@@ -2,6 +2,6 @@
 export interface ApplicationResponse {
   Success: boolean;
   Message: string;
-  Data: any | null;
+  Data: unknown | null;
   ErrorCode: string | null;
 }

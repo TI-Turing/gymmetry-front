@@ -17,8 +17,7 @@ export function CurrentOccupancyDetail() {
     setLoading(true);
     setError(null);
     try {
-      const res =
-        await currentOccupancyService.getCurrentOccupancyById(id);
+      const res = await currentOccupancyService.getCurrentOccupancyById(id);
       setItem(res.Data);
     } catch (_e) {
       setError('Error al consultar');
@@ -30,8 +29,8 @@ export function CurrentOccupancyDetail() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>CurrentOccupancy - Detalle</Text>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Consultar' onPress={fetchOne} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (

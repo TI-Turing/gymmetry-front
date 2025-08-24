@@ -8,8 +8,7 @@ import { accessMethodTypeService } from '@/services';
 
 export function AccessMethodTypeList() {
   const loadAccessMethodTypes = useCallback(async () => {
-    const response =
-      await accessMethodTypeService.getAllAccessMethodTypes();
+    const response = await accessMethodTypeService.getAllAccessMethodTypes();
     return response.Data || [];
   }, []);
 
@@ -52,13 +51,13 @@ export function AccessMethodTypeList() {
 
   return (
     <EntityList
-      title='Métodos de Acceso'
+      title="Métodos de Acceso"
       loadFunction={loadAccessMethodTypes}
       renderItem={renderAccessMethodTypeItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay métodos'
-      emptyMessage='No se encontraron métodos de acceso'
-      loadingMessage='Cargando métodos...'
+      emptyTitle="No hay métodos"
+      emptyMessage="No se encontraron métodos de acceso"
+      loadingMessage="Cargando métodos..."
     />
   );
 }

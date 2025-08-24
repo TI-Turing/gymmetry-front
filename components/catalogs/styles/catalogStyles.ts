@@ -68,7 +68,7 @@ export const catalogStyles = StyleSheet.create({
     marginBottom: 12,
     borderColor: '#666',
     fontSize: 16,
-  // color definido por getColorSchemeStyles.searchInputText
+    // color definido por getColorSchemeStyles.searchInputText
   },
   searchWrapper: {
     position: 'relative',
@@ -77,16 +77,16 @@ export const catalogStyles = StyleSheet.create({
   searchIcon: {
     position: 'absolute',
     right: 12,
-  top: '50%',
-  transform: [{ translateY: -9 }],
+    top: '50%',
+    transform: [{ translateY: -9 }],
   },
   loadingContainer: {
     alignItems: 'center',
     padding: 20,
   },
   optionItem: {
-  padding: 16,
-  borderBottomWidth: 0,
+    padding: 16,
+    borderBottomWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -140,7 +140,7 @@ export const getColorSchemeStyles = (colorScheme: 'light' | 'dark') => ({
     color: Colors[colorScheme].text,
   },
   optionItem: {
-  borderBottomColor: 'transparent',
+    borderBottomColor: 'transparent',
   },
   optionText: {
     color: Colors[colorScheme].text,

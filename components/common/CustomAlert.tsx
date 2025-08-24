@@ -64,18 +64,20 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
     }
   }, [visible, scaleAnim, opacityAnim]);
 
+  const palette = Colors[colorScheme];
+
   const getIconConfig = () => {
     switch (type) {
       case 'success':
-        return { name: 'check-circle', color: '#4CAF50' };
+        return { name: 'check-circle', color: palette.success };
       case 'error':
-        return { name: 'exclamation-circle', color: '#F44336' };
+        return { name: 'exclamation-circle', color: palette.danger };
       case 'warning':
-        return { name: 'exclamation-triangle', color: '#FF9800' };
+        return { name: 'exclamation-triangle', color: palette.warning };
       case 'info':
-        return { name: 'info-circle', color: '#2196F3' };
+        return { name: 'info-circle', color: palette.tint };
       default:
-        return { name: 'info-circle', color: '#2196F3' };
+        return { name: 'info-circle', color: palette.tint };
     }
   };
 
@@ -105,13 +107,13 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType='none'
+      animationType="none"
       onRequestClose={onClose}
     >
       <Animated.View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: palette.overlay,
           justifyContent: 'center',
           alignItems: 'center',
           padding: 20,
@@ -126,7 +128,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
 
         <View
           style={{
-            backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#FFFFFF',
+            backgroundColor: palette.card,
             borderRadius: 16,
             padding: 24,
             width: '100%',
@@ -170,7 +172,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
               style={{
                 fontSize: 20,
                 fontWeight: '700',
-                color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+                color: palette.text,
                 textAlign: 'center',
                 marginBottom: 8,
               }}
@@ -183,7 +185,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           <Text
             style={{
               fontSize: 16,
-              color: colorScheme === 'dark' ? '#E0E0E0' : '#424242',
+              color: palette.textMuted,
               textAlign: 'center',
               lineHeight: 24,
               marginBottom: 28,
@@ -209,7 +211,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   paddingHorizontal: 20,
                   borderRadius: 12,
                   backgroundColor:
-                    colorScheme === 'dark' ? '#404040' : '#F5F5F5',
+                    colorScheme === 'dark' ? '#404040' : '#F3F4F6',
                   alignItems: 'center',
                 }}
                 onPress={handleCancel}
@@ -218,7 +220,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   style={{
                     fontSize: 16,
                     fontWeight: '600',
-                    color: colorScheme === 'dark' ? '#FFFFFF' : '#424242',
+                    color: palette.text,
                   }}
                 >
                   {cancelText}
@@ -232,14 +234,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                 paddingVertical: 14,
                 paddingHorizontal: 20,
                 borderRadius: 12,
-                backgroundColor:
-                  type === 'success'
-                    ? Colors[colorScheme].tint
-                    : type === 'error'
-                      ? Colors[colorScheme].tint
-                      : type === 'warning'
-                        ? Colors[colorScheme].tint
-                        : Colors[colorScheme].tint,
+                backgroundColor: palette.tint,
                 alignItems: 'center',
               }}
               onPress={handleConfirm}
@@ -248,7 +243,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                 style={{
                   fontSize: 16,
                   fontWeight: '600',
-                  color: '#FFFFFF',
+                  color: palette.onTint,
                 }}
               >
                 {confirmText}
@@ -337,7 +332,7 @@ export const useCustomAlert = () => {
   );
 
   const hideAlert = React.useCallback(() => {
-    setAlert(prev => ({ ...prev, visible: false }));
+    setAlert((prev) => ({ ...prev, visible: false }));
   }, []);
 
   const AlertComponent = React.useCallback(

@@ -61,13 +61,13 @@ const BranchMediaList = React.memo(() => {
 
   return (
     <EntityList
-      title='Media de Sucursales'
+      title="Media de Sucursales"
       loadFunction={loadBranchMedia}
       renderItem={renderBranchMediaItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay archivos'
-      emptyMessage='No se encontraron archivos multimedia'
-      loadingMessage='Cargando archivos...'
+      emptyTitle="No hay archivos"
+      emptyMessage="No se encontraron archivos multimedia"
+      loadingMessage="Cargando archivos..."
     />
   );
 });

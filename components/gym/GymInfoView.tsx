@@ -1,13 +1,13 @@
 import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, TouchableOpacity } from 'react-native';
 import SmartImage from '@/components/common/SmartImage';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Colors from '@/constants/Colors';
 import { Gym } from './types';
-import { UI_CONSTANTS } from '@/constants/AppConstants';
 import { authService } from '@/services/authService';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeGymInfoViewStyles } from './styles/gymInfoView';
 
 interface GymInfoViewProps {
   gym: Gym;
@@ -20,6 +20,7 @@ export default function GymInfoView({
   onRefresh,
   onAddBranch,
 }: GymInfoViewProps) {
+  const styles = useThemedStyles(makeGymInfoViewStyles);
   // const { width } = Dimensions.get('window');
   const router = useRouter();
 
@@ -49,7 +50,11 @@ export default function GymInfoView({
           <SmartImage uri={gym.LogoUrl} style={styles.logo} deferOnDataSaver />
         ) : (
           <View style={styles.logoPlaceholder}>
-            <FontAwesome name='building-o' size={40} color={Colors.dark.tint} />
+            <FontAwesome
+              name="building-o"
+              size={40}
+              color={styles.colors.tint}
+            />
           </View>
         )}
 
@@ -61,13 +66,17 @@ export default function GymInfoView({
             <FontAwesome
               name={gym.IsVerified ? 'check-circle' : 'clock-o'}
               size={16}
-              color={gym.IsVerified ? '#4CAF50' : '#FFA726'}
+              color={
+                gym.IsVerified ? styles.colors.success : styles.colors.warning
+              }
             />
             <Text
               style={[
                 styles.statusText,
                 {
-                  color: gym.IsVerified ? '#4CAF50' : '#FFA726',
+                  color: gym.IsVerified
+                    ? styles.colors.success
+                    : styles.colors.warning,
                 },
               ]}
             >
@@ -78,7 +87,7 @@ export default function GymInfoView({
 
         {onRefresh && (
           <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
-            <FontAwesome name='refresh' size={20} color={Colors.dark.tint} />
+            <FontAwesome name="refresh" size={20} color={styles.colors.tint} />
           </TouchableOpacity>
         )}
       </View>
@@ -90,34 +99,34 @@ export default function GymInfoView({
         {gym.Description && (
           <View style={styles.infoItem}>
             <FontAwesome
-              name='info-circle'
+              name="info-circle"
               size={16}
-              color={Colors.dark.tint}
+              color={styles.colors.tint}
             />
             <Text style={styles.infoText}>{gym.Description}</Text>
           </View>
         )}
 
         <View style={styles.infoItem}>
-          <FontAwesome name='id-card' size={16} color={Colors.dark.tint} />
+          <FontAwesome name="id-card" size={16} color={styles.colors.tint} />
           <Text style={styles.infoText}>NIT: {gym.Nit}</Text>
         </View>
 
         <View style={styles.infoItem}>
-          <FontAwesome name='envelope' size={16} color={Colors.dark.tint} />
+          <FontAwesome name="envelope" size={16} color={styles.colors.tint} />
           <Text style={styles.infoText}>{gym.Email}</Text>
         </View>
 
         {gym.PhoneNumber && (
           <View style={styles.infoItem}>
-            <FontAwesome name='phone' size={16} color={Colors.dark.tint} />
+            <FontAwesome name="phone" size={16} color={styles.colors.tint} />
             <Text style={styles.infoText}>{gym.PhoneNumber}</Text>
           </View>
         )}
 
         {gym.WebsiteUrl && (
           <TouchableOpacity style={styles.infoItem}>
-            <FontAwesome name='globe' size={16} color={Colors.dark.tint} />
+            <FontAwesome name="globe" size={16} color={styles.colors.tint} />
             <Text style={[styles.infoText, styles.linkText]}>
               {gym.WebsiteUrl}
             </Text>
@@ -132,14 +141,22 @@ export default function GymInfoView({
 
           {gym.InstagramUrl && (
             <TouchableOpacity style={styles.infoItem}>
-              <FontAwesome name='instagram' size={16} color='#E4405F' />
+              <FontAwesome
+                name="instagram"
+                size={16}
+                color={styles.colors.tint}
+              />
               <Text style={[styles.infoText, styles.linkText]}>Instagram</Text>
             </TouchableOpacity>
           )}
 
           {gym.FacbookUrl && (
             <TouchableOpacity style={styles.infoItem}>
-              <FontAwesome name='facebook' size={16} color='#1877F2' />
+              <FontAwesome
+                name="facebook"
+                size={16}
+                color={styles.colors.tint}
+              />
               <Text style={[styles.infoText, styles.linkText]}>Facebook</Text>
             </TouchableOpacity>
           )}
@@ -175,7 +192,7 @@ export default function GymInfoView({
             style={styles.addBranchButton}
             onPress={onAddBranch}
           >
-            <FontAwesome name='plus' size={18} color='#FFFFFF' />
+            <FontAwesome name="plus" size={18} color={styles.colors.onTint} />
             <Text style={styles.addBranchText}>Agregar sede</Text>
           </TouchableOpacity>
         )}
@@ -186,7 +203,11 @@ export default function GymInfoView({
             style={styles.selectPlanButton}
             onPress={handleSelectPlan}
           >
-            <FontAwesome name='credit-card' size={18} color='#FFFFFF' />
+            <FontAwesome
+              name="credit-card"
+              size={18}
+              color={styles.colors.onTint}
+            />
             <Text style={styles.selectPlanText}>Seleccionar plan</Text>
           </TouchableOpacity>
         )}
@@ -197,7 +218,7 @@ export default function GymInfoView({
         <Text style={styles.sectionTitle}>Detalles</Text>
 
         <View style={styles.infoItem}>
-          <FontAwesome name='calendar' size={16} color={Colors.dark.tint} />
+          <FontAwesome name="calendar" size={16} color={styles.colors.tint} />
           <Text style={styles.infoText}>
             Miembro desde: {formatDate(gym.CreatedAt)}
           </Text>
@@ -205,7 +226,7 @@ export default function GymInfoView({
 
         {gym.UpdatedAt && (
           <View style={styles.infoItem}>
-            <FontAwesome name='edit' size={16} color={Colors.dark.tint} />
+            <FontAwesome name="edit" size={16} color={styles.colors.tint} />
             <Text style={styles.infoText}>
               Última actualización: {formatDate(gym.UpdatedAt)}
             </Text>
@@ -219,139 +240,4 @@ export default function GymInfoView({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-  header: {
-    flexDirection: 'row',
-    padding: UI_CONSTANTS.SPACING.LG,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-    backgroundColor: '#1A1A1A',
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    backgroundColor: '#333333',
-  },
-  logoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    backgroundColor: '#333333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerInfo: {
-    flex: 1,
-    marginLeft: UI_CONSTANTS.SPACING.MD,
-    justifyContent: 'center',
-  },
-  gymName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  slogan: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    fontStyle: 'italic',
-    marginBottom: 8,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusText: {
-    fontSize: 14,
-    marginLeft: 6,
-    fontWeight: '500',
-  },
-  refreshButton: {
-    padding: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  section: {
-    padding: UI_CONSTANTS.SPACING.LG,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.dark.tint,
-    marginBottom: UI_CONSTANTS.SPACING.MD,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: UI_CONSTANTS.SPACING.SM,
-    paddingVertical: 4,
-  },
-  infoText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    marginLeft: 12,
-    flex: 1,
-    lineHeight: 22,
-  },
-  linkText: {
-    color: Colors.dark.tint,
-    textDecorationLine: 'underline',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: UI_CONSTANTS.SPACING.MD,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.dark.tint,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    marginTop: 4,
-  },
-  addBranchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.dark.tint,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginTop: UI_CONSTANTS.SPACING.MD,
-  },
-  addBranchText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  selectPlanButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF6B35',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginTop: UI_CONSTANTS.SPACING.SM,
-  },
-  selectPlanText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-});
+// styles come from themed factory

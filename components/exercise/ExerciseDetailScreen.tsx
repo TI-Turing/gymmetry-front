@@ -1,9 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, View as RNView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  ScrollView,
+  View as RNView,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
-import { View, Text } from '@/components/Themed';
-import Button from '@/components/common/Button';
+import { Text } from '@/components/Themed';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { exerciseService } from '@/services/exerciseService';
 import type { Exercise } from '@/models/Exercise';
@@ -20,8 +25,12 @@ export default function ExerciseDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [current, setCurrent] = useState<Exercise | null>(null);
   const [results, setResults] = useState<Exercise[]>([]);
-  const [debounceTimer, setDebounceTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
-  const [overlayOpacities, setOverlayOpacities] = useState<Record<string, number>>({});
+  const [debounceTimer, setDebounceTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const [overlayOpacities, setOverlayOpacities] = useState<
+    Record<string, number>
+  >({});
   const [muscleTags01, setMuscleTags01] = useState<Record<string, number>>({});
 
   const fetchById = async (id: string) => {
@@ -100,7 +109,7 @@ export default function ExerciseDetailScreen() {
         const v01 = normalize01(v);
         return { label, value01: v01, value10: v01 * 10 };
       })
-      .filter(d => d.value10 > 0);
+      .filter((d) => d.value10 > 0);
     mapped.sort((a, b) => b.value10 - a.value10);
     return mapped;
   }, [muscleTags01]);
@@ -112,7 +121,10 @@ export default function ExerciseDetailScreen() {
       onPressBack={() => router.back()}
       backgroundColor="#1A1A1A"
     >
-      <ScrollView style={{ paddingHorizontal: 16 }} contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView
+        style={{ paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
         {/* Input búsqueda en tiempo real */}
         <RNView style={{ marginTop: 12, marginBottom: 4 }}>
           <Text style={styles.label}>Buscar ejercicio</Text>
@@ -128,7 +140,7 @@ export default function ExerciseDetailScreen() {
         {/* Sugerencias bajo el buscador */}
         {results.length > 0 && (
           <RNView style={styles.suggestionsCard}>
-            {results.map(ex => (
+            {results.map((ex) => (
               <TouchableOpacity
                 key={ex.Id}
                 onPress={() => {
@@ -163,25 +175,39 @@ export default function ExerciseDetailScreen() {
             {/* Card de título/descripción */}
             <RNView style={styles.headerCard}>
               <Text style={styles.exerciseName}>{current.Name}</Text>
-              {current.Description && <Text style={styles.exerciseDesc}>{current.Description}</Text>}
-              {(((current as any)?.CategoryExercise?.Name) || current.CategoryExerciseId) ? (
+              {current.Description && (
+                <Text style={styles.exerciseDesc}>{current.Description}</Text>
+              )}
+              {(current as any)?.CategoryExercise?.Name ||
+              current.CategoryExerciseId ? (
                 <Text style={styles.metaText}>
-                  Categoría: {(current as any)?.CategoryExercise?.Name ?? current.CategoryExerciseId}
+                  Categoría:{' '}
+                  {(current as any)?.CategoryExercise?.Name ??
+                    current.CategoryExerciseId}
                 </Text>
               ) : null}
               {Boolean((current as any).MuscleGroup) && (
-                <Text style={styles.metaText}>Grupo muscular: {(current as any).MuscleGroup}</Text>
+                <Text style={styles.metaText}>
+                  Grupo muscular: {(current as any).MuscleGroup}
+                </Text>
               )}
             </RNView>
 
             {/* Diagrama de músculos */}
             <RNView style={{ height: 420 }}>
-              <BodyMusclesDiagram palette="mono" width="100%" height="100%" overlayOpacities={overlayOpacities} />
+              <BodyMusclesDiagram
+                palette="mono"
+                width="100%"
+                height="100%"
+                overlayOpacities={overlayOpacities}
+              />
             </RNView>
 
             {/* Gráfico 0–10 por músculo */}
             <RNView style={styles.chartCard}>
-              <Text style={styles.sectionTitle}>Enfoque por músculo (0–10)</Text>
+              <Text style={styles.sectionTitle}>
+                Enfoque por músculo (0–10)
+              </Text>
               {muscleChartData.length === 0 ? (
                 <Text style={styles.muted}>Sin datos para mostrar.</Text>
               ) : (
@@ -192,20 +218,29 @@ export default function ExerciseDetailScreen() {
                       <Text style={styles.barValue}>{Math.round(value10)}</Text>
                     </RNView>
                     <RNView style={styles.barTrack}>
-                      <RNView style={[styles.barFill, { width: `${(value10 / 10) * 100}%` }]} />
+                      <RNView
+                        style={[
+                          styles.barFill,
+                          { width: `${(value10 / 10) * 100}%` },
+                        ]}
+                      />
                     </RNView>
                   </RNView>
                 ))
               )}
               <RNView style={styles.scaleRow}>
                 {[0, 2, 4, 6, 8, 10].map((tick) => (
-                  <Text key={tick} style={styles.scaleTick}>{tick}</Text>
+                  <Text key={tick} style={styles.scaleTick}>
+                    {tick}
+                  </Text>
                 ))}
               </RNView>
             </RNView>
           </RNView>
         ) : (
-          <Text style={{ color: '#B0B0B0' }}>Ingresa un nombre o selecciona un resultado para ver el detalle.</Text>
+          <Text style={{ color: '#B0B0B0' }}>
+            Ingresa un nombre o selecciona un resultado para ver el detalle.
+          </Text>
         )}
       </ScrollView>
     </ScreenWrapper>
@@ -245,7 +280,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderRadius: 12,
     padding: 14,
-  marginTop: 12,
+    marginTop: 12,
   },
   exerciseName: { color: '#FFF', fontSize: 18, fontWeight: '700' },
   exerciseDesc: { color: '#B0B0B0', marginTop: 6 },
@@ -257,14 +292,32 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
   },
-  sectionTitle: { color: '#FFF', fontSize: 16, fontWeight: '600', marginBottom: 8 },
+  sectionTitle: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
   muted: { color: '#AAA' },
   barRow: { marginBottom: 10 },
-  barHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  barHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   barLabel: { color: '#DDD' },
   barValue: { color: '#FFF', fontWeight: '700' },
-  barTrack: { height: 10, backgroundColor: '#2A2A2A', borderRadius: 6, overflow: 'hidden' },
+  barTrack: {
+    height: 10,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
   barFill: { height: '100%', backgroundColor: '#FF6B35', borderRadius: 6 },
-  scaleRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
+  scaleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 6,
+  },
   scaleTick: { color: '#888', fontSize: 12 },
 });

@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "expo"
-  ],
+  "extends": ["expo", "plugin:prettier/recommended"],
   "overrides": [
     {
       "files": ["**/*.ts", "**/*.tsx"],
@@ -13,18 +11,41 @@
           "jsx": true
         }
       },
-      "plugins": ["@typescript-eslint"],
-      "extends": [
-        "expo",
-        "@typescript-eslint/recommended"
+      "plugins": [
+        "@typescript-eslint",
+        "unused-imports",
+        "react",
+        "react-hooks",
+        "import"
       ],
+      "extends": ["expo", "plugin:@typescript-eslint/recommended"],
       "rules": {
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/ban-ts-comment": "off",
-        "@typescript-eslint/no-empty-function": "off",
+        "prettier/prettier": ["error", { "endOfLine": "auto" }],
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+          "error",
+          {
+            "vars": "all",
+            "varsIgnorePattern": "^_",
+            "args": "after-used",
+            "argsIgnorePattern": "^_",
+            "ignoreRestSiblings": true
+          }
+        ],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "ignoreRestSiblings": true
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/ban-ts-comment": "warn",
+        "@typescript-eslint/no-empty-function": "warn",
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        "@typescript-eslint/no-redeclare": "off"
+        "@typescript-eslint/no-redeclare": "error",
+        "react-hooks/exhaustive-deps": "error"
       }
     }
   ],
@@ -36,7 +57,7 @@
   },
   "rules": {
     "no-unused-vars": "off",
-    "react-hooks/exhaustive-deps": "off",
+    "react-hooks/exhaustive-deps": "error",
     "import/no-unresolved": "off",
     "react/no-unescaped-entities": "off",
     "consistent-return": "off",
@@ -46,8 +67,6 @@
     "node_modules/",
     ".expo/",
     "dist/",
-    "*.js",
-    "**/*.js",
     "scripts/",
     "babel.config.js",
     "metro.config.js",

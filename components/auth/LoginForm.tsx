@@ -15,6 +15,7 @@ import { useColorScheme } from '../useColorScheme';
 import { handleApiError } from '@/utils';
 import { commonStyles } from './styles/common';
 import Colors from '@/constants/Colors';
+import { makeLoginStyles, getWebGradientColors } from './styles/loginForm';
 import { LoginRequest } from '@/dto/auth/requests';
 import { useI18n } from '@/i18n';
 
@@ -38,12 +39,13 @@ export default function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
 
   const colorScheme = useColorScheme();
+  const styles = makeLoginStyles(colorScheme);
 
   const handleLogin = useCallback(async () => {
     // Validation
     if (!userNameOrEmail || !password) {
       if (showAlert) {
-  showAlert(t('fill_all_fields'));
+        showAlert(t('fill_all_fields'));
       }
       return;
     }
@@ -56,7 +58,7 @@ export default function LoginForm({
       }
       // Si es Success: true, AuthContainer manejará el éxito
     } catch (error: any) {
-  const errorMessage = handleApiError(error);
+      const errorMessage = handleApiError(error);
       if (showAlert) {
         showAlert(errorMessage);
       }
@@ -66,7 +68,7 @@ export default function LoginForm({
   }, [userNameOrEmail, password, onLogin, showAlert]);
 
   const togglePasswordVisibility = useCallback(() => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
   }, []);
 
   const isFormValid = !!userNameOrEmail && !!password;
@@ -78,7 +80,10 @@ export default function LoginForm({
   return (
     <>
       <KeyboardAvoidingView
-        style={[{ flex: 1 }, isWeb && { backgroundColor: '#1A1A1A' }]}
+        style={[
+          { flex: 1 },
+          isWeb && { backgroundColor: Colors[colorScheme].background },
+        ]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
@@ -88,10 +93,10 @@ export default function LoginForm({
             isWeb && {
               alignItems: 'center',
               minHeight: screenHeight,
-              backgroundColor: '#1A1A1A',
+              backgroundColor: Colors[colorScheme].background,
             },
           ]}
-          keyboardShouldPersistTaps='handled'
+          keyboardShouldPersistTaps="handled"
         >
           <View
             style={[
@@ -103,19 +108,16 @@ export default function LoginForm({
           >
             {isWeb ? (
               <LinearGradient
-                colors={['#000000', '#121212', '#000000']}
+                colors={
+                  getWebGradientColors(colorScheme) as unknown as [
+                    string,
+                    string,
+                    ...string[],
+                  ]
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={{
-                  borderRadius: 0,
-                  padding: 40,
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 8 },
-                  shadowOpacity: 0.4,
-                  shadowRadius: 12,
-                  elevation: 12,
-                  borderWidth: 0,
-                }}
+                style={styles.webGradientContainer}
               >
                 <WebFormContent
                   colorScheme={colorScheme}
@@ -182,6 +184,7 @@ function WebFormContent({
   onSwitchToRegister,
 }: FormContentProps) {
   const { t } = useI18n();
+  const styles = makeLoginStyles(colorScheme);
   return (
     <>
       <View
@@ -190,27 +193,8 @@ function WebFormContent({
           { marginBottom: 40, backgroundColor: 'transparent' },
         ]}
       >
-        <Text
-          style={[
-            commonStyles.title,
-            {
-              color: Colors.dark.tint,
-              fontSize: 34,
-              fontWeight: 'bold',
-            },
-          ]}
-        >
-          GYMMETRY
-        </Text>
-        <Text
-          style={[
-            commonStyles.subtitle,
-            {
-              color: '#FFFFFF',
-              backgroundColor: 'transparent',
-            },
-          ]}
-        >
+        <Text style={[commonStyles.title, styles.titleWeb]}>GYMMETRY</Text>
+        <Text style={[commonStyles.subtitle, styles.subtitleWeb]}>
           {t('login_subtitle')}
         </Text>
       </View>
@@ -222,35 +206,19 @@ function WebFormContent({
             { backgroundColor: 'transparent' },
           ]}
         >
-          <Text
-            style={[
-              commonStyles.label,
-              {
-                color: '#FFFFFF',
-                backgroundColor: 'transparent',
-              },
-            ]}
-          >
+          <Text style={[commonStyles.label, styles.label]}>
             {t('username_or_email')}
           </Text>
           <TextInput
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: '#1E1E1E',
-                color: '#FFFFFF',
-                borderColor: Colors.dark.tint,
-                borderWidth: 2,
-              },
-            ]}
+            style={[commonStyles.input, styles.webInput]}
             value={userNameOrEmail}
             onChangeText={setUserNameOrEmail}
-            placeholderTextColor='#B0B0B0'
-            keyboardType='email-address'
-            autoCapitalize='none'
+            placeholderTextColor={Colors[colorScheme].textMuted}
+            keyboardType="email-address"
+            autoCapitalize="none"
             autoCorrect={false}
-            autoComplete='email'
-            textContentType='emailAddress'
+            autoComplete="email"
+            textContentType="emailAddress"
             accessibilityLabel={t('username_or_email')}
             accessibilityHint={t('username_or_email')}
           />
@@ -262,15 +230,7 @@ function WebFormContent({
             { backgroundColor: 'transparent' },
           ]}
         >
-          <Text
-            style={[
-              commonStyles.label,
-              {
-                color: '#FFFFFF',
-                backgroundColor: 'transparent',
-              },
-            ]}
-          >
+          <Text style={[commonStyles.label, styles.label]}>
             {t('password_label')}
           </Text>
           <View
@@ -279,39 +239,30 @@ function WebFormContent({
             <TextInput
               style={[
                 commonStyles.input,
-                {
-                  backgroundColor: '#1E1E1E',
-                  color: '#FFFFFF',
-                  borderColor: '#666',
-                  borderWidth: 2,
-                  paddingRight: 50,
-                },
+                styles.webInput,
+                { paddingRight: 50 },
               ]}
               value={password}
               onChangeText={setPassword}
-              placeholderTextColor='#B0B0B0'
+              placeholderTextColor={Colors[colorScheme].textMuted}
               secureTextEntry={!showPassword}
-              autoComplete='password'
-              textContentType='password'
-              accessibilityLabel='Campo de contraseña'
-              accessibilityHint='Ingresa tu contraseña'
+              autoComplete="password"
+              textContentType="password"
+              accessibilityLabel="Campo de contraseña"
+              accessibilityHint="Ingresa tu contraseña"
             />
             <TouchableOpacity
-              style={{
-                position: 'absolute',
-                right: 16,
-                top: 12,
-                padding: 4,
-                backgroundColor: 'transparent',
-              }}
+              style={styles.eyeButtonWeb}
               onPress={togglePasswordVisibility}
-              accessibilityLabel={showPassword ? t('hide_password') : t('show_password')}
-              accessibilityRole='button'
+              accessibilityLabel={
+                showPassword ? t('hide_password') : t('show_password')
+              }
+              accessibilityRole="button"
             >
               <FontAwesome
                 name={showPassword ? 'eye-slash' : 'eye'}
                 size={20}
-                color='#FFFFFF'
+                color={Colors[colorScheme].text}
               />
             </TouchableOpacity>
           </View>
@@ -320,19 +271,16 @@ function WebFormContent({
         <TouchableOpacity
           style={[
             commonStyles.button,
-            {
-              backgroundColor: Colors.dark.tint,
-              marginTop: 24,
-            },
+            styles.primaryButtonWeb,
             (!isFormValid || isLoading) && { opacity: 0.6 },
           ]}
           onPress={handleLogin}
           disabled={!isFormValid || isLoading}
           accessibilityLabel={isLoading ? t('signing_in') : t('sign_in')}
-          accessibilityRole='button'
+          accessibilityRole="button"
           accessibilityState={{ disabled: !isFormValid || isLoading }}
         >
-          <Text style={[commonStyles.buttonText, { color: '#FFFFFF' }]}>
+          <Text style={[commonStyles.buttonText, styles.buttonText]}>
             {isLoading ? t('signing_in') : t('sign_in')}
           </Text>
         </TouchableOpacity>
@@ -346,7 +294,7 @@ function WebFormContent({
         >
           <Text
             style={{
-              color: '#FFFFFF',
+              color: Colors[colorScheme].text,
               marginBottom: 8,
               backgroundColor: 'transparent',
             }}
@@ -356,17 +304,9 @@ function WebFormContent({
           <TouchableOpacity
             onPress={onSwitchToRegister}
             accessibilityLabel={t('go_register')}
-            accessibilityRole='button'
+            accessibilityRole="button"
           >
-            <Text
-              style={{
-                color: Colors.dark.tint,
-                fontWeight: '600',
-                backgroundColor: 'transparent',
-              }}
-            >
-              {t('go_register')}
-            </Text>
+            <Text style={styles.link}>{t('go_register')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -388,93 +328,59 @@ function MobileFormContent({
   onSwitchToRegister,
 }: FormContentProps) {
   const { t } = useI18n();
+  const styles = makeLoginStyles(colorScheme);
   return (
     <>
       <View style={[commonStyles.header, { marginBottom: 40 }]}>
-        <Text
-          style={[
-            commonStyles.title,
-            {
-              color: Colors[colorScheme].tint,
-              fontSize: 34,
-              fontWeight: 'bold',
-            },
-          ]}
-        >
-          GYMMETRY
-        </Text>
-        <Text
-          style={[commonStyles.subtitle, { color: Colors[colorScheme].text }]}
-        >
+        <Text style={[commonStyles.title, styles.titleMobile]}>GYMMETRY</Text>
+        <Text style={[commonStyles.subtitle, styles.subtitleMobile]}>
           {t('login_subtitle')}
         </Text>
       </View>
 
       <View style={commonStyles.form}>
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, styles.label]}>
             {t('username_or_email')}
           </Text>
           <TextInput
-            style={[
-              commonStyles.input,
-              {
-                backgroundColor: Colors[colorScheme].background,
-                color: Colors[colorScheme].text,
-                borderColor: Colors[colorScheme].tint,
-              },
-            ]}
+            style={[commonStyles.input, styles.mobileInput]}
             value={userNameOrEmail}
             onChangeText={setUserNameOrEmail}
             placeholderTextColor={`${Colors[colorScheme].text}60`}
-            keyboardType='email-address'
-            autoCapitalize='none'
+            keyboardType="email-address"
+            autoCapitalize="none"
             autoCorrect={false}
-            autoComplete='email'
-            textContentType='emailAddress'
+            autoComplete="email"
+            textContentType="emailAddress"
             accessibilityLabel={t('username_or_email')}
             accessibilityHint={t('username_or_email')}
           />
         </View>
 
         <View style={commonStyles.inputContainer}>
-          <Text
-            style={[commonStyles.label, { color: Colors[colorScheme].text }]}
-          >
+          <Text style={[commonStyles.label, styles.label]}>
             {t('password_label')}
           </Text>
           <View style={{ position: 'relative' }}>
             <TextInput
-              style={[
-                commonStyles.input,
-                {
-                  backgroundColor: Colors[colorScheme].background,
-                  color: Colors[colorScheme].text,
-                  borderColor: '#666',
-                  paddingRight: 50,
-                },
-              ]}
+              style={[commonStyles.input, styles.passwordInputMobile]}
               value={password}
               onChangeText={setPassword}
               placeholderTextColor={`${Colors[colorScheme].text}60`}
               secureTextEntry={!showPassword}
-              autoComplete='password'
-              textContentType='password'
+              autoComplete="password"
+              textContentType="password"
               accessibilityLabel={t('password_label')}
               accessibilityHint={t('password_label')}
             />
             <TouchableOpacity
-              style={{
-                position: 'absolute',
-                right: 16,
-                top: 12,
-                padding: 4,
-              }}
+              style={styles.eyeButton}
               onPress={togglePasswordVisibility}
-              accessibilityLabel={showPassword ? t('hide_password') : t('show_password')}
-              accessibilityRole='button'
+              accessibilityLabel={
+                showPassword ? t('hide_password') : t('show_password')
+              }
+              accessibilityRole="button"
             >
               <FontAwesome
                 name={showPassword ? 'eye-slash' : 'eye'}
@@ -488,13 +394,13 @@ function MobileFormContent({
         <TouchableOpacity
           style={[
             commonStyles.button,
-            { backgroundColor: Colors[colorScheme].tint },
+            styles.primaryButton,
             (!isFormValid || isLoading) && commonStyles.buttonDisabled,
           ]}
           onPress={handleLogin}
           disabled={!isFormValid || isLoading}
           accessibilityLabel={isLoading ? t('signing_in') : t('sign_in')}
-          accessibilityRole='button'
+          accessibilityRole="button"
           accessibilityState={{ disabled: !isFormValid || isLoading }}
         >
           <Text style={commonStyles.buttonText}>
@@ -509,7 +415,7 @@ function MobileFormContent({
           <TouchableOpacity
             onPress={onSwitchToRegister}
             accessibilityLabel={t('go_register')}
-            accessibilityRole='button'
+            accessibilityRole="button"
           >
             <Text
               style={[{ color: Colors[colorScheme].tint, fontWeight: '600' }]}

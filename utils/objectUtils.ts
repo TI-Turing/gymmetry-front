@@ -4,12 +4,12 @@
  * @returns Objeto solo con campos que tienen valor
  */
 export const filterEmptyFields = (
-  obj: Record<string, any>
-): Record<string, any> => {
-  const filtered: Record<string, any> = {};
+  obj: Record<string, unknown>
+): Record<string, unknown> => {
+  const filtered: Record<string, unknown> = {};
 
-  Object.keys(obj).forEach(key => {
-    const value = obj[key];
+  Object.keys(obj).forEach((key) => {
+    const value = obj[key as keyof typeof obj];
 
     // Solo agregar si el valor no está vacío
     if (
@@ -18,7 +18,8 @@ export const filterEmptyFields = (
       value !== '' &&
       (typeof value !== 'string' || value.trim() !== '')
     ) {
-      filtered[key] = typeof value === 'string' ? value.trim() : value;
+      filtered[key] =
+        typeof value === 'string' ? (value as string).trim() : value;
     }
   });
 
@@ -30,7 +31,7 @@ export const filterEmptyFields = (
  * @param value Valor a validar
  * @returns true si el valor tiene contenido válido
  */
-export const hasValidValue = (value: any): boolean => {
+export const hasValidValue = (value: unknown): boolean => {
   if (value === null || value === undefined) {
     return false;
   }
@@ -45,9 +46,17 @@ export const hasValidValue = (value: any): boolean => {
 
 // Normaliza colecciones que pueden venir de .NET con forma { $values: [...] }
 // Acepta: array directo, objeto con $values, null/undefined -> []
-export function normalizeCollection<T = any>(raw: any): T[] {
+type WithValues = { $values?: unknown };
+
+export function normalizeCollection<T = unknown>(raw: unknown): T[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw as T[];
-  if (Array.isArray(raw?.$values)) return raw.$values as T[];
+  if (
+    typeof raw === 'object' &&
+    raw !== null &&
+    Array.isArray((raw as WithValues).$values)
+  ) {
+    return ((raw as WithValues).$values as unknown[] as T[]) || [];
+  }
   return [];
 }

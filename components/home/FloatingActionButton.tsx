@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { makeFloatingActionButtonStyles } from './styles/floatingActionButton';
 
 interface FloatingActionButtonProps {
   onPress: () => void;
@@ -13,8 +15,9 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onPress,
   icon = 'plus',
   size = 56,
-  backgroundColor = '#2196F3',
+  backgroundColor,
 }) => {
+  const { styles, colors } = useThemedStyles(makeFloatingActionButtonStyles);
   return (
     <TouchableOpacity
       style={[
@@ -23,33 +26,15 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor,
+          backgroundColor: backgroundColor || colors.tint,
         },
       ]}
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <FontAwesome name={icon} size={size * 0.4} color='#FFFFFF' />
+      <FontAwesome name={icon} size={size * 0.4} color={colors.onTint} />
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: 100, // Para que no quede encima del tab bar
-    right: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
-  },
-});
 
 export default FloatingActionButton;

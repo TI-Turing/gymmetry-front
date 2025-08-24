@@ -8,7 +8,10 @@ interface Props {
   size?: number;
 }
 
-function getRadarPoints(size: number, values: number[]): { x: number; y: number }[] {
+function getRadarPoints(
+  size: number,
+  values: number[]
+): { x: number; y: number }[] {
   const cx = size / 2;
   const cy = size / 2;
   const r = size * 0.38;
@@ -26,11 +29,11 @@ function getRadarPoints(size: number, values: number[]): { x: number; y: number 
 
 export default function RadarChart({ objectives, size = 320 }: Props) {
   const keys = Object.keys(objectives);
-  const values = keys.map(k => objectives[k] ?? 0);
+  const values = keys.map((k) => objectives[k] ?? 0);
   const points = getRadarPoints(size, values);
   const basePoints = getRadarPoints(size, Array(keys.length).fill(1));
-  const pointsStr = points.map(p => `${p.x},${p.y}`).join(' ');
-  const baseStr = basePoints.map(p => `${p.x},${p.y}`).join(' ');
+  const pointsStr = points.map((p) => `${p.x},${p.y}`).join(' ');
+  const baseStr = basePoints.map((p) => `${p.x},${p.y}`).join(' ');
   const cx = size / 2;
   const cy = size / 2;
 
@@ -50,9 +53,20 @@ export default function RadarChart({ objectives, size = 320 }: Props) {
           />
         ))}
         {/* Polígono base */}
-        <Polygon points={baseStr} fill="#fff2" stroke={Colors.tint} strokeWidth={2} />
+        <Polygon
+          points={baseStr}
+          fill="#fff2"
+          stroke={Colors.tint}
+          strokeWidth={2}
+        />
         {/* Polígono de valores */}
-        <Polygon points={pointsStr} fill={Colors.tint} fillOpacity={0.7} stroke={Colors.tint} strokeWidth={3} />
+        <Polygon
+          points={pointsStr}
+          fill={Colors.tint}
+          fillOpacity={0.7}
+          stroke={Colors.tint}
+          strokeWidth={3}
+        />
         {/* Puntos y labels */}
         {basePoints.map((p, i) => (
           <>

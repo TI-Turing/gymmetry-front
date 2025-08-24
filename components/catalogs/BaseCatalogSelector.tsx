@@ -23,8 +23,8 @@ interface BaseCatalogSelectorProps {
 export const BaseCatalogSelector = memo<BaseCatalogSelectorProps>(
   ({
     label,
-  value,
-  placeholder = 'Seleccione',
+    value,
+    placeholder = 'Seleccione',
     disabled = false,
     loading = false,
     required = false,
@@ -38,10 +38,10 @@ export const BaseCatalogSelector = memo<BaseCatalogSelectorProps>(
     const colorStyles = getColorSchemeStyles(colorScheme);
 
     const selectedItem = useMemo(() => {
-      return data.find(item => item.Id === value);
+      return data.find((item) => item.Id === value);
     }, [data, value]);
 
-  const displayText = selectedItem?.Nombre || placeholder;
+    const displayText = selectedItem?.Nombre || placeholder;
     const isSelected = !!selectedItem;
 
     return (
@@ -65,7 +65,7 @@ export const BaseCatalogSelector = memo<BaseCatalogSelectorProps>(
           accessibilityHint={accessibilityHint}
         >
           {loading ? (
-            <LoadingSpinner size='small' />
+            <LoadingSpinner size="small" />
           ) : (
             <Text
               style={[

@@ -70,8 +70,8 @@ export interface AsyncState<T> extends LoadingState {
 
 // Navigation types
 export interface NavigationProps {
-  navigation: any; // TODO: Type properly with React Navigation types
-  route: any;
+  navigation: unknown; // TODO: Type properly with React Navigation types
+  route: unknown;
 }
 
 // Theme types
@@ -120,14 +120,14 @@ export interface UserSession {
   isAuthenticated: boolean;
   token?: string;
   refreshToken?: string;
-  user?: any; // TODO: Define proper User type
+  user?: unknown; // TODO: Define proper User type
 }
 
 // API Error types
 export interface ApiError extends Error {
   status?: number;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
 // Environment configuration types

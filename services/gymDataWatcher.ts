@@ -48,7 +48,7 @@ class GymDataWatcher {
   private async handleGymDataChange(
     newValue: string | null,
     oldValue: string | null,
-    key: string
+    _key: string
   ): Promise<void> {
     // Si no hay valor nuevo, no hacer nada
     if (!newValue) {
@@ -123,7 +123,7 @@ class GymDataWatcher {
         '[GymDataWatcher] Error parseando newValue, intentando con el gymId actual del cache.',
         _error
       );
-      }
+    }
   }
 
   // Consultar datos actualizados del gym

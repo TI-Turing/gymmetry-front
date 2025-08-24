@@ -60,7 +60,7 @@ export default function AccessMethodDropdown({
     }
   };
 
-  const selectedMethod = accessMethods.find(method => method.Id === value);
+  const selectedMethod = accessMethods.find((method) => method.Id === value);
 
   const handleSelect = (methodId: string) => {
     onValueChange(methodId);
@@ -77,7 +77,7 @@ export default function AccessMethodDropdown({
           </Text>
         )}
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size='small' color={Colors.dark.tint} />
+          <ActivityIndicator size="small" color={Colors.dark.tint} />
           <Text style={styles.loadingText}>Cargando métodos...</Text>
         </View>
       </View>
@@ -94,7 +94,7 @@ export default function AccessMethodDropdown({
           </Text>
         )}
         <View style={styles.errorContainer}>
-          <FontAwesome name='exclamation-triangle' size={16} color='#FF6B6B' />
+          <FontAwesome name="exclamation-triangle" size={16} color="#FF6B6B" />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity
             onPress={loadAccessMethods}
@@ -149,7 +149,7 @@ export default function AccessMethodDropdown({
             showsVerticalScrollIndicator={false}
             nestedScrollEnabled={true}
           >
-            {accessMethods.map(method => (
+            {accessMethods.map((method) => (
               <TouchableOpacity
                 key={method.Id}
                 style={[
@@ -168,7 +168,7 @@ export default function AccessMethodDropdown({
                 </Text>
                 {value === method.Id && (
                   <FontAwesome
-                    name='check'
+                    name="check"
                     size={16}
                     color={Colors.dark.tint}
                   />

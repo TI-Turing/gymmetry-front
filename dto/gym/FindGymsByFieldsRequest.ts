@@ -1,3 +1,3 @@
 export interface FindGymsByFieldsRequest {
-  fields: { [key: string]: any };
+  fields: Record<string, unknown>;
 }

@@ -14,8 +14,9 @@ const PermissionList = React.memo(() => {
       const result = await servicePlaceholder();
 
       return result || [];
-    } catch (_error) {return [];
-  }
+    } catch (_error) {
+      return [];
+    }
   }, []);
 
   const renderPermissionItem = useCallback(
@@ -67,8 +68,8 @@ const PermissionList = React.memo(() => {
                       ? '#ffa726'
                       : item.level === 'user'
                         ? '#ff6300'
-                        : Colors.light.text
-  },
+                        : Colors.light.text,
+              },
             ]}
           >
             {item.level === 'admin'
@@ -122,8 +123,8 @@ const PermissionList = React.memo(() => {
             style={[
               styles.value,
               {
-                color: item.requiresTwoFactor ? '#ffa726' : Colors.light.text
-  },
+                color: item.requiresTwoFactor ? '#ffa726' : Colors.light.text,
+              },
             ]}
           >
             {item.requiresTwoFactor ? '🔐 Sí' : '🔓 No'}
@@ -161,13 +162,13 @@ const PermissionList = React.memo(() => {
 
   return (
     <EntityList
-      title='Permisos'
+      title="Permisos"
       loadFunction={loadPermissions}
       renderItem={renderPermissionItem}
       keyExtractor={keyExtractor}
-      emptyTitle='No hay permisos'
-      emptyMessage='No se encontraron permisos'
-      loadingMessage='Cargando permisos...'
+      emptyTitle="No hay permisos"
+      emptyMessage="No se encontraron permisos"
+      loadingMessage="Cargando permisos..."
     />
   );
 });
@@ -181,20 +182,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm
+    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
     color: Colors.light.text,
     flex: 1,
-    marginRight: SPACING.sm
+    marginRight: SPACING.sm,
   },
   statusText: {
     fontSize: FONT_SIZES.sm,
@@ -203,57 +204,57 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.sm,
     backgroundColor: Colors.light.tabIconSelected,
-    color: Colors.light.background
+    color: Colors.light.background,
   },
   description: {
     fontSize: FONT_SIZES.md,
     color: Colors.light.tabIconDefault,
     marginBottom: SPACING.sm,
-    lineHeight: 20
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginVertical: SPACING.xs
+    marginVertical: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    minWidth: 120
+    minWidth: 120,
   },
   value: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    flex: 1
+    flex: 1,
   },
   constraintsSection: {
     marginTop: SPACING.sm,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.tabIconDefault + '20'
+    borderTopColor: Colors.light.tabIconDefault + '20',
   },
   constraintsLabel: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconDefault,
     fontWeight: '500',
-    marginBottom: SPACING.xs
+    marginBottom: SPACING.xs,
   },
   constraintsList: {
-    gap: SPACING.xs
+    gap: SPACING.xs,
   },
   constraint: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.text,
-    marginLeft: SPACING.sm
+    marginLeft: SPACING.sm,
   },
   moreConstraints: {
     fontSize: FONT_SIZES.sm,
     color: Colors.light.tabIconSelected,
     fontStyle: 'italic',
-    marginLeft: SPACING.sm
-
-}});
+    marginLeft: SPACING.sm,
+  },
+});
 
 PermissionList.displayName = 'PermissionList';
 

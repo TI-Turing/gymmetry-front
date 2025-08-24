@@ -10,7 +10,7 @@ const DailyExerciseList = React.memo(() => {
       return result || [];
     } catch {
       return [];
-  }
+    }
   }, []);
 
   const renderDailyExerciseItem = useCallback(
@@ -27,11 +27,11 @@ const DailyExerciseList = React.memo(() => {
 
   return (
     <EntityList
-      title='Daily Exercises'
+      title="Daily Exercises"
       loadFunction={loadDailyExercises}
       renderItem={renderDailyExerciseItem}
-      keyExtractor={item => item.id?.toString() || Math.random().toString()}
-      emptyMessage='No daily exercises found'
+      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      emptyMessage="No daily exercises found"
     />
   );
 });
@@ -49,22 +49,22 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2
-  },
+      height: 2,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
-    elevation: 5
+    elevation: 5,
   },
   itemTitle: {
     fontSize: FONT_SIZES.md,
     fontWeight: 'bold',
     marginBottom: SPACING.xs,
-    color: '#333'
+    color: '#333',
   },
   itemSubtitle: {
     fontSize: FONT_SIZES.sm,
-    color: '#666'
-}
+    color: '#666',
+  },
 });
 
 DailyExerciseList.displayName = 'DailyExerciseList';

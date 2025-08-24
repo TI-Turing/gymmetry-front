@@ -8,6 +8,6 @@ export interface Plan {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
-  planType?: any;
-  user?: any;
+  planType?: unknown;
+  user?: unknown;
 }

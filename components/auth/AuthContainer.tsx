@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
 import { View } from '../Themed';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
@@ -39,7 +38,7 @@ export default function AuthContainer({
   const switchToRegister = () => setIsLogin(false);
   const switchToLogin = () => setIsLogin(true);
 
-  const handleLogin = async ({userNameOrEmail, password}: LoginRequest) => {
+  const handleLogin = async ({ userNameOrEmail, password }: LoginRequest) => {
     // Prevenir múltiples llamadas simultáneas
     if (isLoading) {
       return { Success: false, error: 'Operación en progreso' };
@@ -77,7 +76,7 @@ export default function AuthContainer({
             onAuthSuccess(user);
           }, 1500);
 
-      return { Success: true };
+          return { Success: true };
         } else {
           // No se pudieron obtener los datos del usuario
           showAlert('Error al obtener los datos del usuario');
@@ -86,12 +85,12 @@ export default function AuthContainer({
             error: 'Error al obtener los datos del usuario',
           };
         }
-    }
+      }
 
-    // Login falló
-    const errorMessage = 'Credenciales incorrectas';
-    showAlert(errorMessage);
-    return { Success: false, error: errorMessage };
+      // Login falló
+      const errorMessage = 'Credenciales incorrectas';
+      showAlert(errorMessage);
+      return { Success: false, error: errorMessage };
     } catch (error: any) {
       // Determinar el tipo de error
       let errorMessage =
@@ -126,7 +125,7 @@ export default function AuthContainer({
     password: string;
   }) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       const user: User = {
         id: Date.now(),
@@ -136,16 +135,13 @@ export default function AuthContainer({
         avatar: null,
       };
 
-      Alert.alert(
-        '¡Cuenta creada!',
+      showAlert(
         `Bienvenido ${userData.firstName} ${userData.lastName}. Tu cuenta ha sido creada exitosamente.`,
-        [{ text: 'Continuar', onPress: () => onAuthSuccess(user) }]
+        'success'
       );
+      setTimeout(() => onAuthSuccess(user), 1200);
     } catch (_error) {
-      Alert.alert(
-        'Error',
-        'No se pudo completar el registro. Intenta nuevamente.'
-      );
+      showAlert('No se pudo completar el registro. Intenta nuevamente.');
     }
   };
 

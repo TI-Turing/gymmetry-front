@@ -25,7 +25,7 @@ export const authService = {
       '/auth/login',
       request
     );
-    
+
     // Guardar datos del usuario en AsyncStorage si el login es exitoso
     if (response.Success && response.Data) {
       // Guardar base y luego enriquecer con GymId del perfil completo
@@ -41,17 +41,24 @@ export const authService = {
         }
       } catch {}
 
-  // Derivar roles antes de guardar
-  raw = await this._deriveAndAttachRoles(raw);
-  this._rawUser = raw;
+      // Derivar roles antes de guardar
+      raw = await this._deriveAndAttachRoles(raw);
+      this._rawUser = raw;
       await AsyncStorage.setItem('@user_data', JSON.stringify(raw));
-      await AsyncStorage.setItem('@user_id', (raw as any).UserId ?? (raw as any).Id ?? '');
+      await AsyncStorage.setItem(
+        '@user_id',
+        (raw as any).UserId ?? (raw as any).Id ?? ''
+      );
       // Detectar RoutineTemplateId activo (primer RoutineAssigneds si existe)
       try {
-        const routineAssigneds = (raw as any)?.RoutineAssigneds?.$values || (raw as any)?.RoutineAssigneds || [];
+        const routineAssigneds =
+          (raw as any)?.RoutineAssigneds?.$values ||
+          (raw as any)?.RoutineAssigneds ||
+          [];
         if (Array.isArray(routineAssigneds) && routineAssigneds.length > 0) {
           const active = routineAssigneds[0];
-          const rtid = active?.RoutineTemplateId || active?.routineTemplateId || null;
+          const rtid =
+            active?.RoutineTemplateId || active?.routineTemplateId || null;
           if (rtid) {
             this._activeRoutineTemplateId = rtid;
             await AsyncStorage.setItem('@active_routine_template_id', rtid);
@@ -69,17 +76,25 @@ export const authService = {
       // Persistir expiraciones (formato ISO esperado del backend)
       try {
         if (response.Data.TokenExpiration) {
-          await AsyncStorage.setItem('@token_expiration', response.Data.TokenExpiration);
+          await AsyncStorage.setItem(
+            '@token_expiration',
+            response.Data.TokenExpiration
+          );
         }
         if (response.Data.RefreshTokenExpiration) {
-          await AsyncStorage.setItem('@refresh_token_expiration', response.Data.RefreshTokenExpiration);
+          await AsyncStorage.setItem(
+            '@refresh_token_expiration',
+            response.Data.RefreshTokenExpiration
+          );
         }
       } catch {}
     }
-    
+
     return response;
   },
-  async refreshToken(request: RefreshTokenRequest): Promise<ApiResponse<RefreshTokenResponse>> {
+  async refreshToken(
+    request: RefreshTokenRequest
+  ): Promise<ApiResponse<RefreshTokenResponse>> {
     const response = await apiService.post<RefreshTokenResponse>(
       '/auth/refresh-token',
       request
@@ -94,48 +109,50 @@ export const authService = {
       const token = await AsyncStorage.getItem('authToken');
       const refreshToken = await AsyncStorage.getItem('refreshToken');
       const userData = await AsyncStorage.getItem('@user_data');
-      
+
       if (!token || !refreshToken || !userData) {
         return false;
       }
 
       // Actualizar el token en apiService si no está configurado
       apiService.setAuthToken(token);
-      
+
       const tokenExpIso = await AsyncStorage.getItem('@token_expiration');
-      const refreshExpIso = await AsyncStorage.getItem('@refresh_token_expiration');
-      
+      const refreshExpIso = await AsyncStorage.getItem(
+        '@refresh_token_expiration'
+      );
+
       if (!refreshExpIso) {
         return true; // no info => asumimos válido hasta que falle
       }
-      
+
       const now = Date.now();
       let tokenExpired = false;
       let refreshExpired = false;
       const SAFETY_WINDOW_MS = 60_000; // refrescar si faltan <60s
-      
+
       if (tokenExpIso) {
         const tokenExp = Date.parse(tokenExpIso);
         if (!isNaN(tokenExp)) {
           tokenExpired = tokenExp - now < SAFETY_WINDOW_MS;
         }
       }
-      
+
       const refreshExp = Date.parse(refreshExpIso);
       if (!isNaN(refreshExp)) {
         refreshExpired = refreshExp <= now;
       }
-      
+
       if (refreshExpired) {
         await this.logout();
         return false;
       }
-      
+
       if (tokenExpired) {
         const refreshed = await this.refreshAuthToken();
         return !!refreshed?.Success && !!refreshed.Data;
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error in checkAndRefreshToken:', error);
@@ -146,14 +163,18 @@ export const authService = {
   async getUserData(): Promise<UserData | null> {
     try {
       // Preferir cache en memoria si existe
-      const raw = this._rawUser ?? JSON.parse((await AsyncStorage.getItem('@user_data')) || 'null');
+      const raw =
+        this._rawUser ??
+        JSON.parse((await AsyncStorage.getItem('@user_data')) || 'null');
       if (!raw) return null;
       // Normalizar nombres comunes
       const id = raw.Id ?? raw.UserId ?? raw.id ?? null;
       const email = raw.Email ?? raw.email ?? null;
       const gymId = raw.GymId ?? raw.gymId ?? null;
       const userName = raw.UserName ?? raw.userName ?? null;
-      const roles: string[] = Array.isArray(raw.DerivedRoles) ? raw.DerivedRoles : ['user'];
+      const roles: string[] = Array.isArray(raw.DerivedRoles)
+        ? raw.DerivedRoles
+        : ['user'];
       return id && email
         ? {
             id,
@@ -187,12 +208,15 @@ export const authService = {
     try {
       const data = await AsyncStorage.getItem('@user_data');
       this._rawUser = data ? JSON.parse(data) : null;
-      
+
       if (this._rawUser) {
         // Asegurar que roles estén presentes (en caso de versiones anteriores guardadas sin ellos)
         if (!Array.isArray(this._rawUser?.DerivedRoles)) {
           this._rawUser = await this._deriveAndAttachRoles(this._rawUser);
-          await AsyncStorage.setItem('@user_data', JSON.stringify(this._rawUser));
+          await AsyncStorage.setItem(
+            '@user_data',
+            JSON.stringify(this._rawUser)
+          );
         }
         // Cargar RoutineTemplateId activo si existe
         try {
@@ -200,12 +224,12 @@ export const authService = {
           this._activeRoutineTemplateId = rid || null;
         } catch {}
       }
-      
+
       const token = await AsyncStorage.getItem('authToken');
       if (token) {
         apiService.setAuthToken(token);
       }
-      
+
       return this._rawUser !== null;
     } catch (error) {
       console.error('Error in initializeFromStorage:', error);
@@ -216,11 +240,11 @@ export const authService = {
   async logout(): Promise<void> {
     try {
       // Limpiar datos de usuario y tokens
-  await AsyncStorage.removeItem('@user_data');
-  await AsyncStorage.removeItem('@auth_token');
-  await AsyncStorage.removeItem('authToken');
-  await AsyncStorage.removeItem('refreshToken');
-    await AsyncStorage.removeItem('@active_routine_template_id');
+      await AsyncStorage.removeItem('@user_data');
+      await AsyncStorage.removeItem('@auth_token');
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('@active_routine_template_id');
       // Limpiar referencias de gimnasio persistidas para evitar mostrar datos antiguos
       await AsyncStorage.removeItem('@gym_id');
       await AsyncStorage.removeItem('@gym_cache');
@@ -229,9 +253,9 @@ export const authService = {
         const { gymService } = await import('./gymService');
         gymService.clearCache?.();
       } catch {}
-  apiService.removeAuthToken();
-  this._rawUser = null;
-  this._activeRoutineTemplateId = null;
+      apiService.removeAuthToken();
+      this._rawUser = null;
+      this._activeRoutineTemplateId = null;
     } catch {
       // Handle error silently
     }
@@ -242,20 +266,49 @@ export const authService = {
       const token = await AsyncStorage.getItem('authToken');
       const refreshToken = await AsyncStorage.getItem('refreshToken');
       if (!refreshToken || !token) {
-        return { Success: false, Data: false, Message: 'No refresh token available', StatusCode: 401 };
+        return {
+          Success: false,
+          Data: false,
+          Message: 'No refresh token available',
+          StatusCode: 401,
+        };
       }
 
-      const response = await this.refreshToken({ Token: token, RefreshToken: refreshToken });
+      const response = await this.refreshToken({
+        Token: token,
+        RefreshToken: refreshToken,
+      });
       if (response.Success && response.Data) {
         await AsyncStorage.setItem('authToken', response.Data.NewToken);
-  apiService.setAuthToken(response.Data.NewToken);
-  try { if (response.Data.TokenExpiration) await AsyncStorage.setItem('@token_expiration', response.Data.TokenExpiration);} catch {}
-        return { Success: true, Data: true, Message: 'Token refreshed successfully', StatusCode: 200 };
+        apiService.setAuthToken(response.Data.NewToken);
+        try {
+          if (response.Data.TokenExpiration)
+            await AsyncStorage.setItem(
+              '@token_expiration',
+              response.Data.TokenExpiration
+            );
+        } catch {}
+        return {
+          Success: true,
+          Data: true,
+          Message: 'Token refreshed successfully',
+          StatusCode: 200,
+        };
       }
-      return { Success: false, Data: false, Message: 'Failed to refresh token', StatusCode: 400 };
+      return {
+        Success: false,
+        Data: false,
+        Message: 'Failed to refresh token',
+        StatusCode: 400,
+      };
     } catch (error) {
       console.error('Error refreshing auth token:', error);
-      return { Success: false, Data: false, Message: 'Token refresh error', StatusCode: 500 };
+      return {
+        Success: false,
+        Data: false,
+        Message: 'Token refresh error',
+        StatusCode: 500,
+      };
     }
   },
 
@@ -281,7 +334,9 @@ export const authService = {
   hasRole(role: string): boolean {
     const raw = this._rawUser;
     if (!raw) return false;
-    const roles: string[] = Array.isArray(raw?.DerivedRoles) ? raw.DerivedRoles : ['user'];
+    const roles: string[] = Array.isArray(raw?.DerivedRoles)
+      ? raw.DerivedRoles
+      : ['user'];
     return roles.includes(role.toLowerCase());
   },
 
@@ -295,5 +350,5 @@ export const authService = {
       if (id) await AsyncStorage.setItem('@active_routine_template_id', id);
       else await AsyncStorage.removeItem('@active_routine_template_id');
     } catch {}
-  }
+  },
 };

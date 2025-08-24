@@ -26,12 +26,12 @@ export function withWebLayout<P extends object>(
       }
     }, [pathname]);
 
-  const handleTabChange = (tab: string) => {
+    const handleTabChange = (tab: string) => {
       setActiveTab(tab);
       // Navegación usando expo-router
       if (Platform.OS === 'web') {
-    // Ahora las rutas del menú viven en raíz en web
-    router.push(`/${tab}` as any);
+        // Ahora las rutas del menú viven en raíz en web
+        router.push(`/${tab}` as any);
       }
     };
 

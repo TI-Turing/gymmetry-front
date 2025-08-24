@@ -18,8 +18,7 @@ export function PhysicalAssessmentForm() {
     setMsg(null);
     try {
       const body = JSON.parse(payload);
-      const res =
-        await physicalAssessmentService.addPhysicalAssessment(body);
+      const res = await physicalAssessmentService.addPhysicalAssessment(body);
       setMsg(res.Message || 'Creado');
     } catch {
       setMsg('Error al crear');
@@ -47,8 +46,7 @@ export function PhysicalAssessmentForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const res =
-        await physicalAssessmentService.deletePhysicalAssessment(id);
+      const res = await physicalAssessmentService.deletePhysicalAssessment(id);
       setMsg(res.Message || 'Eliminado');
     } catch {
       setMsg('Error al eliminar');
@@ -69,11 +67,11 @@ export function PhysicalAssessmentForm() {
         numberOfLines={8}
       />
       <View style={styles.row}>
-        <Button title='Crear' onPress={onAdd} />
-        <Button title='Actualizar' onPress={onUpdate} />
+        <Button title="Crear" onPress={onAdd} />
+        <Button title="Actualizar" onPress={onUpdate} />
       </View>
-      <FormInput label='Id' value={id} onChangeText={setId} />
-      <Button title='Eliminar' onPress={onDelete} />
+      <FormInput label="Id" value={id} onChangeText={setId} />
+      <Button title="Eliminar" onPress={onDelete} />
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (
