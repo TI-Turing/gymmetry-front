@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, View as RNView, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
-import { withWebLayout } from '@/components/layout/withWebLayout';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import Button from '@/components/common/Button';
@@ -106,7 +105,7 @@ const UserExerciseMaxScreen: React.FC = () => {
   );
 };
 
-export default withWebLayout(UserExerciseMaxScreen, { defaultTab: 'user-exercise-max' });
+export default UserExerciseMaxScreen;
 
 const styles = StyleSheet.create({
   card: { backgroundColor: '#1E1E1E', borderRadius: 12, padding: 12 },

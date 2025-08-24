@@ -45,17 +45,12 @@ const menuItems = [
     iconType: 'FontAwesome' as const,
   },
   {
-    key: 'feed',
-    icon: 'users' as const,
-    label: 'Feed',
-    iconType: 'FontAwesome' as const,
+    key: 'user-exercise-max',
+    icon: 'weight-lifter' as const,
+    label: 'RM',
+    iconType: 'MaterialCommunityIcons' as const,
   },
-  {
-    key: 'profile',
-    icon: 'user' as const,
-    label: 'Perfil',
-    iconType: 'FontAwesome' as const,
-  },
+  // (Ocultos) Feed y Perfil se retiraron del menú lateral
 ];
 
 export default function WebLayout({

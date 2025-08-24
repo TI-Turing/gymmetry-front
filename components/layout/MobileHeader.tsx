@@ -61,6 +61,12 @@ export default function MobileHeader({
       case 'settings':
   router.push('/settings');
         break;
+      case 'physical-assessment':
+        router.push('/physical-assessment');
+        break;
+      case 'user-exercise-max':
+        router.push('/user-exercise-max');
+        break;
       case 'support':
         // Open support contact
         break;
@@ -116,6 +122,18 @@ export default function MobileHeader({
       icon: 'star',
       label: 'Planes',
       action: () => handleMenuOption('plans'),
+    },
+    {
+      key: 'physical-assessment',
+      icon: 'heartbeat',
+      label: 'Estado físico',
+      action: () => handleMenuOption('physical-assessment'),
+    },
+    {
+      key: 'user-exercise-max',
+      icon: 'line-chart',
+      label: 'RM',
+      action: () => handleMenuOption('user-exercise-max'),
     },
     {
       key: 'theme',

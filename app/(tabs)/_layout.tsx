@@ -72,26 +72,7 @@ export default function TabLayout() {
           tabBarShowLabel: false,
         }}
       />
-      <Tabs.Screen
-        name='physical-assessment'
-        options={{
-          title: 'Estado físico',
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name='heartbeat' color={color} />
-          ),
-          tabBarShowLabel: false,
-        }}
-      />
-      <Tabs.Screen
-        name='user-exercise-max'
-        options={{
-          title: 'RM',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name='weight-lifter' size={28} color={color} style={{ marginBottom: -3 }} />
-          ),
-          tabBarShowLabel: false,
-        }}
-      />
+  {/** Estado físico y RM se movieron al menú lateral, no en tabs */}
       <Tabs.Screen
         name='feed'
         options={{

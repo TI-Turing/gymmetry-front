@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, TextInput, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
-import { withWebLayout } from '@/components/layout/withWebLayout';
 import Button from '@/components/common/Button';
 import { physicalAssessmentService, authService } from '@/services';
 import type { PhysicalAssessment } from '@/models/PhysicalAssessment';
@@ -582,7 +581,7 @@ function PhysicalAssessmentScreen() {
   );
 }
 
-export default withWebLayout(PhysicalAssessmentScreen, { defaultTab: 'physical-assessment' });
+export default PhysicalAssessmentScreen;
 
 const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 6 },
