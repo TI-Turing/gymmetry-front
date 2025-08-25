@@ -43,6 +43,23 @@ import { scheduleLocalNotificationAsync } from '@/utils/localNotifications';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeRoutineDayScreenStyles } from './styles/routineDayScreen';
+import { normalizeCollection } from '@/utils';
+
+// Orden y etiquetas de categorías (estable y fuera del componente)
+const CATEGORY_ORDER: { id: string; label: string }[] = [
+  { id: 'E779339F-36BB-4EF8-9135-CF36BE4C4B07', label: 'Calentamiento' },
+  { id: 'D9507CD0-1EDA-4D4D-A408-13FF76C14D88', label: 'Cardio' },
+  {
+    id: 'BC9D888F-4612-4BBB-ABEC-FF1EE76D129A',
+    label: 'Ejercicio principal (compuesto)',
+  },
+  { id: '6C60B74C-F83A-4AF9-ABD3-BB929D9FAE6A', label: 'Funcional' },
+  {
+    id: '9F9F94D0-7CD1-48E9-81A7-86AA503CA685',
+    label: 'Aislado (focalizado)',
+  },
+  { id: '642FC19F-500F-47AE-A81B-1303AC978D9D', label: 'Estiramiento' },
+];
 
 type ExerciseProgress = {
   completedSets: number;
@@ -68,8 +85,7 @@ function getWeekdayNameEs(dayNum: number) {
 }
 
 export default function RoutineDayScreen() {
-  // Forzamos any para evitar falsos positivos de TS sobre claves de estilos durante la migración temática
-  const styles = useThemedStyles(makeRoutineDayScreenStyles) as any;
+  const styles = useThemedStyles(makeRoutineDayScreenStyles);
   const { settings } = useAppSettings();
   const params = useLocalSearchParams<{ day?: string }>();
   const insets = useSafeAreaInsets();
@@ -83,7 +99,7 @@ export default function RoutineDayScreen() {
   const [celebrateAnim] = useState(new Animated.Value(0));
   const [finalPhrase, setFinalPhrase] = useState<string | null>(null);
   const completionTriggeredRef = React.useRef(false);
-  const [summaryVisible, setSummaryVisible] = useState(false); // Placeholder
+  const [_summaryVisible, setSummaryVisible] = useState(false); // Placeholder
   const [showFinishOptions, setShowFinishOptions] = useState(false);
   const [routineFinishedMode, setRoutineFinishedMode] = useState<
     null | 'partial' | 'full'
@@ -152,7 +168,7 @@ export default function RoutineDayScreen() {
       },
       { seconds: 600 },
       { settings }
-    ).catch(() => {});
+    ).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     hasAnyProgress,
@@ -160,22 +176,6 @@ export default function RoutineDayScreen() {
     settings.notificationsEnabled,
     settings.trainingNotificationsEnabled,
   ]);
-
-  // Orden y etiquetas de categorías
-  const CATEGORY_ORDER: { id: string; label: string }[] = [
-    { id: 'E779339F-36BB-4EF8-9135-CF36BE4C4B07', label: 'Calentamiento' },
-    { id: 'D9507CD0-1EDA-4D4D-A408-13FF76C14D88', label: 'Cardio' },
-    {
-      id: 'BC9D888F-4612-4BBB-ABEC-FF1EE76D129A',
-      label: 'Ejercicio principal (compuesto)',
-    },
-    { id: '6C60B74C-F83A-4AF9-ABD3-BB929D9FAE6A', label: 'Funcional' },
-    {
-      id: '9F9F94D0-7CD1-48E9-81A7-86AA503CA685',
-      label: 'Aislado (focalizado)',
-    },
-    { id: '642FC19F-500F-47AE-A81B-1303AC978D9D', label: 'Estiramiento' },
-  ];
 
   const normalizeCatId = (id?: string | null) =>
     (id || '').trim().toUpperCase();
@@ -217,15 +217,7 @@ export default function RoutineDayScreen() {
     if (uncategorized.length > 0)
       sections.push({ key: 'otros', label: 'Otros', items: uncategorized });
     return sections;
-  }, [exercises, CATEGORY_ORDER]);
-
-  const categoryLabelById = useMemo(() => {
-    const map: Record<string, string> = {};
-    CATEGORY_ORDER.forEach((c) => {
-      map[normalizeCatId(c.id)] = c.label;
-    });
-    return map;
-  }, [CATEGORY_ORDER]);
+  }, [exercises]);
 
   // Animación y efectos al completar 100%
   useEffect(() => {
@@ -254,7 +246,7 @@ export default function RoutineDayScreen() {
         } catch {}
       }
     }
-  }, [overallProgress]);
+  }, [overallProgress, celebrateAnim]);
 
   // Marcar rutina completa manualmente
   const openFinishOptions = () => {
@@ -389,8 +381,7 @@ export default function RoutineDayScreen() {
               const bulk: AddDailyExerciseRequest[] = [];
               for (const ex of exercises) {
                 const routineDayId = ex?.Id;
-                const exerciseId =
-                  (ex as any)?.ExerciseId || (ex as any)?.Exercise?.Id || null;
+                const exerciseId = ex.ExerciseId || ex.Exercise?.Id || null;
                 const setsCount = Number(ex?.Sets || 0);
                 if (!exerciseId || setsCount <= 0) continue;
 
@@ -496,28 +487,18 @@ export default function RoutineDayScreen() {
           setStartDateISO(null);
         }
 
-        const body = {
+        const body: Record<string, unknown> = {
           RoutineTemplateId: templateId,
           DayNumber: dayNum,
-        } as any;
+        };
         // debug request body removido
         let all: RoutineDay[] = [];
         try {
           const resp = await routineDayService.findRoutineDaysByFields(body);
           // Normalizar posibles formas .NET ($values)
-          let extracted: unknown[] = [];
           if (resp?.Success && resp?.Data) {
-            if (Array.isArray(resp.Data)) {
-              extracted = resp.Data;
-            } else if (
-              (resp.Data as any).$values &&
-              Array.isArray((resp.Data as any).$values)
-            ) {
-              extracted = (resp.Data as any).$values;
-            }
+            all = normalizeCollection<RoutineDay>(resp.Data);
           }
-          // debug response removido
-          all = extracted as any;
         } catch (e) {
           // error silencioso
         }
@@ -536,7 +517,7 @@ export default function RoutineDayScreen() {
         }
 
         // El backend ya debería filtrar por DayNumber, pero filtramos por seguridad.
-        const data = all.filter((d) => Number((d as any).DayNumber) === dayNum);
+        const data = all.filter((d) => Number(d.DayNumber) === dayNum);
         if (data.length === 0) {
           // debug de días disponibles removido
           setError('No hay ejercicios configurados para hoy en tu rutina.');
@@ -671,7 +652,7 @@ export default function RoutineDayScreen() {
   };
 
   const goToExerciseDetail = (item: RoutineDay) => {
-    const eid = (item as any)?.ExerciseId || (item as any)?.Exercise?.Id;
+    const eid = item.ExerciseId || item.Exercise?.Id;
     if (eid) {
       router.push({
         pathname: '/exercise-detail',

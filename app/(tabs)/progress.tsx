@@ -16,7 +16,7 @@ function ProgressScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<
     'semana' | 'mes' | 'year'
   >('semana');
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<AnalyticsSummaryResponse | null>(null);
 
   const periods = [
@@ -100,7 +100,7 @@ function ProgressScreen() {
     return () => {
       cancelled = true;
     };
-  }, [dateRange.start, dateRange.end]);
+  }, [dateRange.start, dateRange.end, settings.analyticsEnabled]);
 
   const renderPeriodSelector = () => (
     <View style={styles.periodContainer}>
@@ -139,7 +139,11 @@ function ProgressScreen() {
       <View style={styles.statHeader}>
         {icon != null && icon !== '' && (
           <FontAwesome
-            name={icon as any}
+            name={
+              icon as unknown as React.ComponentProps<
+                typeof FontAwesome
+              >['name']
+            }
             size={20}
             color={styles.colors.text}
             style={styles.statIcon}
@@ -332,7 +336,7 @@ function ProgressScreen() {
         <Text style={styles.chartTitle}>Días con más disciplina</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           {[0, 1, 2, 3, 4, 5, 6].map((wd) => {
-            const it = items.find((x) => x.Weekday === (wd as any));
+            const it = items.find((x) => x.Weekday === (wd as number));
             const v = it?.DaysTrained ?? 0;
             const h = max ? Math.max(4, (v / max) * 80) : 4;
             return (

@@ -1,7 +1,6 @@
 import React, { memo, forwardRef, useImperativeHandle } from 'react';
 import { TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { Text, View } from '../../Themed';
-import { useColorScheme } from '../../useColorScheme';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeStep4Styles } from '../styles/step4';
 import Dropdown from '../Dropdown';
@@ -22,8 +21,7 @@ interface Step4Props {
 const Step4Inner = forwardRef<
   { snapshot: () => Partial<Step4Data> },
   Step4Props
->(({ userId, onNext, onBack, initialData }, ref) => {
-  const colorScheme = useColorScheme();
+>(({ userId, onNext, onBack: _onBack, initialData }, ref) => {
   const styles = useThemedStyles(makeStep4Styles);
   const { showError, showSuccess, AlertComponent } = useCustomAlert();
   const {

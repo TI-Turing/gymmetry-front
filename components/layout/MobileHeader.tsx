@@ -275,7 +275,11 @@ export default function MobileHeader({
                   accessibilityRole="button"
                 >
                   <FontAwesome
-                    name={option.icon as any}
+                    name={
+                      option.icon as React.ComponentProps<
+                        typeof FontAwesome
+                      >['name']
+                    }
                     size={20}
                     color={Colors[colorScheme].text}
                     style={styles.menuIcon}

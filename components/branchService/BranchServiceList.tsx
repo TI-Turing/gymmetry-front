@@ -6,13 +6,20 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 const BranchServiceList = React.memo(() => {
-  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
+  const servicePlaceholder = useCallback(
+    () => Promise.resolve([] as unknown[]),
+    []
+  );
 
   const loadBranchServices = useCallback(async () => {
     try {
       // Placeholder for actual service call
       const result = await servicePlaceholder();
-      return result || [];
+      const raw = result as unknown;
+      const list: unknown[] = Array.isArray(raw)
+        ? raw
+        : (raw as { $values?: unknown[] })?.$values || [];
+      return list;
     } catch (_error) {
       // Handle error silently or use proper error handling
       return [];
@@ -28,7 +35,10 @@ const BranchServiceList = React.memo(() => {
       (typeof o.serviceName === 'string' && o.serviceName) ||
       (typeof o.name === 'string' && o.name) ||
       'Servicio';
-    const isActive = Boolean((o as any).isActive);
+    const isActive = Boolean(
+      (o as { isActive?: unknown; IsActive?: unknown }).isActive ??
+        (o as { isActive?: unknown; IsActive?: unknown }).IsActive
+    );
     const description =
       (typeof o.description === 'string' && o.description) ||
       'Servicio de la sucursal';
@@ -36,25 +46,36 @@ const BranchServiceList = React.memo(() => {
       (typeof o.branchName === 'string' && o.branchName) || 'N/A';
     const category =
       (typeof o.category === 'string' && o.category) || 'General';
-    const priceRaw = (o as any).price;
+    const priceRaw =
+      (o as { price?: unknown; Price?: unknown }).price ??
+      (o as { price?: unknown; Price?: unknown }).Price;
     const priceText =
       typeof priceRaw === 'number' ? `$${priceRaw.toFixed(2)}` : 'Incluido';
-    const durationRaw = (o as any).duration;
+    const durationRaw =
+      (o as { duration?: unknown; Duration?: unknown }).duration ??
+      (o as { duration?: unknown; Duration?: unknown }).Duration;
     const durationText =
       typeof durationRaw === 'number' ? `${durationRaw} min` : 'Variable';
     const availability =
       (typeof o.availability === 'string' && o.availability) || 'Por horario';
-    const maxCapacityRaw = (o as any).maxCapacity;
+    const maxCapacityRaw =
+      (o as { maxCapacity?: unknown; MaxCapacity?: unknown }).maxCapacity ??
+      (o as { maxCapacity?: unknown; MaxCapacity?: unknown }).MaxCapacity;
     const maxCapacityText =
       typeof maxCapacityRaw === 'number'
         ? `${maxCapacityRaw} personas`
         : 'Ilimitada';
-    const requiresInstructor = Boolean((o as any).requiresInstructor);
-    const requiresReservation = Boolean((o as any).requiresReservation);
-    const rating = (o as any).rating ?? '0.0';
-    const reviewCount = (o as any).reviewCount ?? 0;
-    const equipmentArr = Array.isArray((o as any).equipment)
-      ? ((o as any).equipment as unknown[]).filter((e) => typeof e === 'string')
+    const requiresInstructor = Boolean(
+      (o as { requiresInstructor?: unknown }).requiresInstructor
+    );
+    const requiresReservation = Boolean(
+      (o as { requiresReservation?: unknown }).requiresReservation
+    );
+    const rating = (o as { rating?: unknown }).rating ?? '0.0';
+    const reviewCount = (o as { reviewCount?: unknown }).reviewCount ?? 0;
+    const equipmentRaw = (o as { equipment?: unknown }).equipment;
+    const equipmentArr = Array.isArray(equipmentRaw)
+      ? (equipmentRaw as unknown[]).filter((e) => typeof e === 'string')
       : [];
 
     return (
@@ -142,10 +163,17 @@ const BranchServiceList = React.memo(() => {
 
   const keyExtractor = useCallback((item: unknown) => {
     if (isRecord(item)) {
-      const id = (item.id as any) ?? (item.serviceId as any);
+      const r = item as {
+        id?: unknown;
+        serviceId?: unknown;
+        branchId?: unknown;
+        BranchId?: unknown;
+        ServiceId?: unknown;
+      };
+      const id = r.id ?? r.serviceId;
       if (id != null) return String(id);
-      const b = (item.branchId as any) ?? (item.BranchId as any);
-      const s = (item.serviceId as any) ?? (item.ServiceId as any);
+      const b = r.branchId ?? r.BranchId;
+      const s = r.serviceId ?? r.ServiceId;
       if (b != null && s != null) return `${String(b)}-${String(s)}`;
     }
     return String(Math.random());

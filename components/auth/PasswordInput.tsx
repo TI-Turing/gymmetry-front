@@ -52,6 +52,7 @@ export const PasswordInput = memo<PasswordInputProps>(
             ]}
             value={value}
             onChangeText={onChangeText}
+            placeholder={placeholder}
             placeholderTextColor={`${Colors[colorScheme ?? 'light'].text}60`}
             secureTextEntry={!showPassword}
             accessibilityLabel={label}

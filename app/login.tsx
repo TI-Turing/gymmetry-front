@@ -5,7 +5,7 @@ import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { User } from '@/components/auth/types';
 
 export default function LoginPage() {
-  const handleAuthSuccess = (user: User) => {
+  const handleAuthSuccess = (_user: User) => {
     // Después del login exitoso, navegar a la app principal
     router.replace('/(tabs)');
   };

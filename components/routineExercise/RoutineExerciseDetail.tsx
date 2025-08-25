@@ -39,8 +39,20 @@ export function RoutineExerciseDetail() {
         try {
           if (typeof exercise.TagsMuscle === 'string') {
             tags = JSON.parse(exercise.TagsMuscle) as Record<string, number>;
-          } else if (typeof exercise.TagsMuscle === 'object') {
-            tags = exercise.TagsMuscle as any;
+          } else if (
+            typeof exercise.TagsMuscle === 'object' &&
+            exercise.TagsMuscle
+          ) {
+            const raw = exercise.TagsMuscle as unknown;
+            const entries = Object.entries(
+              (raw as Record<string, unknown>) ?? {}
+            );
+            const normalized: Record<string, number> = {};
+            for (const [k, v] of entries) {
+              const n = Number(v);
+              if (Number.isFinite(n)) normalized[k] = n;
+            }
+            tags = normalized;
           }
         } catch {
           tags = {};

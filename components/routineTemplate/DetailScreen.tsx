@@ -46,7 +46,7 @@ export default function RoutineTemplateDetailScreen() {
       setTemplate(found);
 
       // Gym name
-      const gymId = (found as any)?.GymId;
+      const gymId = (found as unknown as { GymId?: string | null })?.GymId;
       if (gymId) {
         try {
           const g = await gymService.getGymById(gymId);
@@ -59,7 +59,8 @@ export default function RoutineTemplateDetailScreen() {
         setGymName(null);
       }
       // Author name si aplica
-      const authorId = (found as any)?.Author_UserId;
+      const authorId = (found as unknown as { Author_UserId?: string | null })
+        ?.Author_UserId;
       if (authorId) {
         try {
           const u = await userService.getUserById(authorId);
@@ -99,11 +100,18 @@ export default function RoutineTemplateDetailScreen() {
       try {
         const res = await routineTemplateService.findRoutineTemplatesByFields({
           Name: search.trim(),
-        } as any);
+        } as unknown as { Name: string });
         let arr: unknown[] = [];
         if (res?.Success && res.Data) {
-          if (Array.isArray(res.Data)) arr = res.Data;
-          else if ((res.Data as any).$values) arr = (res.Data as any).$values;
+          const raw: unknown = res.Data as unknown;
+          if (Array.isArray(raw)) arr = raw;
+          else if (
+            typeof raw === 'object' &&
+            raw &&
+            Array.isArray((raw as { $values?: unknown[] }).$values)
+          ) {
+            arr = (raw as { $values: unknown[] }).$values;
+          }
         }
         setSearchResults(arr as RoutineTemplate[]);
       } catch {
@@ -112,10 +120,11 @@ export default function RoutineTemplateDetailScreen() {
     }, 350);
     setDebounceId(t);
     return () => clearTimeout(t);
-  }, [search]);
+  }, [search, debounceId]);
 
   const objectives = useMemo(() => {
-    const raw = (template as any)?.TagsObjectives as string | null | undefined;
+    const raw = (template as unknown as { TagsObjectives?: string | null })
+      ?.TagsObjectives as string | null | undefined;
     if (!raw)
       return [] as {
         key: string;
@@ -148,7 +157,7 @@ export default function RoutineTemplateDetailScreen() {
         score: Math.round(clamped * 10),
       };
     });
-  }, [template?.TagsObjectives]);
+  }, [template]);
 
   const handleGoBack = () => router.back();
 
@@ -268,7 +277,8 @@ export default function RoutineTemplateDetailScreen() {
           )}
 
           {/* Autor */}
-          {(template as any)?.Author_UserId ? (
+          {(template as unknown as { Author_UserId?: string | null })
+            ?.Author_UserId ? (
             <TouchableOpacity
               onPress={() => {
                 // TODO: navegar al perfil del usuario con id (template as any).Author_UserId
@@ -289,12 +299,15 @@ export default function RoutineTemplateDetailScreen() {
           )}
 
           {/* Gym si aplica */}
-          {!!(template as any)?.GymId && (
+          {!!(template as unknown as { GymId?: string | null })?.GymId && (
             <TouchableOpacity
               onPress={() =>
                 router.push({
                   pathname: '/(tabs)/gym',
-                  params: { gymId: (template as any).GymId },
+                  params: {
+                    gymId: (template as unknown as { GymId?: string | null })
+                      .GymId,
+                  },
                 })
               }
               style={{ marginTop: 8 }}

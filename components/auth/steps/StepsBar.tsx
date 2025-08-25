@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Text } from '../../Themed';
-import { useColorScheme } from '../../useColorScheme';
 import { commonStyles } from '../styles/common';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeStepsBarStyles } from '../styles/stepsBar';
@@ -9,15 +8,10 @@ import { makeStepsBarStyles } from '../styles/stepsBar';
 interface StepsBarProps {
   currentStep: number;
   totalSteps: number;
-  stepTitles?: string[];
+  stepTitles?: string[]; // opcional, no usado en la UI actual
 }
 
-export default function StepsBar({
-  currentStep,
-  totalSteps,
-  stepTitles,
-}: StepsBarProps) {
-  const colorScheme = useColorScheme();
+export default function StepsBar({ currentStep, totalSteps }: StepsBarProps) {
   const styles = useThemedStyles(makeStepsBarStyles);
 
   return (

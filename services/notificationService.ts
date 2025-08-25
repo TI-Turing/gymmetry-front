@@ -20,13 +20,14 @@ export const notificationService = {
       (!st.notificationsEnabled ||
         isWithinQuietHours(new Date(), st.quietHours))
     ) {
-      return {
+      const suppressed: ApiResponse<unknown> = {
         Success: true,
         Message:
           'Notificación suprimida por ajustes del usuario (silencio/horas).',
-        Data: null as any,
+        Data: null,
         StatusCode: 200,
-      } as ApiResponse<unknown>;
+      };
+      return suppressed;
     }
     const response = await apiService.post<unknown>(
       `/notification/add`,

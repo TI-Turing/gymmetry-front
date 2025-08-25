@@ -63,10 +63,10 @@ export default function PlanView({
       // Según convención backend: campos en body Iniciando con Mayúscula
       const response = await planService.findPlansByFields({
         fields: { UserId: userId, IsActive: true },
-      } as any);
+      } as unknown as { fields: { UserId: string; IsActive: boolean } });
       const FREE_PLAN_TYPE_ID = '4aa8380c-8479-4334-8236-3909be9c842b';
       if (response.Success && response.Data) {
-        const raw = normalizeCollection(response.Data as any);
+        const raw = normalizeCollection(response.Data as unknown);
         const active = raw.find((p: unknown) => {
           const r = (p || {}) as Record<string, unknown>;
           return Boolean((r?.isActive as boolean) ?? (r?.IsActive as boolean));

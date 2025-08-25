@@ -34,8 +34,7 @@ export default function Dropdown({
   const colorScheme = useColorScheme();
   const { showAlert, AlertComponent } = useCustomAlert();
 
-  // Debug: agregar logs para verificar las opciones
-  React.useEffect(() => {}, [options, value]);
+  // Debug useEffect removido (evita función vacía)
 
   const filteredOptions = searchable
     ? options.filter((option) =>

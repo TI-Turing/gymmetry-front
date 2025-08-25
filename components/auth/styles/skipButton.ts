@@ -1,8 +1,6 @@
-import Colors from '@/constants/Colors';
 import { ThemeMode } from '@/hooks/useThemedStyles';
 
-export const makeSkipButtonStyles = (theme: ThemeMode) => {
-  const palette = Colors[theme];
+export const makeSkipButtonStyles = (_theme: ThemeMode) => {
   return {
     colors: {
       textOnPrimary: '#FFFFFF',

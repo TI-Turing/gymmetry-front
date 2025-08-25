@@ -8,8 +8,17 @@ import { employeeTypeService } from '@/services';
 
 const EmployeeTypeList = React.memo(() => {
   const loadEmployeeTypes = useCallback(async () => {
-    const response = await employeeTypeService.getAllEmployeeTypes();
-    return response.Success ? response.Data || [] : [];
+    try {
+      const response = await employeeTypeService.getAllEmployeeTypes();
+      if (!response?.Success) return [] as unknown[];
+      const raw = response.Data as unknown;
+      const items = Array.isArray(raw)
+        ? raw
+        : (raw as { $values?: unknown[] })?.$values || [];
+      return items;
+    } catch (_e) {
+      return [] as unknown[];
+    }
   }, []);
 
   const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -21,7 +30,8 @@ const EmployeeTypeList = React.memo(() => {
       (typeof o.name === 'string' && o.name) ||
       (typeof o.typeName === 'string' && o.typeName) ||
       'Tipo sin nombre';
-    const isActive = Boolean((o as any).isActive);
+    const isActiveVal = (o as Record<string, unknown>).isActive;
+    const isActive = typeof isActiveVal === 'boolean' ? isActiveVal : false;
     const description =
       (typeof o.description === 'string' && o.description) ||
       'Sin descripción disponible';
@@ -37,10 +47,16 @@ const EmployeeTypeList = React.memo(() => {
       (typeof o.department === 'string' && o.department) ||
       (typeof o.defaultDepartment === 'string' && o.defaultDepartment) ||
       'General';
-    const employeeCount = (o as any).employeeCount ?? 0;
-    const permissionsLen = Array.isArray((o as any).permissions)
-      ? ((o as any).permissions as unknown[]).length
-      : ((o as any).permissionCount ?? 0);
+    const employeeCountRaw = (o as Record<string, unknown>).employeeCount;
+    const employeeCount =
+      typeof employeeCountRaw === 'number' ? employeeCountRaw : 0;
+    const permissionsRaw = (o as Record<string, unknown>).permissions;
+    const permissionCountRaw = (o as Record<string, unknown>).permissionCount;
+    const permissionsLen = Array.isArray(permissionsRaw)
+      ? (permissionsRaw as unknown[]).length
+      : typeof permissionCountRaw === 'number'
+        ? permissionCountRaw
+        : 0;
 
     return (
       <View style={styles.card}>
@@ -85,7 +101,10 @@ const EmployeeTypeList = React.memo(() => {
 
   const keyExtractor = useCallback((item: unknown) => {
     if (isRecord(item)) {
-      const id = (item.id as any) ?? (item.typeId as any) ?? (item.Id as any);
+      const id =
+        (item.id as unknown) ??
+        (item.typeId as unknown) ??
+        (item.Id as unknown);
       if (id != null) return String(id);
     }
     return String(Math.random());

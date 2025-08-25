@@ -30,40 +30,50 @@ export default function RoutineTemplateDaysScreen() {
   const [error, setError] = useState<string | null>(null);
   const [dataByDay, setDataByDay] = useState<Record<number, RoutineDay[]>>({});
 
+  const fetchDay = React.useCallback(
+    async (dayNumber: number) => {
+      if (!templateId) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const body: Record<string, unknown> = {
+          RoutineTemplateId: templateId,
+          DayNumber: dayNumber,
+        };
+        const resp = await routineDayService.findRoutineDaysByFields(body);
+        let extracted: unknown[] = [];
+        if (resp?.Success && resp?.Data) {
+          const raw: unknown = resp.Data as unknown;
+          if (Array.isArray(raw)) extracted = raw as unknown[];
+          else if (
+            typeof raw === 'object' &&
+            raw !== null &&
+            Array.isArray((raw as { $values?: unknown[] }).$values)
+          )
+            extracted = (raw as { $values: unknown[] }).$values;
+        }
+        const filtered = (extracted as RoutineDay[]).filter(
+          (d) =>
+            Number(
+              (d as unknown as { DayNumber?: number | string }).DayNumber
+            ) === dayNumber
+        );
+        setDataByDay((prev) => ({ ...prev, [dayNumber]: filtered }));
+      } catch (e) {
+        setError('No se pudo cargar los ejercicios del día');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [templateId]
+  );
+
   React.useEffect(() => {
     if (!templateId) return;
     fetchDay(1);
-  }, [templateId]);
+  }, [templateId, fetchDay]);
 
-  const fetchDay = async (dayNumber: number) => {
-    if (!templateId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const body = {
-        RoutineTemplateId: templateId,
-        DayNumber: dayNumber,
-      } as any;
-      const resp = await routineDayService.findRoutineDaysByFields(body);
-      let extracted: unknown[] = [];
-      if (resp?.Success && resp?.Data) {
-        if (Array.isArray(resp.Data)) extracted = resp.Data;
-        else if (
-          (resp.Data as any).$values &&
-          Array.isArray((resp.Data as any).$values)
-        )
-          extracted = (resp.Data as any).$values;
-      }
-      const filtered = (extracted as RoutineDay[]).filter(
-        (d) => Number((d as any).DayNumber) === dayNumber
-      );
-      setDataByDay((prev) => ({ ...prev, [dayNumber]: filtered }));
-    } catch (e) {
-      setError('No se pudo cargar los ejercicios del día');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // fetchDay definido arriba con useCallback
 
   const days = [1, 2, 3, 4, 5, 6, 7];
   const exercises = dataByDay[selectedDay] || [];
@@ -133,8 +143,17 @@ export default function RoutineTemplateDaysScreen() {
                 <TouchableOpacity
                   key={ex.Id}
                   onPress={() => {
+                    const exu = ex as unknown as {
+                      ExerciseId?: unknown;
+                      Exercise?: { Id?: unknown };
+                    };
                     const eid =
-                      (ex as any).ExerciseId || (ex as any).Exercise?.Id;
+                      (typeof exu.ExerciseId === 'string'
+                        ? exu.ExerciseId
+                        : undefined) ||
+                      (typeof exu.Exercise?.Id === 'string'
+                        ? exu.Exercise.Id
+                        : undefined);
                     if (eid)
                       router.push({
                         pathname: '/exercise-detail',

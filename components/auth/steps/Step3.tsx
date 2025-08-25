@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import { TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Text, View } from '../../Themed';
-import { useColorScheme } from '../../useColorScheme';
 import CountryCodePicker, { DEFAULT_COUNTRY } from '../CountryCodePicker';
 import { userService } from '@/services/userService';
 import { catalogService } from '@/services/catalogService';
@@ -49,8 +48,10 @@ interface CatalogData {
 }
 
 export default forwardRef<{ snapshot: () => Partial<Step3Data> }, Step3Props>(
-  function Step3({ userId, onNext, onBack, initialData }: Step3Props, ref) {
-    const colorScheme = useColorScheme();
+  function Step3(
+    { userId, onNext, onBack: _onBack, initialData }: Step3Props,
+    ref
+  ) {
     const { showError, AlertComponent } = useCustomAlert();
     const formData = useStep3Form(initialData);
     const styles = useThemedStyles(makeStep3Styles);
@@ -190,13 +191,13 @@ export default forwardRef<{ snapshot: () => Partial<Step3Data> }, Step3Props>(
         loadRegions(formData.selectedCountryId);
         loadDocumentTypes(formData.selectedCountryId);
       }
-    }, [formData.selectedCountryId]);
+    }, [formData.selectedCountryId, loadRegions, loadDocumentTypes]);
 
     useEffect(() => {
       if (formData.selectedRegionId) {
         loadCities(formData.selectedRegionId);
       }
-    }, [formData.selectedRegionId]);
+    }, [formData.selectedRegionId, loadCities]);
 
     // Auto-select user's country
     useEffect(() => {
@@ -373,7 +374,9 @@ export default forwardRef<{ snapshot: () => Partial<Step3Data> }, Step3Props>(
 
           {/* Región */}
           <RegionSelector
-            regions={catalogData.regions as any}
+            regions={
+              catalogData.regions as unknown as import('@/components/catalogs/types').Region[]
+            }
             countryId={formData.selectedCountryId}
             value={formData.selectedRegionId}
             onSelect={onRegionSelect}
@@ -383,7 +386,9 @@ export default forwardRef<{ snapshot: () => Partial<Step3Data> }, Step3Props>(
 
           {/* Ciudad */}
           <CitySelector
-            cities={catalogData.cities as any}
+            cities={
+              catalogData.cities as unknown as import('@/components/catalogs/types').City[]
+            }
             regionId={formData.selectedRegionId}
             value={formData.selectedCityId}
             onSelect={onCitySelect}
@@ -393,7 +398,9 @@ export default forwardRef<{ snapshot: () => Partial<Step3Data> }, Step3Props>(
 
           {/* Tipo de documento */}
           <DocumentTypeSelector
-            documentTypes={catalogData.documentTypes as any}
+            documentTypes={
+              catalogData.documentTypes as unknown as import('@/components/catalogs/types').DocumentType[]
+            }
             countryId={formData.selectedCountryId}
             value={formData.selectedDocumentTypeId}
             onSelect={onDocumentTypeSelect}
@@ -418,7 +425,9 @@ export default forwardRef<{ snapshot: () => Partial<Step3Data> }, Step3Props>(
 
           {/* EPS */}
           <EPSSelector
-            epsOptions={catalogData.epsOptions as any}
+            epsOptions={
+              catalogData.epsOptions as unknown as import('@/components/catalogs/types').EPS[]
+            }
             value={formData.selectedEpsId}
             onSelect={onEpsSelect}
             loading={epsLoading}

@@ -4,6 +4,7 @@ import React, {
   useRef,
   forwardRef,
   useImperativeHandle,
+  useCallback,
 } from 'react';
 import {
   TextInput,
@@ -14,7 +15,6 @@ import {
   Modal,
 } from 'react-native';
 import { Text, View } from '../../Themed';
-import { useColorScheme } from '../../useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -39,8 +39,10 @@ interface Step5Props {
 }
 
 export default forwardRef<{ snapshot: () => Partial<Step5Data> }, Step5Props>(
-  function Step5({ userId, onNext, onBack, initialData }: Step5Props, ref) {
-    const colorScheme = useColorScheme();
+  function Step5(
+    { userId, onNext, onBack: _onBack, initialData }: Step5Props,
+    ref
+  ) {
     const styles = useThemedStyles(makeStep5Styles);
     const { showError, showSuccess, AlertComponent } = useCustomAlert();
     const [username, setUsername] = useState(initialData?.username || '');
@@ -82,127 +84,142 @@ export default forwardRef<{ snapshot: () => Partial<Step5Data> }, Step5Props>(
     };
 
     // Función para verificar disponibilidad del nombre de usuario
-    const checkUsernameAvailability = async (usernameToCheck: string) => {
-      if (!usernameToCheck.trim()) {
-        setUsernameStatus('idle');
-        setUsernameError('');
-        return;
-      }
-
-      // Validar mínimo de caracteres
-      if (usernameToCheck.length < 4) {
-        setUsernameStatus('invalid');
-        setUsernameError(
-          'El nombre de usuario debe tener al menos 4 caracteres'
-        );
-        return;
-      }
-
-      // Validar formato
-      if (!validateUsernameFormat(usernameToCheck)) {
-        setUsernameStatus('invalid');
-        setUsernameError(
-          'Solo se permiten letras, números y caracteres especiales. No se permiten espacios.'
-        );
-        return;
-      }
-
-      // Verificar cache primero (válido por 5 minutos)
-      const cached = usernameCache.current.get(usernameToCheck);
-      const cacheValidTime = 5 * 60 * 1000; // 5 minutos en millisegundos
-
-      if (cached && Date.now() - cached.timestamp < cacheValidTime) {
-        if (cached.status === 'available') {
-          setUsernameStatus('available');
+    const checkUsernameAvailability = useCallback(
+      async (usernameToCheck: string) => {
+        if (!usernameToCheck.trim()) {
+          setUsernameStatus('idle');
           setUsernameError('');
-        } else {
-          setUsernameStatus('taken');
-          setUsernameError('Este nombre de usuario ya está en uso');
-        }
-        return;
-      }
-
-      // Mantener el foco antes de hacer el request
-      const wasInputFocused = usernameInputRef.current?.isFocused();
-
-      try {
-        setIsCheckingUsername(true);
-        setUsernameError('');
-
-        // Marcar que estamos validando para prevenir cierre del teclado
-        preventKeyboardClose.current = true;
-
-        const requestData: UsernameCheckRequest = {
-          UserName: usernameToCheck,
-        };
-
-        // Usar apiService para incluir el token automáticamente
-        const response = await apiService.post<any[]>(
-          '/users/find',
-          requestData
-        );
-
-        // Restaurar el foco inmediatamente después del request
-        if (wasInputFocused && usernameInputRef.current) {
-          requestAnimationFrame(() => {
-            if (
-              usernameInputRef.current &&
-              !usernameInputRef.current.isFocused()
-            ) {
-              usernameInputRef.current.focus();
-            }
-          });
+          return;
         }
 
-        if (response.Success) {
-          // Si Data está vacío, el nombre de usuario está disponible
-          if (!response.Data || response.Data.length === 0) {
-            setUsernameStatus('available');
-            setUsernameError('');
-            // Guardar en cache
-            usernameCache.current.set(usernameToCheck, {
-              status: 'available',
-              timestamp: Date.now(),
-            });
-          } else {
-            // Si hay datos, el nombre de usuario ya está tomado
-            setUsernameStatus('taken');
-            setUsernameError('Este nombre de usuario ya está en uso');
-            // Guardar en cache
-            usernameCache.current.set(usernameToCheck, {
-              status: 'taken',
-              timestamp: Date.now(),
-            });
-          }
-        } else {
+        // Validar mínimo de caracteres
+        if (usernameToCheck.length < 4) {
           setUsernameStatus('invalid');
           setUsernameError(
-            response.Message || 'Error al verificar el nombre de usuario'
+            'El nombre de usuario debe tener al menos 4 caracteres'
           );
+          return;
         }
-      } catch {
-        setUsernameStatus('invalid');
-        setUsernameError(
-          'Error al verificar la disponibilidad del nombre de usuario'
-        );
 
-        // Restaurar el foco en caso de error también
-        if (wasInputFocused && usernameInputRef.current) {
-          requestAnimationFrame(() => {
-            if (
-              usernameInputRef.current &&
-              !usernameInputRef.current.isFocused()
-            ) {
-              usernameInputRef.current.focus();
-            }
-          });
+        // Validar formato
+        if (!validateUsernameFormat(usernameToCheck)) {
+          setUsernameStatus('invalid');
+          setUsernameError(
+            'Solo se permiten letras, números y caracteres especiales. No se permiten espacios.'
+          );
+          return;
         }
-      } finally {
-        setIsCheckingUsername(false);
-        // Permitir que el teclado se pueda cerrar nuevamente
-        preventKeyboardClose.current = false;
-      }
-    };
+
+        // Verificar cache primero (válido por 5 minutos)
+        const cached = usernameCache.current.get(usernameToCheck);
+        const cacheValidTime = 5 * 60 * 1000; // 5 minutos en millisegundos
+
+        if (cached && Date.now() - cached.timestamp < cacheValidTime) {
+          if (cached.status === 'available') {
+            setUsernameStatus('available');
+            setUsernameError('');
+          } else {
+            setUsernameStatus('taken');
+            setUsernameError('Este nombre de usuario ya está en uso');
+          }
+          return;
+        }
+
+        // Mantener el foco antes de hacer el request
+        const wasInputFocused = usernameInputRef.current?.isFocused();
+
+        try {
+          setIsCheckingUsername(true);
+          setUsernameError('');
+
+          // Marcar que estamos validando para prevenir cierre del teclado
+          preventKeyboardClose.current = true;
+
+          const requestData: UsernameCheckRequest = {
+            UserName: usernameToCheck,
+          };
+
+          // Usar apiService para incluir el token automáticamente
+          const response = await apiService.post<unknown>(
+            '/users/find',
+            requestData
+          );
+
+          // Restaurar el foco inmediatamente después del request
+          if (wasInputFocused && usernameInputRef.current) {
+            requestAnimationFrame(() => {
+              if (
+                usernameInputRef.current &&
+                !usernameInputRef.current.isFocused()
+              ) {
+                usernameInputRef.current.focus();
+              }
+            });
+          }
+
+          if (response.Success) {
+            const raw = response.Data as unknown;
+            let list: unknown[] = [];
+            if (Array.isArray(raw)) {
+              list = raw as unknown[];
+            } else if (
+              typeof raw === 'object' &&
+              raw !== null &&
+              '$values' in (raw as Record<string, unknown>) &&
+              Array.isArray((raw as Record<string, unknown>)['$values'])
+            ) {
+              list = (raw as Record<string, unknown>)['$values'] as unknown[];
+            }
+            // Si Data está vacío, el nombre de usuario está disponible
+            if (!list || list.length === 0) {
+              setUsernameStatus('available');
+              setUsernameError('');
+              // Guardar en cache
+              usernameCache.current.set(usernameToCheck, {
+                status: 'available',
+                timestamp: Date.now(),
+              });
+            } else {
+              // Si hay datos, el nombre de usuario ya está tomado
+              setUsernameStatus('taken');
+              setUsernameError('Este nombre de usuario ya está en uso');
+              // Guardar en cache
+              usernameCache.current.set(usernameToCheck, {
+                status: 'taken',
+                timestamp: Date.now(),
+              });
+            }
+          } else {
+            setUsernameStatus('invalid');
+            setUsernameError(
+              response.Message || 'Error al verificar el nombre de usuario'
+            );
+          }
+        } catch {
+          setUsernameStatus('invalid');
+          setUsernameError(
+            'Error al verificar la disponibilidad del nombre de usuario'
+          );
+
+          // Restaurar el foco en caso de error también
+          if (wasInputFocused && usernameInputRef.current) {
+            requestAnimationFrame(() => {
+              if (
+                usernameInputRef.current &&
+                !usernameInputRef.current.isFocused()
+              ) {
+                usernameInputRef.current.focus();
+              }
+            });
+          }
+        } finally {
+          setIsCheckingUsername(false);
+          // Permitir que el teclado se pueda cerrar nuevamente
+          preventKeyboardClose.current = false;
+        }
+      },
+      []
+    );
 
     // Hook para manejar el debounce del nombre de usuario
     useEffect(() => {
@@ -238,7 +255,7 @@ export default forwardRef<{ snapshot: () => Partial<Step5Data> }, Step5Props>(
           clearTimeout(debounceRef.current);
         }
       };
-    }, [username]);
+    }, [username, checkUsernameAvailability]);
 
     // Hook para manejar eventos del teclado
     useEffect(() => {
@@ -387,11 +404,13 @@ export default forwardRef<{ snapshot: () => Partial<Step5Data> }, Step5Props>(
 
         // Preparar el archivo de imagen
         const filename = `profile_${userId}_${Date.now()}.png`;
-        formData.append('ProfileImage', {
+        // React Native FormData file shape
+        const rnFile = {
           uri: imageUri,
           type: 'image/png',
           name: filename,
-        } as any);
+        } as unknown as Blob;
+        formData.append('ProfileImage', rnFile, filename);
 
         // Hacer el request usando apiService para incluir el token automáticamente
         const response = await apiService.post<string>(

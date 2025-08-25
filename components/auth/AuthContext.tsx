@@ -9,6 +9,7 @@ interface AuthContextType {
   setOnSkip: (callback: (() => void) | undefined) => void;
 }
 
+/* eslint-disable @typescript-eslint/no-empty-function */
 const AuthContext = createContext<AuthContextType>({
   currentStep: 0,
   setCurrentStep: () => {},
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   onSkip: () => {},
   setOnSkip: () => {},
 });
+/* eslint-enable @typescript-eslint/no-empty-function */
 
 export const useAuthContext = () => useContext(AuthContext);
 

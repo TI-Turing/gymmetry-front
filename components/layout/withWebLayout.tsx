@@ -31,7 +31,7 @@ export function withWebLayout<P extends object>(
       // Navegación usando expo-router
       if (Platform.OS === 'web') {
         // Ahora las rutas del menú viven en raíz en web
-        router.push(`/${tab}` as any);
+        router.push(`/${tab}`);
       }
     };
 

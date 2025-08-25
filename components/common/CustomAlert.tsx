@@ -159,7 +159,11 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
               }}
             >
               <FontAwesome
-                name={iconConfig.name as any}
+                name={
+                  iconConfig.name as React.ComponentProps<
+                    typeof FontAwesome
+                  >['name']
+                }
                 size={32}
                 color={iconConfig.color}
               />

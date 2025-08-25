@@ -9,7 +9,11 @@ import { equipmentService } from '@/services';
 const EquipmentList = React.memo(() => {
   const loadEquipment = useCallback(async () => {
     const response = await equipmentService.getAllEquipment();
-    return response || [];
+    const raw = (response as unknown as { Data?: unknown })?.Data;
+    const list: unknown[] = Array.isArray(raw)
+      ? raw
+      : (raw as { $values?: unknown[] })?.$values || [];
+    return list;
   }, []);
 
   const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -19,7 +23,10 @@ const EquipmentList = React.memo(() => {
     const o = isRecord(item) ? item : ({} as Record<string, unknown>);
     const title =
       (typeof o.name === 'string' && o.name) || 'Equipamiento sin nombre';
-    const isAvailable = Boolean((o as any).isAvailable);
+    const isAvailable = Boolean(
+      (o as { isAvailable?: unknown; IsAvailable?: unknown }).isAvailable ??
+        (o as { isAvailable?: unknown; IsAvailable?: unknown }).IsAvailable
+    );
     const description =
       (typeof o.description === 'string' && o.description) ||
       'Sin descripción disponible';
@@ -32,7 +39,11 @@ const EquipmentList = React.memo(() => {
       (typeof o.location === 'string' && o.location) ||
       (typeof o.zone === 'string' && o.zone) ||
       'N/A';
-    const exerciseCount = (o as any).exerciseCount ?? 0;
+    const ec = (o as { exerciseCount?: unknown; ExerciseCount?: unknown })
+      .exerciseCount;
+    const ecAlt = (o as { exerciseCount?: unknown; ExerciseCount?: unknown })
+      .ExerciseCount;
+    const exerciseCount = Number(ec ?? ecAlt ?? 0);
     return (
       <View style={styles.card}>
         <View style={styles.header}>
@@ -74,7 +85,8 @@ const EquipmentList = React.memo(() => {
 
   const keyExtractor = useCallback((item: unknown) => {
     if (isRecord(item)) {
-      const id = (item.id as any) ?? (item.Id as any);
+      const rec = item as { id?: unknown; Id?: unknown };
+      const id = rec.id ?? rec.Id;
       if (id != null) return String(id);
     }
     return String(Math.random());

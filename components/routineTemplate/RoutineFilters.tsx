@@ -85,12 +85,7 @@ export default function RoutineFilters({
     onFiltersChange(filters);
   }, [filters, onFiltersChange]);
 
-  const toggleBooleanFilter = (key: 'requiereEquipos' | 'calistenia') => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: prev[key] === null ? true : prev[key] === true ? false : null,
-    }));
-  };
+  // toggleBooleanFilter: se dejó de usar, mantener la lógica inline en botones
 
   const toggleObjectiveFilter = (
     key: string,

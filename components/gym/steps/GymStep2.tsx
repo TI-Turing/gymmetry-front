@@ -18,7 +18,7 @@ interface GymStep2Props extends GymStepProps<GymStep2Data> {
 
 export default function GymStep2({
   onNext,
-  onBack,
+  onBack: _onBack,
   initialData,
   gymId,
   isLoading = false,

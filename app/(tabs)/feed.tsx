@@ -124,7 +124,7 @@ function FeedScreen() {
       ProfileImageUrl: 'https://via.placeholder.com/40?text=M',
     };
 
-  const p1: LocalPost = {
+    const p1: LocalPost = {
       Id: 'p1',
       UserId: 'u1',
       Content: '¡Nuevo PR en peso muerto! 180kg 💪',
@@ -140,7 +140,7 @@ function FeedScreen() {
       Comments: [],
       Likes: [],
     };
-  const p2: LocalPost = {
+    const p2: LocalPost = {
       Id: 'p2',
       UserId: 'u2',
       Content:
@@ -168,7 +168,7 @@ function FeedScreen() {
         } as Record<string, unknown>,
       ],
     };
-  const p3: LocalPost = {
+    const p3: LocalPost = {
       Id: 'p3',
       UserId: 'u3',
       Content: 'Día de piernas intenso. Mañana no podré caminar 😅',
@@ -180,9 +180,9 @@ function FeedScreen() {
       Ip: null,
       IsActive: true,
       IsDeleted: false,
-  User: userC,
-  Comments: [],
-  Likes: [],
+      User: userC,
+      Comments: [],
+      Likes: [],
     };
 
     return [p1, p2, p3];
@@ -224,8 +224,8 @@ function FeedScreen() {
         return;
       }
     } catch {}
-  const me = posts[0]?.User; // mock fallback
-  const newPost: LocalPost = {
+    const me = posts[0]?.User; // mock fallback
+    const newPost: LocalPost = {
       Id: 'p' + (Math.random() * 100000).toFixed(0),
       UserId: me?.Id || 'me',
       Content: content,
@@ -237,7 +237,7 @@ function FeedScreen() {
       Ip: null,
       IsActive: true,
       IsDeleted: false,
-  User: me as User,
+      User: me as User,
       Comments: [],
       Likes: [],
     };
@@ -267,8 +267,8 @@ function FeedScreen() {
             }),
           };
         }
-  const now = new Date().toISOString();
-  const like = {
+        const now = new Date().toISOString();
+        const like = {
           Id: 'l' + Math.random(),
           PostId: p.Id,
           UserId: meId,

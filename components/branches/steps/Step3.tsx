@@ -7,10 +7,9 @@ import { UI_CONSTANTS } from '@/constants/AppConstants';
 
 interface Step3Props {
   branchId: string;
-  onMediaUpload?: (mediaFiles: unknown[]) => void;
 }
 
-export default function Step3({ branchId, onMediaUpload }: Step3Props) {
+export default function Step3({ branchId: _branchId }: Step3Props) {
   const handleSelectImages = () => {
     // TODO: Implementar selección de imágenes
   };

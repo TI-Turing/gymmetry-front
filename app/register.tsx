@@ -5,7 +5,7 @@ import AuthContainer from '@/components/auth/AuthContainer';
 import { User } from '@/components/auth/types';
 
 export default function RegisterPage() {
-  const handleAuthSuccess = (user: User) => {
+  const handleAuthSuccess = (_user: User) => {
     // Después del registro exitoso, navegar a la app principal
     router.replace('/(tabs)');
   };

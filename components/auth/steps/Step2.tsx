@@ -399,7 +399,7 @@ export default forwardRef<{ snapshot: () => Partial<Step2Data> }, Step2Props>(
                       color: Colors[colorScheme].text,
                       borderColor: phoneVerified
                         ? `${Colors[colorScheme].text}40`
-                        : (styles as any).input.borderColor,
+                        : (styles.input?.borderColor as string),
                       paddingRight: phoneVerified ? 40 : 16,
                       opacity: phoneVerified ? 0.8 : 1,
                     },
@@ -440,7 +440,7 @@ export default forwardRef<{ snapshot: () => Partial<Step2Data> }, Step2Props>(
                 commonStyles.input,
                 {
                   backgroundColor: Colors[colorScheme].background,
-                  borderColor: (styles as any).input.borderColor,
+                  borderColor: styles.input?.borderColor as string,
                   justifyContent: 'center',
                 },
               ]}
@@ -476,7 +476,7 @@ export default forwardRef<{ snapshot: () => Partial<Step2Data> }, Step2Props>(
                   commonStyles.input,
                   {
                     backgroundColor: Colors[colorScheme].background,
-                    borderColor: (styles as any).input.borderColor,
+                    borderColor: styles.input?.borderColor as string,
                     justifyContent: 'center',
                   },
                 ]}
@@ -491,7 +491,7 @@ export default forwardRef<{ snapshot: () => Partial<Step2Data> }, Step2Props>(
                   commonStyles.input,
                   {
                     backgroundColor: Colors[colorScheme].background,
-                    borderColor: (styles as any).input.borderColor,
+                    borderColor: styles.input?.borderColor as string,
                     justifyContent: 'center',
                   },
                 ]}

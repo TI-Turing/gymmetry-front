@@ -6,7 +6,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 
 export function ConfigList() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, _setItems] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

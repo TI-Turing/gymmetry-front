@@ -9,7 +9,7 @@ import { makeRoutineTemplateStyles } from './styles.themed';
 export function RoutineTemplateDetail() {
   const styles = useThemedStyles(makeRoutineTemplateStyles);
   const [id, setId] = useState('');
-  const [item, setItem] = useState<unknown>(null);
+  const [item, _setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

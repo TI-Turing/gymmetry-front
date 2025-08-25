@@ -1,5 +1,6 @@
 import { apiService } from './apiService';
 import type { ApiResponse } from '@/dto/common/ApiResponse';
+import type { GymImage } from '@/models/GymImage';
 
 // Auto-generated service for GymImage Azure Functions
 export const gymImageService = {
@@ -15,8 +16,8 @@ export const gymImageService = {
     const response = await apiService.get<unknown>(`/gymimage/${id}`);
     return response;
   },
-  async getAllGymImages(): Promise<ApiResponse<any[]>> {
-    const response = await apiService.get<any[]>(`/gymimages`);
+  async getAllGymImages(): Promise<ApiResponse<GymImage[]>> {
+    const response = await apiService.get<GymImage[]>(`/gymimages`);
     return response;
   },
   async updateGymImage(request: unknown): Promise<ApiResponse<unknown>> {

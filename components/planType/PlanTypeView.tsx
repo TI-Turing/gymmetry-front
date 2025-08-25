@@ -58,7 +58,7 @@ export default function PlanTypeView({
     string | null
   >(null);
   const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null); // selected plan id for modal
-  const [retryMotivo, setRetryMotivo] = useState<string | null>(null); // deprecated UI, kept for banner logic
+  const [_retryMotivo, setRetryMotivo] = useState<string | null>(null); // deprecated UI, kept for banner logic
   const [paymentMethod] = useState<'CARD' | 'PSE'>('CARD'); // default; UI removed
   const [buyerEmail, setBuyerEmail] = useState<string>('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
@@ -79,11 +79,20 @@ export default function PlanTypeView({
         // Finalizar asignación visual y recargar tipos
         loadPlanTypes();
       }
-      const exp = (raw as any)?.expiresAt || (raw as any)?.ExpiresAt || null;
+      const exp =
+        (raw as unknown as { expiresAt?: string; ExpiresAt?: string })
+          ?.expiresAt ||
+        (raw as unknown as { expiresAt?: string; ExpiresAt?: string })
+          ?.ExpiresAt ||
+        null;
       if (exp) setExpiresAt(exp);
       // Caso raro: Approved sin planCreated => re-poll corto y ofrecer reintento
       if (s === 'approved') {
-        const created = (raw as any)?.planCreated ?? (raw as any)?.PlanCreated;
+        const created =
+          (raw as unknown as { planCreated?: boolean; PlanCreated?: boolean })
+            ?.planCreated ??
+          (raw as unknown as { planCreated?: boolean; PlanCreated?: boolean })
+            ?.PlanCreated;
         if (!created && preferenceId) {
           await probePlanCreated(preferenceId);
         }
@@ -101,7 +110,18 @@ export default function PlanTypeView({
         await new Promise((r) => setTimeout(r, 3000));
         const resp = await paymentService.getPaymentStatus(prefId);
         const created =
-          (resp.Data as any)?.planCreated ?? (resp.Data as any)?.PlanCreated;
+          (
+            resp.Data as
+              | { planCreated?: boolean; PlanCreated?: boolean }
+              | null
+              | undefined
+          )?.planCreated ??
+          (
+            resp.Data as
+              | { planCreated?: boolean; PlanCreated?: boolean }
+              | null
+              | undefined
+          )?.PlanCreated;
         if (created) {
           ok = true;
           break;
@@ -173,7 +193,7 @@ export default function PlanTypeView({
       const response = await planTypeService.getAllPlanTypes();
 
       if (response.Success && response.Data) {
-        const raw = normalizeCollection<ApiPlanType>(response.Data as any);
+        const raw = normalizeCollection<ApiPlanType>(response.Data as unknown);
         // Mapear la respuesta de la API a la estructura esperada por el componente
         const mappedPlanTypes: PlanType[] = raw.map((apiPlanType) => ({
           id: apiPlanType.Id,
@@ -213,7 +233,7 @@ export default function PlanTypeView({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [activePlanTypeId, hideActive]);
 
   useEffect(() => {
     loadPlanTypes();
@@ -229,7 +249,7 @@ export default function PlanTypeView({
 
   // Countdown expiración
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
     if (
       expiresAt &&
       (paymentStatus === 'pending' || paymentStatus === 'polling')
@@ -239,7 +259,7 @@ export default function PlanTypeView({
         setRemaining(diff > 0 ? Math.floor(diff / 1000) : 0);
       };
       tick();
-      timer = setInterval(tick, 1000) as any;
+      timer = setInterval(tick, 1000);
     } else {
       setRemaining(0);
     }
@@ -334,7 +354,8 @@ export default function PlanTypeView({
           startPolling(prefId);
         }
       } else {
-        const msg = (prefResp as any)?.Message || '';
+        const msg =
+          (prefResp as unknown as { Message?: string })?.Message || '';
         if (msg.toLowerCase().includes('pendiente') && preferenceId) {
           startPolling(preferenceId);
         } else {
@@ -457,10 +478,31 @@ export default function PlanTypeView({
             (() => {
               const v = getPaymentVisual(paymentStatus);
               const pm =
-                (rawStatus as any)?.paymentMethod ||
-                (rawStatus as any)?.PaymentMethod;
+                (
+                  rawStatus as
+                    | { paymentMethod?: string; PaymentMethod?: string }
+                    | null
+                    | undefined
+                )?.paymentMethod ||
+                (
+                  rawStatus as
+                    | { paymentMethod?: string; PaymentMethod?: string }
+                    | null
+                    | undefined
+                )?.PaymentMethod;
               const bank =
-                (rawStatus as any)?.bankCode || (rawStatus as any)?.BankCode;
+                (
+                  rawStatus as
+                    | { bankCode?: string; BankCode?: string }
+                    | null
+                    | undefined
+                )?.bankCode ||
+                (
+                  rawStatus as
+                    | { bankCode?: string; BankCode?: string }
+                    | null
+                    | undefined
+                )?.BankCode;
               return (
                 <View
                   style={[

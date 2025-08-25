@@ -6,20 +6,19 @@ import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 
 const CommentList = React.memo(() => {
-  const servicePlaceholder = useCallback(() => Promise.resolve([]), []);
+  const servicePlaceholder = useCallback(
+    () => Promise.resolve([] as unknown[]),
+    []
+  );
+
   const loadComments = useCallback(async () => {
     try {
-      // Placeholder for actual service call
-
       const result = await servicePlaceholder();
-
-      return result || [];
+      return Array.isArray(result) ? result : [];
     } catch (_error) {
-      return [];
+      return [] as unknown[];
     }
   }, [servicePlaceholder]);
-
-  CommentList.displayName = 'CommentList';
 
   const isRecord = (v: unknown): v is Record<string, unknown> =>
     !!v && typeof v === 'object';
@@ -79,7 +78,7 @@ const CommentList = React.memo(() => {
             ? '❌ Rechazado'
             : '📝 Borrador';
 
-    const ratingRaw = (obj as any).rating;
+    const ratingRaw = obj.rating as unknown;
     const rating = typeof ratingRaw === 'number' ? ratingRaw : null;
 
     const category =
@@ -87,9 +86,19 @@ const CommentList = React.memo(() => {
       (typeof obj.topic === 'string' && obj.topic) ||
       'General';
 
-    const likes = (obj as any).likes ?? (obj as any).upvotes ?? 0;
-    const dislikes = (obj as any).dislikes ?? (obj as any).downvotes ?? 0;
-    const replies = (obj as any).replies ?? (obj as any).repliesCount ?? 0;
+    const likesCandidate =
+      (obj as Record<string, unknown>).likes ??
+      (obj as Record<string, unknown>).upvotes;
+    const likes = typeof likesCandidate === 'number' ? likesCandidate : 0;
+    const dislikesCandidate =
+      (obj as Record<string, unknown>).dislikes ??
+      (obj as Record<string, unknown>).downvotes;
+    const dislikes =
+      typeof dislikesCandidate === 'number' ? dislikesCandidate : 0;
+    const repliesCandidate =
+      (obj as Record<string, unknown>).replies ??
+      (obj as Record<string, unknown>).repliesCount;
+    const replies = typeof repliesCandidate === 'number' ? repliesCandidate : 0;
 
     const parentC = isRecord(obj.parentComment) ? obj.parentComment : null;
     const parentAuthor =
@@ -101,13 +110,13 @@ const CommentList = React.memo(() => {
         ? parentC.content.substring(0, 50)
         : 'Comentario';
 
-    const reportCountRaw = (obj as any).reportCount;
+    const reportCountRaw = obj.reportCount as unknown;
     const reportCount = typeof reportCountRaw === 'number' ? reportCountRaw : 0;
 
     const platform = typeof obj.platform === 'string' ? obj.platform : null;
     const platformLabel =
       platform === 'mobile'
-        ? '� Móvil'
+        ? '📱 Móvil'
         : platform === 'web'
           ? '💻 Web'
           : platform === 'app'
@@ -117,13 +126,14 @@ const CommentList = React.memo(() => {
     const moderatorNote =
       typeof obj.moderatorNote === 'string' ? obj.moderatorNote : null;
 
-    const tagsArr = Array.isArray((obj as any).tags)
-      ? ((obj as any).tags as unknown[]).filter((t) => typeof t === 'string')
+    const tagsRaw = obj.tags as unknown;
+    const tagsArr = Array.isArray(tagsRaw)
+      ? (tagsRaw as unknown[]).filter((t): t is string => typeof t === 'string')
       : [];
 
     const lastEditedAtVal = obj.lastEditedAt as unknown;
     const lastEditedAt = lastEditedAtVal
-      ? new Date(lastEditedAtVal as any)
+      ? new Date(String(lastEditedAtVal))
       : null;
 
     return (
@@ -256,12 +266,12 @@ const CommentList = React.memo(() => {
   const keyExtractor = useCallback((item: unknown) => {
     if (isRecord(item)) {
       const v =
-        (item.id as any) ??
-        (item.commentId as any) ??
-        (item.uuid as any) ??
-        (item.Id as any) ??
-        (item.CommentId as any) ??
-        (item.Uuid as any);
+        (item.id as unknown) ??
+        (item.commentId as unknown) ??
+        (item.uuid as unknown) ??
+        (item.Id as unknown) ??
+        (item.CommentId as unknown) ??
+        (item.Uuid as unknown);
       if (v != null) return String(v);
     }
     return String(Math.random());
@@ -279,6 +289,7 @@ const CommentList = React.memo(() => {
     />
   );
 });
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,

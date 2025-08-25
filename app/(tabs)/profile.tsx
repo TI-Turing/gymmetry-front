@@ -35,16 +35,17 @@ function ProfileScreen() {
     { icon: 'fire', title: '30 Días Consecutivos', color: styles.colors.tint },
     { icon: 'star', title: 'Meta Mensual', color: styles.colors.tint },
     { icon: 'medal', title: 'Primer PR', color: styles.colors.tint },
-  ];
+  ] as const;
 
+  const noop = () => undefined;
   const menuItems = [
     { icon: 'user', title: 'Editar Perfil', action: () => setIsEditing(true) },
-    { icon: 'cog', title: 'Configuración', action: () => {} },
-    { icon: 'chart-line', title: 'Estadísticas', action: () => {} },
-    { icon: 'calendar', title: 'Historial', action: () => {} },
-    { icon: 'question-circle', title: 'Ayuda', action: () => {} },
-    { icon: 'info-circle', title: 'Acerca de', action: () => {} },
-  ];
+    { icon: 'cog', title: 'Configuración', action: noop },
+    { icon: 'chart-line', title: 'Estadísticas', action: noop },
+    { icon: 'calendar', title: 'Historial', action: noop },
+    { icon: 'question-circle', title: 'Ayuda', action: noop },
+    { icon: 'info-circle', title: 'Acerca de', action: noop },
+  ] as const;
 
   const handleLogout = () => {
     showAlert(
@@ -108,7 +109,11 @@ function ProfileScreen() {
         {achievements.map((achievement, index) => (
           <View key={index} style={styles.achievementItem}>
             <FontAwesome
-              name={achievement.icon as any}
+              name={
+                achievement.icon as unknown as React.ComponentProps<
+                  typeof FontAwesome
+                >['name']
+              }
               size={24}
               color={achievement.color}
             />
@@ -119,10 +124,14 @@ function ProfileScreen() {
     </View>
   );
 
-  const renderMenuItem = (item: (typeof menuItems)[0], index: number) => (
+  const renderMenuItem = (item: (typeof menuItems)[number], index: number) => (
     <TouchableOpacity key={index} style={styles.menuItem} onPress={item.action}>
       <FontAwesome
-        name={item.icon as any}
+        name={
+          item.icon as unknown as React.ComponentProps<
+            typeof FontAwesome
+          >['name']
+        }
         size={20}
         color={styles.colors.muted}
       />

@@ -38,8 +38,7 @@ export default function EnneagonChart({ objectives, size = 320 }: Props) {
   const basePoints = getEnneagonPoints(size, Array(9).fill(1));
   const pointsStr = points.map((p) => `${p.x},${p.y}`).join(' ');
   const baseStr = basePoints.map((p) => `${p.x},${p.y}`).join(' ');
-  const cx = size / 2;
-  const cy = size / 2;
+  // cx, cy se usan dentro de getEnneagonPoints
 
   return (
     <View style={{ alignItems: 'center', marginVertical: 24 }}>
@@ -61,11 +60,10 @@ export default function EnneagonChart({ objectives, size = 320 }: Props) {
         />
         {/* Puntos y labels */}
         {basePoints.map((p, i) => (
-          <>
-            <Circle key={`c${i}`} cx={p.x} cy={p.y} r={8} fill={Colors.tint} />
+          <React.Fragment key={`f${i}`}>
+            <Circle cx={p.x} cy={p.y} r={8} fill={Colors.tint} />
             {paddedKeys[i] && (
               <SvgText
-                key={`t${i}`}
                 x={p.x}
                 y={p.y - 16}
                 fontSize={16}
@@ -76,7 +74,7 @@ export default function EnneagonChart({ objectives, size = 320 }: Props) {
                 {paddedKeys[i]}
               </SvgText>
             )}
-          </>
+          </React.Fragment>
         ))}
       </Svg>
       <Text style={{ marginTop: 8, fontWeight: 'bold', color: Colors.tint }}>

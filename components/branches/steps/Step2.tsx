@@ -7,15 +7,11 @@ import { UI_CONSTANTS } from '@/constants/AppConstants';
 
 interface Step2Props {
   branchId: string;
-  formData: unknown;
-  onFormDataChange: (field: string, value: unknown) => void;
+  formData?: unknown; // no se usa internamente aún
+  onFormDataChange?: (field: string, value: unknown) => void; // hook in futuro
 }
 
-export default function Step2({
-  branchId,
-  formData,
-  onFormDataChange,
-}: Step2Props) {
+export default function Step2({ branchId }: Step2Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.stepTitle}>Paso 2: Información Adicional</Text>

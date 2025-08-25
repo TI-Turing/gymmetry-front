@@ -29,7 +29,7 @@ export const SelectorModal = memo<SelectorModalProps>(
     loading = false,
     selectedId,
     showSearch = false,
-    searchPlaceholder = 'Buscar...',
+    searchPlaceholder,
   }) => {
     const colorScheme = useColorScheme();
     const colorStyles = getColorSchemeStyles(colorScheme);
@@ -74,7 +74,7 @@ export const SelectorModal = memo<SelectorModalProps>(
                     catalogStyles.searchInput,
                     colorStyles.searchInputText,
                   ]}
-                  // Sin placeholder visible por requerimiento
+                  placeholder={searchPlaceholder}
                   placeholderTextColor={colorStyles.placeholderText.color}
                   onChangeText={setTerm}
                   value={term}

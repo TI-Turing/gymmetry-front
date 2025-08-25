@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   Modal,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/Themed';
 import ExerciseList from '@/components/exercise/ExerciseList';
 import { exerciseService } from '@/services/exerciseService';
@@ -37,8 +37,8 @@ const EmbeddedExerciseSelector: React.FC<Props> = ({
   const [muscleTags01, setMuscleTags01] = useState<Record<string, number>>({});
   const [showDiagramFull, setShowDiagramFull] = useState(false);
   const [diagramSide, setDiagramSide] = useState<'front' | 'back'>('front');
-  const { width, height: screenHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  // const insets = useSafeAreaInsets();
   const small = width < 720; // breakpoint sencillo
 
   const fetchDetail = useCallback(async (id: string) => {
@@ -50,10 +50,11 @@ const EmbeddedExerciseSelector: React.FC<Props> = ({
       setDetail(ex);
       let tags: Record<string, number> = {};
       try {
-        const raw: unknown = (ex as any)?.TagsMuscle;
+        const raw: unknown = (ex as Exercise | null)?.TagsMuscle ?? null;
         if (raw) {
           if (typeof raw === 'string') tags = JSON.parse(raw);
-          else if (typeof raw === 'object') tags = raw as any;
+          else if (typeof raw === 'object')
+            tags = raw as Record<string, number>;
         }
       } catch {}
       setMuscleTags01(tags);
@@ -67,7 +68,8 @@ const EmbeddedExerciseSelector: React.FC<Props> = ({
 
   const handleSelect = useCallback(
     (ex: unknown) => {
-      const id: unknown = (ex as any).Id || (ex as any).id;
+      const anyEx = ex as { Id?: unknown; id?: unknown };
+      const id: unknown = anyEx?.Id ?? anyEx?.id;
       if (id) {
         setSelectedId(String(id));
         fetchDetail(String(id));
@@ -126,19 +128,19 @@ const EmbeddedExerciseSelector: React.FC<Props> = ({
                 <RNView style={{ gap: 12 }}>
                   <RNView style={styles.detailHeaderCard}>
                     <Text style={styles.exerciseName}>
-                      {(detail as any).Name || (detail as any).name}
+                      {(detail as Exercise).Name}
                     </Text>
                     {detail.Description && (
                       <Text style={styles.exerciseDesc}>
                         {detail.Description}
                       </Text>
                     )}
-                    {((detail as any)?.CategoryExercise?.Name ||
-                      (detail as any).CategoryExerciseId) && (
+                    {((detail as Exercise)?.CategoryExercise?.Name ||
+                      (detail as Exercise).CategoryExerciseId) && (
                       <Text style={styles.metaText}>
                         Categoría:{' '}
-                        {(detail as any)?.CategoryExercise?.Name ??
-                          (detail as any).CategoryExerciseId}
+                        {(detail as Exercise)?.CategoryExercise?.Name ??
+                          (detail as Exercise).CategoryExerciseId}
                       </Text>
                     )}
                   </RNView>
@@ -222,24 +224,17 @@ const EmbeddedExerciseSelector: React.FC<Props> = ({
                 {diagramSide === 'front' ? '↻' : '↺'}
               </Text>
             </TouchableOpacity>
-            {(() => {
-              const aspect = 500 / 700; // w/h del SVG de un lado (más alto que ancho)
-              // Como es más alto que ancho, usar toda la altura disponible
-              const figHeight = screenHeight;
-              const figWidth = figHeight * aspect;
-
-              return (
-                <RNView style={StyleSheet.absoluteFillObject}>
-                  <BodyMusclesDiagram
-                    palette="mono"
-                    width="100%"
-                    height="100%"
-                    overlayOpacities={overlayOpacities}
-                    side={diagramSide}
-                  />
-                </RNView>
-              );
-            })()}
+            {(() => (
+              <RNView style={StyleSheet.absoluteFillObject}>
+                <BodyMusclesDiagram
+                  palette="mono"
+                  width="100%"
+                  height="100%"
+                  overlayOpacities={overlayOpacities}
+                  side={diagramSide}
+                />
+              </RNView>
+            ))()}
             <Text style={styles.tapToClose}>Toca para cerrar</Text>
           </RNView>
         </RNView>

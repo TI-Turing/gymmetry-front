@@ -209,7 +209,11 @@ export default function WebHeader({
                 onPress={option.action}
               >
                 <FontAwesome
-                  name={option.icon as any}
+                  name={
+                    option.icon as React.ComponentProps<
+                      typeof FontAwesome
+                    >['name']
+                  }
                   size={14}
                   style={[
                     styles.menuIcon,

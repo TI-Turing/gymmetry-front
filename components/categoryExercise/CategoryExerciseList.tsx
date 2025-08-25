@@ -7,7 +7,7 @@ import Colors from '@/constants/Colors';
 import { categoryExerciseService } from '@/services';
 
 export function CategoryExerciseList() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

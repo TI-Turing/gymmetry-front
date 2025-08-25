@@ -12,7 +12,7 @@ import { makeGymStepsStyles } from '../styles/gymSteps';
 export default function GymStep5({
   gymId,
   onNext,
-  onBack,
+  onBack: _onBack,
   initialData,
 }: GymStepProps<GymStep5Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();

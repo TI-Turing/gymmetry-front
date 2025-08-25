@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { catalogService } from '@/services/catalogService';
 import { userSessionService } from '@/services/userSessionService';
 import { Gender, Country, Region, City, EPS, DocumentType } from '@/dto/common';
@@ -9,7 +9,7 @@ export function useGenders(autoLoad: boolean = false) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadGenders = async () => {
+  const loadGenders = useCallback(async () => {
     if (loading) {
       return;
     }
@@ -25,13 +25,13 @@ export function useGenders(autoLoad: boolean = false) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading]);
 
   useEffect(() => {
     if (autoLoad) {
       loadGenders();
     }
-  }, [autoLoad]);
+  }, [autoLoad, loadGenders]);
 
   return {
     genders,
@@ -48,7 +48,7 @@ export function useCountries(autoLoad: boolean = false) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadCountries = async () => {
+  const loadCountries = useCallback(async () => {
     if (loading) {
       return;
     }
@@ -64,13 +64,13 @@ export function useCountries(autoLoad: boolean = false) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading]);
 
   useEffect(() => {
     if (autoLoad) {
       loadCountries();
     }
-  }, [autoLoad]);
+  }, [autoLoad, loadCountries]);
 
   return {
     countries,
@@ -87,24 +87,29 @@ export function useRegionsByCountry(countryId?: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadRegions = async (targetCountryId?: string) => {
-    const finalCountryId = targetCountryId || countryId;
-    if (!finalCountryId || loading) {
-      return;
-    }
+  const loadRegions = useCallback(
+    async (targetCountryId?: string) => {
+      const finalCountryId = targetCountryId || countryId;
+      if (!finalCountryId || loading) {
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const data = await catalogService.getRegionsByCountry(finalCountryId);
-      setRegions(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error cargando regiones');
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const data = await catalogService.getRegionsByCountry(finalCountryId);
+        setRegions(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Error cargando regiones'
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [countryId, loading]
+  );
 
   useEffect(() => {
     if (countryId) {
@@ -112,7 +117,7 @@ export function useRegionsByCountry(countryId?: string) {
     } else {
       setRegions([]);
     }
-  }, [countryId]);
+  }, [countryId, loadRegions]);
 
   return {
     regions,
@@ -129,24 +134,29 @@ export function useCitiesByRegion(regionId?: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadCities = async (targetRegionId?: string) => {
-    const finalRegionId = targetRegionId || regionId;
-    if (!finalRegionId || loading) {
-      return;
-    }
+  const loadCities = useCallback(
+    async (targetRegionId?: string) => {
+      const finalRegionId = targetRegionId || regionId;
+      if (!finalRegionId || loading) {
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const data = await catalogService.getCitiesByRegion(finalRegionId);
-      setCities(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error cargando ciudades');
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const data = await catalogService.getCitiesByRegion(finalRegionId);
+        setCities(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Error cargando ciudades'
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [regionId, loading]
+  );
 
   useEffect(() => {
     if (regionId) {
@@ -154,7 +164,7 @@ export function useCitiesByRegion(regionId?: string) {
     } else {
       setCities([]);
     }
-  }, [regionId]);
+  }, [regionId, loadCities]);
 
   return {
     cities,
@@ -171,7 +181,7 @@ export function useEPS(autoLoad: boolean = false) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadEPS = async () => {
+  const loadEPS = useCallback(async () => {
     if (loading) {
       return;
     }
@@ -187,13 +197,13 @@ export function useEPS(autoLoad: boolean = false) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading]);
 
   useEffect(() => {
     if (autoLoad) {
       loadEPS();
     }
-  }, [autoLoad]);
+  }, [autoLoad, loadEPS]);
 
   return {
     eps,
@@ -213,40 +223,45 @@ export function useDocumentTypes(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadDocumentTypes = async (targetCountryId?: string) => {
-    if (loading) {
-      return;
-    }
+  const loadDocumentTypes = useCallback(
+    async (targetCountryId?: string) => {
+      if (loading) {
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      // Si no se proporciona countryId, el servicio usará automáticamente el país de sesión
-      const data = await catalogService.getDocumentTypes(
-        targetCountryId || countryId
-      );
-      setDocumentTypes(data);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Error cargando tipos de documento'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        // Si no se proporciona countryId, el servicio usará automáticamente el país de sesión
+        const data = await catalogService.getDocumentTypes(
+          targetCountryId || countryId
+        );
+        setDocumentTypes(data);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Error cargando tipos de documento'
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [countryId, loading]
+  );
 
   useEffect(() => {
     if (autoLoad) {
       loadDocumentTypes();
     }
-  }, [autoLoad]);
+  }, [autoLoad, loadDocumentTypes]);
 
   useEffect(() => {
     if (countryId) {
       loadDocumentTypes(countryId);
     }
-  }, [countryId]);
+  }, [countryId, loadDocumentTypes]);
 
   return {
     documentTypes,

@@ -5,9 +5,10 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 import { brandService } from '@/services';
+import type { Brand } from '@/models/Brand';
 
 export function BrandList() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +17,15 @@ export function BrandList() {
     setError(null);
     try {
       const res = await brandService.getAllBrands();
-      setItems(res.Data || []);
+      const raw = res?.Data as unknown;
+      const list = (
+        Array.isArray(raw)
+          ? raw
+          : raw && typeof raw === 'object' && '$values' in raw
+            ? (raw as Record<string, unknown>)['$values']
+            : []
+      ) as unknown;
+      setItems((Array.isArray(list) ? list : []) as Brand[]);
     } catch (_e) {
       setError('Error al cargar');
     } finally {

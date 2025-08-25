@@ -5,7 +5,6 @@ import { RoutineDayDetail } from '@/components/routineDay/RoutineDayDetail';
 import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 
 const makeRoutineDetailScreenStyles = (theme: 'light' | 'dark') => {
@@ -35,7 +34,6 @@ const makeRoutineDetailScreenStyles = (theme: 'light' | 'dark') => {
 };
 
 export default function RoutineDayDetailScreen() {
-  const theme = useColorScheme();
   const styles = useThemedStyles(makeRoutineDetailScreenStyles);
   return (
     <SafeAreaView style={styles.container}>

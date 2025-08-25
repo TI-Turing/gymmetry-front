@@ -13,7 +13,7 @@ import { makeGymStepsStyles } from '../styles/gymSteps';
 
 export default function GymStep1({
   onNext,
-  onBack,
+  onBack: _onBack,
   initialData,
   isLoading = false,
 }: GymStepProps<GymStep1Data>) {
@@ -87,11 +87,13 @@ export default function GymStep1({
       const response = await GymService.registerGym(payload);
       if (response.Success && response.Data) {
         // Pasar los datos junto con gymId y owner_UserId al siguiente paso
+        // Enviar datos del paso 1 con identificadores válidos para el siguiente paso
         onNext({
           ...formData,
-          gymId: response.Data,
+          // Persistimos owner_UserId proveniente de AsyncStorage
           owner_UserId: userId,
-        } as any);
+          // El id del gimnasio se persiste externamente para pasos siguientes
+        });
       } else {
         showError(response.Message || 'Error al registrar el gimnasio');
       }

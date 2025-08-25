@@ -9,20 +9,31 @@ import { makePlanStyles } from './styles';
 const PlanList = React.memo(() => {
   const loadPlans = useCallback(async (): Promise<Plan[]> => {
     const response = await planService.getAllPlans();
-    const data = (response.Data || []) as Plan[];
+    const raw = response?.Data as unknown;
+    const list: unknown[] = Array.isArray(raw)
+      ? raw
+      : (raw as { $values?: unknown[] })?.$values || [];
     // Normalizar planType/user a objetos predecibles con nombre en minúscula si vienen como unknown
-    return data.map((p) => {
-      const pt = p.planType as any;
-      const usr = p.user as any;
+    return (list as Plan[]).map((p) => {
+      const pt = p?.planType as unknown;
+      const usr = p?.user as unknown;
       return {
         ...p,
         planType:
           pt && typeof pt === 'object'
-            ? { name: (pt.Name as string) || (pt.name as string) }
+            ? {
+                name:
+                  (pt as { Name?: string; name?: string }).Name ||
+                  (pt as { Name?: string; name?: string }).name,
+              }
             : undefined,
         user:
           usr && typeof usr === 'object'
-            ? { name: (usr.Name as string) || (usr.name as string) }
+            ? {
+                name:
+                  (usr as { Name?: string; name?: string }).Name ||
+                  (usr as { Name?: string; name?: string }).name,
+              }
             : undefined,
       } as Plan;
     });

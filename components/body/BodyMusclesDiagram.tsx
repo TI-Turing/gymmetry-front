@@ -1,8 +1,26 @@
-import React, { memo, useEffect, useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { View, ActivityIndicator, type DimensionValue } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system';
+// Assets base y overlays importados estáticamente para evitar require()
+import frontBaseSvg from '../../assets/images/muscles/muscular_system_front.svg';
+import backBaseSvg from '../../assets/images/muscles/muscular_system_back.svg';
+import overlayFrontBiceps from '../../assets/images/muscles/main/front-biceps.svg';
+import overlayFrontCuadriceps from '../../assets/images/muscles/main/front-cuadriceps.svg';
+import overlayFrontDeltoides from '../../assets/images/muscles/main/front-deltoides.svg';
+import overlayFrontDorsales from '../../assets/images/muscles/main/front-dorsales.svg';
+import overlayFrontOblicuos from '../../assets/images/muscles/main/front-oblicuos.svg';
+import overlayFrontPectoralMayor from '../../assets/images/muscles/main/front-pectoralMayor.svg';
+import overlayFrontRectoAbdominal from '../../assets/images/muscles/main/front-rectoAbdominal.svg';
+import overlayFrontSerratoAnterior from '../../assets/images/muscles/main/front-serratoAnterior.svg';
+import overlayBackDorsal from '../../assets/images/muscles/main/back-dorsal.svg';
+import overlayBackGluteos from '../../assets/images/muscles/main/back-gluteos.svg';
+import overlayBackIsquiotibiales from '../../assets/images/muscles/main/back-isquiotibiales.svg';
+import overlayBackPantorrillas from '../../assets/images/muscles/main/back-pantorrillas.svg';
+import overlayBackSoleo from '../../assets/images/muscles/main/back-soleo.svg';
+import overlayBackTrapecio from '../../assets/images/muscles/main/back-trapecio.svg';
+import overlayBackTriceps from '../../assets/images/muscles/main/back-triceps.svg';
 // Conservamos los tipos/exports por compatibilidad futura, pero no se usan en este render basado en SVG externo
 // import { FRONT_MUSCLES, BACK_MUSCLES, MUSCLES_BY_ID, colorForMuscle } from './musclesPaths';
 
@@ -12,8 +30,8 @@ export type ActiveMuscle = {
 };
 
 interface BodyMusclesDiagramProps {
-  width?: number | string; // admite porcentajes como '100%'
-  height?: number | string; // permite porcentaje; si se omite, usa 100%
+  width?: DimensionValue; // admite porcentajes como '100%'
+  height?: DimensionValue; // permite porcentaje; si se omite, usa 100%
   // listado de ids de músculos activos o estructuras con role
   activeMuscles?: (string | ActiveMuscle)[];
   // color por defecto de músculos inactivos
@@ -39,9 +57,9 @@ interface BodyMusclesDiagramProps {
 const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
   width = 360,
   height = '100%',
-  activeMuscles = [], // reservado para futuras superposiciones
-  defaultColor = '#cccccc', // sin uso en base SVG
-  scale, // sin uso en base SVG
+  activeMuscles: _activeMuscles = [], // reservado para futuras superposiciones
+  defaultColor: _defaultColor = '#cccccc', // sin uso en base SVG
+  scale: _scale, // sin uso en base SVG
   palette = 'color',
   backgroundColor = 'transparent',
   overlayOpacities,
@@ -59,95 +77,90 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const monoTransform = (xml: string) => {
-    if (palette !== 'mono') return xml;
-    // Reemplazar fills por un gris oscuro y strokes por gris claro
-    let out = xml.replace(/fill="#([0-9a-fA-F]{3,6})"/g, 'fill="#2d2d2d"');
-    out = out.replace(/stroke="#([0-9a-fA-F]{3,6})"/g, 'stroke="#f2f2f2"');
-    return out;
-  };
+  const monoTransform = useCallback(
+    (xml: string) => {
+      if (palette !== 'mono') return xml;
+      // Reemplazar fills por un gris oscuro y strokes por gris claro
+      let out = xml.replace(/fill="#([0-9a-fA-F]{3,6})"/g, 'fill="#2d2d2d"');
+      out = out.replace(/stroke="#([0-9a-fA-F]{3,6})"/g, 'stroke="#f2f2f2"');
+      return out;
+    },
+    [palette]
+  );
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         setLoading(true);
-        // Definir módulos (ids de require) y metadatos para overlays
-        const frontMod = require('../../assets/images/muscles/muscular_system_front.svg');
-        const backMod = require('../../assets/images/muscles/muscular_system_back.svg');
+        // Definir módulos importados y metadatos para overlays
+        const frontMod = frontBaseSvg;
+        const backMod = backBaseSvg;
         const overlayDefs = [
           {
-            mod: require('../../assets/images/muscles/main/front-biceps.svg'),
+            mod: overlayFrontBiceps,
             key: 'front-biceps',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-cuadriceps.svg'),
+            mod: overlayFrontCuadriceps,
             key: 'front-cuadriceps',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-deltoides.svg'),
+            mod: overlayFrontDeltoides,
             key: 'front-deltoides',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-dorsales.svg'),
+            mod: overlayFrontDorsales,
             key: 'front-dorsales',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-oblicuos.svg'),
+            mod: overlayFrontOblicuos,
             key: 'front-oblicuos',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-pectoralMayor.svg'),
+            mod: overlayFrontPectoralMayor,
             key: 'front-pectoralMayor',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-rectoAbdominal.svg'),
+            mod: overlayFrontRectoAbdominal,
             key: 'front-rectoAbdominal',
             side: 'front' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/front-serratoAnterior.svg'),
+            mod: overlayFrontSerratoAnterior,
             key: 'front-serratoAnterior',
             side: 'front' as const,
           },
+          { mod: overlayBackDorsal, key: 'back-dorsal', side: 'back' as const },
           {
-            mod: require('../../assets/images/muscles/main/back-dorsal.svg'),
-            key: 'back-dorsal',
-            side: 'back' as const,
-          },
-          {
-            mod: require('../../assets/images/muscles/main/back-gluteos.svg'),
+            mod: overlayBackGluteos,
             key: 'back-gluteos',
             side: 'back' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/back-isquiotibiales.svg'),
+            mod: overlayBackIsquiotibiales,
             key: 'back-isquiotibiales',
             side: 'back' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/back-pantorrillas.svg'),
+            mod: overlayBackPantorrillas,
             key: 'back-pantorrillas',
             side: 'back' as const,
           },
+          { mod: overlayBackSoleo, key: 'back-soleo', side: 'back' as const },
           {
-            mod: require('../../assets/images/muscles/main/back-soleo.svg'),
-            key: 'back-soleo',
-            side: 'back' as const,
-          },
-          {
-            mod: require('../../assets/images/muscles/main/back-trapecio.svg'),
+            mod: overlayBackTrapecio,
             key: 'back-trapecio',
             side: 'back' as const,
           },
           {
-            mod: require('../../assets/images/muscles/main/back-triceps.svg'),
+            mod: overlayBackTriceps,
             key: 'back-triceps',
             side: 'back' as const,
           },
@@ -204,7 +217,7 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [palette]);
+  }, [monoTransform]);
 
   // Simulación de API: actualiza opacidades con valores mock tras la carga
   useEffect(() => {
@@ -219,7 +232,8 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
       return;
     }
     // Simulación de API: intensidades mock entre 0 y 1
-    const mockOpacities = overlayLayers.map((_, i) => {
+    const count = overlayLayers.length;
+    const mockOpacities = Array.from({ length: count }, (_, i) => {
       if (i % 7 === 0) return 0.85;
       if (i % 11 === 0) return 0.55;
       return 0;
@@ -233,8 +247,8 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
     return (
       <View
         style={{
-          width: width as any,
-          height: height as any,
+          width: width,
+          height: height,
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor,
@@ -249,8 +263,8 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
     return (
       <View
         style={{
-          width: width as any,
-          height: height as any,
+          width: width,
+          height: height,
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor,
@@ -326,18 +340,14 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
 
   if (side === 'front') {
     return (
-      <View
-        style={{ width: width as any, height: height as any, backgroundColor }}
-      >
+      <View style={{ width: width, height: height, backgroundColor }}>
         {renderFront}
       </View>
     );
   }
   if (side === 'back') {
     return (
-      <View
-        style={{ width: width as any, height: height as any, backgroundColor }}
-      >
+      <View style={{ width: width, height: height, backgroundColor }}>
         {renderBack}
       </View>
     );
@@ -346,8 +356,8 @@ const BodyMusclesDiagram: React.FC<BodyMusclesDiagramProps> = ({
   return (
     <View
       style={{
-        width: width as any,
-        height: height as any,
+        width: width,
+        height: height,
         backgroundColor,
         flexDirection: 'row',
         alignItems: 'center',

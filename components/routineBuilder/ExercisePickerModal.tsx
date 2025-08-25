@@ -47,10 +47,20 @@ const ExercisePickerModal: React.FC<Props> = ({
       // Parse tags for diagram
       let tags: Record<string, number> = {};
       try {
-        const raw: unknown = (ex as any)?.TagsMuscle;
+        const rawHolder = ex as unknown as { TagsMuscle?: unknown };
+        const raw = rawHolder?.TagsMuscle;
         if (raw) {
-          if (typeof raw === 'string') tags = JSON.parse(raw);
-          else if (typeof raw === 'object') tags = raw as any;
+          if (typeof raw === 'string') {
+            tags = JSON.parse(raw);
+          } else if (typeof raw === 'object') {
+            const obj = raw as Record<string, unknown>;
+            const norm: Record<string, number> = {};
+            for (const [k, v] of Object.entries(obj)) {
+              const n = Number(v);
+              if (Number.isFinite(n)) norm[k] = n;
+            }
+            tags = norm;
+          }
         }
       } catch {}
       setMuscleTags01(tags);
@@ -77,9 +87,25 @@ const ExercisePickerModal: React.FC<Props> = ({
   const small = width < 640; // breakpoint para usar vista apilada
   const [showDetail, setShowDetail] = useState(false);
 
+  const detailName = useMemo(() => {
+    if (!detail) return '';
+    const d = detail as unknown as { Name?: string; name?: string };
+    return d.Name || d.name || '';
+  }, [detail]);
+
+  const categoryNameOrId = useMemo(() => {
+    if (!detail) return null as string | null;
+    const d = detail as unknown as {
+      CategoryExercise?: { Name?: string } | null;
+      CategoryExerciseId?: string | null;
+    };
+    return d.CategoryExercise?.Name ?? d.CategoryExerciseId ?? null;
+  }, [detail]);
+
   const handlePick = useCallback(
     (ex: unknown) => {
-      const id: unknown = (ex as any).Id || (ex as any).id;
+      const r = (ex || {}) as Record<string, unknown>;
+      const id: unknown = (r.Id as unknown) ?? (r.id as unknown);
       if (id) {
         setSelectedId(String(id));
         fetchDetail(String(id));
@@ -154,20 +180,15 @@ const ExercisePickerModal: React.FC<Props> = ({
                     ) : detail ? (
                       <RNView style={{ gap: 12 }}>
                         <RNView style={styles.detailHeaderCard}>
-                          <Text style={styles.exerciseName}>
-                            {(detail as any).Name || (detail as any).name}
-                          </Text>
+                          <Text style={styles.exerciseName}>{detailName}</Text>
                           {detail.Description && (
                             <Text style={styles.exerciseDesc}>
                               {detail.Description}
                             </Text>
                           )}
-                          {(detail as any)?.CategoryExercise?.Name ||
-                          (detail as any).CategoryExerciseId ? (
+                          {categoryNameOrId ? (
                             <Text style={styles.metaText}>
-                              Categoría:{' '}
-                              {(detail as any)?.CategoryExercise?.Name ??
-                                (detail as any).CategoryExerciseId}
+                              Categoría: {categoryNameOrId}
                             </Text>
                           ) : null}
                         </RNView>

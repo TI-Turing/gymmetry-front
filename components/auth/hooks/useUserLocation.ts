@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface UserLocationData {
   country?: string;
@@ -15,40 +15,24 @@ export function useUserLocation() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    detectUserLocation();
-  }, []);
-
-  const detectUserLocation = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // 1. Intentar usar timezone del navegador
-      const timezoneResult = getCountryFromTimezone();
-      if (timezoneResult) {
-        setLocationData({ ...timezoneResult, source: 'locale' });
-        setLoading(false);
-        return;
-      }
-
-      // 2. Detección por IP como fallback
-      const ipResult = await getCountryFromIP();
-      if (ipResult) {
-        setLocationData({ ...ipResult, source: 'ip' });
-        setLoading(false);
-        return;
-      }
-
-      setLocationData({ source: 'unknown' });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
+  // Mapeo básico de códigos a nombres de países
+  const getCountryNameFromCode = (code: string): string => {
+    const countryMap: Record<string, string> = {
+      CO: 'Colombia',
+      US: 'Estados Unidos',
+      MX: 'México',
+      AR: 'Argentina',
+      BR: 'Brasil',
+      CL: 'Chile',
+      PE: 'Perú',
+      EC: 'Ecuador',
+      VE: 'Venezuela',
+      ES: 'España',
+    };
+    return countryMap[code] || code;
   };
 
-  const getCountryFromTimezone = (): Omit<
+  const getCountryFromTimezone = useCallback((): Omit<
     UserLocationData,
     'source'
   > | null => {
@@ -88,12 +72,11 @@ export function useUserLocation() {
       // Fallback silencioso en caso de error
     }
     return null;
-  };
+  }, []);
 
-  const getCountryFromIP = async (): Promise<Omit<
-    UserLocationData,
-    'source'
-  > | null> => {
+  const getCountryFromIP = useCallback(async (): Promise<
+    Omit<UserLocationData, 'source'>
+  > => {
     try {
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
@@ -107,26 +90,44 @@ export function useUserLocation() {
     } catch (error) {
       // Fallback silencioso en caso de error
     }
-    return null;
-  };
+    return { country: undefined, countryCode: undefined } as Omit<
+      UserLocationData,
+      'source'
+    >;
+  }, []);
 
-  // Mapeo básico de códigos a nombres de países
-  const getCountryNameFromCode = (code: string): string => {
-    const countryMap: Record<string, string> = {
-      CO: 'Colombia',
-      US: 'Estados Unidos',
-      MX: 'México',
-      AR: 'Argentina',
-      BR: 'Brasil',
-      CL: 'Chile',
-      PE: 'Perú',
-      EC: 'Ecuador',
-      VE: 'Venezuela',
-      ES: 'España',
-      // Agregar más países según necesites
-    };
-    return countryMap[code] || code;
-  };
+  const detectUserLocation = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 1. Intentar usar timezone del navegador
+      const timezoneResult = getCountryFromTimezone();
+      if (timezoneResult) {
+        setLocationData({ ...timezoneResult, source: 'locale' });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Detección por IP como fallback
+      const ipResult = await getCountryFromIP();
+      if (ipResult) {
+        setLocationData({ ...ipResult, source: 'ip' });
+        setLoading(false);
+        return;
+      }
+
+      setLocationData({ source: 'unknown' });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  }, [getCountryFromTimezone, getCountryFromIP]);
+
+  useEffect(() => {
+    detectUserLocation();
+  }, [detectUserLocation]);
 
   return {
     locationData,

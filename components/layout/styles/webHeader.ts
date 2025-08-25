@@ -52,8 +52,7 @@ export const makeWebHeaderStyles = (theme: ThemeMode) => {
       flex: 1,
       color: palette.text,
       fontSize: 14,
-      borderWidth: 0,
-      outlineWidth: 0 as any,
+      // Nota: propiedades web-only removidas para cumplir RN types
       backgroundColor: 'transparent',
     },
     searchContainerFocused: {
@@ -121,7 +120,7 @@ export const makeWebHeaderStyles = (theme: ThemeMode) => {
     logoutText: { color: danger },
     logoutIcon: { color: danger },
     overlay: {
-      position: 'fixed' as any,
+      position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
