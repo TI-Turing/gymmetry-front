@@ -16,6 +16,7 @@ import { GymService } from '@/services/gymService';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymStepsStyles } from '../styles/gymSteps';
 import { Country, Region, City } from '@/dto/common';
+import { useI18n } from '@/i18n';
 
 export default function GymStep3({
   gymId,
@@ -23,6 +24,7 @@ export default function GymStep3({
 }: GymStepProps<GymStep3Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
   const { styles, colors } = useThemedStyles(makeGymStepsStyles);
+  const { t } = useI18n();
   const [countries, setCountries] = useState<Country[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -41,9 +43,9 @@ export default function GymStep3({
       const countries = await catalogService.getCountries();
       setCountries(countries);
     } catch {
-      showAlert('error', 'Error', 'No se pudieron cargar los países');
+      showAlert('error', t('error'), t('error_loading_countries'));
     }
-  }, [showAlert]);
+  }, [showAlert, t]);
 
   // El campo país estará deshabilitado, no se permite selección manual
   const handleCountrySelect = async (countryId: string) => {
@@ -63,10 +65,10 @@ export default function GymStep3({
         setRegions(regions);
         setCities([]);
       } catch {
-        showAlert('error', 'Error', 'No se pudieron cargar las regiones');
+        showAlert('error', t('error'), t('error_loading_regions'));
       }
     },
-    [showAlert]
+    [showAlert, t]
   );
 
   const loadCities = useCallback(
@@ -75,10 +77,10 @@ export default function GymStep3({
         const cities = await catalogService.getCitiesByRegion(regionId);
         setCities(cities);
       } catch {
-        showAlert('error', 'Error', 'No se pudieron cargar las ciudades');
+        showAlert('error', t('error'), t('error_loading_cities'));
       }
     },
-    [showAlert]
+    [showAlert, t]
   );
 
   useEffect(() => {
@@ -123,19 +125,19 @@ export default function GymStep3({
 
   const validate = () => {
     if (!formData.countryId) {
-      showAlert('warning', 'Campo requerido', 'Selecciona un país');
+      showAlert('warning', t('required_field'), t('country_required'));
       return false;
     }
     if (!formData.regionId) {
-      showAlert('warning', 'Campo requerido', 'Selecciona una región');
+      showAlert('warning', t('required_field'), t('region_required'));
       return false;
     }
     if (!formData.cityId) {
-      showAlert('warning', 'Campo requerido', 'Selecciona una ciudad');
+      showAlert('warning', t('required_field'), t('city_required'));
       return false;
     }
     if (!formData.address.trim()) {
-      showAlert('warning', 'Campo requerido', 'Ingresa la dirección');
+      showAlert('warning', t('required_field'), t('address_required'));
       return false;
     }
     return true;
@@ -150,11 +152,7 @@ export default function GymStep3({
       await GymService.updateGymStep(formData);
       onNext(formData);
     } catch {
-      showAlert(
-        'error',
-        'Error',
-        'No se pudo guardar la información de ubicación'
-      );
+      showAlert('error', t('error'), t('error_saving_location'));
     } finally {
       setLoading(false);
     }
@@ -171,11 +169,8 @@ export default function GymStep3({
       >
         <View style={styles.step3Header}>
           <FontAwesome name="map-marker" size={40} color={colors.tint} />
-          <Text style={styles.step3Title}>Ubicación de la empresa</Text>
-          <Text style={styles.step3Subtitle}>
-            Selecciona el país, región, ciudad en el que se encuentra registrado
-            el gimnasio
-          </Text>
+          <Text style={styles.step3Title}>{t('gym_step3_title')}</Text>
+          <Text style={styles.step3Subtitle}>{t('gym_step3_subtitle')}</Text>
         </View>
 
         <View style={styles.step3Form}>
@@ -203,7 +198,7 @@ export default function GymStep3({
             required
           />
           <FormInput
-            label="Dirección de la oficina principal*"
+            label={t('main_office_address_label')}
             value={formData.address}
             onChangeText={handleAddressChange}
             multiline
@@ -212,7 +207,7 @@ export default function GymStep3({
         </View>
       </ScrollView>
       <View style={styles.step3ButtonContainer}>
-        <Button title="Continuar" onPress={onSubmit} loading={loading} />
+        <Button title={t('continue')} onPress={onSubmit} loading={loading} />
       </View>
       <AlertComponent />
     </KeyboardAvoidingView>

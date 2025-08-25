@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
@@ -110,16 +110,11 @@ function HomeScreen() {
     router.push('/routine-exercise-detail');
   };
 
-  const headerSubtitle = useMemo(() => {
-    return todayRoutine.routineName
-      ? `Hoy: ${todayRoutine.routineName}`
-      : undefined;
-  }, [todayRoutine.routineName]);
+  // Se elimina el subtítulo bajo el header que mostraba "Hoy: <rutina>"
 
   return (
     <ScreenWrapper
       headerTitle="Gymmetry"
-      headerSubtitle={headerSubtitle}
       backgroundColor={styles.colors.background}
     >
       <ScrollView

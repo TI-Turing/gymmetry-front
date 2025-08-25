@@ -5,6 +5,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { GymType } from './types';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymTypeDropdownStyles } from './styles/gymTypeDropdown';
+import { useI18n } from '@/i18n';
 
 interface GymTypeDropdownProps {
   label: string;
@@ -18,7 +19,7 @@ interface GymTypeDropdownProps {
 
 export default function GymTypeDropdown({
   label,
-  placeholder = 'Seleccione',
+  placeholder,
   options,
   value,
   onSelect,
@@ -27,9 +28,11 @@ export default function GymTypeDropdown({
 }: GymTypeDropdownProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { styles, colors } = useThemedStyles(makeGymTypeDropdownStyles);
+  const { t } = useI18n();
 
+  const defaultPlaceholder = placeholder || t('select_option');
   const selectedOption = options.find((option) => option.Id === value);
-  const selectedName = selectedOption?.Name || placeholder;
+  const selectedName = selectedOption?.Name || defaultPlaceholder;
 
   const handleSelect = (typeId: string) => {
     // eslint-disable-next-line no-console
@@ -60,7 +63,7 @@ export default function GymTypeDropdown({
         onPress={handleOpen}
         disabled={loading}
         accessibilityLabel={label}
-        accessibilityHint="Presiona para abrir la lista de tipos de gimnasio"
+        accessibilityHint={t('dropdown_hint')}
       >
         <Text
           style={{
@@ -88,7 +91,7 @@ export default function GymTypeDropdown({
         >
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              Selecciona el tipo de gimnasio
+              {t('select_gym_type_modal_title')}
             </Text>
 
             <ScrollView
@@ -115,7 +118,7 @@ export default function GymTypeDropdown({
 
               {options.length === 0 && !loading && (
                 <Text style={styles.noOptionsText}>
-                  Sin opciones disponibles
+                  {t('no_options_available')}
                 </Text>
               )}
             </ScrollView>

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { usePreload } from '@/contexts/PreloadContext';
 import { authService } from '@/services/authService';
-import MobileHeader from '@/components/layout/MobileHeader';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { logger } from '@/utils';
 import { AddBranchForm } from '@/components/branches';
@@ -18,12 +17,14 @@ import NoGymView from './NoGymView';
 import GymConnectedView from './GymConnectedView';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymScreenStyles } from './styles/gymScreen';
+import { useI18n } from '@/i18n';
 
 function GymScreen(): React.JSX.Element {
-  const { styles } = useThemedStyles(makeGymScreenStyles);
+  const { styles, colors } = useThemedStyles(makeGymScreenStyles);
   const { gymId: paramGymId } = useLocalSearchParams<{ gymId?: string }>();
   const { AlertComponent } = useCustomAlert();
   const { gymData, refreshGymData } = usePreload();
+  const { t } = useI18n();
 
   const [isConnectedToGym, setIsConnectedToGym] = useState(false);
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
@@ -113,13 +114,23 @@ function GymScreen(): React.JSX.Element {
   };
   const handleBranchFormCancel = () => setShowAddBranchForm(false);
 
+  const handleBackFromRegistration = () => {
+    setShowRegistrationForm(false);
+  };
+
   return (
-    <>
-      {Platform.OS !== 'web' && <MobileHeader />}
+    <ScreenWrapper
+      headerTitle="Gymmetry"
+      backgroundColor={colors.background}
+      showBackButton={showRegistrationForm}
+      onPressBack={
+        showRegistrationForm ? handleBackFromRegistration : undefined
+      }
+    >
       <View style={styles.container}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <Text>Cargando...</Text>
+            <Text>{t('loading')}</Text>
           </View>
         ) : showAddBranchForm ? (
           <AddBranchForm
@@ -147,7 +158,7 @@ function GymScreen(): React.JSX.Element {
         )}
         <AlertComponent />
       </View>
-    </>
+    </ScreenWrapper>
   );
 }
 export default withWebLayout(GymScreen, { defaultTab: 'gym' });

@@ -7,6 +7,8 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/components/useColorScheme';
 
 interface SkeletonProps {
   width?: number | string;
@@ -22,6 +24,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   style,
 }) => {
   const shimmer = useRef(new Animated.Value(0)).current;
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
 
   useEffect(() => {
     const loop = Animated.loop(
@@ -46,7 +50,12 @@ export const Skeleton: React.FC<SkeletonProps> = ({
       style={
         [
           styles.container,
-          { width, height, borderRadius },
+          {
+            width,
+            height,
+            borderRadius,
+            backgroundColor: isDark ? '#2A2A2A' : Colors.light.neutral,
+          },
           style,
         ] as StyleProp<ViewStyle>
       }
@@ -56,6 +65,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
           styles.shimmer,
           {
             transform: [{ translateX }],
+            backgroundColor: isDark ? '#3A3A3A' : '#F2F3F5',
           },
         ]}
       />
@@ -64,11 +74,10 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { overflow: 'hidden', backgroundColor: '#2A2A2A' },
+  container: { overflow: 'hidden' },
   shimmer: {
     width: '40%',
     height: '100%',
-    backgroundColor: '#3A3A3A',
     opacity: 0.6,
   },
 });

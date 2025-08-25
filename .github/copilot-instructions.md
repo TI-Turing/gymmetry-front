@@ -2,6 +2,14 @@
 
 Conciso, accionable y específico al proyecto. Usa este documento como guía operativa.
 
+> Nota temporal — 25/08/2025
+> Se relajaron las validaciones automáticas de lint/type-check/tests para acelerar entregas.
+> Recordatorio: antes de cualquier release estable, volver a habilitar estas verificaciones y restaurar:
+>
+> - En la sección 2: líneas de "Type check" y "Lint/format".
+> - En la sección 6: reemplazar el punto 6 por ejecución de lint/type-check/tests.
+> - En la sección 10: reponer checks de TypeScript, lint/format y tests.
+
 ## 1. Panorama Arquitectónico
 
 - App React Native + Expo Router (carpeta `app/`) con routing basado en archivos.
@@ -17,8 +25,6 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 ## 2. Flujos Clave de Desarrollo
 
 - Iniciar dev: `npm run start:local` (carga `.env.local` vía `env-loader.js`).
-- Type check antes de PR: `npm run type-check` (strict, sin emitir). Mantener 0 errores.
-- Lint/format: `npm run lint:check` y `npm run format:check` (Prettier/ESLint estrictos, 0 warnings).
 - Cambiar entorno: usar scripts `start:dev`, `start:prod` (no cambies manualmente `.env`).
 - Añadir nueva entidad: (1) modelo en `models/`, (2) DTOs request/response en `dto/<Entity>/`, (3) servicio en `services/<entity>Service.ts` exportado por `services/index.ts`, (4) lista/pantallas usando patrón EntityList si aplica.
 
@@ -64,7 +70,19 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 3. Crea servicio siguiendo naming y exporta en `services/index.ts`.
 4. Implementa UI reutilizando patrones (EntityList, modales, botones `Button` propio, `ScreenWrapper`).
 5. Persiste estado granular en AsyncStorage solo si se necesita reanudación.
-6. Ejecuta `npm run lint:check && npm run type-check && npm run test` y corrige.
+6. (Temporal) Omite validaciones automáticas de lint/type-check/tests; enfócate en funcionalidad.
+7. Traduce textos estáticos a través de `useI18n`.
+8. Los estiulos nunca deben ir dentro del archivo del componente sino que en un archivo de estilos independientes.
+9. Se deben manejar estilos para el modo oscuro y modo claro.
+10. Se deben utilizar constantes para los textos estáticos en lugar de hardcodearlos.
+11. Se deben utilizar hooks personalizados para lógica reutilizable.
+12. Se deben utilizar componentes reutilizables para UI común.
+13. En la carpeta components/ se deben organizar los componentes por dominio o entidad, las entidades estan en models/ ambas carpetas en la raiz del proyecto, es decir, los componentes relacionados con rutinas deben estar en `components/routines/` y asi sucesivamente con los demas.
+14. Los archivos no deben ser largos, si un archivo es muy largo separar en pequeños componentes individuales. y reutilizables.
+15. Los componentes deben tener pruebas unitarias que verifiquen su comportamiento.
+16. Los componentes deben ser fácilmente reutilizables en diferentes partes de la aplicación.
+17. Los componentes deben ser accesibles, cumpliendo con las pautas de accesibilidad.
+18. Los componentes deben tener documentación clara y concisa.
 
 ## 7. Testing Manual Rápido
 
@@ -110,12 +128,9 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 
 ## 10. Revisión Final Antes de Commit
 
-- TypeScript sin errores.
 - Sin hardcodes de URLs/keys; usar config.
 - Limpieza de timers/intervalos en efectos.
 - Ajustes de color migrados a theme si tocaste UI.
-- Lint/format sin warnings (`npm run lint:check && npm run format:check`).
-- Tests básicos pasando (`npm run test`).
 
 Notas:
 

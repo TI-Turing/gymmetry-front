@@ -35,10 +35,12 @@ import {
   getActiveFiltersCount,
 } from './filterUtils';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useI18n } from '@/i18n';
 // import { gymService } from '@/services/gymService';
 
 function RoutineTemplatesScreen() {
   const styles = useThemedStyles(makeRoutineTemplateStyles);
+  const { t: translate } = useI18n();
   // Datos
   const [activeAssignment, setActiveAssignment] =
     useState<RoutineAssigned | null>(null);
@@ -106,7 +108,7 @@ function RoutineTemplatesScreen() {
       const user = await authService.getUserData();
       log('getUser', tUserStart);
       const userId = user?.id;
-      if (!userId) throw new Error('Usuario no autenticado');
+      if (!userId) throw new Error(translate('user_not_authenticated'));
 
       // 1. Cargar plantillas primero (no bloqueante con asignación)
       const tTemplatesStart = performance.now();
@@ -155,7 +157,8 @@ function RoutineTemplatesScreen() {
         .catch(() => setActiveAssignment(null))
         .finally(() => setLoadingAssignment(false));
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Error al cargar rutinas';
+      const msg =
+        e instanceof Error ? e.message : translate('loading_routines_error');
       setError(msg);
       setLoadingTemplates(false);
       setLoadingAssignment(false);
@@ -163,7 +166,7 @@ function RoutineTemplatesScreen() {
     } finally {
       log('total load', totalStart);
     }
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     fetchTemplatesFirst();
@@ -209,25 +212,25 @@ function RoutineTemplatesScreen() {
     {
       key: 'home',
       icon: 'home',
-      label: 'Inicio',
+      label: translate('home'),
       action: () => router.push('/'),
     },
     {
       key: 'plans',
       icon: 'star',
-      label: 'Planes',
+      label: translate('routine_plans'),
       action: () => router.push('/plans'),
     },
     {
       key: 'progress',
       icon: 'line-chart',
-      label: 'Progreso',
+      label: translate('progress'),
       action: () => router.push('/(tabs)/progress'),
     },
     {
       key: 'settings',
       icon: 'cog',
-      label: 'Ajustes',
+      label: translate('routine_settings'),
       action: () => {
         router.push('/settings');
       },
@@ -235,7 +238,7 @@ function RoutineTemplatesScreen() {
     {
       key: 'logout',
       icon: 'sign-out',
-      label: 'Cerrar Sesión',
+      label: translate('routine_logout'),
       action: () => {
         // Lógica de logout
       },
@@ -266,7 +269,7 @@ function RoutineTemplatesScreen() {
     setAssignError(null);
     try {
       const user = await authService.getUserData();
-      if (!user?.id) throw new Error('Usuario no autenticado');
+      if (!user?.id) throw new Error(translate('user_not_authenticated'));
 
       const request = {
         Comments: assignComment.trim() || null,
@@ -275,7 +278,7 @@ function RoutineTemplatesScreen() {
       };
       const resp = await routineAssignedService.addRoutineAssigned(request);
       if (!resp?.Success)
-        throw new Error(resp?.Message || 'Error al asignar rutina');
+        throw new Error(resp?.Message || translate('assign_routine_error'));
 
       // Refrescar asignaciones para obtener la activa reciente
       const assignedRes =
@@ -303,7 +306,7 @@ function RoutineTemplatesScreen() {
       }
       setShowAssignModal(false);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Error desconocido';
+      const msg = e instanceof Error ? e.message : translate('unknown_error');
       setAssignError(msg);
     } finally {
       setAssignLoading(false);
@@ -317,7 +320,7 @@ function RoutineTemplatesScreen() {
       <TouchableOpacity
         style={styles.filterButton}
         onPress={toggleFilters}
-        accessibilityLabel="Abrir filtros"
+        accessibilityLabel={translate('open_filters')}
       >
         <FontAwesome name="filter" size={20} color={styles.colors.onTint} />
         {activeCount > 0 && (
@@ -331,8 +334,8 @@ function RoutineTemplatesScreen() {
 
   return (
     <ScreenWrapper
-      headerTitle="Rutinas"
-      headerSubtitle={`${filteredTemplates.length} de ${templates.length} rutina${templates.length !== 1 ? 's' : ''}`}
+      headerTitle={translate('routine_templates_title')}
+      headerSubtitle={`${filteredTemplates.length} ${translate('of')} ${templates.length} ${translate('routine')}${templates.length !== 1 ? 's' : ''}`}
       showBackButton={true}
       onPressBack={handleGoBack}
       headerRightComponent={<FilterButton />}
@@ -349,7 +352,9 @@ function RoutineTemplatesScreen() {
 
         {activeAssignment ? (
           <>
-            <Text style={styles.sectionTitle}>Rutina Activa</Text>
+            <Text style={styles.sectionTitle}>
+              {translate('active_routine')}
+            </Text>
             <RoutineAssignedCard
               assignment={activeAssignment}
               onPress={() => router.push('/routine-day')}
@@ -357,14 +362,12 @@ function RoutineTemplatesScreen() {
           </>
         ) : (
           !loadingAssignment && (
-            <Text style={styles.text}>
-              Sin rutinas activas en este momento.
-            </Text>
+            <Text style={styles.text}>{translate('no_active_routines')}</Text>
           )
         )}
 
         <Text style={styles.sectionTitle}>
-          Rutinas Disponibles en tu plan activo
+          {translate('available_routines_in_plan')}
         </Text>
 
         {(loadingTemplates || refreshing) && showSkeleton ? (
@@ -373,11 +376,13 @@ function RoutineTemplatesScreen() {
           <>
             {filteredTemplates.length === 0 && templates.length > 0 && (
               <Text style={styles.text}>
-                No hay rutinas que coincidan con los filtros seleccionados.
+                {translate('no_routines_match_filters')}
               </Text>
             )}
             {filteredTemplates.length === 0 && templates.length === 0 && (
-              <Text style={styles.text}>No hay rutinas disponibles.</Text>
+              <Text style={styles.text}>
+                {translate('no_routines_available')}
+              </Text>
             )}
             {filteredTemplates.map((t) => (
               <TouchableOpacity
@@ -394,7 +399,7 @@ function RoutineTemplatesScreen() {
                       t.Premium ? styles.badgePremium : styles.badgeFree,
                     ]}
                   >
-                    {t.Premium ? 'Premium' : 'Gratis'}
+                    {t.Premium ? translate('premium') : translate('free')}
                   </Text>
                 </View>
                 {t.Comments && <Text style={styles.text}>{t.Comments}</Text>}
@@ -403,7 +408,7 @@ function RoutineTemplatesScreen() {
                   onPress={() => openAssignModal(t)}
                 >
                   <Text style={styles.assignLabel}>
-                    Establecer como mi rutina
+                    {translate('set_as_routine')}
                   </Text>
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -433,12 +438,14 @@ function RoutineTemplatesScreen() {
             style={styles.modalCard}
             onStartShouldSetResponder={() => true}
           >
-            <Text style={styles.modalTitle}>Establecer Rutina</Text>
+            <Text style={styles.modalTitle}>{translate('set_routine')}</Text>
             <Text style={styles.modalSubTitle}>{selectedTemplate?.Name}</Text>
-            <Text style={styles.modalLabel}>Comentario (opcional)</Text>
+            <Text style={styles.modalLabel}>
+              {translate('comment_optional')}
+            </Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Agregar un comentario..."
+              placeholder={translate('add_comment_placeholder')}
               placeholderTextColor={styles.colors.dim}
               multiline
               value={assignComment}
@@ -451,7 +458,7 @@ function RoutineTemplatesScreen() {
                 disabled={assignLoading}
                 onPress={closeAssignModal}
               >
-                <Text style={styles.modalCancel}>Cancelar</Text>
+                <Text style={styles.modalCancel}>{translate('cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleAssignRoutine}
@@ -468,7 +475,7 @@ function RoutineTemplatesScreen() {
                   />
                 )}
                 <Text style={styles.modalPrimaryText}>
-                  Establecer como rutina
+                  {translate('set_as_routine_button')}
                 </Text>
               </TouchableOpacity>
             </RNView>
@@ -480,7 +487,7 @@ function RoutineTemplatesScreen() {
       <TouchableOpacity
         style={styles.fabCreate}
         accessibilityRole="button"
-        accessibilityLabel="Crear nueva rutina"
+        accessibilityLabel={translate('create_new_routine')}
         onPress={() => router.push('/create-routine')}
       >
         <Text style={styles.fabIcon}>＋</Text>

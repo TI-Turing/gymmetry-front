@@ -11,6 +11,7 @@ import { gymTypeService } from '@/services/gymTypeService';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymStepsStyles } from '../styles/gymSteps';
+import { useI18n } from '@/i18n';
 
 interface GymStep2Props extends GymStepProps<GymStep2Data> {
   gymId: string;
@@ -25,6 +26,7 @@ export default function GymStep2({
 }: GymStep2Props) {
   const { showAlert, AlertComponent } = useCustomAlert();
   const { styles, colors } = useThemedStyles(makeGymStepsStyles);
+  const { t } = useI18n();
   const [formData, setFormData] = useState<GymStep2Data>({
     gymTypeId: initialData?.gymTypeId || '',
     slogan: initialData?.slogan || '',
@@ -43,22 +45,14 @@ export default function GymStep2({
       if (response.Success) {
         setGymTypes(response.Data || []);
       } else {
-        showAlert(
-          'error',
-          'Error',
-          'No se pudieron cargar los tipos de gimnasio'
-        );
+        showAlert('error', t('error'), t('error_loading_gym_types'));
       }
     } catch {
-      showAlert(
-        'error',
-        'Error',
-        'Error de conexión al cargar tipos de gimnasio'
-      );
+      showAlert('error', t('error'), t('connection_error_gym_types'));
     } finally {
       setLoadingTypes(false);
     }
-  }, [showAlert]);
+  }, [showAlert, t]);
 
   useEffect(() => {
     loadGymTypes();
@@ -80,10 +74,10 @@ export default function GymStep2({
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.gymTypeId) {
-      newErrors.gymTypeId = 'Debes seleccionar un tipo de gimnasio';
+      newErrors.gymTypeId = t('gym_type_required');
     }
     if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es requerida';
+      newErrors.description = t('gym_description_required');
     }
 
     setErrors(newErrors);
@@ -92,11 +86,7 @@ export default function GymStep2({
 
   const handleNext = async () => {
     if (!validateForm()) {
-      showAlert(
-        'warning',
-        'Formulario incompleto',
-        'Por favor completa todos los campos requeridos'
-      );
+      showAlert('warning', t('form_incomplete'), t('complete_required_fields'));
       return;
     }
     formData.Id = gymId;
@@ -105,7 +95,7 @@ export default function GymStep2({
       await GymService.updateGymStep(formData);
       onNext(formData);
     } catch {
-      showAlert('error', 'Error', 'Error al actualizar la información');
+      showAlert('error', t('error'), t('error_updating_info'));
     } finally {
       setLoading(false);
     }
@@ -127,16 +117,14 @@ export default function GymStep2({
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Tipo y Descripción</Text>
-          <Text style={styles.headerSubtitle}>
-            Cuéntanos qué tipo de gimnasio es y sus características principales
-          </Text>
+          <Text style={styles.headerTitle}>{t('gym_step2_title')}</Text>
+          <Text style={styles.headerSubtitle}>{t('gym_step2_subtitle')}</Text>
         </View>
 
         {/* Tipo de Gimnasio */}
         <View style={styles.section}>
           <GymTypeDropdown
-            label="Tipo de Gimnasio *"
+            label={t('gym_type_label')}
             options={gymTypes}
             value={formData.gymTypeId}
             onSelect={(typeId) => handleInputChange('gymTypeId', typeId)}
@@ -148,7 +136,7 @@ export default function GymStep2({
         {/* Formulario */}
         <View style={styles.form}>
           <FormInput
-            label="Slogan (Opcional)"
+            label={t('slogan_label')}
             value={formData.slogan}
             onChangeText={(value) => handleInputChange('slogan', value)}
             multiline
@@ -156,7 +144,7 @@ export default function GymStep2({
           />
 
           <FormInput
-            label="Descripción del Gimnasio *"
+            label={t('gym_description_label')}
             value={formData.description}
             onChangeText={(value) => handleInputChange('description', value)}
             multiline
@@ -170,7 +158,7 @@ export default function GymStep2({
           <View style={styles.infoCard}>
             <FontAwesome name="info-circle" size={20} color={colors.tint} />
             <View style={styles.infoContent}>
-              <Text style={styles.infoTitle}>Tipo seleccionado:</Text>
+              <Text style={styles.infoTitle}>{t('selected_type_label')}</Text>
               <Text style={styles.infoText}>{selectedGymType.Name}</Text>
             </View>
           </View>
@@ -180,7 +168,7 @@ export default function GymStep2({
       {/* Botones */}
       <View style={styles.buttonContainer}>
         <Button
-          title={loading ? 'Guardando...' : 'Continuar'}
+          title={loading ? t('loading_saving') : t('continue')}
           onPress={handleNext}
           disabled={loading || isLoading || loadingTypes}
           style={styles.nextButton}

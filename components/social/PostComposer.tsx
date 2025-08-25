@@ -14,11 +14,13 @@ import { makePostComposerStyles } from './styles/postComposer';
 export interface PostComposerProps {
   avatarUrl?: string | null;
   onSubmit: (content: string, mediaUrl?: string | null) => void;
+  isAnonymous?: boolean;
 }
 
 export const PostComposer: React.FC<PostComposerProps> = ({
   avatarUrl,
   onSubmit,
+  isAnonymous = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
@@ -35,7 +37,11 @@ export const PostComposer: React.FC<PostComposerProps> = ({
     <View style={styles.card}>
       <View style={styles.header}>
         <SmartImage
-          uri={avatarUrl || 'https://via.placeholder.com/40'}
+          uri={
+            isAnonymous
+              ? 'https://via.placeholder.com/40?text=Anon'
+              : avatarUrl || 'https://via.placeholder.com/40'
+          }
           style={styles.avatar}
           deferOnDataSaver={false}
         />
@@ -44,7 +50,9 @@ export const PostComposer: React.FC<PostComposerProps> = ({
           onPress={() => setOpen(true)}
         >
           <Text style={styles.placeholder}>
-            ¿Cómo fue tu entrenamiento hoy?
+            {isAnonymous
+              ? 'Publicar como Anónimo'
+              : '¿Cómo fue tu entrenamiento hoy?'}
           </Text>
         </TouchableOpacity>
       </View>

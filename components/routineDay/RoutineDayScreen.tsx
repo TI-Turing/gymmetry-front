@@ -44,22 +44,7 @@ import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeRoutineDayScreenStyles } from './styles/routineDayScreen';
 import { normalizeCollection } from '@/utils';
-
-// Orden y etiquetas de categorías (estable y fuera del componente)
-const CATEGORY_ORDER: { id: string; label: string }[] = [
-  { id: 'E779339F-36BB-4EF8-9135-CF36BE4C4B07', label: 'Calentamiento' },
-  { id: 'D9507CD0-1EDA-4D4D-A408-13FF76C14D88', label: 'Cardio' },
-  {
-    id: 'BC9D888F-4612-4BBB-ABEC-FF1EE76D129A',
-    label: 'Ejercicio principal (compuesto)',
-  },
-  { id: '6C60B74C-F83A-4AF9-ABD3-BB929D9FAE6A', label: 'Funcional' },
-  {
-    id: '9F9F94D0-7CD1-48E9-81A7-86AA503CA685',
-    label: 'Aislado (focalizado)',
-  },
-  { id: '642FC19F-500F-47AE-A81B-1303AC978D9D', label: 'Estiramiento' },
-];
+import { useI18n } from '@/i18n';
 
 type ExerciseProgress = {
   completedSets: number;
@@ -71,20 +56,21 @@ function getTodayDayNumber() {
   return d === 0 ? 7 : d; // 1-7 (Mon=1 ... Sun=7)
 }
 
-function getWeekdayNameEs(dayNum: number) {
+function getWeekdayNameEs(dayNum: number, t: (key: string) => string) {
   const names = [
-    'Lunes',
-    'Martes',
-    'Miércoles',
-    'Jueves',
-    'Viernes',
-    'Sábado',
-    'Domingo',
+    t('monday'),
+    t('tuesday'),
+    t('wednesday'),
+    t('thursday'),
+    t('friday'),
+    t('saturday'),
+    t('sunday'),
   ];
   return names[(dayNum - 1) % 7];
 }
 
 export default function RoutineDayScreen() {
+  const { t } = useI18n();
   const styles = useThemedStyles(makeRoutineDayScreenStyles);
   const { settings } = useAppSettings();
   const params = useLocalSearchParams<{ day?: string }>();
@@ -163,8 +149,8 @@ export default function RoutineDayScreen() {
     if (!hasAnyProgress || overallProgress >= 100) return;
     scheduleLocalNotificationAsync(
       {
-        title: '¿Retomas tu rutina?',
-        body: 'Tienes una rutina en curso. Cuando puedas, vuelve a darle.',
+        title: t('resume_routine_notification_title'),
+        body: t('resume_routine_notification_body'),
       },
       { seconds: 600 },
       { settings }
@@ -181,6 +167,22 @@ export default function RoutineDayScreen() {
     (id || '').trim().toUpperCase();
 
   const groupedSections = useMemo(() => {
+    // Orden y etiquetas de categorías usando traducciones
+    const CATEGORY_ORDER: { id: string; label: string }[] = [
+      { id: 'E779339F-36BB-4EF8-9135-CF36BE4C4B07', label: t('warmup') },
+      { id: 'D9507CD0-1EDA-4D4D-A408-13FF76C14D88', label: t('cardio') },
+      {
+        id: 'BC9D888F-4612-4BBB-ABEC-FF1EE76D129A',
+        label: t('compound_exercise'),
+      },
+      { id: '6C60B74C-F83A-4AF9-ABD3-BB929D9FAE6A', label: t('functional') },
+      {
+        id: '9F9F94D0-7CD1-48E9-81A7-86AA503CA685',
+        label: t('isolated_focused'),
+      },
+      { id: '642FC19F-500F-47AE-A81B-1303AC978D9D', label: t('stretching') },
+    ];
+
     if (!exercises || exercises.length === 0)
       return [] as { key: string; label: string; items: RoutineDay[] }[];
     const map: Record<string, RoutineDay[]> = {};
@@ -215,9 +217,9 @@ export default function RoutineDayScreen() {
       items: map[normalizeCatId(c.id)],
     })).filter((s) => s.items.length > 0);
     if (uncategorized.length > 0)
-      sections.push({ key: 'otros', label: 'Otros', items: uncategorized });
+      sections.push({ key: 'otros', label: t('other'), items: uncategorized });
     return sections;
-  }, [exercises]);
+  }, [exercises, t]);
 
   // Animación y efectos al completar 100%
   useEffect(() => {
@@ -584,12 +586,14 @@ export default function RoutineDayScreen() {
       }
 
       if (activeOtherDay && activeOtherDay !== dayVal) {
-        const fromLbl = getWeekdayNameEs(activeOtherDay);
-        const toLbl = getWeekdayNameEs(dayVal);
+        const fromLbl = getWeekdayNameEs(activeOtherDay, t);
+        const toLbl = getWeekdayNameEs(dayVal, t);
         showAlert(
           'warning',
-          'Día en progreso',
-          `Ya iniciaste los ejercicios del día ${fromLbl}. Debes cancelar ese avance para poder continuar con el día ${toLbl}.`
+          t('day_in_progress_title'),
+          t('day_in_progress_message')
+            .replace('{fromDay}', fromLbl)
+            .replace('{toDay}', toLbl)
         );
         return;
       }
@@ -735,7 +739,9 @@ export default function RoutineDayScreen() {
           </View>
         </View>
         {/* Etiqueta de categoría temporal removida */}
-        <Text style={styles.cardSub}>Reps: {item.Repetitions}</Text>
+        <Text style={styles.cardSub}>
+          {t('reps_label')} {item.Repetitions}
+        </Text>
         <View style={styles.progressBar}>
           <RNView style={[styles.progressFill, { width: `${percent}%` }]} />
         </View>
@@ -746,7 +752,7 @@ export default function RoutineDayScreen() {
 
   return (
     <ScreenWrapper
-      headerTitle="Rutina de Hoy"
+      headerTitle={t('todays_routine')}
       showBackButton
       onPressBack={() => router.back()}
       backgroundColor={undefined}
@@ -761,11 +767,11 @@ export default function RoutineDayScreen() {
                   {routineTemplateName}
                 </Text>
                 <Text style={styles.weekdayLabel}>
-                  {getWeekdayNameEs(selectedDayNumber)}
+                  {getWeekdayNameEs(selectedDayNumber, t)}
                   {selectedDayNumber !== todayNumber && (
                     <Text style={{ color: styles.colors.muted as string }}>
                       {' '}
-                      (Hoy: {getWeekdayNameEs(todayNumber)})
+                      ({t('today')}: {getWeekdayNameEs(todayNumber, t)})
                     </Text>
                   )}
                 </Text>
@@ -852,24 +858,23 @@ export default function RoutineDayScreen() {
               }}
             >
               <Text style={styles.congratsTitle}>
-                ¡Entrenamiento completado!
+                {t('training_completed')}
               </Text>
               <Text style={styles.congratsSubtitle}>
-                Gran trabajo, mantén la constancia. Marca la diferencia cada
-                día.
+                {t('great_job_subtitle')}
               </Text>
               {finalPhrase && (
                 <Text style={styles.finalPhrase}>“{finalPhrase}”</Text>
               )}
               <View style={styles.actionsRow}>
                 <Button
-                  title="Ver resumen"
+                  title={t('view_summary')}
                   onPress={handleShowSummary}
                   variant="secondary"
                   style={styles.actionButton}
                 />
                 <Button
-                  title="Compartir"
+                  title={t('share')}
                   onPress={handleShare}
                   style={styles.actionButton}
                 />
@@ -894,18 +899,20 @@ export default function RoutineDayScreen() {
                   { color: styles.colors.warning as string },
                 ]}
               >
-                Rutina finalizada (avance {overallProgress}%)
+                {t('routine_finished_partial').replace(
+                  '{progress}',
+                  overallProgress.toString()
+                )}
               </Text>
               <Text style={styles.congratsSubtitle}>
-                Buen esfuerzo aunque no hayas terminado todo. La constancia se
-                construye día a día.
+                {t('good_effort_subtitle')}
               </Text>
               {finalPhrase && (
                 <Text style={styles.finalPhrase}>“{finalPhrase}”</Text>
               )}
               <View style={styles.actionsRow}>
                 <Button
-                  title="Compartir"
+                  title={t('share')}
                   onPress={handleShare}
                   style={styles.actionButton}
                 />
@@ -937,7 +944,7 @@ export default function RoutineDayScreen() {
               {(error.includes('No tienes una rutina activa') ||
                 error.includes('No hay ejercicios configurados')) && (
                 <Button
-                  title="Explorar rutinas"
+                  title={t('explore_routines')}
                   onPress={() => router.push('/routine-templates')}
                   style={{ marginTop: 16, width: 200 }}
                 />
@@ -994,20 +1001,19 @@ export default function RoutineDayScreen() {
             <TouchableWithoutFeedback>
               <View style={styles.finishCard}>
                 <Text style={styles.finishTitle}>
-                  ¿Cómo prefieres terminar esta rutina?
+                  {t('how_to_finish_title')}
                 </Text>
                 <Text style={styles.finishSubtitle}>
-                  Puedes cerrar con tu avance actual o marcar todo como
-                  completado.
+                  {t('how_to_finish_subtitle')}
                 </Text>
                 <View style={{ height: 12 }} />
                 <Button
-                  title="Marcar todo y finalizar"
+                  title={t('mark_all_and_finish')}
                   onPress={finalizeFull}
                 />
                 <View style={{ height: 12 }} />
                 <Button
-                  title="Finalizar con avance actual"
+                  title={t('finish_with_current_progress')}
                   onPress={finalizePartial}
                   variant="secondary"
                   style={{ marginBottom: 0 }}
@@ -1022,7 +1028,7 @@ export default function RoutineDayScreen() {
                       marginTop: 1,
                     }}
                   >
-                    Necesitas al menos 30% de avance para esta opción.
+                    {t('minimum_progress_required')}
                   </Text>
                 )}
                 <TouchableOpacity
@@ -1058,11 +1064,11 @@ export default function RoutineDayScreen() {
                 <Text style={styles.infoTitle}>{routineTemplateName}</Text>
                 <ScrollView style={{ maxHeight: 240 }}>
                   <Text style={styles.infoDesc}>
-                    {routineTemplateDesc || 'Sin descripción.'}
+                    {routineTemplateDesc || t('no_description')}
                   </Text>
                 </ScrollView>
                 <Button
-                  title="Cerrar"
+                  title={t('close')}
                   onPress={() => setShowTemplateInfo(false)}
                   style={{ marginTop: 16 }}
                 />
@@ -1075,10 +1081,10 @@ export default function RoutineDayScreen() {
       {/* Modal de confirmación para reiniciar progreso */}
       <ConfirmationModal
         visible={confirmResetVisible}
-        title="Reiniciar progreso"
-        message="Perderás el avance registrado en todos los ejercicios. ¿Deseas continuar?"
-        confirmLabel="Reiniciar"
-        cancelLabel="Cancelar"
+        title={t('restart_progress')}
+        message={t('restart_progress_message')}
+        confirmLabel={t('restart')}
+        cancelLabel={t('cancel')}
         onCancel={() => setConfirmResetVisible(false)}
         onConfirm={performReset}
         destructive
@@ -1094,14 +1100,14 @@ export default function RoutineDayScreen() {
         >
           <View style={styles.bottomBarContent}>
             <Button
-              title="Finalizar rutina"
+              title={t('finish_routine')}
               onPress={openFinishOptions}
               variant="secondary"
               style={styles.bottomBarButton}
             />
             {hasAnyProgress && (
               <Button
-                title="Reiniciar"
+                title={t('restart')}
                 onPress={resetProgress}
                 variant="secondary"
                 style={styles.bottomBarButtonSecondary}

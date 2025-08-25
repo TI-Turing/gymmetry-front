@@ -10,6 +10,7 @@ import {
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
 import { getActiveFiltersCount } from './filterUtils';
+import { useI18n } from '@/i18n';
 
 // Tipos para los filtros
 export interface FilterState {
@@ -28,36 +29,6 @@ interface FilterProps {
   totalResults: number; // Nuevo: total de resultados
 }
 
-const objectiveLabels: { [key: string]: string } = {
-  perdida_peso: 'Pérdida de Peso',
-  masa_muscular: 'Masa Muscular',
-  definicion_muscular: 'Definición Muscular',
-  fuerza: 'Fuerza',
-  resistencia_fisica: 'Resistencia Física',
-  tonificacion: 'Tonificación',
-  movilidad: 'Movilidad',
-  postura: 'Postura',
-  rehabilitacion: 'Rehabilitación',
-  salud_cardiovascular: 'Salud Cardiovascular',
-  anti_estres: 'Anti Estrés',
-  energia: 'Energía',
-  sueño: 'Sueño',
-  adulto_mayor: 'Adulto Mayor',
-  enfermedades_cronicas: 'Enfermedades Crónicas',
-  entrenamiento_funcional: 'Entrenamiento Funcional',
-  deportes_especificos: 'Deportes Específicos',
-  pruebas_fisicas: 'Pruebas Físicas',
-  hiit: 'HIIT',
-  velocidad_agilidad: 'Velocidad y Agilidad',
-  entrenamiento_pareja: 'Entrenamiento en Pareja',
-  principiante: 'Principiante',
-  intermedio: 'Intermedio',
-  avanzado: 'Avanzado',
-  rutina_corta: 'Rutina Corta',
-  rutina_larga: 'Rutina Larga',
-  autoestima: 'Autoestima',
-};
-
 const levelColors = {
   bajo: '#ff6300',
   medio: '#FF9800',
@@ -71,7 +42,39 @@ export default function RoutineFilters({
   currentFilters,
   totalResults,
 }: FilterProps) {
+  const { t } = useI18n();
   const [filters, setFilters] = useState<FilterState>(currentFilters);
+
+  // Objeto de etiquetas dinámico basado en las traducciones
+  const objectiveLabels: { [key: string]: string } = {
+    perdida_peso: t('weight_loss'),
+    masa_muscular: t('muscle_mass'),
+    definicion_muscular: t('muscle_definition'),
+    fuerza: t('strength'),
+    resistencia_fisica: t('physical_endurance'),
+    tonificacion: t('toning'),
+    movilidad: t('mobility'),
+    postura: t('posture'),
+    rehabilitacion: t('rehabilitation'),
+    salud_cardiovascular: t('cardiovascular_health'),
+    anti_estres: t('anti_stress'),
+    energia: t('energy'),
+    sueño: t('sleep'),
+    adulto_mayor: t('senior'),
+    enfermedades_cronicas: t('chronic_diseases'),
+    entrenamiento_funcional: t('functional_training'),
+    deportes_especificos: t('specific_sports'),
+    pruebas_fisicas: t('physical_tests'),
+    hiit: t('hiit'),
+    velocidad_agilidad: t('speed_agility'),
+    entrenamiento_pareja: t('partner_training'),
+    principiante: t('beginner'),
+    intermedio: t('intermediate'),
+    avanzado: t('advanced'),
+    rutina_corta: t('short_routine'),
+    rutina_larga: t('long_routine'),
+    autoestima: t('self_esteem'),
+  };
 
   // Sincronizar con currentFilters cuando el modal se abre
   React.useEffect(() => {
@@ -131,7 +134,7 @@ export default function RoutineFilters({
                 value === null && styles.booleanOptionTextActive,
               ]}
             >
-              Todos
+              {t('all')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -147,7 +150,7 @@ export default function RoutineFilters({
                 value === true && styles.booleanOptionTextActive,
               ]}
             >
-              Sí
+              {t('yes')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -163,7 +166,7 @@ export default function RoutineFilters({
                 value === false && styles.booleanOptionTextActive,
               ]}
             >
-              No
+              {t('no')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -195,7 +198,7 @@ export default function RoutineFilters({
                   { color: value === level ? '#FFFFFF' : levelColors[level] },
                 ]}
               >
-                {level.charAt(0).toUpperCase() + level.slice(1)}
+                {t(level)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -217,16 +220,17 @@ export default function RoutineFilters({
             <FontAwesome name="times" size={24} color={Colors.dark.text} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.title}>Filtros de Rutinas</Text>
+            <Text style={styles.title}>{t('routine_filters')}</Text>
             <View style={styles.headerResults}>
               <Text style={styles.headerResultsText}>
-                {totalResults} rutina{totalResults !== 1 ? 's' : ''} encontrada
+                {totalResults} {t('routine')}
+                {totalResults !== 1 ? 's' : ''} {t('found')}
                 {totalResults !== 1 ? 's' : ''}
               </Text>
             </View>
           </View>
           <TouchableOpacity onPress={clearAllFilters}>
-            <Text style={styles.clearText}>Limpiar</Text>
+            <Text style={styles.clearText}>{t('clear')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -234,16 +238,18 @@ export default function RoutineFilters({
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Filtros Booleanos */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Características</Text>
-            {renderBooleanFilter('requiereEquipos', 'Requiere Equipos')}
-            {renderBooleanFilter('calistenia', 'Calistenia')}
+            <Text style={styles.sectionTitle}>{t('characteristics')}</Text>
+            {renderBooleanFilter('requiereEquipos', t('equipment_required'))}
+            {renderBooleanFilter('calistenia', t('calisthenics'))}
           </View>
 
           {/* Filtros de Objetivos */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Objetivos y Características</Text>
+            <Text style={styles.sectionTitle}>
+              {t('objectives_and_characteristics')}
+            </Text>
             <Text style={styles.sectionSubtitle}>
-              Selecciona el nivel de enfoque para cada objetivo
+              {t('select_focus_level')}
             </Text>
             {Object.entries(objectiveLabels).map(([key, label]) => (
               <View key={key}>{renderObjectiveFilter(key, label)}</View>
@@ -254,7 +260,7 @@ export default function RoutineFilters({
         {/* Footer simplificado */}
         <View style={styles.footer}>
           <Text style={styles.activeFiltersText}>
-            {getActiveFiltersCount(filters)} filtros activos
+            {getActiveFiltersCount(filters)} {t('active_filters')}
           </Text>
         </View>
       </View>

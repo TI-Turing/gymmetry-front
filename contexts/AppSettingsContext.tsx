@@ -39,6 +39,8 @@ export interface AppSettings {
   logLevel: LogLevel;
   enableOfflineCache: boolean;
   experiments: Record<string, boolean>;
+  // Social
+  socialAnonymousMode: boolean; // Mostrar publicaciones/comentarios/acciones propias como anónimas
   // futuros: otaChannel, lockOnBackground, hideScreenshots
 }
 
@@ -59,6 +61,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   logLevel: 'warn',
   enableOfflineCache: false,
   experiments: {},
+  socialAnonymousMode: false,
 };
 
 type Ctx = {

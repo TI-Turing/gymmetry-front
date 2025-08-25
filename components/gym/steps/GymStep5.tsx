@@ -8,6 +8,7 @@ import { GymService } from '@/services/gymService';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymStepsStyles } from '../styles/gymSteps';
+import { useI18n } from '@/i18n';
 
 export default function GymStep5({
   gymId,
@@ -17,6 +18,7 @@ export default function GymStep5({
 }: GymStepProps<GymStep5Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
   const { styles, colors } = useThemedStyles(makeGymStepsStyles);
+  const { t } = useI18n();
   const [formData] = useState<GymStep5Data>({
     Id: gymId,
     logo: initialData?.logo || null,
@@ -29,30 +31,26 @@ export default function GymStep5({
 
   const handleSelectLogo = () => {
     // Placeholder para selección de logo
-    showAlert('info', 'Funcionalidad', 'Selección de logo en desarrollo');
+    showAlert('info', t('functionality'), t('logo_selection_development'));
   };
 
   const handleSelectCoverImage = () => {
     // Placeholder para selección de imagen de portada
     showAlert(
       'info',
-      'Funcionalidad',
-      'Selección de imagen de portada en desarrollo'
+      t('functionality'),
+      t('cover_image_selection_development')
     );
   };
 
   const handleAddGalleryImage = () => {
     // Placeholder para agregar imágenes a la galería
-    showAlert(
-      'info',
-      'Funcionalidad',
-      'Agregar imágenes a la galería en desarrollo'
-    );
+    showAlert('info', t('functionality'), t('gallery_images_development'));
   };
 
   const handleAddVideo = () => {
     // Placeholder para agregar videos
-    showAlert('info', 'Funcionalidad', 'Agregar videos en desarrollo');
+    showAlert('info', t('functionality'), t('videos_development'));
   };
 
   const handleFinish = async () => {
@@ -62,11 +60,7 @@ export default function GymStep5({
 
       onNext(formData);
     } catch (_error) {
-      showAlert(
-        'error',
-        'Error',
-        'No se pudo guardar la información multimedia'
-      );
+      showAlert('error', t('error'), t('error_saving_multimedia'));
     } finally {
       setIsLoading(false);
     }
@@ -76,16 +70,14 @@ export default function GymStep5({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.step5Header}>
         <FontAwesome name="camera" size={40} color={colors.tint} />
-        <Text style={styles.step5Title}>Multimedia</Text>
-        <Text style={styles.step5Subtitle}>
-          Agrega imágenes y videos para mostrar tu gimnasio (opcional)
-        </Text>
+        <Text style={styles.step5Title}>{t('gym_step5_title')}</Text>
+        <Text style={styles.step5Subtitle}>{t('gym_step5_subtitle')}</Text>
       </View>
 
       <View style={styles.step5Form}>
         {/* Logo */}
         <View style={styles.step5Section}>
-          <Text style={styles.step5SectionTitle}>Logo del Gimnasio</Text>
+          <Text style={styles.step5SectionTitle}>{t('gym_logo_section')}</Text>
           <TouchableOpacity style={styles.uploadBox} onPress={handleSelectLogo}>
             {formData.logo ? (
               <View style={styles.uploadedItem}>
@@ -94,12 +86,12 @@ export default function GymStep5({
                   size={24}
                   color={colors.tint}
                 />
-                <Text style={styles.uploadedText}>Logo seleccionado</Text>
+                <Text style={styles.uploadedText}>{t('logo_selected')}</Text>
               </View>
             ) : (
               <View style={styles.uploadPlaceholder}>
                 <FontAwesome name="plus" size={24} color={colors.tint} />
-                <Text style={styles.uploadText}>Seleccionar Logo</Text>
+                <Text style={styles.uploadText}>{t('select_logo')}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -107,7 +99,9 @@ export default function GymStep5({
 
         {/* Imagen de Portada */}
         <View style={styles.step5Section}>
-          <Text style={styles.step5SectionTitle}>Imagen de Portada</Text>
+          <Text style={styles.step5SectionTitle}>
+            {t('cover_image_section')}
+          </Text>
           <TouchableOpacity
             style={styles.uploadBox}
             onPress={handleSelectCoverImage}
@@ -120,15 +114,13 @@ export default function GymStep5({
                   color={colors.tint}
                 />
                 <Text style={styles.uploadedText}>
-                  Imagen de portada seleccionada
+                  {t('cover_image_selected')}
                 </Text>
               </View>
             ) : (
               <View style={styles.uploadPlaceholder}>
                 <FontAwesome name="plus" size={24} color={colors.tint} />
-                <Text style={styles.uploadText}>
-                  Seleccionar Imagen de Portada
-                </Text>
+                <Text style={styles.uploadText}>{t('select_cover_image')}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -136,7 +128,9 @@ export default function GymStep5({
 
         {/* Galería de Imágenes */}
         <View style={styles.step5Section}>
-          <Text style={styles.step5SectionTitle}>Galería de Imágenes</Text>
+          <Text style={styles.step5SectionTitle}>
+            {t('gallery_images_section')}
+          </Text>
           <TouchableOpacity
             style={styles.uploadBox}
             onPress={handleAddGalleryImage}
@@ -144,7 +138,7 @@ export default function GymStep5({
             <View style={styles.uploadPlaceholder}>
               <FontAwesome name="picture-o" size={24} color={colors.tint} />
               <Text style={styles.uploadText}>
-                Agregar Imágenes ({formData.galleryImages.length})
+                {t('add_gallery_images')} ({formData.galleryImages.length})
               </Text>
             </View>
           </TouchableOpacity>
@@ -152,12 +146,12 @@ export default function GymStep5({
 
         {/* Videos */}
         <View style={styles.step5Section}>
-          <Text style={styles.step5SectionTitle}>Videos</Text>
+          <Text style={styles.step5SectionTitle}>{t('videos_section')}</Text>
           <TouchableOpacity style={styles.uploadBox} onPress={handleAddVideo}>
             <View style={styles.uploadPlaceholder}>
               <FontAwesome name="video-camera" size={24} color={colors.tint} />
               <Text style={styles.uploadText}>
-                Agregar Videos ({formData.videos.length})
+                {t('add_videos')} ({formData.videos.length})
               </Text>
             </View>
           </TouchableOpacity>
@@ -165,16 +159,13 @@ export default function GymStep5({
 
         <View style={styles.step5InfoContainer}>
           <FontAwesome name="info-circle" size={16} color={colors.muted} />
-          <Text style={styles.step5InfoText}>
-            Todos los archivos multimedia son opcionales. Podrás agregarlos más
-            tarde desde tu perfil.
-          </Text>
+          <Text style={styles.step5InfoText}>{t('multimedia_info')}</Text>
         </View>
       </View>
 
       <View style={styles.step5ButtonContainer}>
         <Button
-          title="Finalizar Registro"
+          title={t('finish_registration')}
           onPress={handleFinish}
           loading={isLoading}
           style={styles.finishButton}

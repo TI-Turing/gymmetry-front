@@ -34,6 +34,7 @@ import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { scheduleLocalNotificationAsync } from '@/utils/localNotifications';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeExerciseModalStyles } from './styles/exerciseModal';
+import { useI18n } from '@/i18n';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -54,6 +55,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   onMarkExercise,
   completedSets,
 }) => {
+  const { t } = useI18n();
   const styles = useThemedStyles(makeExerciseModalStyles);
   const { settings } = useAppSettings();
   const [isExecuting, setIsExecuting] = useState(false);
@@ -522,7 +524,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           </View>
 
           <Text style={styles.modalSub}>
-            Sets: {exercise.Sets} • Reps: {exercise.Repetitions} ·{' '}
+            {t('sets')}: {exercise.Sets} • {t('reps')}: {exercise.Repetitions} ·{' '}
             <Text
               style={[styles.linkText]}
               onPress={() => {
@@ -587,12 +589,12 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 <Text style={[styles.timerLabel, { marginBottom: 6 }]}>
                   {timerPhase
                     ? timerPhase === 'on'
-                      ? 'ACTIVO'
+                      ? t('timer_on')
                       : timerPhase === 'off'
-                        ? 'DESCANSO'
-                        : 'PREPÁRATE'
+                        ? t('timer_off')
+                        : t('timer_prep')
                     : wasStopped
-                      ? 'Detenido'
+                      ? t('timer_stopped')
                       : ''}
                 </Text>
                 <Text style={styles.timerTime}>
@@ -680,21 +682,21 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 <Button
                   title={
                     timeSpec && wasStopped
-                      ? 'Reiniciar tiempo'
-                      : `Iniciar ${getOrdinalEs(nextSetNumber)} set`
+                      ? t('restart_timer')
+                      : `${t('start_set').replace('{ordinal}', getOrdinalEs(nextSetNumber))}`
                   }
                   onPress={handleStartSet}
                   style={styles.startButton}
                 />
                 <View style={styles.buttonRow}>
                   <Button
-                    title="Deshacer Set"
+                    title={t('undo_set_exercise')}
                     onPress={() => onUndoSet(exercise.Id)}
                     variant="secondary"
                     style={styles.halfButton}
                   />
                   <Button
-                    title="Completar Ejercicio"
+                    title={t('complete_exercise')}
                     onPress={() => onMarkExercise(exercise.Id)}
                     style={styles.halfButton}
                   />
@@ -702,7 +704,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               </>
             ) : timeSpec ? (
               <Button
-                title="Detener"
+                title={t('stop')}
                 onPress={stopTimer}
                 variant="secondary"
                 style={styles.finishButton}
@@ -710,7 +712,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               />
             ) : (
               <Button
-                title="Terminar Set"
+                title={t('finish_set')}
                 onPress={handleFinishSet}
                 style={styles.finishButton}
               />
@@ -732,16 +734,24 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
             onPress={() => setShowRepsPrompt(false)}
           >
             <Pressable style={styles.promptCard} onPress={() => undefined}>
-              <Text style={styles.promptTitle}>Repeticiones realizadas</Text>
+              <Text style={styles.promptTitle}>
+                {t('repetitions_completed')}
+              </Text>
               <Text style={styles.promptSubtitle}>
-                Set {Math.min(completedSets + 1, exercise.Sets)} de{' '}
-                {exercise.Sets}
+                {t('set_of')
+                  .replace(
+                    '{current}',
+                    String(Math.min(completedSets + 1, exercise.Sets))
+                  )
+                  .replace('{total}', String(exercise.Sets))}
               </Text>
               <TextInput
                 style={styles.promptInput}
                 value={repsValue}
-                onChangeText={(t) => setRepsValue(t.replace(/[^0-9]/g, ''))}
-                placeholder="Ej. 8"
+                onChangeText={(text) =>
+                  setRepsValue(text.replace(/[^0-9]/g, ''))
+                }
+                placeholder={t('reps_placeholder')}
                 placeholderTextColor={styles.placeholder.color as string}
                 keyboardType="number-pad"
                 maxLength={3}
@@ -749,7 +759,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
               />
               <View style={styles.promptButtonsRow}>
                 <Button
-                  title="Omitir"
+                  title={t('skip')}
                   variant="secondary"
                   style={styles.promptButton}
                   onPress={async () => {
@@ -758,7 +768,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                   }}
                 />
                 <Button
-                  title="Guardar"
+                  title={t('save_reps')}
                   style={styles.promptButton}
                   onPress={async () => {
                     setShowRepsPrompt(false);

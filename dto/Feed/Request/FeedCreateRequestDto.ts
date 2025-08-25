@@ -10,4 +10,5 @@ export interface FeedCreateRequestDto {
   FeedId: string;
   ContentType: string | null;
   Hashtag: string | null;
+  IsAnonymous?: boolean | null;
 }

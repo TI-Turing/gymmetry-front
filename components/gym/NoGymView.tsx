@@ -9,6 +9,7 @@ import RegisterGymOption from './RegisterGymOption';
 import GymSearchModal from './GymSearchModal';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeNoGymViewStyles } from './styles/noGymView';
+import { useI18n } from '@/i18n';
 
 interface NoGymViewProps {
   onConnect: (connected: boolean) => void;
@@ -22,10 +23,11 @@ export default function NoGymView({
   const { showSuccess } = useCustomAlert();
   const [showGymSearchModal, setShowGymSearchModal] = useState(false);
   const styles = useThemedStyles(makeNoGymViewStyles);
+  const { t } = useI18n();
 
   const handleScanQR = () => {
-    showSuccess('Escáner QR', {
-      confirmText: 'Abrir Escáner',
+    showSuccess(t('qr_scanner'), {
+      confirmText: t('open_scanner'),
       onConfirm: () => {
         // Aquí abrir escáner QR
         onConnect(true);
@@ -57,10 +59,8 @@ export default function NoGymView({
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>¡Conecta con tu Gym! 🏋️‍♂️</Text>
-        <Text style={styles.headerSubtitle}>
-          Vincula tu cuenta con un gimnasio para comenzar tu experiencia
-        </Text>
+        <Text style={styles.headerTitle}>{t('connect_gym_title')}</Text>
+        <Text style={styles.headerSubtitle}>{t('connect_gym_subtitle')}</Text>
       </View>
 
       {/* QR Scanner Option */}
@@ -75,10 +75,7 @@ export default function NoGymView({
       {/* Info Card */}
       <View style={styles.infoCard}>
         <FontAwesome name="info-circle" size={24} color={styles.colors.info} />
-        <Text style={styles.infoText}>
-          Una vez vinculado, podrás ver información en tiempo real del gimnasio,
-          horarios, ocupación y mucho más.
-        </Text>
+        <Text style={styles.infoText}>{t('connect_gym_info')}</Text>
       </View>
 
       {/* Gym Search Modal */}

@@ -10,6 +10,7 @@ import { GymStep1Data, GymStepProps } from '../types';
 import { GymService } from '@/services/gymService';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymStepsStyles } from '../styles/gymSteps';
+import { useI18n } from '@/i18n';
 
 export default function GymStep1({
   onNext,
@@ -19,6 +20,7 @@ export default function GymStep1({
 }: GymStepProps<GymStep1Data>) {
   const { showError, AlertComponent } = useCustomAlert();
   const { styles, colors } = useThemedStyles(makeGymStepsStyles);
+  const { t } = useI18n();
 
   const [formData, setFormData] = useState<GymStep1Data>({
     name: initialData?.name || '',
@@ -49,18 +51,18 @@ export default function GymStep1({
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre del gimnasio es requerido';
+      newErrors.name = t('gym_name_required');
     }
     if (!formData.email.trim()) {
-      newErrors.email = 'El email es requerido';
+      newErrors.email = t('email_required');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El email no es válido';
+      newErrors.email = t('email_invalid');
     }
     if (!formData.phone.trim()) {
-      newErrors.phone = 'El teléfono es requerido';
+      newErrors.phone = t('phone_required');
     }
     if (!formData.nit.trim()) {
-      newErrors.nit = 'El NIT es requerido';
+      newErrors.nit = t('nit_required');
     }
 
     setErrors(newErrors);
@@ -69,7 +71,7 @@ export default function GymStep1({
 
   const handleNext = async () => {
     if (!validateForm()) {
-      showError('Por favor completa todos los campos requeridos');
+      showError(t('complete_required_fields'));
       return;
     }
     setLoading(true);
@@ -95,10 +97,10 @@ export default function GymStep1({
           // El id del gimnasio se persiste externamente para pasos siguientes
         });
       } else {
-        showError(response.Message || 'Error al registrar el gimnasio');
+        showError(response.Message || t('registration_error'));
       }
     } catch {
-      showError('Error de conexión. Intenta nuevamente.');
+      showError(t('connection_error_retry'));
     } finally {
       setLoading(false);
     }
@@ -117,23 +119,21 @@ export default function GymStep1({
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Información Básica</Text>
-            <Text style={styles.headerSubtitle}>
-              Comencemos con los datos principales de tu gimnasio
-            </Text>
+            <Text style={styles.headerTitle}>{t('gym_step1_title')}</Text>
+            <Text style={styles.headerSubtitle}>{t('gym_step1_subtitle')}</Text>
           </View>
 
           {/* Formulario */}
           <View style={styles.form}>
             <FormInput
-              label="Nombre del Gimnasio *"
+              label={t('gym_name_label')}
               value={formData.name}
               onChangeText={(value) => handleInputChange('name', value)}
               error={errors.name}
             />
 
             <FormInput
-              label="Email Corporativo *"
+              label={t('corporate_email_label')}
               value={formData.email}
               onChangeText={(value) => handleInputChange('email', value)}
               keyboardType="email-address"
@@ -142,7 +142,7 @@ export default function GymStep1({
             />
 
             <FormInput
-              label="Teléfono Principal *"
+              label={t('main_phone_label')}
               value={formData.phone}
               onChangeText={(value) => handleInputChange('phone', value)}
               keyboardType="phone-pad"
@@ -150,7 +150,7 @@ export default function GymStep1({
             />
 
             <FormInput
-              label="NIT o Identificación Tributaria *"
+              label={t('nit_label')}
               value={formData.nit}
               onChangeText={(value) => handleInputChange('nit', value)}
               error={errors.nit}
@@ -160,17 +160,14 @@ export default function GymStep1({
           {/* Info Card */}
           <View style={styles.infoCard}>
             <FontAwesome name="info-circle" size={20} color={colors.tint} />
-            <Text style={styles.infoText}>
-              Esta información será verificada por nuestro equipo. Asegúrate de
-              que sea correcta y esté actualizada.
-            </Text>
+            <Text style={styles.infoText}>{t('gym_step1_info')}</Text>
           </View>
         </ScrollView>
 
         {/* Botones */}
         <View style={styles.buttonContainer}>
           <Button
-            title={loading ? 'Registrando...' : 'Continuar'}
+            title={loading ? t('loading_registering_gym') : t('save_continue')}
             onPress={handleNext}
             disabled={loading || isLoading}
             style={styles.nextButton}

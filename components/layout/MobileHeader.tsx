@@ -166,6 +166,32 @@ export default function MobileHeader({
   // Usar opciones personalizadas o por defecto
   const currentMenuOptions = menuOptions || defaultMenuOptions;
 
+  // Dividir opciones: core arriba, 3 no-core abajo, y logout al final
+  const logoutOption = currentMenuOptions.find((o) => o.key === 'logout');
+  const nonLogout = currentMenuOptions.filter((o) => o.key !== 'logout');
+  const topOptions = nonLogout.slice(0, Math.max(0, nonLogout.length - 3));
+  const bottomOptions = nonLogout.slice(-3);
+
+  const renderOption = (option: MenuOption, isLogout = false) => (
+    <TouchableOpacity
+      key={option.key}
+      style={[styles.menuOption, isLogout && styles.logoutOption]}
+      onPress={option.action}
+      accessibilityLabel={option.label}
+      accessibilityRole="button"
+    >
+      <FontAwesome
+        name={option.icon as React.ComponentProps<typeof FontAwesome>['name']}
+        size={20}
+        color={Colors[colorScheme].text}
+        style={styles.menuIcon}
+      />
+      <Text style={[styles.menuText, isLogout && styles.logoutText]}>
+        {option.label}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <>
       <View
@@ -263,37 +289,20 @@ export default function MobileHeader({
 
             {/* Opciones del menú */}
             <View style={styles.menuOptions}>
-              {currentMenuOptions.map((option) => (
-                <TouchableOpacity
-                  key={option.key}
-                  style={[
-                    styles.menuOption,
-                    option.key === 'logout' && styles.logoutOption,
-                  ]}
-                  onPress={option.action}
-                  accessibilityLabel={option.label}
-                  accessibilityRole="button"
-                >
-                  <FontAwesome
-                    name={
-                      option.icon as React.ComponentProps<
-                        typeof FontAwesome
-                      >['name']
-                    }
-                    size={20}
-                    color={Colors[colorScheme].text}
-                    style={styles.menuIcon}
-                  />
-                  <Text
-                    style={[
-                      styles.menuText,
-                      option.key === 'logout' && styles.logoutText,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {/* Sección superior (core) */}
+              {topOptions.map((opt) => renderOption(opt))}
+
+              {/* Empujador para fijar sección inferior */}
+              <View style={styles.flexSpacer} />
+
+              {/* Sección inferior (no core) */}
+              <View style={styles.menuBottomSection}>
+                <View style={styles.menuDivider} />
+                {bottomOptions.map((opt) => renderOption(opt))}
+              </View>
+
+              {/* Logout al fondo */}
+              {logoutOption ? renderOption(logoutOption, true) : null}
             </View>
           </Animated.View>
         </TouchableOpacity>

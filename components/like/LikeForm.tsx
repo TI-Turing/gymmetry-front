@@ -6,8 +6,10 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 import { likeService } from '@/services';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 export function LikeForm() {
+  const { settings } = useAppSettings();
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +19,11 @@ export function LikeForm() {
     setLoading(true);
     setMsg(null);
     try {
-      const body = JSON.parse(payload);
+      const base = JSON.parse(payload || '{}');
+      const body = {
+        IsAnonymous: settings.socialAnonymousMode,
+        ...base,
+      };
       const res = await likeService.createLike(body);
       setMsg(res.Message || 'Creado');
     } catch {

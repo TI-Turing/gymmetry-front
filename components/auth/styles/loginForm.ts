@@ -52,7 +52,7 @@ export function makeLoginStyles(theme: ThemeMode) {
     mobileInput: {
       backgroundColor: palette.background,
       color: palette.text,
-      borderColor: palette.tint,
+      borderColor: '#666666',
     },
     passwordInputMobile: {
       backgroundColor: palette.background,

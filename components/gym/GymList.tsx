@@ -5,8 +5,11 @@ import { gymService } from '@/services';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymListStyles } from './styles/gymList';
 import { normalizeCollection } from '@/utils';
+import { useI18n } from '@/i18n';
 
 const GymList = React.memo(() => {
+  const { t } = useI18n();
+
   const loadGyms = useCallback(async () => {
     const response = await gymService.getAllGyms();
     const items = normalizeCollection<unknown>(response?.Data);
@@ -19,9 +22,7 @@ const GymList = React.memo(() => {
     ({ item }: { item: unknown }) => {
       const r = (item ?? {}) as Record<string, unknown>;
       const name =
-        (r['name'] as string) ||
-        (r['gymName'] as string) ||
-        'Gimnasio sin nombre';
+        (r['name'] as string) || (r['gymName'] as string) || t('gym_no_name');
       const isActive =
         (r['isActive'] as boolean) ?? (r['IsActive'] as boolean) ?? false;
       const description =
@@ -107,7 +108,7 @@ const GymList = React.memo(() => {
         </View>
       );
     },
-    [styles]
+    [styles, t]
   );
 
   const keyExtractor = useCallback((item: unknown) => {
@@ -123,13 +124,13 @@ const GymList = React.memo(() => {
 
   return (
     <EntityList
-      title="Gimnasios"
+      title={t('gyms_title')}
       loadFunction={loadGyms}
       renderItem={renderGymItem}
       keyExtractor={keyExtractor}
-      emptyTitle="No hay gimnasios"
-      emptyMessage="No se encontraron gimnasios registrados"
-      loadingMessage="Cargando gimnasios..."
+      emptyTitle={t('no_gyms_title')}
+      emptyMessage={t('no_gyms_message')}
+      loadingMessage={t('loading_gyms')}
     />
   );
 });

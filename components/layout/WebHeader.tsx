@@ -14,15 +14,18 @@ import SmartImage from '@/components/common/SmartImage';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeWebHeaderStyles } from './styles/webHeader';
 import { useColorScheme } from '@/components/useColorScheme';
+import { useI18n } from '@/i18n';
 
 interface WebHeaderProps {
   userName?: string;
   userAvatar?: string;
+  hideUserSection?: boolean;
 }
 
 export default function WebHeader({
   userName = 'Usuario',
   userAvatar,
+  hideUserSection = false,
 }: WebHeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -30,6 +33,7 @@ export default function WebHeader({
   const screenWidth = useScreenWidth();
   const styles = useThemedStyles(makeWebHeaderStyles);
   const theme = useColorScheme();
+  const { t } = useI18n();
 
   if (Platform.OS !== 'web') {
     return null;
@@ -87,49 +91,49 @@ export default function WebHeader({
     {
       key: 'routines',
       icon: 'tasks',
-      label: 'Rutinas',
+      label: t('routines'),
       action: () => handleMenuOption('routines'),
     },
     {
       key: 'plans',
       icon: 'star',
-      label: 'Planes',
+      label: t('plans'),
       action: () => handleMenuOption('plans'),
     },
     {
       key: 'physical-assessment',
       icon: 'heartbeat',
-      label: 'Estado físico',
+      label: t('physical_assessment'),
       action: () => handleMenuOption('physical-assessment'),
     },
     {
       key: 'user-exercise-max',
       icon: 'line-chart',
-      label: 'RM',
+      label: t('user_exercise_max_short'),
       action: () => handleMenuOption('user-exercise-max'),
     },
     {
       key: 'settings',
       icon: 'cog',
-      label: 'Ajustes',
+      label: t('settings_label'),
       action: () => handleMenuOption('settings'),
     },
     {
       key: 'support',
       icon: 'life-ring',
-      label: 'Contactar Soporte',
+      label: t('support_contact'),
       action: () => handleMenuOption('support'),
     },
     {
       key: 'bug',
       icon: 'bug',
-      label: 'Reportar un problema o bug',
+      label: t('report_bug'),
       action: () => handleMenuOption('bug'),
     },
     {
       key: 'logout',
       icon: 'sign-out',
-      label: 'Cerrar Sesión',
+      label: t('logout'),
       action: () => handleMenuOption('logout'),
     },
   ];
@@ -168,7 +172,8 @@ export default function WebHeader({
       </View>
 
       {/* Usuario y menú derecho */}
-      <View style={styles.userContainer}>
+      {!hideUserSection && (
+        <View style={styles.userContainer}>
         <TouchableOpacity
           style={styles.userButton}
           onPress={handleUserMenuToggle}
@@ -197,7 +202,7 @@ export default function WebHeader({
         </TouchableOpacity>
 
         {/* Menú desplegable */}
-        {showUserMenu && (
+  {showUserMenu && (
           <View style={styles.userMenu}>
             {userMenuOptions.map((option) => (
               <TouchableOpacity
@@ -235,9 +240,10 @@ export default function WebHeader({
           </View>
         )}
       </View>
+      )}
 
       {/* Overlay para cerrar el menú */}
-      {showUserMenu && (
+  {!hideUserSection && showUserMenu && (
         <TouchableOpacity
           style={styles.overlay}
           onPress={() => setShowUserMenu(false)}

@@ -26,26 +26,39 @@ export interface PostCardProps {
   };
   onToggleLike: (postId: string) => void;
   onOpenComments: (postId: string) => void;
+  isAnonymousActive?: boolean;
+  currentUserId?: string;
 }
 
 export const PostCard: React.FC<PostCardProps> = ({
   post,
   onToggleLike,
   onOpenComments,
+  isAnonymousActive = false,
+  currentUserId,
 }) => {
   const likesCount = post.Likes?.length ?? 0;
   const commentsCount = post.Comments?.length ?? 0;
   const [liked, setLiked] = useState(false);
   const styles = useThemedStyles(makePostCardStyles);
 
-  const userName = useMemo(
-    () => post.User?.Name || post.User?.UserName || 'Usuario',
-    [post]
-  );
-  const avatarUrl = useMemo(
-    () => post.User?.ProfileImageUrl || 'https://via.placeholder.com/40',
-    [post]
-  );
+  const userName = useMemo(() => {
+    const fallback = 'Usuario';
+    if (
+      isAnonymousActive &&
+      (!post.User?.Id || post.User?.Id === currentUserId)
+    )
+      return 'Anónimo';
+    return post.User?.Name || post.User?.UserName || fallback;
+  }, [post, isAnonymousActive, currentUserId]);
+  const avatarUrl = useMemo(() => {
+    if (
+      isAnonymousActive &&
+      (!post.User?.Id || post.User?.Id === currentUserId)
+    )
+      return 'https://via.placeholder.com/40?text=Anon';
+    return post.User?.ProfileImageUrl || 'https://via.placeholder.com/40';
+  }, [post, isAnonymousActive, currentUserId]);
 
   const onPressLike = () => {
     setLiked((prev) => !prev);

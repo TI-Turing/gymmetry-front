@@ -7,6 +7,7 @@ import { useScreenWidth } from './useScreenWidth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeWebLayoutStyles } from './styles/webLayout';
+import { useI18n } from '@/i18n';
 
 interface WebLayoutProps {
   children: React.ReactNode;
@@ -55,6 +56,7 @@ export default function WebLayout({
 }: WebLayoutProps) {
   const screenWidth = useScreenWidth();
   const styles = useThemedStyles(makeWebLayoutStyles);
+  const { t } = useI18n();
 
   if (Platform.OS !== 'web') {
     return <>{children}</>;
@@ -64,62 +66,133 @@ export default function WebLayout({
   const isCompact = screenWidth < 1200;
   const leftColumnWidth = isCompact ? 70 : 250;
 
+  // Separar las 3 últimas opciones a la parte baja del menú
+  const topItems = menuItems.slice(0, Math.max(0, menuItems.length - 3));
+  const bottomItems = menuItems.slice(-3);
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <WebHeader />
+  {/* Header */}
+  <WebHeader hideUserSection={activeTab === 'feed'} />
       <View style={styles.mainContent}>
         {/* Columna 1: Menú Vertical */}
         <View style={[styles.leftColumn, { width: leftColumnWidth }]}>
           {/* Menú de navegación */}
           <View style={styles.menuContainer}>
-            {menuItems.map((item) => (
-              <TouchableOpacity
-                key={item.key}
-                style={[
-                  styles.menuItem,
-                  activeTab === item.key && styles.activeMenuItem,
-                  isCompact && styles.menuItemCompact,
-                ]}
-                onPress={() => onTabChange(item.key)}
-              >
-                {item.iconType === 'MaterialCommunityIcons' ? (
-                  <MaterialCommunityIcons
-                    name={item.icon}
-                    size={20}
-                    style={[
-                      styles.menuIcon,
-                      activeTab === item.key
-                        ? styles.menuIconActive
-                        : styles.menuIconInactive,
-                      isCompact && styles.menuIconCompact,
-                    ]}
-                  />
-                ) : (
-                  <FontAwesome
-                    name={item.icon}
-                    size={20}
-                    style={[
-                      styles.menuIcon,
-                      activeTab === item.key
-                        ? styles.menuIconActive
-                        : styles.menuIconInactive,
-                      isCompact && styles.menuIconCompact,
-                    ]}
-                  />
-                )}
-                {!isCompact && (
-                  <Text
-                    style={[
-                      styles.menuText,
-                      activeTab === item.key && styles.activeMenuText,
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ))}
+            {/* Sección superior (core) */}
+            <View>
+              {topItems.map((item) => (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[
+                    styles.menuItem,
+                    activeTab === item.key && styles.activeMenuItem,
+                    isCompact && styles.menuItemCompact,
+                  ]}
+                  onPress={() => onTabChange(item.key)}
+                >
+                  {item.iconType === 'MaterialCommunityIcons' ? (
+                    <MaterialCommunityIcons
+                      name={item.icon}
+                      size={20}
+                      style={[
+                        styles.menuIcon,
+                        activeTab === item.key
+                          ? styles.menuIconActive
+                          : styles.menuIconInactive,
+                        isCompact && styles.menuIconCompact,
+                      ]}
+                    />
+                  ) : (
+                    <FontAwesome
+                      name={item.icon}
+                      size={20}
+                      style={[
+                        styles.menuIcon,
+                        activeTab === item.key
+                          ? styles.menuIconActive
+                          : styles.menuIconInactive,
+                        isCompact && styles.menuIconCompact,
+                      ]}
+                    />
+                  )}
+                  {!isCompact && (
+                    <Text
+                      style={[
+                        styles.menuText,
+                        activeTab === item.key && styles.activeMenuText,
+                      ]}
+                    >
+                      {t(
+                        item.key === 'index'
+                          ? 'home'
+                          : item.key === 'gym'
+                            ? 'gym'
+                            : item.key === 'progress'
+                              ? 'progress'
+                              : item.key === 'physical-assessment'
+                                ? 'physical_assessment'
+                                : item.key === 'user-exercise-max'
+                                  ? 'user_exercise_max_short'
+                                  : item.label
+                      )}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Sección inferior (no core) */}
+            <View style={styles.menuBottomSection}>
+              {!isCompact && <View style={styles.menuDivider} />}
+              {bottomItems.map((item) => (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[
+                    styles.menuItem,
+                    activeTab === item.key && styles.activeMenuItem,
+                    isCompact && styles.menuItemCompact,
+                  ]}
+                  onPress={() => onTabChange(item.key)}
+                >
+                  {item.iconType === 'MaterialCommunityIcons' ? (
+                    <MaterialCommunityIcons
+                      name={item.icon}
+                      size={20}
+                      style={[
+                        styles.menuIcon,
+                        activeTab === item.key
+                          ? styles.menuIconActive
+                          : styles.menuIconInactive,
+                        isCompact && styles.menuIconCompact,
+                      ]}
+                    />
+                  ) : (
+                    <FontAwesome
+                      name={item.icon}
+                      size={20}
+                      style={[
+                        styles.menuIcon,
+                        activeTab === item.key
+                          ? styles.menuIconActive
+                          : styles.menuIconInactive,
+                        isCompact && styles.menuIconCompact,
+                      ]}
+                    />
+                  )}
+                  {!isCompact && (
+                    <Text
+                      style={[
+                        styles.menuText,
+                        activeTab === item.key && styles.activeMenuText,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
 

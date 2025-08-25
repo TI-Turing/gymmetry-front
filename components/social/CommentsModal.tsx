@@ -16,6 +16,8 @@ export interface CommentsModalProps {
   comments: Comment[];
   onClose: () => void;
   onAddComment: (text: string) => void;
+  isAnonymousActive?: boolean;
+  currentUserId?: string;
 }
 
 export const CommentsModal: React.FC<CommentsModalProps> = ({
@@ -23,6 +25,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
   comments,
   onClose,
   onAddComment,
+  isAnonymousActive = false,
+  currentUserId,
 }) => {
   const [text, setText] = React.useState('');
   const styles = useThemedStyles(makeCommentsModalStyles);
@@ -42,7 +46,9 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
           renderItem={({ item }) => (
             <View style={styles.commentRow}>
               <Text style={styles.commentAuthor}>
-                {item.User?.UserName || 'Usuario'}
+                {isAnonymousActive && item.UserId === currentUserId
+                  ? 'Anónimo'
+                  : item.User?.UserName || 'Usuario'}
               </Text>
               <Text style={styles.commentText}>{item.Content}</Text>
             </View>
@@ -53,7 +59,11 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
           <TextInput
             value={text}
             onChangeText={setText}
-            placeholder="Escribe un comentario"
+            placeholder={
+              isAnonymousActive
+                ? 'Comentar como Anónimo'
+                : 'Escribe un comentario'
+            }
             placeholderTextColor={styles.colors.placeholder}
             style={styles.input}
           />

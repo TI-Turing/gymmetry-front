@@ -17,24 +17,27 @@ import {
   GymStep4Data,
   GymStep5Data,
 } from './types';
+import { useI18n } from '@/i18n';
 
 const TOTAL_STEPS = 5;
-const STEP_TITLES = [
-  'Información Básica',
-  'Tipo y Descripción',
-  'Ubicación',
-  'Presencia Digital',
-  'Multimedia',
-];
 
 export default function GymRegistrationSteps({
   onComplete,
   onCancel,
 }: GymRegistrationStepsProps) {
   const { styles } = useThemedStyles(makeGymStepsStyles);
+  const { t } = useI18n();
   const [currentStep, setCurrentStep] = useState(0);
   const [gymData, setGymData] = useState<Partial<GymCompleteData>>({});
   const [gymId, setGymId] = useState<string>('');
+
+  const STEP_TITLES = [
+    t('gym_step_basic_info'),
+    t('gym_step_type_description'),
+    t('gym_step_location'),
+    t('gym_step_digital_presence'),
+    t('gym_step_multimedia'),
+  ];
 
   const handleStep1Complete = (data: GymStep1Data & { gymId?: string }) => {
     if (data.gymId) {

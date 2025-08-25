@@ -9,6 +9,7 @@ import { GymService } from '@/services/gymService';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymStepsStyles } from '../styles/gymSteps';
+import { useI18n } from '@/i18n';
 
 export default function GymStep4({
   gymId,
@@ -18,6 +19,7 @@ export default function GymStep4({
 }: GymStepProps<GymStep4Data> & { gymId: string }) {
   const { showAlert, AlertComponent } = useCustomAlert();
   const { styles, colors } = useThemedStyles(makeGymStepsStyles);
+  const { t } = useI18n();
   const [formData, setFormData] = useState<GymStep4Data>({
     Id: gymId,
     website: initialData?.website || '',
@@ -46,15 +48,15 @@ export default function GymStep4({
 
   const validateForm = (): boolean => {
     if (formData.website && !validateUrl(formData.website)) {
-      showAlert('error', 'Error', 'La URL del sitio web no es válida');
+      showAlert('error', t('error'), t('invalid_website_url'));
       return false;
     }
     if (formData.instagram && !validateUrl(formData.instagram)) {
-      showAlert('error', 'Error', 'La URL de Instagram no es válida');
+      showAlert('error', t('error'), t('invalid_instagram_url'));
       return false;
     }
     if (formData.facebook && !validateUrl(formData.facebook)) {
-      showAlert('error', 'Error', 'La URL de Facebook no es válida');
+      showAlert('error', t('error'), t('invalid_facebook_url'));
       return false;
     }
     return true;
@@ -71,11 +73,7 @@ export default function GymStep4({
 
       onNext(formData);
     } catch {
-      showAlert(
-        'error',
-        'Error',
-        'No se pudo guardar la información de presencia digital'
-      );
+      showAlert('error', t('error'), t('error_saving_digital_presence'));
     } finally {
       setIsLoading(false);
     }
@@ -85,15 +83,13 @@ export default function GymStep4({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <FontAwesome name="globe" size={40} color={colors.tint} />
-        <Text style={styles.title}>Presencia Digital</Text>
-        <Text style={styles.subtitle}>
-          Agrega los enlaces a tus redes sociales y sitio web (opcional)
-        </Text>
+        <Text style={styles.title}>{t('gym_step4_title')}</Text>
+        <Text style={styles.subtitle}>{t('gym_step4_subtitle')}</Text>
       </View>
 
       <View style={styles.form}>
         <FormInput
-          label="Sitio Web"
+          label={t('website_label')}
           value={formData.website}
           onChangeText={(value) => handleInputChange('website', value)}
           keyboardType="url"
@@ -102,7 +98,7 @@ export default function GymStep4({
         />
 
         <FormInput
-          label="Instagram"
+          label={t('instagram_label')}
           value={formData.instagram}
           onChangeText={(value) => handleInputChange('instagram', value)}
           keyboardType="url"
@@ -111,7 +107,7 @@ export default function GymStep4({
         />
 
         <FormInput
-          label="Facebook"
+          label={t('facebook_label')}
           value={formData.facebook}
           onChangeText={(value) => handleInputChange('facebook', value)}
           keyboardType="url"
@@ -121,15 +117,13 @@ export default function GymStep4({
 
         <View style={styles.infoContainer}>
           <FontAwesome name="info-circle" size={16} color={colors.tint} />
-          <Text style={styles.infoText}>
-            Todos los campos son opcionales. Puedes agregarlos más tarde.
-          </Text>
+          <Text style={styles.infoText}>{t('digital_presence_info')}</Text>
         </View>
       </View>
 
       <View style={styles.buttonContainer}>
         <Button
-          title="Continuar"
+          title={t('continue')}
           onPress={handleNext}
           loading={isLoading}
           style={styles.nextButton}

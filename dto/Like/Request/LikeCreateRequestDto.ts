@@ -2,4 +2,5 @@
 export interface LikeCreateRequestDto {
   PostId: string;
   UserId: string;
+  IsAnonymous?: boolean | null;
 }

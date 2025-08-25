@@ -39,5 +39,16 @@ export const makeWebLayoutStyles = (theme: ThemeMode) => {
     activeMenuText: { color: palette.tint, fontWeight: '600' },
     centerColumn: { flex: 1, backgroundColor: palette.background },
     rightColumn: { width: 300, backgroundColor: sideBg },
+    // Nueva sección inferior del menú
+    menuBottomSection: {
+      marginTop: 'auto',
+      paddingTop: 10,
+    },
+    menuDivider: {
+      height: 1,
+      backgroundColor: theme === 'dark' ? '#2A2A2A' : '#E5E7EB',
+      marginVertical: 10,
+      marginHorizontal: 8,
+    },
   });
 };

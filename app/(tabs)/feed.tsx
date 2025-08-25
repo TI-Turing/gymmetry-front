@@ -1,15 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  TouchableOpacity,
-  Image,
-  SafeAreaView,
-  Platform,
-  FlatList,
-  ScrollView,
-} from 'react-native';
+import { Image, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import MobileHeader from '@/components/layout/MobileHeader';
+import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import type { Post } from '@/models/Post';
 import type { Comment } from '@/models/Comment';
@@ -17,14 +10,24 @@ import type { User } from '@/models/User';
 import PostComposer from '@/components/social/PostComposer';
 import PostCard from '@/components/social/PostCard';
 import CommentsModal from '@/components/social/CommentsModal';
-import { feedService } from '@/services';
+import { feedService, commentService, likeService } from '@/services';
 import type { FeedResponseDto } from '@/dto/Feed/Response/FeedResponseDto';
 import Skeleton from '@/components/common/Skeleton';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeFeedStyles } from './styles/feed';
+import { useI18n } from '@/i18n';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
+import { useAuth } from '@/contexts/AuthContext';
+import CommunityRulesModal from '@/components/social/CommunityRulesModal';
 
 function FeedScreen() {
   const styles = useThemedStyles(makeFeedStyles);
+  const { t } = useI18n();
+  const { settings, setSettings } = useAppSettings();
+  const { userData } = useAuth();
+  const currentUserId = userData?.id || 'me';
+  const [showAnonNotice, setShowAnonNotice] = useState<boolean>(false);
+  const [showRules, setShowRules] = useState<boolean>(false);
   type MinimalUser = {
     Name?: string | null;
     UserName?: string | null;
@@ -193,6 +196,35 @@ function FeedScreen() {
   const [page, setPage] = useState<number>(1);
   const pageSize = 10;
   const [hasMore, setHasMore] = useState<boolean>(true);
+
+  const handleNotifications = () => {
+    // TODO: Implementar lógica de notificaciones
+  };
+
+  const HeaderRight = () => (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel={t('toggle_anonymous_mode')}
+        onPress={() =>
+          setSettings((prev) => ({
+            ...prev,
+            socialAnonymousMode: !prev.socialAnonymousMode,
+          }))
+        }
+        style={{ padding: 8 }}
+      >
+        <FontAwesome
+          name={settings.socialAnonymousMode ? 'user-secret' : 'user-o'}
+          size={22}
+          color={styles.colors.text}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={{ padding: 8 }} onPress={handleNotifications}>
+        <FontAwesome name="bell" size={24} color={styles.colors.text} />
+      </TouchableOpacity>
+    </View>
+  );
   const [allCache, setAllCache] = useState<LocalPost[] | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const endReachedAt = useRef<number>(0);
@@ -207,7 +239,7 @@ function FeedScreen() {
     // Crear en backend Feed (si el servicio lo permite) o fallback a mock local
     try {
       const res = await feedService.createFeed({
-        UserId: null,
+        UserId: currentUserId,
         Title: content.slice(0, 60),
         Description: content,
         Media: null,
@@ -217,6 +249,7 @@ function FeedScreen() {
         FeedId: '',
         ContentType: null,
         Hashtag: null,
+  IsAnonymous: settings.socialAnonymousMode,
       });
       if (res.Success && res.Data) {
         // Volver a cargar feeds
@@ -224,10 +257,11 @@ function FeedScreen() {
         return;
       }
     } catch {}
-    const me = posts[0]?.User; // mock fallback
+    const me =
+      posts[0]?.User ?? ({ Id: currentUserId, UserName: 'Tú' } as MinimalUser); // mock fallback
     const newPost: LocalPost = {
       Id: 'p' + (Math.random() * 100000).toFixed(0),
-      UserId: me?.Id || 'me',
+      UserId: (me as MinimalUser)?.Id || currentUserId,
       Content: content,
       MediaUrl: null,
       MediaType: null,
@@ -251,13 +285,14 @@ function FeedScreen() {
     setPosts((prev) =>
       prev.map((p) => {
         if (p.Id !== postId) return p;
-        const meId = 'me';
+        const meId = currentUserId;
         const hasLike = (p.Likes || []).some((l: unknown) => {
           if (!isRecord(l)) return false;
           const uid = (l as Record<string, unknown>)['UserId'] as unknown;
           return typeof uid === 'string' && uid === meId;
         });
         if (hasLike) {
+          // Intento opcional backend: eliminar like (pendiente endpoint)
           return {
             ...p,
             Likes: (p.Likes || []).filter((l: unknown) => {
@@ -279,6 +314,16 @@ function FeedScreen() {
           Post: p as unknown,
           User: p.User,
         };
+        // Intento opcional backend: crear like respetando anonimato
+        (async () => {
+          try {
+            await likeService.createLike({
+              PostId: p.Id,
+              UserId: meId,
+              IsAnonymous: settings.socialAnonymousMode,
+            });
+          } catch {}
+        })();
         return { ...p, Likes: [...(p.Likes || []), like] };
       })
     );
@@ -288,11 +333,11 @@ function FeedScreen() {
     if (!openPost) return;
     const p = openPost;
     const now = new Date().toISOString();
-    const me = p.User; // reutilizar mock
+    const me: MinimalUser = { Id: currentUserId, UserName: 'Yo' };
     const comment: Comment = {
       Id: 'c' + Math.random(),
       PostId: p.Id,
-      UserId: me?.Id || 'me',
+      UserId: me?.Id || currentUserId,
       Content: text,
       CreatedAt: now,
       UpdatedAt: null,
@@ -303,6 +348,18 @@ function FeedScreen() {
       Post: p as unknown as Post,
       User: me as unknown as User,
     };
+    // Intento opcional backend: crear comentario respetando anonimato
+    (async () => {
+      try {
+        await commentService.createComment({
+          PostId: p.Id,
+          UserId: me?.Id || currentUserId,
+          Content: text,
+          Id: '',
+          IsAnonymous: settings.socialAnonymousMode,
+        });
+      } catch {}
+    })();
     setPosts((prev) =>
       prev.map((pp) =>
         pp.Id === p.Id
@@ -388,9 +445,23 @@ function FeedScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Aviso temporal de modo anónimo
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    if (settings.socialAnonymousMode) {
+      setShowAnonNotice(true);
+      timer = setTimeout(() => setShowAnonNotice(false), 7000);
+    } else {
+      setShowAnonNotice(false);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [settings.socialAnonymousMode]);
+
   const renderActiveUsers = () => (
     <View style={styles.activeUsersCard}>
-      <Text style={styles.activeUsersTitle}>Entrenando Ahora</Text>
+      <Text style={styles.activeUsersTitle}>{t('training_now')}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.activeUsersList}>
           {[1, 2, 3, 4, 5].map((user) => (
@@ -404,7 +475,9 @@ function FeedScreen() {
                 />
                 <View style={styles.onlineIndicator} />
               </View>
-              <Text style={styles.activeUserName}>Usuario {user}</Text>
+              <Text style={styles.activeUserName}>
+                {t('user')} {user}
+              </Text>
             </View>
           ))}
         </View>
@@ -414,16 +487,44 @@ function FeedScreen() {
 
   const renderHeader = () => (
     <>
-      <View style={styles.header}>
-        <Text style={styles.title}>Feed</Text>
-        <TouchableOpacity style={styles.notificationButton}>
-          <FontAwesome name="bell" size={24} color={styles.colors.text} />
-        </TouchableOpacity>
-      </View>
+      {showAnonNotice && (
+        <View
+          style={{
+            backgroundColor: styles.colors.skeletonCardBg,
+            marginHorizontal: 20,
+            borderRadius: 12,
+            padding: 12,
+            marginBottom: 16,
+            borderWidth: 1,
+            borderColor: styles.colors.success,
+          }}
+        >
+          <Text style={{ color: styles.colors.text, marginBottom: 6 }}>
+            {t('anonymous_notice_message')}
+          </Text>
+          <Text style={{ color: styles.colors.text }}>
+            {t('anonymous_notice_support_visible')}{' '}
+            <Text
+              onPress={() => setShowRules(true)}
+              style={{
+                textDecorationLine: 'underline',
+                color: styles.colors.text,
+              }}
+            >
+              {t('view_behavior_rules')}
+            </Text>
+          </Text>
+        </View>
+      )}
       {renderActiveUsers()}
       <PostComposer
-        avatarUrl={posts[0]?.User?.ProfileImageUrl || null}
+        avatarUrl={
+          settings.socialAnonymousMode
+            ? 'https://via.placeholder.com/40?text=Anon'
+            : posts[0]?.User?.ProfileImageUrl || null
+        }
         onSubmit={addMockPost}
+        isAnonymous={settings.socialAnonymousMode}
       />
       {loading && (
         <View style={{ paddingHorizontal: 20, gap: 12 }}>
@@ -475,8 +576,10 @@ function FeedScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {Platform.OS !== 'web' && <MobileHeader />}
+    <ScreenWrapper
+      headerTitle={t('feed')}
+      headerRightComponent={<HeaderRight />}
+    >
       <FlatList
         data={posts}
         keyExtractor={(item) => item.Id}
@@ -485,6 +588,8 @@ function FeedScreen() {
             post={item}
             onToggleLike={toggleLike}
             onOpenComments={setOpenPostId}
+            isAnonymousActive={settings.socialAnonymousMode}
+            currentUserId={currentUserId}
           />
         )}
         ListHeaderComponent={renderHeader}
@@ -526,7 +631,7 @@ function FeedScreen() {
               <Text
                 style={{ color: styles.colors.footerText, textAlign: 'center' }}
               >
-                No hay más publicaciones
+                {t('no_more_posts')}
               </Text>
             ) : null}
           </View>
@@ -553,8 +658,14 @@ function FeedScreen() {
         comments={openPost?.Comments || []}
         onClose={() => setOpenPostId(null)}
         onAddComment={addComment}
+        isAnonymousActive={settings.socialAnonymousMode}
+        currentUserId={currentUserId}
       />
-    </SafeAreaView>
+      <CommunityRulesModal
+        visible={showRules}
+        onClose={() => setShowRules(false)}
+      />
+    </ScreenWrapper>
   );
 }
 

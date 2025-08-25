@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
+import type { ThemeMode } from '@/hooks/useThemedStyles';
 
 export const styles = StyleSheet.create({
   // RoutineAssignedCard styles
@@ -190,3 +191,64 @@ export const styles = StyleSheet.create({
     marginLeft: SPACING.sm,
   },
 });
+
+// Themed styles for RoutineAssignedCard
+export const makeRoutineAssignedCardStyles = (theme: ThemeMode) => {
+  const isDark = theme === 'dark';
+  const palette = Colors[theme];
+  const colors = {
+    background: palette.background,
+    text: palette.text,
+    tint: palette.tint,
+    cardBg: isDark ? '#1F1F1F' : '#FFFFFF',
+    border: isDark ? '#333333' : '#DDDDDD',
+    neutral: isDark ? '#2E2E2E' : '#EEEEEE',
+  } as const;
+
+  return StyleSheet.create({
+    container: {
+      backgroundColor: colors.cardBg,
+      padding: SPACING.md,
+      borderRadius: BORDER_RADIUS.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    title: {
+      fontSize: FONT_SIZES.lg,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: SPACING.sm,
+    },
+    text: {
+      color: colors.text,
+      marginBottom: SPACING.sm,
+    },
+    status: {
+      color: colors.tint,
+      fontWeight: '500',
+    },
+    badgeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: SPACING.xs,
+      backgroundColor: 'transparent',
+    },
+    badge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 20,
+      fontSize: FONT_SIZES.xs,
+      fontWeight: '600',
+      overflow: 'hidden',
+    },
+    badgePremium: {
+      backgroundColor: colors.tint,
+      color: colors.background,
+    },
+    badgeFree: {
+      backgroundColor: colors.neutral,
+      color: colors.text,
+    },
+  });
+};

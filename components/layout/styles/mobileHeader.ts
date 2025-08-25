@@ -92,6 +92,9 @@ export function makeMobileHeaderStyles(theme: ThemeMode) {
       flex: 1,
       paddingTop: 20,
     },
+    flexSpacer: {
+      flexGrow: 1,
+    },
     menuOption: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -99,6 +102,13 @@ export function makeMobileHeaderStyles(theme: ThemeMode) {
       paddingVertical: 20,
       borderBottomWidth: 1,
       borderBottomColor: border,
+    },
+    menuBottomSection: {
+      paddingTop: 6,
+    },
+    menuDivider: {
+      height: 8,
+      backgroundColor: 'transparent',
     },
     logoutOption: {
       borderBottomWidth: 0,

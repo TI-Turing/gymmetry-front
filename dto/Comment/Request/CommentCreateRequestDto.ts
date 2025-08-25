@@ -4,4 +4,5 @@ export interface CommentCreateRequestDto {
   UserId: string;
   Content: string | null;
   Id: string;
+  IsAnonymous?: boolean | null;
 }
