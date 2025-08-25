@@ -14,6 +14,7 @@ import { exerciseService } from '@/services/exerciseService';
 import type { Exercise } from '@/models/Exercise';
 import BodyMusclesDiagram from '@/components/body/BodyMusclesDiagram';
 import { mapTagsToOverlayOpacities } from '@/components/body/overlayMapping';
+import { normalizeCollection } from '@/utils';
 
 export default function ExerciseDetailScreen() {
   const params = useLocalSearchParams<{ exerciseId?: string }>();
@@ -80,14 +81,8 @@ export default function ExerciseDetailScreen() {
       try {
         const body = { Name: query.trim() } as Record<string, unknown>; // contains-match según contrato
         const res = await exerciseService.findExercisesByFields(body);
-        let arr: unknown[] = [];
-        if (res?.Success && res.Data) {
-          if (Array.isArray(res.Data)) arr = res.Data as unknown[];
-          else if ((res.Data as unknown as { $values?: unknown[] }).$values)
-            arr =
-              (res.Data as unknown as { $values?: unknown[] }).$values || [];
-        }
-        setResults((arr as Exercise[]) || []);
+        const arr = res?.Success ? normalizeCollection<Exercise>(res.Data) : [];
+        setResults(arr as Exercise[]);
       } catch {
         setError('Error en la búsqueda');
       } finally {

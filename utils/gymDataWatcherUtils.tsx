@@ -16,7 +16,10 @@ export function GymAwareComponent() {
   useEffect(() => {
     // El componente puede reaccionar automáticamente a cambios en los datos del gym
     // if (gymData) {
-    //   console.debug('Datos del gym actualizados:', gymData.gym?.Name);
+    // Logger de depuración opcional: logger.debug(
+    //   'Datos del gym actualizados:',
+    //   gymData.gym?.Name
+    // );
     // }
     return undefined;
   }, [gymData]);

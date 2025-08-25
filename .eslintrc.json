@@ -9,8 +9,8 @@
         "sourceType": "module",
         "ecmaFeatures": {
           "jsx": true
-  },
-  "warnOnUnsupportedTypeScriptVersion": false
+        },
+        "warnOnUnsupportedTypeScriptVersion": false
       },
       "plugins": [
         "@typescript-eslint",
@@ -21,6 +21,8 @@
       ],
       "extends": ["expo", "plugin:@typescript-eslint/recommended"],
       "rules": {
+        "no-console": "error",
+        "no-debugger": "error",
         "prettier/prettier": ["error", { "endOfLine": "auto" }],
         "unused-imports/no-unused-imports": "error",
         "unused-imports/no-unused-vars": [
@@ -47,6 +49,12 @@
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-redeclare": "error",
         "react-hooks/exhaustive-deps": "error"
+      }
+    },
+    {
+      "files": ["utils/logger.ts"],
+      "rules": {
+        "no-console": "off"
       }
     }
   ],

@@ -387,7 +387,7 @@ class ApiService {
   ): Promise<BackendApiResponse<T>> {
     try {
       // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
-      // console.log(__curl);
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.get<BackendApiResponse<T>>(
         endpoint,
         {
@@ -419,7 +419,7 @@ class ApiService {
     try {
       //Show curl
       // const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
-      // console.log(__curl);
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.post<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -451,7 +451,7 @@ class ApiService {
   ): Promise<BackendApiResponse<T>> {
     try {
       // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
-      // console.log(__curl);
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.put<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -483,7 +483,7 @@ class ApiService {
   ): Promise<BackendApiResponse<T>> {
     try {
       // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
-      // console.log(__curl);
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.patch<BackendApiResponse<T>>(
         endpoint,
         body,
@@ -514,7 +514,7 @@ class ApiService {
   ): Promise<BackendApiResponse<T>> {
     try {
       // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
-      // console.log(__curl);
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.delete<BackendApiResponse<T>>(
         endpoint,
         {

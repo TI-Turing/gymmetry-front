@@ -30,6 +30,7 @@ import { useCustomAlert } from '@/components/common/CustomAlert';
 import { LoadingAnimation } from '../LoadingAnimation';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeStep5Styles } from '../styles/step5';
+import { normalizeCollection } from '@/utils';
 
 interface Step5Props {
   userId: string;
@@ -158,18 +159,7 @@ export default forwardRef<{ snapshot: () => Partial<Step5Data> }, Step5Props>(
           }
 
           if (response.Success) {
-            const raw = response.Data as unknown;
-            let list: unknown[] = [];
-            if (Array.isArray(raw)) {
-              list = raw as unknown[];
-            } else if (
-              typeof raw === 'object' &&
-              raw !== null &&
-              '$values' in (raw as Record<string, unknown>) &&
-              Array.isArray((raw as Record<string, unknown>)['$values'])
-            ) {
-              list = (raw as Record<string, unknown>)['$values'] as unknown[];
-            }
+            const list = normalizeCollection<unknown>(response.Data);
             // Si Data está vacío, el nombre de usuario está disponible
             if (!list || list.length === 0) {
               setUsernameStatus('available');

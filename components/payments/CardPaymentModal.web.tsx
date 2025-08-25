@@ -3,6 +3,7 @@ import { Modal, View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/Themed';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { logger } from '@/utils';
 import { makePaymentModalStyles } from './styles';
 
 type Props = {
@@ -60,7 +61,7 @@ export default function CardPaymentModalWeb({
   };
 
   const onError = async (err: unknown) => {
-    console.error('MP brick error', err);
+    logger.error('MP brick error', err);
   };
 
   return (

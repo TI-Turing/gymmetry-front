@@ -5,19 +5,14 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { gymTypeService } from '@/services/gymTypeService';
+import { normalizeCollection } from '@/utils';
 
 const GymTypeList = React.memo(() => {
-  const isRecord = (v: unknown): v is Record<string, unknown> =>
-    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadGymTypes = useCallback(async () => {
     try {
       const response = await gymTypeService.getAllGymTypes();
-      const raw = (response?.Data ?? []) as unknown;
-      if (Array.isArray(raw)) return raw as unknown[];
-      if (isRecord(raw) && Array.isArray((raw['$values'] as unknown[]) ?? [])) {
-        return ((raw['$values'] as unknown[]) ?? []) as unknown[];
-      }
-      return [];
+      const items = normalizeCollection<unknown>(response?.Data);
+      return items;
     } catch (_error) {
       // Fallback to mock data if service doesn't exist
       return [];

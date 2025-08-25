@@ -9,6 +9,7 @@ import type { Gym } from '@/dto/gym/Gym';
 import type { FindGymsByNameResponse } from '@/dto/gym/FindGymsByNameResponse';
 import type { UploadGymLogoRequest } from '@/dto/gym/UploadGymLogoRequest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@/utils';
 
 // Auto-generated service for Gym Azure Functions
 export const gymService = {
@@ -117,7 +118,8 @@ export const gymService = {
 
   // Método para refrescar datos del gimnasio
   async refreshGymData(gymId?: string): Promise<void> {
-    console.log('refreshGymData called with gymId:', gymId);
+    // Log de depuración centralizado
+    logger.debug('refreshGymData called with gymId:', gymId);
     // Implementación básica para compatibilidad
   },
 

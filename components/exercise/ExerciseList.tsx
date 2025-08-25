@@ -12,6 +12,7 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { exerciseService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
 type ExerciseRaw = {
   Id?: number | string;
@@ -146,10 +147,7 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
               | { Success?: boolean; Data?: unknown }
               | undefined;
             if (anyRes?.Success && anyRes.Data) {
-              const data = anyRes.Data as unknown;
-              const arr = Array.isArray(data)
-                ? data
-                : (data as { $values?: ExerciseRaw[] })?.$values || [];
+              const arr = normalizeCollection<ExerciseRaw>(anyRes.Data);
               rawList = arr as ExerciseRaw[];
             }
           }
@@ -200,20 +198,15 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
               | { Success?: boolean; Data?: unknown }
               | undefined;
             if (anyRes?.Success && anyRes.Data) {
-              const data = anyRes.Data as unknown;
-              const arr = Array.isArray(data)
-                ? data
-                : (data as { $values?: ExerciseRaw[] })?.$values || [];
+              const arr = normalizeCollection<ExerciseRaw>(anyRes.Data);
               rawList = arr as ExerciseRaw[];
             }
           }
           const res = await exerciseService.getAllExercises();
           if (res?.Success) {
-            const raw = res.Data as unknown;
-            const maybe = Array.isArray(raw)
-              ? raw
-              : (raw as { $values?: ExerciseRaw[] })?.$values || [];
-            rawList = (maybe || []) as ExerciseRaw[];
+            rawList = normalizeCollection<ExerciseRaw>(
+              res.Data
+            ) as ExerciseRaw[];
           }
           rawList = rawList.filter((e) =>
             (e.Name || e.name || '')
@@ -234,12 +227,9 @@ const ExerciseList = React.memo((props: ExerciseListProps) => {
     // Modo local (eager): cargar todos y filtrar
     const response = await exerciseService.getAllExercises();
     const raw = response.Success ? (response.Data as unknown) : [];
-    let list: ExerciseRaw[] = Array.isArray(raw)
-      ? (raw as ExerciseRaw[])
-      : ((raw as { $values?: ExerciseRaw[] })?.$values as
-          | ExerciseRaw[]
-          | undefined) || [];
-    if (!Array.isArray(list)) list = [];
+    const list: ExerciseRaw[] = normalizeCollection<ExerciseRaw>(
+      raw
+    ) as ExerciseRaw[];
     let normalized = normalizeExercises(list);
     if (internalQuery.trim()) {
       const q = internalQuery.trim().toLowerCase();

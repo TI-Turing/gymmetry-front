@@ -56,21 +56,11 @@ class UserSessionService {
 
       // Obtener lista de países del catálogo
       const { catalogService } = await import('./catalogService');
-      const isRecord = (v: unknown): v is Record<string, unknown> =>
-        !!v && typeof v === 'object' && !Array.isArray(v);
+      const { normalizeCollection } = await import('@/utils');
       const countriesResp = (await catalogService.getCountries()) as unknown;
       const rawObj = countriesResp as unknown;
-      const rawData = isRecord(rawObj)
-        ? ((rawObj['Data'] as unknown) ?? rawObj)
-        : rawObj;
-      let countries: unknown[] = [];
-      if (Array.isArray(rawData)) countries = rawData as unknown[];
-      else if (
-        isRecord(rawData) &&
-        Array.isArray((rawData['$values'] as unknown[]) ?? [])
-      ) {
-        countries = ((rawData['$values'] as unknown[]) ?? []) as unknown[];
-      }
+      const rawData = (rawObj as Record<string, unknown>)?.['Data'] ?? rawObj;
+      const countries: unknown[] = normalizeCollection<unknown>(rawData);
 
       // Buscar el país en la lista del catálogo
       const matchedCountry = this.findCountryInCatalog(

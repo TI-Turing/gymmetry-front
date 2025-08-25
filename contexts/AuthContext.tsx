@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { logger } from '@/utils';
 import { authService, UserData } from '@/services/authService';
 
 interface AuthContextType {
@@ -64,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUserData(null);
       }
     } catch (error) {
-      console.error('Error initializing auth:', error);
+      logger.error('Error initializing auth:', error);
       setIsAuthenticated(false);
       setUserData(null);
     } finally {

@@ -1,13 +1,15 @@
-import { apiService } from './apiService';
-import type { ApiResponse } from '@/dto/common/ApiResponse';
-import type { LoginResponse } from '@/dto/auth/Response/LoginResponse';
-import type { LoginRequest } from '@/dto/auth/Request/LoginRequest';
-import type { RefreshTokenResponse } from '@/dto/auth/Response/RefreshTokenResponse';
-import type { RefreshTokenRequest } from '@/dto/auth/Request/RefreshTokenRequest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const isRecord = (v: unknown): v is Record<string, unknown> =>
-  !!v && typeof v === 'object' && !Array.isArray(v);
+import type { ApiResponse } from '@/dto/common/ApiResponse';
+import type { LoginRequest } from '@/dto/auth/Request/LoginRequest';
+import type { RefreshTokenRequest } from '@/dto/auth/Request/RefreshTokenRequest';
+import type { LoginResponse } from '@/dto/auth/Response/LoginResponse';
+import type { RefreshTokenResponse } from '@/dto/auth/Response/RefreshTokenResponse';
+
+import { logger, normalizeCollection } from '@/utils';
+import { apiService } from './apiService';
+
+// ...
 
 export interface UserData {
   id: string;
@@ -62,12 +64,7 @@ export const authService = {
       try {
         const rr = (raw ?? {}) as Record<string, unknown>;
         const maybe = rr['RoutineAssigneds'] as unknown;
-        const routineAssigneds = Array.isArray(maybe)
-          ? maybe
-          : (isRecord(maybe) &&
-            Array.isArray((maybe as Record<string, unknown>)['$values'])
-              ? ((maybe as Record<string, unknown>)['$values'] as unknown[])
-              : []) || [];
+        const routineAssigneds = normalizeCollection<unknown>(maybe);
         if (Array.isArray(routineAssigneds) && routineAssigneds.length > 0) {
           const active = routineAssigneds[0];
           const ar = (active ?? {}) as Record<string, unknown>;
@@ -171,7 +168,7 @@ export const authService = {
 
       return true;
     } catch (error) {
-      console.error('Error in checkAndRefreshToken:', error);
+      logger.error('Error in checkAndRefreshToken:', error);
       return false;
     }
   },
@@ -262,7 +259,7 @@ export const authService = {
 
       return this._rawUser !== null;
     } catch (error) {
-      console.error('Error in initializeFromStorage:', error);
+      logger.error('Error in initializeFromStorage:', error);
       return false;
     }
   },
@@ -332,7 +329,7 @@ export const authService = {
         StatusCode: 400,
       };
     } catch (error) {
-      console.error('Error refreshing auth token:', error);
+      logger.error('Error refreshing auth token:', error);
       return {
         Success: false,
         Data: false,

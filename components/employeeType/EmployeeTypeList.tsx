@@ -5,16 +5,14 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { employeeTypeService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
 const EmployeeTypeList = React.memo(() => {
   const loadEmployeeTypes = useCallback(async () => {
     try {
       const response = await employeeTypeService.getAllEmployeeTypes();
       if (!response?.Success) return [] as unknown[];
-      const raw = response.Data as unknown;
-      const items = Array.isArray(raw)
-        ? raw
-        : (raw as { $values?: unknown[] })?.$values || [];
+      const items = normalizeCollection<unknown>(response.Data as unknown);
       return items;
     } catch (_e) {
       return [] as unknown[];

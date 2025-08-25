@@ -7,6 +7,7 @@ import Button from '@/components/common/Button';
 import type { Exercise } from '@/models/Exercise';
 import type { UserExerciseMax } from '@/models/UserExerciseMax';
 import { authService, userExerciseMaxService } from '@/services';
+import { normalizeCollection } from '@/utils';
 import ExercisePickerModal from '@/components/routineBuilder/ExercisePickerModal';
 import UserExerciseMaxModal from './UserExerciseMaxModal';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
@@ -67,13 +68,9 @@ const UserExerciseMaxScreen: React.FC = () => {
       if (exerciseId) body.ExerciseId = exerciseId;
       const resp =
         await userExerciseMaxService.findUserExerciseMaxesByFields(body);
-      let arr: UserExerciseMax[] = [];
-      if (resp?.Success && resp.Data) {
-        const raw = resp.Data as unknown;
-        arr = Array.isArray(raw)
-          ? (raw as UserExerciseMax[])
-          : (raw as { $values?: UserExerciseMax[] })?.$values || [];
-      }
+      const arr = resp?.Success
+        ? normalizeCollection<UserExerciseMax>(resp.Data as unknown)
+        : [];
       arr.sort((a: UserExerciseMax, b: UserExerciseMax) => {
         const ta = new Date(a.AchievedAt || a.CreatedAt).getTime();
         const tb = new Date(b.AchievedAt || b.CreatedAt).getTime();

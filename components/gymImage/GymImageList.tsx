@@ -5,19 +5,12 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { gymImageService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
 const GymImageList = React.memo(() => {
-  const isRecord = (v: unknown): v is Record<string, unknown> =>
-    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadGymImages = useCallback(async () => {
     const response = await gymImageService.getAllGymImages();
-    const raw = (response?.Data ?? []) as unknown;
-    let items: unknown[] = [];
-    if (Array.isArray(raw)) items = raw as unknown[];
-    else if (isRecord(raw)) {
-      const maybeValues = raw['$values'] as unknown;
-      if (Array.isArray(maybeValues)) items = maybeValues as unknown[];
-    }
+    const items = normalizeCollection<unknown>(response?.Data);
     return items;
   }, []);
 

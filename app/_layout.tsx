@@ -19,6 +19,8 @@ import {
 import 'react-native-reanimated';
 import { LogBox } from 'react-native';
 
+import { logger } from '@/utils';
+
 import { userSessionService } from '@/services/userSessionService';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import {
@@ -70,7 +72,7 @@ export default function RootLayout() {
     if (loaded) {
       setFontReady(true);
     } else if (error) {
-      console.warn(
+      logger.warn(
         'No se pudieron cargar las fuentes. Continuando sin pre-carga de íconos.',
         error
       );
@@ -181,7 +183,7 @@ function RootLayoutNav() {
         { seconds: secs },
         { settings }
       ).catch((err) => {
-        if (__DEV__) console.debug('Notif hydration schedule failed', err);
+        if (__DEV__) logger.debug('Notif hydration schedule failed', err);
       });
     }
     // Pausas activas
@@ -199,7 +201,7 @@ function RootLayoutNav() {
         { seconds: secs },
         { settings }
       ).catch((err) => {
-        if (__DEV__) console.debug('Notif activeBreak schedule failed', err);
+        if (__DEV__) logger.debug('Notif activeBreak schedule failed', err);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

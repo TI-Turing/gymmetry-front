@@ -300,24 +300,9 @@ function PhysicalAssessmentScreen() {
         await physicalAssessmentService.findPhysicalAssessmentsByFields(
           body as Record<string, unknown>
         );
-      let arr: unknown[] = [];
-      if (resp?.Success && resp.Data) {
-        const raw: unknown = resp.Data as unknown;
-        const isRecord = (v: unknown): v is Record<string, unknown> =>
-          v !== null && typeof v === 'object';
-        if (Array.isArray(raw)) {
-          arr = raw;
-        } else if (isRecord(raw)) {
-          const vals = (raw as Record<string, unknown>)['$values'];
-          if (Array.isArray(vals)) {
-            arr = vals as unknown[];
-          } else {
-            arr = [];
-          }
-        } else {
-          arr = [];
-        }
-      }
+      const arr: unknown[] = resp?.Success
+        ? (await import('@/utils')).normalizeCollection(resp.Data as unknown)
+        : [];
       setItems(arr as PhysicalAssessment[]);
     } catch {
       setError('No se pudieron cargar tus evaluaciones');

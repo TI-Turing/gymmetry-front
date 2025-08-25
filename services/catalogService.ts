@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import { Environment } from '@/environment';
 import { userSessionService } from './userSessionService';
 import {
   Gender,
@@ -9,6 +8,8 @@ import {
   EPS,
   DocumentType,
 } from '../dto/common';
+import { Environment } from '@/environment';
+import { logger } from '@/utils';
 
 class CatalogService {
   private catalogsAPI: AxiosInstance;
@@ -174,11 +175,12 @@ class CatalogService {
         const response = await this.catalogsAPI.get<Region[]>(
           `/regiones?paisId=${countryId}`
         );
-        console.log('Fetched regions:', response.data);
+        // Logging centralizado
+        logger.info('Fetched regions:', response.data);
         const regions = response.data || [];
         return this.sortByName(regions);
       } catch (error) {
-        console.error('Error fetching regions by country:', error);
+        logger.error('Error fetching regions by country:', error);
         throw error;
       }
     });

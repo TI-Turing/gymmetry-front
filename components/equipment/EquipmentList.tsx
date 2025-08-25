@@ -5,14 +5,14 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { equipmentService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
 const EquipmentList = React.memo(() => {
   const loadEquipment = useCallback(async () => {
     const response = await equipmentService.getAllEquipment();
-    const raw = (response as unknown as { Data?: unknown })?.Data;
-    const list: unknown[] = Array.isArray(raw)
-      ? raw
-      : (raw as { $values?: unknown[] })?.$values || [];
+    const list: unknown[] = normalizeCollection<unknown>(
+      (response as unknown as { Data?: unknown })?.Data
+    );
     return list;
   }, []);
 

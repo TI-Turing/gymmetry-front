@@ -4,6 +4,7 @@ import type { AnalyticsSummaryRequest, AnalyticsSummaryResponse } from '@/dto';
 import { dailyService } from './dailyService';
 import { routineDayService } from './routineDayService';
 import { authService } from './authService';
+import { normalizeCollection } from '@/utils';
 
 const base = '/analytics';
 
@@ -93,16 +94,9 @@ export const analyticsService = {
         EndDate: req.EndDate,
       };
       const dResp = await dailyService.findDailiesByFields(payload);
-      let dailies: unknown[] = [];
-      if (dResp?.Success && dResp.Data) {
-        const raw: unknown = dResp.Data as unknown;
-        if (Array.isArray(raw)) {
-          dailies = raw;
-        } else if (isRecord(raw)) {
-          const vals = (raw as Record<string, unknown>)['$values'];
-          if (Array.isArray(vals)) dailies = vals as unknown[];
-        }
-      }
+      const dailies: unknown[] = dResp?.Success
+        ? normalizeCollection<unknown>(dResp.Data as unknown)
+        : [];
 
       // Normalizar fecha sin horas y filtrar inclusivo
       const inRange = (iso: string) => {
@@ -177,16 +171,9 @@ export const analyticsService = {
         const rResp = await routineDayService.findRoutineDaysByFields({
           RoutineTemplateId: routineTemplateId,
         });
-        let rds: unknown[] = [];
-        if (rResp?.Success && rResp.Data) {
-          const raw: unknown = rResp.Data as unknown;
-          if (Array.isArray(raw)) {
-            rds = raw;
-          } else if (isRecord(raw)) {
-            const vals = (raw as Record<string, unknown>)['$values'];
-            if (Array.isArray(vals)) rds = vals as unknown[];
-          }
-        }
+        const rds: unknown[] = rResp?.Success
+          ? normalizeCollection<unknown>(rResp.Data as unknown)
+          : [];
         const set = new Set<number>();
         for (const r of rds) {
           const rr = isRecord(r) ? r : {};

@@ -70,7 +70,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 
 - Ruta ejercicio del día: abrir pantalla rutina, completar sets, finalizar → verifica creación de Daily (network) y limpieza de claves `@daily_start_*`.
 - Temporizador: crear ejercicio con reps tipo "30s por lado" → validar 2 ciclos y fase `PREPÁRATE`.
- - Comentarios: abrir lista de comentarios → verificar render seguro con campos faltantes/`unknown`, tags y conteos.
+- Comentarios: abrir lista de comentarios → verificar render seguro con campos faltantes/`unknown`, tags y conteos.
 
 ## 8. Anti‑Patrones a Evitar
 
@@ -84,18 +84,21 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 ## 9. Ejemplos Rápidos
 
 - Petición típica:
+
   ```ts
   const resp = await dailyService.addDaily(req);
   if (resp?.Success) {
     /* usar resp.Data */
   }
   ```
-  
+
   Con normalización de arrays:
+
   ```ts
   const resp = await employeeTypeService.findEmployeeTypesByFields({});
   const items = resp?.Success ? normalizeArray(resp.Data) : [];
   ```
+
 - Lectura reps guardadas:
   ```ts
   const key = `exercise_${id}_reps`;
@@ -115,6 +118,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Tests básicos pasando (`npm run test`).
 
 Notas:
+
 - Los reportes de cobertura se generan en `coverage/` (gitignored). Usa `npm run test:coverage` y abre `coverage/index.html` si necesitas revisar cobertura.
 
 Actualiza este documento si:

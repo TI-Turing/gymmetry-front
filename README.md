@@ -29,6 +29,7 @@ npm run validate       # Lint + format-check + type-check + test:ci
 ```
 
 Notas:
+
 - Los reportes HTML de cobertura se guardan en `coverage/` (gitignored). Abre `coverage/index.html` para verlos.
 - No edites manualmente `.env` raíz; usa los scripts `start:*` que ejecutan `env-loader.js`.
 
@@ -66,8 +67,8 @@ Los scripts preparan el archivo `.env` correcto antes de iniciar:
 ```json
 {
   "start:local": "npx cross-env NODE_ENV=local EXPO_PUBLIC_ENV=local node env-loader.js && expo start",
-  "start:dev":   "npx cross-env NODE_ENV=development EXPO_PUBLIC_ENV=development node env-loader.js && expo start",
-  "start:prod":  "npx cross-env NODE_ENV=production EXPO_PUBLIC_ENV=production node env-loader.js && expo start"
+  "start:dev": "npx cross-env NODE_ENV=development EXPO_PUBLIC_ENV=development node env-loader.js && expo start",
+  "start:prod": "npx cross-env NODE_ENV=production EXPO_PUBLIC_ENV=production node env-loader.js && expo start"
 }
 ```
 

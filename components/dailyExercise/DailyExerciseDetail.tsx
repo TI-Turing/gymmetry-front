@@ -6,6 +6,7 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Colors from '@/constants/Colors';
 import { dailyExerciseService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
 export function DailyExerciseDetail() {
   const [id, setId] = useState('');
@@ -45,13 +46,9 @@ export function DailyExerciseDetail() {
         const res = await dailyExerciseService.findDailyExercisesByFields({
           Name: query.trim(),
         } as Record<string, unknown>);
-        let arr: unknown[] = [];
-        if (res?.Success && res.Data) {
-          if (Array.isArray(res.Data)) arr = res.Data as unknown[];
-          else if ((res.Data as unknown as { $values?: unknown[] }).$values)
-            arr =
-              (res.Data as unknown as { $values?: unknown[] }).$values || [];
-        }
+        const arr = res?.Success
+          ? (normalizeCollection<unknown>(res.Data) as unknown[])
+          : [];
         setResults((arr as SearchItem[]) || []);
       } catch {
         setError('Error en la búsqueda');

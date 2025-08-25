@@ -5,24 +5,14 @@ import { routineTemplateService } from '@/services';
 import { RoutineTemplateSkeleton } from './RoutineTemplateSkeleton';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeRoutineTemplateStyles } from './styles.themed';
+import { normalizeCollection } from '@/utils';
 
 const RoutineTemplateList = React.memo(() => {
   const styles = useThemedStyles(makeRoutineTemplateStyles);
-  const isRecord = (v: unknown): v is Record<string, unknown> =>
-    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadRoutineTemplates = useCallback(async () => {
     const response = await routineTemplateService.getAllRoutineTemplates();
     const raw = (response?.Data ?? []) as unknown;
-    let items: unknown[] = [];
-    if (Array.isArray(raw)) items = raw as unknown[];
-    else if (
-      isRecord(raw) &&
-      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
-    ) {
-      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
-      items = (values ?? []) as unknown[];
-    }
-    return items;
+    return normalizeCollection<unknown>(raw);
   }, []);
 
   const renderRoutineTemplateItem = useCallback(

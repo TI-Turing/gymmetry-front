@@ -14,6 +14,7 @@ import { gymService } from '@/services/gymService';
 import { userService } from '@/services/userService';
 import Skeleton from '@/components/common/Skeleton';
 import Button from '@/components/common/Button';
+import { normalizeCollection } from '@/utils';
 
 export default function RoutineTemplateDetailScreen() {
   const params = useLocalSearchParams<{ templateId?: string }>();
@@ -101,19 +102,12 @@ export default function RoutineTemplateDetailScreen() {
         const res = await routineTemplateService.findRoutineTemplatesByFields({
           Name: search.trim(),
         } as unknown as { Name: string });
-        let arr: unknown[] = [];
-        if (res?.Success && res.Data) {
-          const raw: unknown = res.Data as unknown;
-          if (Array.isArray(raw)) arr = raw;
-          else if (
-            typeof raw === 'object' &&
-            raw &&
-            Array.isArray((raw as { $values?: unknown[] }).$values)
-          ) {
-            arr = (raw as { $values: unknown[] }).$values;
-          }
-        }
-        setSearchResults(arr as RoutineTemplate[]);
+        const arr = res?.Success
+          ? (normalizeCollection<RoutineTemplate>(
+              res.Data
+            ) as RoutineTemplate[])
+          : [];
+        setSearchResults(arr);
       } catch {
         // silencioso
       }

@@ -7,6 +7,7 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { RoutineDay } from '@/models/RoutineDay';
 import { routineDayService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
 function getWeekdayNameEs(dayNum: number) {
   const names = [
@@ -41,17 +42,9 @@ export default function RoutineTemplateDaysScreen() {
           DayNumber: dayNumber,
         };
         const resp = await routineDayService.findRoutineDaysByFields(body);
-        let extracted: unknown[] = [];
-        if (resp?.Success && resp?.Data) {
-          const raw: unknown = resp.Data as unknown;
-          if (Array.isArray(raw)) extracted = raw as unknown[];
-          else if (
-            typeof raw === 'object' &&
-            raw !== null &&
-            Array.isArray((raw as { $values?: unknown[] }).$values)
-          )
-            extracted = (raw as { $values: unknown[] }).$values;
-        }
+        const extracted: RoutineDay[] = resp?.Success
+          ? normalizeCollection<RoutineDay>(resp.Data)
+          : [];
         const filtered = (extracted as RoutineDay[]).filter(
           (d) =>
             Number(

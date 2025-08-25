@@ -5,14 +5,12 @@ import { planService } from '@/services';
 import { Plan } from '@/dto/plan/Plan';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makePlanStyles } from './styles';
+import { normalizeCollection } from '@/utils';
 
 const PlanList = React.memo(() => {
   const loadPlans = useCallback(async (): Promise<Plan[]> => {
     const response = await planService.getAllPlans();
-    const raw = response?.Data as unknown;
-    const list: unknown[] = Array.isArray(raw)
-      ? raw
-      : (raw as { $values?: unknown[] })?.$values || [];
+    const list: unknown[] = normalizeCollection<unknown>(response?.Data);
     // Normalizar planType/user a objetos predecibles con nombre en minúscula si vienen como unknown
     return (list as Plan[]).map((p) => {
       const pt = p?.planType as unknown;

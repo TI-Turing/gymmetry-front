@@ -1,3 +1,4 @@
+import { normalizeCollection } from '@/utils';
 import React, { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
@@ -16,9 +17,7 @@ const BranchServiceList = React.memo(() => {
       // Placeholder for actual service call
       const result = await servicePlaceholder();
       const raw = result as unknown;
-      const list: unknown[] = Array.isArray(raw)
-        ? raw
-        : (raw as { $values?: unknown[] })?.$values || [];
+      const list = normalizeCollection<unknown>(raw);
       return list;
     } catch (_error) {
       // Handle error silently or use proper error handling

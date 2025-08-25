@@ -1,6 +1,10 @@
-/* eslint-disable no-console */
 const path = require('path');
 const fs = require('fs');
+// Logger mínimo para entorno Node (evitar console directo en lint runtime RN)
+const log = {
+  warn: (msg) => process.stderr.write(String(msg) + '\n'),
+  error: (msg) => process.stderr.write(String(msg) + '\n'),
+};
 
 /**
  * Copies the appropriate .env file from environment folder to project root
@@ -63,21 +67,21 @@ function setupEnvironmentFile() {
 
       fs.writeFileSync(targetFile, envContent);
     } catch (err) {
-      console.error(`❌ Error copying environment file: ${err.message}`);
+      log.error(`❌ Error copying environment file: ${err.message}`);
     }
   } else {
-    console.warn(`⚠️ Environment file not found: ${sourceFile}`);
-    console.warn(`Available files in ${envPath}:`);
+    log.warn(`⚠️ Environment file not found: ${sourceFile}`);
+    log.warn(`Available files in ${envPath}:`);
 
     try {
       const files = fs.readdirSync(envPath);
       files
         .filter((f) => f.startsWith('.env'))
         .forEach((f) => {
-          console.warn(`  - ${f}`);
+          log.warn(`  - ${f}`);
         });
     } catch (err) {
-      console.warn(`Error reading environment directory: ${err.message}`);
+      log.warn(`Error reading environment directory: ${err.message}`);
     }
   }
 }

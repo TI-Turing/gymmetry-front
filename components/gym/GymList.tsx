@@ -4,19 +4,12 @@ import { EntityList } from '@/components/common';
 import { gymService } from '@/services';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeGymListStyles } from './styles/gymList';
+import { normalizeCollection } from '@/utils';
 
 const GymList = React.memo(() => {
-  const isRecord = (v: unknown): v is Record<string, unknown> =>
-    !!v && typeof v === 'object' && !Array.isArray(v);
   const loadGyms = useCallback(async () => {
     const response = await gymService.getAllGyms();
-    const raw = (response?.Data ?? []) as unknown;
-    let items: unknown[] = [];
-    if (Array.isArray(raw)) items = raw as unknown[];
-    else if (isRecord(raw)) {
-      const maybeValues = raw['$values'] as unknown;
-      if (Array.isArray(maybeValues)) items = maybeValues as unknown[];
-    }
+    const items = normalizeCollection<unknown>(response?.Data);
     return items;
   }, []);
 

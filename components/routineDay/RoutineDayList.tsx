@@ -5,25 +5,15 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { routineDayService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
-// Type guard util
-const isRecord = (v: unknown): v is Record<string, unknown> =>
-  !!v && typeof v === 'object' && !Array.isArray(v);
+// ...
 
 const RoutineDayList = React.memo(() => {
   const loadRoutineDays = useCallback(async () => {
     const response = await routineDayService.getAllRoutineDays();
     const raw = (response?.Data ?? []) as unknown;
-    let items: unknown[] = [];
-    if (Array.isArray(raw)) {
-      items = raw as unknown[];
-    } else if (
-      isRecord(raw) &&
-      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
-    ) {
-      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
-      items = (values ?? []) as unknown[];
-    }
+    const items = normalizeCollection<unknown>(raw);
     return items;
   }, []);
 

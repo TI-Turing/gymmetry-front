@@ -5,23 +5,15 @@ import { EntityList } from '@/components/common';
 import { Colors } from '@/constants';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import { routineexerciseService } from '@/services';
+import { normalizeCollection } from '@/utils';
 
-const isRecord = (v: unknown): v is Record<string, unknown> =>
-  !!v && typeof v === 'object' && !Array.isArray(v);
+// ...
 
 const RoutineExerciseList = React.memo(() => {
   const loadRoutineExercises = useCallback(async () => {
     const response = await routineexerciseService.getAllRoutineExercises();
     const raw = (response?.Data ?? []) as unknown;
-    let items: unknown[] = [];
-    if (Array.isArray(raw)) items = raw as unknown[];
-    else if (
-      isRecord(raw) &&
-      Array.isArray((raw as Record<string, unknown>)['$values'] as unknown[])
-    ) {
-      const values = (raw as Record<string, unknown>)['$values'] as unknown[];
-      items = (values ?? []) as unknown[];
-    }
+    const items = normalizeCollection<unknown>(raw);
     return items;
   }, []);
 
