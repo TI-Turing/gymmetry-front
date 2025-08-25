@@ -18,7 +18,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 
 - Iniciar dev: `npm run start:local` (carga `.env.local` vía `env-loader.js`).
 - Type check antes de PR: `npm run type-check` (strict, sin emitir). Mantener 0 errores.
-- Formato: `npm run format` / `format-check` (Prettier). No introducir estilo propio; extender siguiendo el existente.
+- Lint/format: `npm run lint:check` y `npm run format:check` (Prettier/ESLint estrictos, 0 warnings).
 - Cambiar entorno: usar scripts `start:dev`, `start:prod` (no cambies manualmente `.env`).
 - Añadir nueva entidad: (1) modelo en `models/`, (2) DTOs request/response en `dto/<Entity>/`, (3) servicio en `services/<entity>Service.ts` exportado por `services/index.ts`, (4) lista/pantallas usando patrón EntityList si aplica.
 
@@ -28,6 +28,14 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Servicios: métodos CRUD nombrados `add<Entity>`, `update<Entity>`, `delete<Entity>`, `get<Entity>ById`, `find<Entities>ByFields`; POST de búsquedas usa `/plural/find`. El metodo `find<Entities>ByFields` debe aceptar un objeto con los campos a buscar, se creo para poder filtrar por cualquier campo de esa entidad, en el body siempre debe ir el nombre del campo (iniciando con mayuscula) como llave y el valor de este como valor a filtrar, este siempre retornara un array de datos ya sea con uno o muchos valores.
 - Respuesta API unificada: interfaz `ApiResponse<T>` con campos `{ Success, Message, Data, StatusCode }`. Siempre verificar `resp?.Success` antes de acceder a `Data`.
 - Backends .NET pueden devolver arrays como objeto con `$values`; normalizar siempre si consumes colecciones.
+- Helper sugerido para normalizar arrays:
+  ```ts
+  const normalizeArray = (raw: unknown): unknown[] => {
+    const anyRaw = raw as any;
+    if (Array.isArray(anyRaw)) return anyRaw;
+    return anyRaw?.$values ?? [];
+  };
+  ```
 - Almacén local: usar claves con prefijo claro (`exercise_<Id>_progress`, `@daily_start_<templateId>_<dayNumber>`). Preferir `AsyncStorage` nativo; para web detectar `window.localStorage`.
 - Timer y ejercicios: lógica compleja en `components/routineDay/ExerciseModal.tsx` (fases on/off/prep, detección de tiempos tipo "30s", doble ciclo con "por lado/pierna/brazo"). Reutiliza helpers allí si amplías funcionalidad.
 - Finalización de rutina: creación de Daily y DailyExercise solo tras acción explícita (ver `RoutineDayScreen.tsx`: efecto dependiente de `routineFinishedMode`). No dispares por llegar a 100% automáticamente.
@@ -56,12 +64,13 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 3. Crea servicio siguiendo naming y exporta en `services/index.ts`.
 4. Implementa UI reutilizando patrones (EntityList, modales, botones `Button` propio, `ScreenWrapper`).
 5. Persiste estado granular en AsyncStorage solo si se necesita reanudación.
-6. Ejecuta `npm run type-check` y corrige.
+6. Ejecuta `npm run lint:check && npm run type-check && npm run test` y corrige.
 
 ## 7. Testing Manual Rápido
 
 - Ruta ejercicio del día: abrir pantalla rutina, completar sets, finalizar → verifica creación de Daily (network) y limpieza de claves `@daily_start_*`.
 - Temporizador: crear ejercicio con reps tipo "30s por lado" → validar 2 ciclos y fase `PREPÁRATE`.
+ - Comentarios: abrir lista de comentarios → verificar render seguro con campos faltantes/`unknown`, tags y conteos.
 
 ## 8. Anti‑Patrones a Evitar
 
@@ -69,6 +78,8 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - No llamar a servicios en cada render/entrada si depende de acción del usuario.
 - No introducir dependencias pesadas sin justificación (mantener footprint de Expo).
 - No usar `any` salvo envolturas de respuestas backend heterogéneas.
+- No usar `Alert` nativo; siempre `CustomAlert`.
+- No acceder a `resp.Data` sin chequear `resp?.Success` y normalizar `$values` cuando aplique.
 
 ## 9. Ejemplos Rápidos
 
@@ -78,6 +89,12 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
   if (resp?.Success) {
     /* usar resp.Data */
   }
+  ```
+  
+  Con normalización de arrays:
+  ```ts
+  const resp = await employeeTypeService.findEmployeeTypesByFields({});
+  const items = resp?.Success ? normalizeArray(resp.Data) : [];
   ```
 - Lectura reps guardadas:
   ```ts
@@ -94,6 +111,11 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 - Sin hardcodes de URLs/keys; usar config.
 - Limpieza de timers/intervalos en efectos.
 - Ajustes de color migrados a theme si tocaste UI.
+- Lint/format sin warnings (`npm run lint:check && npm run format:check`).
+- Tests básicos pasando (`npm run test`).
+
+Notas:
+- Los reportes de cobertura se generan en `coverage/` (gitignored). Usa `npm run test:coverage` y abre `coverage/index.html` si necesitas revisar cobertura.
 
 Actualiza este documento si:
 

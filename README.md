@@ -2,48 +2,35 @@
 
 Una aplicación móvil moderna construida con React Native y Expo, diseñada para gestión de usuarios y fitness con arquitectura robusta y tecnologías de vanguardia.
 
-## 🚀 Comandos de Desarrollo
-
-### Comandos Principales
+## 🚀 Guía Rápida
 
 ```bash
-# Instalar dependencias
+# 1) Instalar dependencias
 npm install
 
-# Iniciar servidor de desarrollo
-npm start
+# 2) Iniciar en entorno local (carga environment/.env.local)
+npm run start:local
 
-# Verificación de código
-npm run type-check      # Verificar tipos TypeScript
-npm run format         # Formatear código co### 📊 Métricas de Calidad
-
-- **Code Coverage**: Preparado para tests
-- **Type Safety**: 100% TypeScript coverage
-- **Error Rate**: 0 errores de compilación
-- **Build Time**: Optimizado
-- **Bundle Size**: Optimizado con tree-shaking
-- **Component Consistency**: 100% - EntityList pattern aplicado
-- **Architecture Quality**: Excelente - Patrón unificado en 57+ componentes
-- **Maintainability**: Alta - Código consistente y predecibleier
-npm run format-check   # Verificar formato sin cambios
-
-# Builds y deployment
-npm run build          # Build para producción
-npm run clean          # Limpiar caché de Metro
-npm run doctor         # Diagnóstico de Expo
+# 3) Elegir plataforma en el prompt (a, i, w) o usar:
+npm run android   # Android
+npm run ios       # iOS
+npm run web       # Web
 ```
 
-### Comandos por Plataforma
+### Verificación de calidad
 
 ```bash
-# Desarrollo
-npm run android        # Ejecutar en Android
-npm run ios           # Ejecutar en iOS
-npm run web           # Ejecutar en navegador
-
-# Builds nativos
-npm run prebuild      # Generar código nativo
+npm run lint           # Lint
+npm run format         # Formateo
+npm run type-check     # TypeScript (sin emitir)
+npm run test           # Tests (jest-expo)
+npm run test:coverage  # Tests con cobertura (genera carpeta coverage/)
+npm run validate       # Lint + format-check + type-check + test:ci
 ```
+
+Notas:
+- Los reportes HTML de cobertura se guardan en `coverage/` (gitignored). Abre `coverage/index.html` para verlos.
+- No edites manualmente `.env` raíz; usa los scripts `start:*` que ejecutan `env-loader.js`.
 
 ## ⚙️ Configuración del Entorno
 
@@ -72,17 +59,19 @@ EXPO_PUBLIC_DEBUG=true
 EXPO_PUBLIC_ENVIRONMENT=local
 ```
 
-### Configuración de Scripts NPM
+### Scripts de entorno
 
-El proyecto incluye scripts automatizados que configuran el entorno apropiado:
+Los scripts preparan el archivo `.env` correcto antes de iniciar:
 
 ```json
 {
-  "start:local": "cross-env NODE_ENV=local node env-loader.js && expo start",
-  "start:dev": "cross-env NODE_ENV=development node env-loader.js && expo start",
-  "start:prod": "cross-env NODE_ENV=production node env-loader.js && expo start"
+  "start:local": "npx cross-env NODE_ENV=local EXPO_PUBLIC_ENV=local node env-loader.js && expo start",
+  "start:dev":   "npx cross-env NODE_ENV=development EXPO_PUBLIC_ENV=development node env-loader.js && expo start",
+  "start:prod":  "npx cross-env NODE_ENV=production EXPO_PUBLIC_ENV=production node env-loader.js && expo start"
 }
 ```
+
+`env-loader.js` copia el `.env.<entorno>` desde `environment/` a la raíz y completa variables sin prefijo para compatibilidad con Node.
 
 ## 🔧 Tecnologías y Librerías
 
@@ -94,10 +83,10 @@ El proyecto incluye scripts automatizados que configuran el entorno apropiado:
 
 ### Desarrollo y Calidad de Código
 
-- **Prettier** - Formateo automático de código
-- **TypeScript Strict Mode** - Verificación de tipos estricta
-- **Metro Bundler** - Empaquetado optimizado
-- **Hot Reload** - Recarga automática en desarrollo
+- **ESLint + Prettier** - Reglas estrictas activas (sin `any`, imports no usados, hooks deps)
+- **TypeScript strict** - Tipado fuerte con chequeo en CI (`npm run type-check`)
+- **Jest (jest-expo)** - Soporte de tests y cobertura
+- **Metro Bundler** - Empaquetado optimizado con Expo
 
 ### Navegación y Routing
 
@@ -233,7 +222,7 @@ gymmetry-front/
 
 ## 🎯 Patrón EntityList - Arquitectura Unificada
 
-### � EntityList Pattern
+### 🧩 EntityList Pattern
 
 El proyecto implementa un **patrón arquitectónico unificado** para la gestión de listas, aplicado consistentemente en **57+ componentes**. Este patrón garantiza coherencia visual, mantenibilidad y escalabilidad.
 
@@ -385,12 +374,11 @@ El proyecto incluye generación automática de comandos cURL (compatible con Win
 
 ## 🛠️ Calidad de Código y Desarrollo
 
-### Estado Actual del Proyecto ✅
+### Estado Actual del Proyecto
 
-- **0 Errores TypeScript** - Código completamente tipado y sin errores
-- **Compilación Exitosa** - Build de producción funcionando
-- **Code Quality** - Prettier configurado y funcionando
-- **Testing Ready** - Estructura preparada para tests
+- TypeScript estricto, sin errores conocidos
+- Linter y formateo configurados y ejecutables
+- Tests básicos listos; cobertura opcional
 
 ### Configuración TypeScript Optimizada
 
@@ -405,18 +393,13 @@ El proyecto incluye generación automática de comandos cURL (compatible con Win
 }
 ```
 
-### Scripts de Desarrollo
+### Scripts útiles
 
 ```bash
-# Verificación de código
-npm run type-check        # TypeScript: 0 errores ✅
-npm run format           # Prettier formatting
-npm run format-check     # Verificar formato
-
-# Desarrollo y debugging
-npm run clean           # Limpiar cache Metro
-npm run doctor         # Expo health check
-npx expo start -c      # Desarrollo con cache limpio
+npm run format:check   # Verificar formato sin cambiar archivos
+npm run lint:check     # Lint con max-warnings=0
+npm run clean          # Limpiar caché de Metro
+npm run test:ci        # Tests en CI con cobertura
 ```
 
 ### Buenas Prácticas Implementadas
@@ -444,7 +427,7 @@ console.log('[API] Request:', requestData);
 console.log('[FORM] Validation:', errors);
 ```
 
-## � Configuración y Deployment
+## 🚢 Configuración y Deployment
 
 ### Variables de Entorno Requeridas
 
@@ -463,21 +446,9 @@ EXPO_PUBLIC_DEBUG=true
 EXPO_PUBLIC_ENVIRONMENT=development
 ```
 
-### Dependencias Actualizadas
+### Dependencias
 
-Ejecutar para mantener compatibilidad:
-
-```bash
-npx expo install --fix
-```
-
-Paquetes que pueden necesitar actualización:
-
-- `@react-native-async-storage/async-storage@2.1.2`
-- `@react-native-community/datetimepicker@8.4.1`
-- `lottie-react-native@7.2.2`
-- `react-native-svg@15.11.2`
-- `eslint-config-expo@~9.2.0`
+Usa `npm install` y sigue recomendaciones de `expo doctor`/`expo install` cuando sea necesario.
 
 ### Builds y Deployment
 
@@ -583,23 +554,17 @@ npx eas build --platform all
 - **Type checking** sin errores
 - **Build de producción** funcionando correctamente
 
-### 🚀 Estado Actual
+### 🚀 Estado Actual (resumen)
 
-- **Compilación**: ✅ Exitosa sin warnings
-- **TypeScript**: ✅ 0 errores de tipos
-- **Expo Server**: ✅ Funcionando (puerto 8083)
-- **Metro Bundler**: ✅ Optimizado y estable
-- **Componentes**: ✅ Todos funcionando correctamente
-- **EntityList Pattern**: ✅ 57+ componentes refactorizados
-- **Arquitectura Unificada**: ✅ Patrón consistente implementado
+- TS estricto y linter configurados
+- EntityList aplicado ampliamente
+- Tests básicos y cobertura disponibles
 
-### � Métricas de Calidad
+### 📊 Métricas de Calidad (indicativas)
 
-- **Code Coverage**: Preparado para tests
-- **Type Safety**: 100% TypeScript coverage
-- **Error Rate**: 0 errores de compilación
-- **Build Time**: Optimizado
-- **Bundle Size**: Optimizado con tree-shaking
+- Cobertura: generable con `npm run test:coverage` (revisar `coverage/`)
+- Tipado: verificación con `npm run type-check`
+- Formato/Lint: `npm run format:check` y `npm run lint:check`
 
 ### 🔄 Próximos Pasos Sugeridos
 
