@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ScrollView,
   TouchableOpacity,
@@ -14,21 +14,124 @@ import { useCustomAlert } from '@/components/common/CustomAlert';
 import SmartImage from '@/components/common/SmartImage';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeProfileStyles } from './styles/profile';
+import {
+  dailyHistoryService,
+  physicalAssessmentService,
+  userService,
+} from '@/services';
+import type { User } from '@/models/User';
+import type { PhysicalAssessment } from '@/models/PhysicalAssessment';
+import type { DailyHistory } from '@/models/DailyHistory';
+import { normalizeCollection } from '@/utils/objectUtils';
 
 function ProfileScreen() {
-  const { user, logout } = useAuth();
+  const { user: authUser, userData, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const styles = useThemedStyles(makeProfileStyles);
   const { showAlert, AlertComponent } = useCustomAlert();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<User | null>(null);
+  const [latestAssessment, setLatestAssessment] =
+    useState<PhysicalAssessment | null>(null);
+  const [dailyHistories, setDailyHistories] = useState<DailyHistory[]>([]);
 
-  const userStats = {
-    workouts: 156,
-    streak: 12,
-    weight: 75.2,
-    height: 175,
-    age: 28,
-    joinDate: 'Enero 2024',
+  const userId = userData?.id || authUser?.id || null;
+
+  useEffect(() => {
+    const load = async () => {
+      if (!userId) return;
+      setLoading(true);
+      setError(null);
+      try {
+        // Perfil básico
+        const u = await userService.getUserById(userId);
+        if (u?.Success && u.Data) setProfile(u.Data);
+
+        // Última valoración física
+        try {
+          const pa =
+            await physicalAssessmentService.findPhysicalAssessmentsByFields({
+              UserId: userId,
+            });
+          const list = pa?.Success
+            ? normalizeCollection<PhysicalAssessment>(pa.Data as unknown)
+            : [];
+          if (Array.isArray(list) && list.length > 0) {
+            // Ordenar por CreatedAt desc
+            const sorted = [...list].sort(
+              (a, b) =>
+                (Date.parse(b.CreatedAt || '') || 0) -
+                (Date.parse(a.CreatedAt || '') || 0)
+            );
+            setLatestAssessment(sorted[0]);
+          }
+        } catch {}
+
+        // Historial de dailies
+        try {
+          const dh = await dailyHistoryService.findDailyHistoriesByFields({
+            UserId: userId,
+          });
+          const list = dh?.Success
+            ? normalizeCollection<DailyHistory>(dh.Data as unknown)
+            : [];
+          setDailyHistories(Array.isArray(list) ? list : []);
+        } catch {}
+      } catch (e) {
+        setError('No se pudo cargar el perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [userId]);
+
+  const computeStreak = (items: DailyHistory[]): number => {
+    if (!items || items.length === 0) return 0;
+    const days = new Set(
+      items
+        .map((h) => h.EndDate || h.StartDate)
+        .filter(Boolean)
+        .map((iso) => new Date(iso as string).toDateString())
+    );
+    let streak = 0;
+    const d = new Date();
+    for (;;) {
+      const key = d.toDateString();
+      if (days.has(key)) {
+        streak += 1;
+        d.setDate(d.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
   };
+
+  const computedStats = useMemo(() => {
+    const workouts = dailyHistories.length;
+    const streak = computeStreak(dailyHistories);
+    const weight = latestAssessment?.Weight
+      ? Number(latestAssessment.Weight)
+      : null;
+    const height = latestAssessment?.Height
+      ? Number(latestAssessment.Height)
+      : null;
+    const birth = profile?.BirthDate ? new Date(profile.BirthDate) : null;
+    const age = birth
+      ? Math.floor(
+          (Date.now() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+        )
+      : null;
+    const joinDate = profile?.CreatedAt
+      ? new Date(profile.CreatedAt).toLocaleDateString('es-ES', {
+          month: 'long',
+          year: 'numeric',
+        })
+      : null;
+    return { workouts, streak, weight, height, age, joinDate };
+  }, [dailyHistories, latestAssessment, profile]);
 
   const achievements = [
     { icon: 'trophy', title: '100 Entrenamientos', color: styles.colors.tint },
@@ -64,7 +167,7 @@ function ProfileScreen() {
     <View style={styles.profileHeader}>
       <View style={styles.avatarContainer}>
         <SmartImage
-          uri={'https://via.placeholder.com/100'}
+          uri={profile?.ProfileImageUrl || 'https://via.placeholder.com/100'}
           style={styles.avatar}
           deferOnDataSaver={false}
         />
@@ -72,9 +175,15 @@ function ProfileScreen() {
           <FontAwesome name="camera" size={16} color={styles.colors.text} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.userName}>{user?.email || 'Usuario'}</Text>
-      <Text style={styles.userEmail}>{user?.email || 'email@ejemplo.com'}</Text>
-      <Text style={styles.joinDate}>Miembro desde {userStats.joinDate}</Text>
+      <Text style={styles.userName}>
+        {profile?.Name || profile?.UserName || authUser?.userName || 'Usuario'}
+      </Text>
+      <Text style={styles.userEmail}>{profile?.Email || authUser?.email}</Text>
+      {computedStats.joinDate ? (
+        <Text style={styles.joinDate}>
+          Miembro desde {computedStats.joinDate}
+        </Text>
+      ) : null}
     </View>
   );
 
@@ -83,19 +192,23 @@ function ProfileScreen() {
       <Text style={styles.statsTitle}>Estadísticas</Text>
       <View style={styles.statsGrid}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{userStats.workouts}</Text>
+          <Text style={styles.statValue}>{computedStats.workouts}</Text>
           <Text style={styles.statLabel}>Entrenamientos</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{userStats.streak}</Text>
+          <Text style={styles.statValue}>{computedStats.streak}</Text>
           <Text style={styles.statLabel}>Días seguidos</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{userStats.weight} kg</Text>
+          <Text style={styles.statValue}>
+            {computedStats.weight != null ? `${computedStats.weight} kg` : '-'}
+          </Text>
           <Text style={styles.statLabel}>Peso actual</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{userStats.height} cm</Text>
+          <Text style={styles.statValue}>
+            {computedStats.height != null ? `${computedStats.height} cm` : '-'}
+          </Text>
           <Text style={styles.statLabel}>Altura</Text>
         </View>
       </View>
@@ -158,6 +271,11 @@ function ProfileScreen() {
             />
           </TouchableOpacity>
         </View>
+        {loading ? (
+          <Text style={{ marginHorizontal: 20 }}>Cargando…</Text>
+        ) : error ? (
+          <Text style={{ marginHorizontal: 20, color: 'red' }}>{error}</Text>
+        ) : null}
 
         {renderProfileHeader()}
         {renderStatsCard()}
