@@ -174,76 +174,76 @@ export default function WebHeader({
       {/* Usuario y menú derecho */}
       {!hideUserSection && (
         <View style={styles.userContainer}>
-        <TouchableOpacity
-          style={styles.userButton}
-          onPress={handleUserMenuToggle}
-        >
-          {userAvatar ? (
-            <SmartImage
-              uri={userAvatar}
-              style={styles.userAvatar}
-              deferOnDataSaver={false}
-            />
-          ) : (
-            <View style={styles.defaultAvatar}>
-              <FontAwesome
-                name="user"
-                size={20}
-                color={Colors[theme].background}
+          <TouchableOpacity
+            style={styles.userButton}
+            onPress={handleUserMenuToggle}
+          >
+            {userAvatar ? (
+              <SmartImage
+                uri={userAvatar}
+                style={styles.userAvatar}
+                deferOnDataSaver={false}
               />
+            ) : (
+              <View style={styles.defaultAvatar}>
+                <FontAwesome
+                  name="user"
+                  size={20}
+                  color={Colors[theme].background}
+                />
+              </View>
+            )}
+            <Text style={styles.userName}>{userName}</Text>
+            <FontAwesome
+              name={showUserMenu ? 'chevron-up' : 'chevron-down'}
+              size={12}
+              style={styles.subtleIcon}
+            />
+          </TouchableOpacity>
+
+          {/* Menú desplegable */}
+          {showUserMenu && (
+            <View style={styles.userMenu}>
+              {userMenuOptions.map((option) => (
+                <TouchableOpacity
+                  key={option.key}
+                  style={[
+                    styles.menuOption,
+                    option.key === 'logout' && styles.logoutOption,
+                  ]}
+                  onPress={option.action}
+                >
+                  <FontAwesome
+                    name={
+                      option.icon as React.ComponentProps<
+                        typeof FontAwesome
+                      >['name']
+                    }
+                    size={14}
+                    style={[
+                      styles.menuIcon,
+                      option.key === 'logout'
+                        ? styles.logoutIcon
+                        : styles.subtleIcon,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.menuText,
+                      option.key === 'logout' && styles.logoutText,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           )}
-          <Text style={styles.userName}>{userName}</Text>
-          <FontAwesome
-            name={showUserMenu ? 'chevron-up' : 'chevron-down'}
-            size={12}
-            style={styles.subtleIcon}
-          />
-        </TouchableOpacity>
-
-        {/* Menú desplegable */}
-  {showUserMenu && (
-          <View style={styles.userMenu}>
-            {userMenuOptions.map((option) => (
-              <TouchableOpacity
-                key={option.key}
-                style={[
-                  styles.menuOption,
-                  option.key === 'logout' && styles.logoutOption,
-                ]}
-                onPress={option.action}
-              >
-                <FontAwesome
-                  name={
-                    option.icon as React.ComponentProps<
-                      typeof FontAwesome
-                    >['name']
-                  }
-                  size={14}
-                  style={[
-                    styles.menuIcon,
-                    option.key === 'logout'
-                      ? styles.logoutIcon
-                      : styles.subtleIcon,
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.menuText,
-                    option.key === 'logout' && styles.logoutText,
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </View>
+        </View>
       )}
 
       {/* Overlay para cerrar el menú */}
-  {!hideUserSection && showUserMenu && (
+      {!hideUserSection && showUserMenu && (
         <TouchableOpacity
           style={styles.overlay}
           onPress={() => setShowUserMenu(false)}

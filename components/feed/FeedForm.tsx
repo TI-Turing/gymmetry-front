@@ -5,9 +5,11 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { feedService } from '@/services';
-import { styles } from './styles';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import styles from './styles';
 
 export function FeedForm() {
+  const themed = useThemedStyles(styles);
   const [payload, setPayload] = useState<string>('{}');
   const [id, setId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -55,18 +57,18 @@ export function FeedForm() {
   };
 
   return (
-    <View style={styles.formContainer}>
-      <Text style={styles.formTitle}>Feed - Formulario</Text>
-      <Text style={styles.formLabel}>Campos (JSON)</Text>
+    <View style={themed.formContainer}>
+      <Text style={themed.formTitle}>Feed - Formulario</Text>
+      <Text style={themed.formLabel}>Campos (JSON)</Text>
       <TextInput
-        style={styles.textarea}
+        style={themed.textarea}
         value={payload}
         onChangeText={setPayload}
         multiline
         numberOfLines={8}
         placeholderTextColor="#666666"
       />
-      <View style={styles.formRow}>
+      <View style={themed.formRow}>
         <Button title="Crear" onPress={onAdd} />
         <Button title="Actualizar" onPress={onUpdate} />
       </View>
@@ -75,7 +77,7 @@ export function FeedForm() {
       {loading ? (
         <LoadingSpinner />
       ) : msg ? (
-        <Text style={styles.info}>{msg}</Text>
+        <Text style={themed.info}>{msg}</Text>
       ) : null}
     </View>
   );

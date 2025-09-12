@@ -14,7 +14,7 @@ interface Props {
 const RoutineAssignedCard: React.FC<Props> = ({ assignment, onPress }) => {
   const styles = useThemedStyles(makeRoutineAssignedCardStyles);
   const { t } = useI18n();
-  
+
   // Backend a veces devuelve la plantilla como "RoutineTemplate" (objeto) o como
   // colección "RoutineTemplates" (array). Fallback al primer elemento si existe.
   type ShortTpl = { Name: string; Premium?: boolean };

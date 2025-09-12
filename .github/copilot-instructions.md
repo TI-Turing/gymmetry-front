@@ -72,7 +72,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 5. Persiste estado granular en AsyncStorage solo si se necesita reanudación.
 6. (Temporal) Omite validaciones automáticas de lint/type-check/tests; enfócate en funcionalidad.
 7. Traduce textos estáticos a través de `useI18n`.
-8. Los estiulos nunca deben ir dentro del archivo del componente sino que en un archivo de estilos independientes.
+8. Los estiulos nunca deben ir dentro del archivo del componente sino que en un archivo de estilos independientes. Cada carpeta de compoenentes debe tener una carpeta llamada styles donde se encuentren los archivos de estilos de los componentes que esten en esa carpeta. Maneja un archivo de estilos por componente.
 9. Se deben manejar estilos para el modo oscuro y modo claro.
 10. Se deben utilizar constantes para los textos estáticos en lugar de hardcodearlos.
 11. Se deben utilizar hooks personalizados para lógica reutilizable.

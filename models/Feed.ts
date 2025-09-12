@@ -14,5 +14,7 @@ export interface Feed {
   Ip: string | null;
   IsActive: boolean;
   IsDeleted: boolean;
+  LikesCount?: number; // nuevo backend: contadores
+  CommentsCount?: number;
   User: User;
 }

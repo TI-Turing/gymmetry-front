@@ -12,6 +12,7 @@ export interface DailyExerciseHistory {
   Ip: string | null;
   IsActive: boolean;
   DailyHistoryId: string;
+  ExerciseId?: string; // nuevo en backend
   DailyHistory: DailyHistory;
   Exercises: Exercise[];
 }

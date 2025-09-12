@@ -4,9 +4,11 @@ import { Text, View } from '@/components/Themed';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { feedService } from '@/services';
-import { styles } from './styles';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import styles from './styles';
 
 export function FeedDetail() {
+  const themed = useThemedStyles(styles);
   const [id, setId] = useState('');
   const [item, setItem] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
@@ -26,18 +28,18 @@ export function FeedDetail() {
   };
 
   return (
-    <View style={styles.detailContainer}>
-      <Text style={styles.formTitle}>Feed - Detalle</Text>
+    <View style={themed.detailContainer}>
+      <Text style={themed.formTitle}>Feed - Detalle</Text>
       <FormInput label="Id" value={id} onChangeText={setId} />
       <Button title="Consultar" onPress={fetchOne} />
       {loading ? (
         <LoadingSpinner />
       ) : item ? (
-        <View style={styles.detailCard}>
-          <Text style={styles.detailText}>{JSON.stringify(item, null, 2)}</Text>
+        <View style={themed.detailCard}>
+          <Text style={themed.detailText}>{JSON.stringify(item, null, 2)}</Text>
         </View>
       ) : error ? (
-        <Text style={styles.error}>{error}</Text>
+        <Text style={themed.error}>{error}</Text>
       ) : null}
     </View>
   );

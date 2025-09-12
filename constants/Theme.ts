@@ -1,3 +1,13 @@
+// Tipo utilitario para el theme
+export type Theme = {
+  SPACING: typeof SPACING;
+  FONT_SIZES: typeof FONT_SIZES;
+  FONT_WEIGHTS: typeof FONT_WEIGHTS;
+  BORDER_RADIUS: typeof BORDER_RADIUS;
+  SHADOWS: typeof SHADOWS;
+  OPACITY: typeof OPACITY;
+  Z_INDEX: typeof Z_INDEX;
+};
 /**
  * Constantes de tema centralizadas para la aplicación
  */

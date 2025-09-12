@@ -106,6 +106,7 @@ export { logUninstallService } from './logUninstallService';
 
 // Servicios de comunicación
 export { signalRService } from './signalRService';
+export { progressReportService } from './progressReportService';
 
 // Servicios de utilidad y observadores
 export { gymDataWatcher } from './gymDataWatcher';

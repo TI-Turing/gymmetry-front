@@ -8,6 +8,7 @@ export interface DailyHistory {
   Id: string;
   StartDate: string;
   EndDate: string;
+  Percentage?: number; // nuevo en backend
   CreatedAt: string;
   UpdatedAt: string | null;
   DeletedAt: string | null;

@@ -121,3 +121,15 @@ export * from './Analytics/Response/AnalyticsSummaryResponse';
 // UserExerciseMax
 export * from './UserExerciseMax/Request/AddUserExerciseMaxRequest';
 export * from './UserExerciseMax/Request/UpdateUserExerciseMaxRequest';
+// Progress
+export * from './Progress';
+// BranchService
+export * from './BranchService/Request/AddBranchServiceRequest';
+export * from './BranchService/Request/UpdateBranchServiceRequest';
+export * from './BranchService/Response/BranchServiceResponse';
+// Payments
+export * from './Payments/Requests/CreateUserPlanPreferenceRequest';
+export * from './Payments/Requests/CreateGymPlanPreferenceRequest';
+export * from './Payments/Requests/CreateCardPaymentRequest';
+export * from './Payments/Responses/PaymentPreferenceResponse';
+export * from './Payments/Responses/PreferenceCreationResult';

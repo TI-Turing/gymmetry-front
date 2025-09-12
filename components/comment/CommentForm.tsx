@@ -19,8 +19,8 @@ export function CommentForm() {
     setLoading(true);
     setMsg(null);
     try {
-  const base = JSON.parse(payload || '{}');
-  const body = { IsAnonymous: settings.socialAnonymousMode, ...base };
+      const base = JSON.parse(payload || '{}');
+      const body = { IsAnonymous: settings.socialAnonymousMode, ...base };
       const res = await commentService.createComment(body);
       setMsg(res.Message || 'Creado');
     } catch {

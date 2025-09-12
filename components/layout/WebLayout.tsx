@@ -72,8 +72,8 @@ export default function WebLayout({
 
   return (
     <View style={styles.container}>
-  {/* Header */}
-  <WebHeader hideUserSection={activeTab === 'feed'} />
+      {/* Header */}
+      <WebHeader hideUserSection={activeTab === 'feed'} />
       <View style={styles.mainContent}>
         {/* Columna 1: Menú Vertical */}
         <View style={[styles.leftColumn, { width: leftColumnWidth }]}>
