@@ -387,9 +387,9 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
-      logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      console.log('CURL', __curl);
+      // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
+      // console.log('CURL', __curl);
       const response = await this.axiosInstance.get<BackendApiResponse<T>>(
         endpoint,
         {
@@ -421,9 +421,9 @@ class ApiService {
   ): Promise<BackendApiResponse<T>> {
     try {
       //Show curl
-      const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
-      logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      console.log('CURL', __curl);
+      // const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
+      // console.log('CURL', __curl);
       const response = await this.axiosInstance.post<BackendApiResponse<T>>(
         endpoint,
         body,

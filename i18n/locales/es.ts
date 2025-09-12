@@ -503,6 +503,88 @@ const es: Dict = {
   rule_false_info: 'No difundas información falsa o engañosa.',
   rule_report_abuse:
     'Reporta abusos; el equipo puede tomar medidas incluyendo suspensión.',
+
+  // Progress Dashboard
+  progress_dashboard_login_required:
+    'Debes iniciar sesión para ver tu progreso',
+  progress_dashboard_no_data: 'No hay datos de progreso disponibles.',
+  progress_dashboard_error_rendering:
+    'Error al mostrar el dashboard de progreso',
+  progress_dashboard_retry: 'Reintentar',
+  progress_dashboard_no_muscle_data: 'No hay datos de músculos disponibles',
+  progress_dashboard_period_label: 'Período:',
+  progress_dashboard_last_month: 'Último mes',
+  progress_dashboard_last_3_months: 'Últimos 3 meses',
+  progress_dashboard_last_6_months: 'Últimos 6 meses',
+  progress_dashboard_last_year: 'Último año',
+  progress_dashboard_last_2_years: 'Últimos 2 años',
+  progress_dashboard_custom: 'Personalizado',
+  progress_dashboard_select_period: 'Seleccionar Período',
+  progress_dashboard_custom_period: 'Período Personalizado',
+  progress_dashboard_start_date: 'Fecha de inicio:',
+  progress_dashboard_end_date: 'Fecha de fin:',
+  progress_dashboard_cancel: 'Cancelar',
+  progress_dashboard_apply: 'Aplicar',
+
+  // Physical Measures
+  progress_dashboard_recent_measures: 'Medidas físicas recientes',
+  progress_dashboard_height: 'Altura',
+  progress_dashboard_weight: 'Peso',
+  progress_dashboard_body_fat: '% Grasa',
+  progress_dashboard_waist: 'Cintura',
+  progress_dashboard_hip: 'Cadera',
+  progress_dashboard_chest: 'Pecho',
+  progress_dashboard_arm: 'Brazo',
+  progress_dashboard_leg: 'Pierna',
+  progress_dashboard_see_more: 'Ver más',
+  progress_dashboard_see_less: 'Ver menos',
+  progress_dashboard_see_history: 'Ver histórico',
+
+  // Summary Section
+  progress_dashboard_period_summary: '📊 Resumen del Período',
+  progress_dashboard_adherence: 'Adherencia',
+  progress_dashboard_current_streak: 'Racha Actual',
+  progress_dashboard_sessions: 'Sesiones',
+  progress_dashboard_exercises: 'Ejercicios',
+  progress_dashboard_weekly_progress: 'Progreso semanal',
+  progress_dashboard_days: 'días',
+
+  // Muscle Distribution
+  progress_dashboard_muscle_distribution: '💪 Distribución Muscular',
+  progress_dashboard_dominant_groups: 'Grupos dominantes:',
+
+  // Featured Exercises
+  progress_dashboard_featured_exercises: '🏋️‍♂️ Ejercicios Destacados',
+  progress_dashboard_most_practiced: 'Más practicados:',
+  progress_dashboard_total_series: 'Series totales',
+  progress_dashboard_repetitions: 'Repeticiones',
+  progress_dashboard_total_minutes: 'Minutos totales',
+
+  // Objectives
+  progress_dashboard_objectives: '🎯 Objetivos',
+
+  // Suggestions
+  progress_dashboard_suggestions: '💡 Sugerencias',
+  progress_dashboard_suggestion: 'Sugerencia',
+
+  // Discipline
+  progress_dashboard_discipline: '⏰ Disciplina',
+  progress_dashboard_consistency: 'Consistencia',
+  progress_dashboard_common_hour: 'Hora común',
+  progress_dashboard_regularity: 'Regularidad',
+
+  // Progress Tabs
+  progress_tabs_login_required: 'Debes iniciar sesión para ver tu progreso',
+  progress_tabs_loading: 'Cargando progreso...',
+  progress_tabs_error: 'Error:',
+  progress_tabs_no_data:
+    'No hay datos de progreso disponibles para este período',
+  progress_tabs_summary: 'Resumen',
+  progress_tabs_exercises: 'Ejercicios',
+  progress_tabs_objectives: 'Objetivos',
+  progress_tabs_muscles: 'Músculos',
+  progress_tabs_discipline: 'Disciplina',
+  progress_tabs_suggestions: 'Sugerencias',
 };
 
 export default es;

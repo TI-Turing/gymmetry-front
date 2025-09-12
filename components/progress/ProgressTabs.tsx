@@ -12,15 +12,16 @@ import ProgressSuggestionsTab from './ProgressSuggestionsTab';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { ProgressSummaryResponse } from '../../dto/Progress/ProgressSummaryResponse';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '../../i18n';
 import styles from './styles';
 
 const TABS = [
-  'Resumen',
-  'Ejercicios',
-  'Objetivos',
-  'Músculos',
-  'Disciplina',
-  'Sugerencias',
+  'summary',
+  'exercises',
+  'objectives',
+  'muscles',
+  'discipline',
+  'suggestions',
 ] as const;
 
 type TabKey = (typeof TABS)[number];
@@ -42,10 +43,11 @@ const getDefaultPeriod = () => {
 };
 
 export const ProgressTabs: React.FC = () => {
-  const [tab, setTab] = useState<TabKey>('Resumen');
+  const [tab, setTab] = useState<TabKey>('summary');
   const [periodIdx, setPeriodIdx] = useState(0); // Para seleccionar periodo
   const themed = useThemedStyles(styles);
   const { user } = useAuth();
+  const { t } = useI18n();
 
   // Usar el userId del usuario autenticado
   const req = useMemo(
@@ -73,7 +75,7 @@ export const ProgressTabs: React.FC = () => {
     return (
       <View style={themed.container}>
         <Text style={themed.errorText}>
-          Debes iniciar sesión para ver tu progreso
+          {t('progress_tabs_login_required')}
         </Text>
       </View>
     );
@@ -82,7 +84,7 @@ export const ProgressTabs: React.FC = () => {
   if (loading && periods.length === 0) {
     return (
       <View style={themed.container}>
-        <Text style={themed.loadingText}>Cargando progreso...</Text>
+        <Text style={themed.loadingText}>{t('progress_tabs_loading')}</Text>
       </View>
     );
   }
@@ -90,7 +92,9 @@ export const ProgressTabs: React.FC = () => {
   if (error) {
     return (
       <View style={themed.container}>
-        <Text style={themed.errorText}>Error: {error}</Text>
+        <Text style={themed.errorText}>
+          {t('progress_tabs_error')} {error}
+        </Text>
       </View>
     );
   }
@@ -98,9 +102,7 @@ export const ProgressTabs: React.FC = () => {
   if (!current && !loading) {
     return (
       <View style={themed.container}>
-        <Text style={themed.errorText}>
-          No hay datos de progreso disponibles para este período
-        </Text>
+        <Text style={themed.errorText}>{t('progress_tabs_no_data')}</Text>
       </View>
     );
   }
@@ -131,11 +133,16 @@ export const ProgressTabs: React.FC = () => {
         ))}
       </View>
       <ProgressTabBar
-        tabs={TABS}
-        selected={tab}
-        onSelect={(t: string) => setTab((t as TabKey) || 'Resumen')}
+        tabs={TABS.map((tabKey) => t(`progress_tabs_${tabKey}`))}
+        selected={t(`progress_tabs_${tab}`)}
+        onSelect={(selectedTab: string) => {
+          const tabIndex = TABS.findIndex(
+            (tabKey) => t(`progress_tabs_${tabKey}`) === selectedTab
+          );
+          if (tabIndex >= 0) setTab(TABS[tabIndex]);
+        }}
       />
-      {tab === 'Resumen' && (
+      {tab === 'summary' && (
         <ProgressSummaryTab
           data={current}
           loading={loading}
@@ -143,7 +150,7 @@ export const ProgressTabs: React.FC = () => {
           onRefresh={refetch}
         />
       )}
-      {tab === 'Ejercicios' && (
+      {tab === 'exercises' && (
         <ProgressExercisesTab
           data={current?.Exercises}
           loading={loading}
@@ -151,7 +158,7 @@ export const ProgressTabs: React.FC = () => {
           onRefresh={refetch}
         />
       )}
-      {tab === 'Objetivos' && (
+      {tab === 'objectives' && (
         <ProgressObjectivesTab
           data={current?.Objectives}
           loading={loading}
@@ -159,7 +166,7 @@ export const ProgressTabs: React.FC = () => {
           onRefresh={refetch}
         />
       )}
-      {tab === 'Músculos' && (
+      {tab === 'muscles' && (
         <ProgressMusclesTab
           data={current?.Muscles}
           loading={loading}
@@ -167,7 +174,7 @@ export const ProgressTabs: React.FC = () => {
           onRefresh={refetch}
         />
       )}
-      {tab === 'Disciplina' && (
+      {tab === 'discipline' && (
         <ProgressDisciplineTab
           data={current?.Discipline}
           loading={loading}
@@ -175,7 +182,7 @@ export const ProgressTabs: React.FC = () => {
           onRefresh={refetch}
         />
       )}
-      {tab === 'Sugerencias' && (
+      {tab === 'suggestions' && (
         <ProgressSuggestionsTab
           data={current?.Suggestions}
           loading={loading}

@@ -1,5 +1,5 @@
 import type { MultiProgressReportRequest } from '@/dto/Progress/MultiProgressReportRequest';
-import type { MultiProgressHistoryResponse, MultiProgressData } from '@/dto/Progress/MultiProgressHistoryResponse';
+import type { MultiProgressData } from '@/dto/Progress/MultiProgressHistoryResponse';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { progressReportService } from '@/services';
 import type { ProgressReportRequest, ProgressSummaryResponse } from '@/dto';
@@ -24,9 +24,10 @@ export function useMultiProgressSummary(
 
   // Usamos el tipo importado para múltiples períodos
   const getInitialData = () => {
-    const cached = queryCache.get<
-      import('@/dto/common/ApiResponse').ApiResponse<any>
-    >(key);
+    const cached =
+      queryCache.get<
+        import('@/dto/common/ApiResponse').ApiResponse<MultiProgressData>
+      >(key);
     return cached?.Data ?? undefined;
   };
   const [data, setData] = useState<MultiProgressData | undefined>(() => {
@@ -40,9 +41,10 @@ export function useMultiProgressSummary(
 
   useEffect(() => {
     const unsub = queryCache.subscribe(key, () => {
-      const cached = queryCache.get<
-        import('@/dto/common/ApiResponse').ApiResponse<any>
-      >(key);
+      const cached =
+        queryCache.get<
+          import('@/dto/common/ApiResponse').ApiResponse<MultiProgressData>
+        >(key);
       setData(cached?.Data ?? undefined);
     });
     return () => unsub();
@@ -58,7 +60,7 @@ export function useMultiProgressSummary(
       setLoading(true);
       setError(undefined);
       try {
-  const resp = await progressReportService.getMultiSummary(req, {
+        const resp = await progressReportService.getMultiSummary(req, {
           signal: controller.signal,
           retries: opts?.retries ?? DEFAULT_RETRIES,
           retryDelayMs: DEFAULT_RETRY_DELAY,

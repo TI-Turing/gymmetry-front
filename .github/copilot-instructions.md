@@ -83,6 +83,7 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
 16. Los componentes deben ser fácilmente reutilizables en diferentes partes de la aplicación.
 17. Los componentes deben ser accesibles, cumpliendo con las pautas de accesibilidad.
 18. Los componentes deben tener documentación clara y concisa.
+19. Cada componente debe manejar el componente del i18n para los textos estáticos. Nunca deben manejar textos hardcodeados.
 
 ## 7. Testing Manual Rápido
 

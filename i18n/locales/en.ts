@@ -494,6 +494,85 @@ const en: Dict = {
   rule_false_info: 'Do not spread false or misleading information.',
   rule_report_abuse:
     'Report abuse; the team may take actions including suspension.',
+
+  // Progress Dashboard
+  progress_dashboard_login_required: 'You must log in to view your progress',
+  progress_dashboard_no_data: 'No progress data available.',
+  progress_dashboard_error_rendering: 'Error displaying progress dashboard',
+  progress_dashboard_retry: 'Retry',
+  progress_dashboard_no_muscle_data: 'No muscle data available',
+  progress_dashboard_period_label: 'Period:',
+  progress_dashboard_last_month: 'Last month',
+  progress_dashboard_last_3_months: 'Last 3 months',
+  progress_dashboard_last_6_months: 'Last 6 months',
+  progress_dashboard_last_year: 'Last year',
+  progress_dashboard_last_2_years: 'Last 2 years',
+  progress_dashboard_custom: 'Custom',
+  progress_dashboard_select_period: 'Select Period',
+  progress_dashboard_custom_period: 'Custom Period',
+  progress_dashboard_start_date: 'Start date:',
+  progress_dashboard_end_date: 'End date:',
+  progress_dashboard_cancel: 'Cancel',
+  progress_dashboard_apply: 'Apply',
+
+  // Physical Measures
+  progress_dashboard_recent_measures: 'Recent physical measurements',
+  progress_dashboard_height: 'Height',
+  progress_dashboard_weight: 'Weight',
+  progress_dashboard_body_fat: '% Fat',
+  progress_dashboard_waist: 'Waist',
+  progress_dashboard_hip: 'Hip',
+  progress_dashboard_chest: 'Chest',
+  progress_dashboard_arm: 'Arm',
+  progress_dashboard_leg: 'Leg',
+  progress_dashboard_see_more: 'See more',
+  progress_dashboard_see_less: 'See less',
+  progress_dashboard_see_history: 'See history',
+
+  // Summary Section
+  progress_dashboard_period_summary: '📊 Period Summary',
+  progress_dashboard_adherence: 'Adherence',
+  progress_dashboard_current_streak: 'Current Streak',
+  progress_dashboard_sessions: 'Sessions',
+  progress_dashboard_exercises: 'Exercises',
+  progress_dashboard_weekly_progress: 'Weekly progress',
+  progress_dashboard_days: 'days',
+
+  // Muscle Distribution
+  progress_dashboard_muscle_distribution: '💪 Muscle Distribution',
+  progress_dashboard_dominant_groups: 'Dominant groups:',
+
+  // Featured Exercises
+  progress_dashboard_featured_exercises: '🏋️‍♂️ Featured Exercises',
+  progress_dashboard_most_practiced: 'Most practiced:',
+  progress_dashboard_total_series: 'Total series',
+  progress_dashboard_repetitions: 'Repetitions',
+  progress_dashboard_total_minutes: 'Total minutes',
+
+  // Objectives
+  progress_dashboard_objectives: '🎯 Objectives',
+
+  // Suggestions
+  progress_dashboard_suggestions: '💡 Suggestions',
+  progress_dashboard_suggestion: 'Suggestion',
+
+  // Discipline
+  progress_dashboard_discipline: '⏰ Discipline',
+  progress_dashboard_consistency: 'Consistency',
+  progress_dashboard_common_hour: 'Common hour',
+  progress_dashboard_regularity: 'Regularity',
+
+  // Progress Tabs
+  progress_tabs_login_required: 'You must log in to view your progress',
+  progress_tabs_loading: 'Loading progress...',
+  progress_tabs_error: 'Error:',
+  progress_tabs_no_data: 'No progress data available for this period',
+  progress_tabs_summary: 'Summary',
+  progress_tabs_exercises: 'Exercises',
+  progress_tabs_objectives: 'Objectives',
+  progress_tabs_muscles: 'Muscles',
+  progress_tabs_discipline: 'Discipline',
+  progress_tabs_suggestions: 'Suggestions',
 };
 
 export default en;
