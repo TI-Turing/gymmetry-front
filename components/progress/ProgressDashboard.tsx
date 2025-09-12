@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { ScrollView, View, Text, ActivityIndicator } from 'react-native';
-import { useMultiProgressSummary } from '../../hooks/useProgress';
+import { useProgressSummary } from '../../hooks/useProgress';
 import { ProgressSummaryResponse } from '../../dto/Progress/ProgressSummaryResponse';
 import { useColorScheme } from '../../components/useColorScheme';
 import { useAuth } from '../../contexts/AuthContext';
@@ -134,16 +134,15 @@ const ProgressDashboard: React.FC = () => {
         : 0
       : currentOption?.days;
 
-  const { data, loading, error } = useMultiProgressSummary({
+  const { data, loading, error } = useProgressSummary({
     UserId: user?.id || '',
-    Periods: [
-      {
-        From: from || '',
-        To: to || '',
-        Days: days || 0,
-      },
-    ],
-    IncludeHistory: false,
+    StartDate: from || '',
+    EndDate: to || '',
+    Timezone: undefined,
+    IncludeAssessments: true,
+    ComparePreviousPeriod: false,
+    MinCompletionForAdherence: 50,
+    TopExercises: 10,
   });
 
   // Defensive data validation
@@ -171,18 +170,17 @@ const ProgressDashboard: React.FC = () => {
     if (!safeRender || !data) return null;
 
     try {
-      const rawData = data as Record<string, unknown>;
-
-      // Normalize suggestions array if present
-      const suggestions = rawData.Suggestions
-        ? normalizeArray(rawData.Suggestions)
+      // data is already a ProgressSummaryResponse, just normalize suggestions if needed
+      const suggestions = data.Suggestions
+        ? normalizeArray(data.Suggestions).filter(
+            (s): s is string => typeof s === 'string'
+          )
         : [];
 
-      // Return normalized data structure
       return {
-        ...rawData,
+        ...data,
         Suggestions: suggestions,
-      } as ProgressSummaryResponse;
+      };
     } catch {
       return null;
     }
