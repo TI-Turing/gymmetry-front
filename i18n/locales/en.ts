@@ -556,6 +556,11 @@ const en: Dict = {
   progress_dashboard_suggestions: '💡 Suggestions',
   progress_dashboard_suggestion: 'Suggestion',
 
+  // Personal Records
+  progress_dashboard_personal_records: '🏆 Personal Records',
+  progress_dashboard_no_personal_records:
+    'No personal records registered in this period.',
+
   // Discipline
   progress_dashboard_discipline: '⏰ Discipline',
   progress_dashboard_consistency: 'Consistency',

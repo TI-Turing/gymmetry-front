@@ -75,6 +75,7 @@ export interface ExerciseBlock {
   TotalReps: number;
   MissingPlanned: MissingPlannedItem[];
   NewExercises: ExerciseFreq[];
+  PersonalRecords: PersonalRecordItem[];
 }
 export interface ExerciseFreq {
   ExerciseId: string;
@@ -137,4 +138,11 @@ export interface DisciplineBlock {
   ConsistencyIndex: number;
   CommonStartHour?: string | null;
   ScheduleRegularity: number;
+}
+
+export interface PersonalRecordItem {
+  ExerciseId: string;
+  ExerciseName: string;
+  WeightKg: number;
+  AchievedAt: string;
 }

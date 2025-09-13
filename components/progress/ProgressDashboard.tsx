@@ -1,7 +1,10 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { ScrollView, View, Text, ActivityIndicator } from 'react-native';
 import { useProgressSummary } from '../../hooks/useProgress';
-import { ProgressSummaryResponse } from '../../dto/Progress/ProgressSummaryResponse';
+import {
+  ProgressSummaryResponse,
+  PersonalRecordItem,
+} from '../../dto/Progress/ProgressSummaryResponse';
 import { useColorScheme } from '../../components/useColorScheme';
 import { useAuth } from '../../contexts/AuthContext';
 import { useI18n } from '../../i18n';
@@ -20,6 +23,7 @@ import Objectives from './sections/Objectives';
 import Suggestions from './sections/Suggestions';
 import Discipline from './sections/Discipline';
 import NoData from './sections/NoData';
+import PersonalRecords from './sections/PersonalRecords';
 
 type PeriodType =
   | 'month'
@@ -134,16 +138,22 @@ const ProgressDashboard: React.FC = () => {
         : 0
       : currentOption?.days;
 
-  const { data, loading, error } = useProgressSummary({
-    UserId: user?.id || '',
-    StartDate: from || '',
-    EndDate: to || '',
-    Timezone: undefined,
-    IncludeAssessments: true,
-    ComparePreviousPeriod: false,
-    MinCompletionForAdherence: 50,
-    TopExercises: 10,
-  });
+  // Memoizar la request para evitar recreaciones infinitas
+  const progressRequest = useMemo(
+    () => ({
+      UserId: user?.id || '',
+      StartDate: from || '',
+      EndDate: to || '',
+      Timezone: undefined,
+      IncludeAssessments: true,
+      ComparePreviousPeriod: false,
+      MinCompletionForAdherence: 50,
+      TopExercises: 10,
+    }),
+    [user?.id, from, to]
+  );
+
+  const { data, loading, error } = useProgressSummary(progressRequest);
 
   // Defensive data validation
   const safeRender = useMemo(() => {
@@ -326,7 +336,6 @@ const ProgressDashboard: React.FC = () => {
         label={currentOption?.label || t('progress_dashboard_select_period')}
         onPress={() => setShowPeriodModal(true)}
       />
-
       {current.Assessments?.Latest && (
         <MeasuresCard
           latest={current.Assessments.Latest}
@@ -335,7 +344,6 @@ const ProgressDashboard: React.FC = () => {
           onShowHistory={() => setShowHistoryModal(true)}
         />
       )}
-
       {/* Debug info - temporary */}
       {__DEV__ && (
         <View
@@ -392,7 +400,6 @@ const ProgressDashboard: React.FC = () => {
           </Text>
         </View>
       )}
-
       {/* KPIs principales */}
       <View
         style={{
@@ -439,30 +446,60 @@ const ProgressDashboard: React.FC = () => {
           total={current?.Adherence?.TargetDays || 0}
         />
       </View>
-
       {current.Muscles?.Distribution && (
         <MuscleDistribution
           distribution={current.Muscles.Distribution}
           dominant={current.Muscles.Dominant}
         />
       )}
-
       <FeaturedExercises
         topExercises={current.Exercises?.TopExercises || []}
         totalSeries={current.Exercises?.TotalSeries || 0}
         totalReps={current.Exercises?.TotalReps || 0}
         totalMinutes={current.Time?.TotalMinutes || 0}
       />
+      {(() => {
+        // Helper para normalizar arrays que pueden venir con $values
+        const normalizeArray = (raw: unknown): unknown[] => {
+          try {
+            const anyRaw = raw as Record<string, unknown> & {
+              $values?: unknown[];
+            };
+            if (Array.isArray(anyRaw)) return anyRaw;
+            return anyRaw?.$values ?? [];
+          } catch {
+            return [];
+          }
+        };
 
+        const normalizedRecords = current.Exercises?.PersonalRecords
+          ? normalizeArray(current.Exercises.PersonalRecords)
+          : [];
+
+        // eslint-disable-next-line no-console
+        console.log('🏆 PersonalRecords Debug:', {
+          hasExercises: !!current.Exercises,
+          rawPersonalRecords: current.Exercises?.PersonalRecords,
+          normalizedRecords,
+          normalizedLength: normalizedRecords.length,
+        });
+
+        if (normalizedRecords.length > 0) {
+          return (
+            <PersonalRecords
+              personalRecords={normalizedRecords as PersonalRecordItem[]}
+            />
+          );
+        }
+        return null;
+      })()}
       {current.Objectives?.Planned && current.Objectives?.Executed && (
         <Objectives
           planned={current.Objectives.Planned}
           executed={current.Objectives.Executed}
         />
       )}
-
       <Suggestions suggestions={current.Suggestions || []} />
-
       {current.Discipline && (
         <Discipline
           consistencyIndex={current.Discipline.ConsistencyIndex || 0}
@@ -472,7 +509,6 @@ const ProgressDashboard: React.FC = () => {
           )}
         />
       )}
-
       {/* Modales refactorizados */}
       <PeriodModal
         visible={showPeriodModal}
@@ -484,7 +520,6 @@ const ProgressDashboard: React.FC = () => {
         }}
         onClose={() => setShowPeriodModal(false)}
       />
-
       <CustomPeriodModal
         visible={showCustomModal}
         customFrom={customFrom}

@@ -27,6 +27,8 @@ export default (theme: 'light' | 'dark') =>
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: SPACING.md,
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
     },
     title: {
       fontSize: FONT_SIZES.lg,
@@ -205,5 +207,58 @@ export default (theme: 'light' | 'dark') =>
       fontSize: FONT_SIZES.md,
       color: '#888888',
       textAlign: 'center',
+    },
+    feedHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
+      backgroundColor:
+        theme === 'dark' ? Colors.dark.background : Colors.light.background,
+      borderBottomWidth: 1,
+      borderBottomColor: theme === 'dark' ? '#333' : '#f0f0f0',
+    },
+    actionsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: SPACING.md,
+      paddingTop: SPACING.sm,
+      borderTopWidth: 1,
+      borderTopColor: theme === 'dark' ? '#333' : '#f0f0f0',
+      gap: SPACING.sm,
+    },
+    headerTitle: {
+      fontSize: FONT_SIZES.xl,
+      fontWeight: '700',
+      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
+      flex: 1,
+    },
+    list: {
+      flex: 1,
+    },
+    listContent: {
+      paddingVertical: SPACING.md,
+      paddingHorizontal: SPACING.sm,
+    },
+    retryButton: {
+      color: Colors.dark.tint,
+      fontSize: FONT_SIZES.md,
+      fontWeight: '600',
+      textAlign: 'center',
+      marginTop: SPACING.md,
+      textDecorationLine: 'underline',
+    },
+    emptyText: {
+      fontSize: FONT_SIZES.md,
+      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
+      textAlign: 'center',
+      marginBottom: SPACING.lg,
+    },
+    listContainer: {
+      paddingBottom: SPACING.xl,
+    },
+    separator: {
+      height: SPACING.sm,
     },
   });

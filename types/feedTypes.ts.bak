@@ -1,0 +1,174 @@
+// Tipos unificados para el mdulo feed/social
+import type { Feed } from '@/models/Feed';
+import type { Post } from '@/models/Post';
+
+// Interfaz base para items del feed social
+export interface FeedItemBase {
+  id: string;
+  title?: string;
+  content?: string;
+  mediaUrl?: string;
+  mediaType?: string;
+  isPublic?: boolean;
+  authorName?: string;
+  authorAvatar?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  likesCount?: number;
+  commentsCount?: number;
+  sharesCount?: number;
+  tags?: string;
+  // Informacin del autor completa
+  author?: {
+    id: string;
+    name: string;
+    avatar?: string;
+    username?: string;
+  };
+}
+
+// Extender para diferentes tipos de contenido
+export interface FeedItem extends FeedItemBase {
+  type: 'feed' | 'post';
+}
+
+export interface PostItem extends FeedItemBase {
+  type: 'post';
+  content: string; // Required for posts
+}
+
+export interface SocialFeedItem extends FeedItemBase {
+  type: 'feed';
+  title: string; // Required for feeds
+}
+
+// Funcin para mapear Feed del backend a FeedItem unificado
+export const mapFeedToFeedItem = (feed: Feed): FeedItem => {
+  const fullName = [feed.User?.Name, feed.User?.LastName]
+    .filter(Boolean)
+    .join(' ');
+  const authorName =
+    fullName || feed.User?.UserName || feed.User?.Email || 'Usuario annimo';
+
+  return {
+    type: 'feed',
+    id: feed.Id,
+    title: feed.Title,
+    content: feed.Description || undefined,
+    mediaUrl: feed.MediaUrl || undefined,
+    mediaType: feed.MediaType || undefined,
+    isPublic: feed.IsActive && !feed.IsDeleted,
+    authorName,
+    authorAvatar: feed.User?.ProfileImageUrl || undefined,
+    createdAt: feed.CreatedAt,
+    updatedAt: feed.UpdatedAt || undefined,
+    likesCount: feed.LikesCount,
+    commentsCount: feed.CommentsCount,
+    sharesCount: 0, // No hay sharesCount en el modelo Feed
+    tags: feed.MediaType || undefined,
+    author: {
+      id: feed.UserId,
+      name: authorName,
+      avatar: feed.User?.ProfileImageUrl || undefined,
+      username: feed.User?.UserName || undefined,
+    },
+  };
+};
+
+// Funcin para mapear Post del backend a FeedItem unificado
+export const mapPostToFeedItem = (post: Post): FeedItem => {
+  const fullName = [post.User?.Name, post.User?.LastName]
+    .filter(Boolean)
+    .join(' ');
+  const authorName =
+    fullName || post.User?.UserName || post.User?.Email || 'Usuario annimo';
+
+  return {
+    type: 'post',
+    id: post.Id,
+    title: undefined, // Posts no tienen ttulo
+    content: post.Content,
+    mediaUrl: post.MediaUrl || undefined,
+    mediaType: post.MediaType || undefined,
+    isPublic: post.IsActive && !post.IsDeleted,
+    authorName,
+    authorAvatar: post.User?.ProfileImageUrl || undefined,
+    createdAt: post.CreatedAt,
+    updatedAt: post.UpdatedAt || undefined,
+    likesCount: post.Likes?.length || 0,
+    commentsCount: post.Comments?.length || 0,
+    sharesCount: 0, // No hay sharesCount en el modelo Post
+    tags: post.MediaType || undefined,
+    author: {
+      id: post.UserId,
+      name: authorName,
+      avatar: post.User?.ProfileImageUrl || undefined,
+      username: post.User?.UserName || undefined,
+    },
+  };
+};
+
+// Funcin genrica para mapear cualquier tipo de contenido
+export const mapToFeedItem = (item: Feed | Post): FeedItem => {
+  // Detectar tipo por propiedades presentes
+  if ('Title' in item) {
+    return mapFeedToFeedItem(item as Feed);
+  } else {
+    return mapPostToFeedItem(item as Post);
+  }
+};
+
+// Tipos para props de componentes
+export interface FeedListProps {
+  items: FeedItem[];
+  loading: boolean;
+  error?: string;
+  refetch: () => void;
+  onItemPress?: (item: FeedItem) => void;
+  onLike?: (itemId: string) => void;
+  onComment?: (itemId: string) => void;
+  onShare?: (itemId: string) => void;
+}
+
+export interface PostCardProps {
+  item: FeedItem;
+  onPress?: () => void;
+  onLike?: () => void;
+  onComment?: () => void;
+  onShare?: () => void;
+  showActions?: boolean;
+}
+
+// Estados de carga y error para hooks
+export interface FeedHookState<T> {
+  data: T;
+  loading: boolean;
+  error?: string;
+  refetch: () => void;
+}
+
+// Tipos para bsqueda y filtros
+export interface FeedSearchParams {
+  query?: string;
+  authorId?: string;
+  mediaType?: string;
+  tags?: string[];
+  startDate?: string;
+  endDate?: string;
+  isPublic?: boolean;
+}
+
+// Tipo para paginacin
+export interface FeedPagination {
+  page: number;
+  size: number;
+  total?: number;
+  hasMore?: boolean;
+}
+
+export interface PaginatedFeedData {
+  items: FeedItem[];
+  pagination: FeedPagination;
+}
+
+

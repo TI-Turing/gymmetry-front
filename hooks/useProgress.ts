@@ -37,7 +37,24 @@ export function useMultiProgressSummary(
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+  const [failureCount, setFailureCount] = useState<number>(0);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Circuit breaker: después de 3 fallos consecutivos, esperar 5 minutos
+  const isCircuitOpen = failureCount >= 3;
+  const circuitCooldownMs = 5 * 60 * 1000; // 5 minutos
+
+  // Auto-reset del circuit breaker después del cooldown
+  useEffect(() => {
+    if (isCircuitOpen && failureCount >= 3) {
+      const timer = setTimeout(() => {
+        setFailureCount(0);
+      }, circuitCooldownMs);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isCircuitOpen, failureCount, circuitCooldownMs]);
 
   useEffect(() => {
     const unsub = queryCache.subscribe(key, () => {
@@ -52,6 +69,17 @@ export function useMultiProgressSummary(
 
   useEffect(() => {
     if (!enabled) return;
+
+    // Circuit breaker: si hay muchos fallos, no hacer más requests
+    if (isCircuitOpen) {
+      setError(
+        `Servicio temporalmente no disponible. Reintentando en ${Math.ceil(
+          circuitCooldownMs / 60000
+        )} minutos.`
+      );
+      return;
+    }
+
     let mounted = true;
     const controller = new AbortController();
     abortRef.current?.abort();
@@ -62,20 +90,24 @@ export function useMultiProgressSummary(
       try {
         const resp = await progressReportService.getMultiSummary(req, {
           signal: controller.signal,
-          retries: opts?.retries ?? DEFAULT_RETRIES,
+          retries: Math.min(opts?.retries ?? DEFAULT_RETRIES, 1), // Máximo 1 reintento
           retryDelayMs: DEFAULT_RETRY_DELAY,
         });
         if (!mounted) return;
         if (resp?.Success && resp.Data) {
           queryCache.set(key, resp, opts?.cacheTtlMs ?? 60_000);
           setData(resp.Data); // resp.Data ya tiene la estructura correcta
+          // Resetear contador de fallos en caso de éxito
+          setFailureCount(0);
         } else {
+          setFailureCount((prev) => prev + 1);
           setError(resp?.Message || 'No se pudo cargar el resumen multi');
         }
       } catch (e) {
         if (!mounted) return;
         const err = e as { name?: string; message?: string };
         if (err?.name === 'CanceledError') return;
+        setFailureCount((prev) => prev + 1);
         setError(err?.message || 'Error de red');
       } finally {
         if (mounted) setLoading(false);
@@ -87,7 +119,15 @@ export function useMultiProgressSummary(
       controller.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, enabled, opts?.cacheTtlMs, opts?.retries, reqKey]);
+  }, [
+    key,
+    enabled,
+    opts?.cacheTtlMs,
+    opts?.retries,
+    reqKey,
+    isCircuitOpen,
+    circuitCooldownMs,
+  ]);
 
   const refetch = () => queryCache.invalidate(key);
 
@@ -137,17 +177,36 @@ export function useProgressSummary(
   opts?: { enabled?: boolean; cacheTtlMs?: number; retries?: number }
 ) {
   const enabled = opts?.enabled ?? true;
+
+  const req = useMemo(() => buildRequest(reqPartial), [reqPartial]);
+
   const key = useMemo(() => {
-    const req = buildRequest(reqPartial);
     return `progress_summary_${req.UserId}_${req.StartDate}_${req.EndDate}_${req.Timezone}`;
-  }, [reqPartial]);
+  }, [req]);
 
   const [data, setData] = useState<ProgressSummaryResponse | undefined>(() =>
     queryCache.get<ProgressSummaryResponse>(key)
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+  const [failureCount, setFailureCount] = useState<number>(0);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Circuit breaker: después de 3 fallos consecutivos, esperar 5 minutos
+  const isCircuitOpen = failureCount >= 3;
+  const circuitCooldownMs = 5 * 60 * 1000; // 5 minutos
+
+  // Auto-reset del circuit breaker después del cooldown
+  useEffect(() => {
+    if (isCircuitOpen && failureCount >= 3) {
+      const timer = setTimeout(() => {
+        setFailureCount(0);
+      }, circuitCooldownMs);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isCircuitOpen, failureCount, circuitCooldownMs]);
 
   useEffect(() => {
     const unsub = queryCache.subscribe(key, () => {
@@ -158,6 +217,17 @@ export function useProgressSummary(
 
   useEffect(() => {
     if (!enabled) return;
+
+    // Circuit breaker: si hay muchos fallos, no hacer más requests
+    if (isCircuitOpen) {
+      setError(
+        `Servicio temporalmente no disponible. Reintentando en ${Math.ceil(
+          circuitCooldownMs / 60000
+        )} minutos.`
+      );
+      return;
+    }
+
     let mounted = true;
     const controller = new AbortController();
     abortRef.current?.abort();
@@ -165,12 +235,11 @@ export function useProgressSummary(
     const exec = async () => {
       setLoading(true);
       setError(undefined);
-      const req = buildRequest(reqPartial);
       try {
         const resp: ApiResponse<ProgressSummaryResponse> =
           await progressReportService.getSummary(req, {
             signal: controller.signal,
-            retries: opts?.retries ?? DEFAULT_RETRIES,
+            retries: Math.min(opts?.retries ?? DEFAULT_RETRIES, 1), // Máximo 1 reintento
             retryDelayMs: DEFAULT_RETRY_DELAY,
           });
         if (!mounted) return;
@@ -178,13 +247,17 @@ export function useProgressSummary(
           const data = resp.Data;
           queryCache.set(key, data, opts?.cacheTtlMs ?? 60_000);
           setData(data);
+          // Resetear contador de fallos en caso de éxito
+          setFailureCount(0);
         } else {
+          setFailureCount((prev) => prev + 1);
           setError(resp?.Message || 'No se pudo cargar el resumen');
         }
       } catch (e) {
         if (!mounted) return;
         const err = e as { name?: string; message?: string };
         if (err?.name === 'CanceledError') return;
+        setFailureCount((prev) => prev + 1);
         setError(err?.message || 'Error de red');
       } finally {
         if (mounted) setLoading(false);
@@ -195,7 +268,16 @@ export function useProgressSummary(
       mounted = false;
       controller.abort();
     };
-  }, [key, enabled, opts?.cacheTtlMs, opts?.retries, reqPartial]);
+  }, [
+    key,
+    enabled,
+    opts?.cacheTtlMs,
+    opts?.retries,
+    req,
+    isCircuitOpen,
+    circuitCooldownMs,
+    failureCount,
+  ]);
 
   const refetch = () => queryCache.invalidate(key);
 

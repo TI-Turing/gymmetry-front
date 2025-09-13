@@ -62,55 +62,67 @@ const FeedList: React.FC<FeedListProps> = React.memo(
 
     if (loading) {
       return (
-        <View style={themed.container}>
-          <Text style={themed.loadingText}>Cargando...</Text>
+        <View style={themed.loadingContainer}>
+          <Text style={themed.loadingText}>Cargando feed...</Text>
         </View>
       );
     }
 
     if (error) {
       return (
-        <View style={themed.container}>
-          <Text style={themed.errorText}>Error: {error}</Text>
-          {refetch && (
-            <Text style={themed.retryButton} onPress={refetch}>
-              Reintentar
-            </Text>
-          )}
+        <View style={themed.errorContainer}>
+          <Text style={themed.errorText}>{error}</Text>
+          <Text style={themed.retryText} onPress={refetch}>
+            Reintentar
+          </Text>
         </View>
       );
     }
 
     if (!items || items.length === 0) {
       return (
-        <View style={themed.container}>
-          <Text style={themed.emptyText}>No hay publicaciones disponibles</Text>
-          <MediaUploadButton
-            onMediaUploaded={refetch ? () => refetch() : undefined}
-          />
+        <View style={themed.emptyContainer}>
+          <Text style={themed.emptyTitle}>No hay publicaciones</Text>
+          <Text style={themed.emptyMessage}>
+            Sé el primero en compartir algo interesante
+          </Text>
         </View>
       );
     }
 
     return (
-      <View style={themed.container}>
-        <FlatList
-          data={items}
-          renderItem={renderFeedItem}
-          keyExtractor={keyExtractor}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={themed.listContainer}
-          ItemSeparatorComponent={() => <View style={themed.separator} />}
-        />
+      <>
+        <View style={themed.container}>
+          <View style={themed.header}>
+            <Text style={themed.headerTitle}>Feed</Text>
+            <MediaUploadButton
+              onMediaUploaded={(files) => {
+                // TODO: Integrar con crear post después de subir media
+                void files;
+                // Refrescar el feed para mostrar nuevos posts
+                refetch?.();
+              }}
+              feedId={authUser?.id} // Usar ID de usuario para asociar media
+              maxFiles={3}
+            />
+          </View>
 
-        {selectedPostId && (
-          <EnhancedCommentsModal
-            feedId={selectedPostId}
-            visible={selectedPostId !== null}
-            onClose={() => setSelectedPostId(null)}
+          <FlatList
+            data={items}
+            renderItem={renderFeedItem}
+            keyExtractor={keyExtractor}
+            style={themed.list}
+            contentContainerStyle={themed.listContent}
+            showsVerticalScrollIndicator={false}
           />
-        )}
-      </View>
+        </View>
+
+        <EnhancedCommentsModal
+          visible={selectedPostId !== null}
+          feedId={selectedPostId || ''}
+          onClose={() => setSelectedPostId(null)}
+        />
+      </>
     );
   }
 );

@@ -567,6 +567,11 @@ const es: Dict = {
   progress_dashboard_suggestions: '💡 Sugerencias',
   progress_dashboard_suggestion: 'Sugerencia',
 
+  // Personal Records
+  progress_dashboard_personal_records: '🏆 Records Personales',
+  progress_dashboard_no_personal_records:
+    'No hay records personales registrados en este período.',
+
   // Discipline
   progress_dashboard_discipline: '⏰ Disciplina',
   progress_dashboard_consistency: 'Consistencia',

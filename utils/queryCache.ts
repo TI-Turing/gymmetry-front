@@ -30,6 +30,29 @@ class QueryCache {
     this.notify(key);
   }
 
+  // Invalidar por patrón (ej: "feed_*" para invalidar todos los feeds)
+  invalidatePattern(pattern: string): void {
+    const regex = new RegExp(pattern.replace('*', '.*'));
+    const keysToInvalidate: string[] = [];
+
+    for (const key of this.store.keys()) {
+      if (regex.test(key)) {
+        keysToInvalidate.push(key);
+      }
+    }
+
+    for (const key of keysToInvalidate) {
+      this.invalidate(key);
+    }
+  }
+
+  // Invalidar múltiples keys relacionadas
+  invalidateRelated(keys: string[]): void {
+    for (const key of keys) {
+      this.invalidate(key);
+    }
+  }
+
   subscribe(key: string, cb: Subscriber): () => void {
     if (!this.subs.has(key)) this.subs.set(key, new Set());
     this.subs.get(key)!.add(cb);
