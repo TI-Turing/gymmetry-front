@@ -114,5 +114,14 @@ export { asyncStorageObserver } from './asyncStorageObserver';
 // Analytics
 export { analyticsService } from './analyticsService';
 
+// Social & Reporting
+export { reportContentService } from './reportContentService';
+export {
+  userBlockService,
+  BLOCK_LIMITS,
+  BLOCK_ERROR_CODES,
+} from './userBlockService';
+export type { BlockOperationError } from './userBlockService';
+
 // Tipos exportados
 export type { CachedGymData } from '@/dto/gym/CachedGymData';

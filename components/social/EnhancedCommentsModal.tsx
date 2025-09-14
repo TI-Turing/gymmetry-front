@@ -13,6 +13,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useFeedComments, useFeedInteractions } from '@/hooks/useFeed';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { BlockButton } from '../social/BlockButton';
+import { useBlockedContentFilter } from '../../hooks/useBlockedContentFilter';
 import Colors from '@/constants/Colors';
 import { SPACING, FONT_SIZES, BORDER_RADIUS } from '@/constants/Theme';
 import type { FeedComment } from '@/models/FeedComment';
@@ -511,6 +513,26 @@ const CommentItem: React.FC<CommentItemProps> = ({
               </Text>
             </TouchableOpacity>
           )}
+
+          {/* Opción de bloquear usuario si no es el owner */}
+          {!isOwner && comment.UserId && (
+            <View style={styles.actionItem}>
+              <BlockButton
+                userId={comment.UserId}
+                userName={
+                  isAnonymousActive && comment.IsAnonymous
+                    ? 'Usuario anónimo'
+                    : 'Usuario'
+                }
+                style="compact"
+                size="small"
+                onBlockStatusChanged={() => {
+                  setShowActions(false);
+                  // TODO: Ocultar comentarios del usuario bloqueado
+                }}
+              />
+            </View>
+          )}
         </View>
       )}
 
@@ -571,6 +593,8 @@ export const EnhancedCommentsModal: React.FC<EnhancedCommentsModalProps> = ({
 }) => {
   const styles = useThemedStyles(createEnhancedCommentsModalStyles);
   const [newComment, setNewComment] = useState('');
+  const [filteredComments, setFilteredComments] = useState<FeedComment[]>([]);
+  const { filterBlockedComments } = useBlockedContentFilter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hooks para comentarios y interacciones
@@ -583,11 +607,21 @@ export const EnhancedCommentsModal: React.FC<EnhancedCommentsModalProps> = ({
 
   const { addComment, removeComment } = useFeedInteractions(feedId);
 
-  const comments = useMemo(() => {
-    return commentsData.items.filter(
-      (item) => item && typeof item === 'object' && 'Id' in item
-    ) as FeedComment[];
-  }, [commentsData.items]);
+  // Filtrar comentarios, excluyendo usuarios bloqueados
+  React.useEffect(() => {
+    const filterComments = async () => {
+      const validComments = commentsData.items.filter(
+        (item) => item && typeof item === 'object' && 'Id' in item
+      ) as FeedComment[];
+
+      const filtered = await filterBlockedComments(validComments);
+      setFilteredComments(filtered);
+    };
+
+    filterComments();
+  }, [commentsData.items, filterBlockedComments, setFilteredComments]);
+
+  const comments = filteredComments;
 
   const handleAddComment = useCallback(async () => {
     if (!newComment.trim() || isSubmitting) return;

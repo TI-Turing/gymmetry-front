@@ -590,6 +590,101 @@ const es: Dict = {
   progress_tabs_muscles: 'Músculos',
   progress_tabs_discipline: 'Disciplina',
   progress_tabs_suggestions: 'Sugerencias',
+
+  // Report System
+  reportModal_title: 'Reportar Contenido',
+  reportModal_submit: 'Enviar',
+  reportModal_contentPreview: 'Vista Previa del Contenido',
+  reportModal_reasonTitle: 'Motivo del Reporte',
+  reportModal_reasonDescription:
+    'Selecciona la razón que mejor describe el problema',
+  reportModal_descriptionTitle: 'Descripción Detallada',
+  reportModal_descriptionDescription:
+    'Proporciona más detalles sobre el problema',
+  reportModal_descriptionPlaceholder:
+    'Describe específicamente qué está mal con este contenido...',
+  reportModal_priorityTitle: 'Prioridad',
+  reportModal_priorityDescription:
+    'Indica qué tan urgente consideras este reporte',
+  reportModal_priority_low: 'Baja',
+  reportModal_priority_medium: 'Media',
+  reportModal_priority_high: 'Alta',
+  reportModal_guidelinesTitle: 'Directrices de la Comunidad',
+  reportModal_guidelinesText:
+    'Los reportes se revisan manualmente. Reporta solo contenido que viole genuinamente nuestras reglas comunitarias.',
+  reportModal_validation_title: 'Validación Requerida',
+  reportModal_validation_reasonRequired:
+    'Debes seleccionar un motivo para el reporte',
+  reportModal_validation_descriptionTooShort:
+    'La descripción debe tener al menos 10 caracteres',
+  reportModal_validation_descriptionTooLong:
+    'La descripción no puede exceder 500 caracteres',
+  reportModal_success_title: 'Reporte Enviado',
+  reportModal_success_message:
+    'Tu reporte ha sido enviado y será revisado por nuestro equipo de moderación',
+  reportModal_error_title: 'Error al Enviar',
+  reportModal_error_defaultMessage: 'Ocurrió un error al enviar el reporte',
+  reportModal_error_networkError:
+    'Error de conexión. Revisa tu internet e intenta de nuevo',
+  reportModal_rateLimit_title: 'Límite de Reportes',
+  reportModal_rateLimit_message:
+    'Has alcanzado el límite diario de reportes. Intenta mañana.',
+  reportModal_rateLimit_warning: 'Reportes restantes hoy:',
+  reportModal_rateLimit_reached: 'Límite diario de reportes alcanzado',
+
+  reportButton_report: 'Reportar',
+  reportButton_accessibilityLabel: 'Reportar contenido',
+  reportButton_accessibilityHint:
+    'Abre un formulario para reportar este contenido',
+
+  // Block System
+  blockButton_block: 'Bloquear',
+  blockButton_unblock: 'Desbloquear',
+  blockButton_success_blocked_title: 'Usuario Bloqueado',
+  blockButton_success_blocked_message:
+    'Has bloqueado a este usuario exitosamente',
+  blockButton_success_unblocked_title: 'Usuario Desbloqueado',
+  blockButton_success_unblocked_message:
+    'Has desbloqueado a este usuario exitosamente',
+  blockButton_error_title: 'Error de Bloqueo',
+  blockButton_error_defaultMessage: 'Ocurrió un error al procesar la acción',
+  blockButton_error_networkError:
+    'Error de conexión. Revisa tu internet e intenta de nuevo',
+  blockButton_confirm_block_title: 'Confirmar Bloqueo',
+  blockButton_confirm_block_message:
+    '¿Estás seguro que quieres bloquear a este usuario?',
+  blockButton_confirm_unblock_title: 'Confirmar Desbloqueo',
+  blockButton_confirm_unblock_message:
+    '¿Estás seguro que quieres desbloquear a este usuario?',
+  blockButton_accessibility_block: 'Bloquear usuario',
+  blockButton_accessibility_unblock: 'Desbloquear usuario',
+  blockButton_accessibility_blockHint:
+    'Bloquea a este usuario para no ver su contenido',
+  blockButton_accessibility_unblockHint:
+    'Desbloquea a este usuario para volver a ver su contenido',
+  blockButton_remaining: 'Restantes',
+
+  // Blocked Users List
+  blockedUsersList_loading: 'Cargando usuarios bloqueados...',
+  blockedUsersList_stats: 'usuarios bloqueados',
+  blockedUsersList_unblock: 'Desbloquear',
+  blockedUsersList_blockedFor: 'Bloqueado hace',
+  blockedUsersList_success_unblocked_title: 'Usuario Desbloqueado',
+  blockedUsersList_success_unblocked_message: 'Has desbloqueado a',
+  blockedUsersList_error_title: 'Error',
+  blockedUsersList_error_loadFailed:
+    'No se pudieron cargar los usuarios bloqueados',
+  blockedUsersList_error_unblockFailed: 'No se pudo desbloquear al usuario',
+  blockedUsersList_error_networkError: 'Error de conexión. Revisa tu internet',
+  blockedUsersList_confirm_unblock_title: 'Confirmar Desbloqueo',
+  blockedUsersList_confirm_unblock_message: '¿Desbloquear a',
+  blockedUsersList_accessibility_unblock: 'Desbloquear a',
+  blockedUsersList_empty_title: 'No hay usuarios bloqueados',
+  blockedUsersList_empty_message: 'Cuando bloquees a alguien, aparecerá aquí',
+  blockedUsersList_retry: 'Reintentar',
+
+  // Blocked Users Screen
+  blockedUsers_title: 'Usuarios Bloqueados',
 };
 
 export default es;

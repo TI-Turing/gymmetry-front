@@ -1,0 +1,132 @@
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '../useColorScheme';
+import { useI18n } from '../../hooks/useI18n';
+import { ReportButton } from '../social/ReportButton';
+import { BlockButton } from '../social/BlockButton';
+import { ContentType } from '@/models/ReportContent';
+import { postCardWithReportStyles } from './styles/postCardWithReportStyles';
+
+interface PostCardWithReportProps {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  authorId: string;
+  date: string;
+  likes: number;
+  comments: number;
+  isActive?: boolean;
+  onLike?: () => void;
+  onComment?: () => void;
+  onReportSubmitted?: () => void;
+  onBlockCompleted?: () => void;
+}
+
+export const PostCardWithReport: React.FC<PostCardWithReportProps> = ({
+  id,
+  title,
+  content,
+  author,
+  authorId,
+  date,
+  likes,
+  comments,
+  isActive = true,
+  onLike,
+  onComment,
+  onReportSubmitted,
+  onBlockCompleted,
+}) => {
+  const { t } = useI18n();
+  const colorScheme = useColorScheme();
+  const styles = postCardWithReportStyles(colorScheme);
+
+  const contentPreview =
+    content.length > 100 ? `${content.substring(0, 100)}...` : content;
+
+  return (
+    <View style={styles.card}>
+      {/* Header with title and report button */}
+      <View style={styles.header}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{title}</Text>
+          {!isActive && (
+            <View style={styles.inactiveBadge}>
+              <Text style={styles.inactiveBadgeText}>Inactivo</Text>
+            </View>
+          )}
+        </View>
+        <ReportButton
+          contentId={id}
+          contentType={ContentType.Feed}
+          contentPreview={contentPreview}
+          style="icon"
+          size="medium"
+          onReportSubmitted={onReportSubmitted}
+        />
+      </View>
+
+      {/* Content */}
+      <Text style={styles.content}>{content}</Text>
+
+      {/* Author and date */}
+      <View style={styles.metaRow}>
+        <Text style={styles.metaText}>
+          Por <Text style={styles.authorText}>{author}</Text> • {date}
+        </Text>
+      </View>
+
+      {/* Actions bar */}
+      <View style={styles.actionsBar}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={onLike}
+          accessibilityLabel={t('post.likeAction')}
+        >
+          <Ionicons
+            name="heart-outline"
+            size={20}
+            color={Colors[colorScheme].text}
+          />
+          <Text style={styles.actionText}>{likes}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={onComment}
+          accessibilityLabel={t('post.commentAction')}
+        >
+          <Ionicons
+            name="chatbubble-outline"
+            size={20}
+            color={Colors[colorScheme].text}
+          />
+          <Text style={styles.actionText}>{comments}</Text>
+        </TouchableOpacity>
+
+        <View style={styles.spacer} />
+
+        {/* Action buttons for report and block */}
+        <BlockButton
+          userId={authorId}
+          userName={author}
+          style="compact"
+          size="small"
+          onBlockStatusChanged={() => onBlockCompleted?.()}
+        />
+
+        <ReportButton
+          contentId={id}
+          contentType={ContentType.Feed}
+          contentPreview={contentPreview}
+          style="compact"
+          size="small"
+          onReportSubmitted={onReportSubmitted}
+        />
+      </View>
+    </View>
+  );
+};

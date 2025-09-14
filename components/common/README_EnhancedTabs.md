@@ -7,6 +7,7 @@ Sistema completo de navegación por pestañas con características avanzadas com
 ## 🎯 Características Principales
 
 ### ✨ Funcionalidades Avanzadas
+
 - **Animaciones Fluidas**: Transiciones suaves con React Native Animated API
 - **Badges Dinámicos**: Notificaciones con conteo y texto personalizable
 - **Persistencia de Estado**: Recordar tab activo entre sesiones
@@ -16,6 +17,7 @@ Sistema completo de navegación por pestañas con características avanzadas com
 - **Estados**: Disabled, selected, loading, error states
 
 ### 🎨 Variantes Visuales
+
 1. **Default**: Tabs clásicos con indicador superior
 2. **Pills**: Tabs con forma de píldora redondeada
 3. **Underline**: Tabs con línea inferior animada
@@ -38,16 +40,19 @@ hooks/
 Componente principal con tres sub-componentes:
 
 #### TabBadge
+
 - Maneja badges de notificación
 - Soporte para conteo numérico y texto
 - Auto-formato para números > 99 ("99+")
 
-#### TabItemComponent  
+#### TabItemComponent
+
 - Representa cada tab individual
 - Maneja estados (selected, disabled, loading)
 - Integra ícono, badge y label
 
 #### EnhancedTabBar
+
 - Contenedor principal con animaciones
 - Manejo de selección y persistencia
 - Renderizado del indicador animado
@@ -56,25 +61,25 @@ Componente principal con tres sub-componentes:
 
 ```typescript
 interface EnhancedTabBarProps {
-  tabs: TabItem[];                    // Array de configuración de tabs
-  selectedTabId: string;              // ID del tab activo
+  tabs: TabItem[]; // Array de configuración de tabs
+  selectedTabId: string; // ID del tab activo
   onTabPress: (tabId: string) => void; // Callback de selección
   variant?: 'default' | 'pills' | 'underline';
-  showLabels?: boolean;               // Mostrar labels de texto
-  animated?: boolean;                 // Habilitar animaciones
-  persistState?: boolean;             // Persistir estado
-  storageKey?: string;                // Clave para AsyncStorage
-  iconSize?: number;                  // Tamaño de íconos
-  enableAccessibility?: boolean;      // Características de accesibilidad
+  showLabels?: boolean; // Mostrar labels de texto
+  animated?: boolean; // Habilitar animaciones
+  persistState?: boolean; // Persistir estado
+  storageKey?: string; // Clave para AsyncStorage
+  iconSize?: number; // Tamaño de íconos
+  enableAccessibility?: boolean; // Características de accesibilidad
 }
 
 interface TabItem {
-  id: string;                         // Identificador único
-  label: string;                      // Texto del tab
-  icon: string;                       // Nombre del ícono FontAwesome5
-  badgeCount?: number;                // Conteo para badge
-  badgeText?: string;                 // Texto personalizado para badge
-  isDisabled?: boolean;               // Estado deshabilitado
+  id: string; // Identificador único
+  label: string; // Texto del tab
+  icon: string; // Nombre del ícono FontAwesome5
+  badgeCount?: number; // Conteo para badge
+  badgeText?: string; // Texto personalizado para badge
+  isDisabled?: boolean; // Estado deshabilitado
 }
 ```
 
@@ -83,12 +88,14 @@ interface TabItem {
 ### enhancedTabBar.ts
 
 Estilos completamente temáticos con:
+
 - **Theme-aware colors**: Colores adaptativos según modo claro/oscuro
 - **Responsive layouts**: Diseños que se adaptan al tamaño de pantalla
 - **Animation styles**: Estilos para transiciones y efectos
 - **Badge positioning**: Posicionamiento preciso de notificaciones
 
 ### Tokens de Color
+
 ```typescript
 // Colores principales
 primary: palette.tint,           // Color primario del tema
@@ -110,36 +117,46 @@ error: '#EF4444',               // Rojo para errores
 Tres hooks especializados:
 
 #### 1. useTabStatePersistence
+
 ```typescript
-const { currentTab, setTab, clearPersistedState, isLoaded } = useTabStatePersistence({
-  storageKey: 'feed_tabs_state',
-  defaultTab: 'Feed',
-  enabled: true
-});
+const { currentTab, setTab, clearPersistedState, isLoaded } =
+  useTabStatePersistence({
+    storageKey: 'feed_tabs_state',
+    defaultTab: 'Feed',
+    enabled: true,
+  });
 ```
 
 **Funcionalidades:**
+
 - Carga estado inicial desde AsyncStorage
 - Persiste cambios automáticamente
 - Limpieza de estado
 - Indicador de carga
 
 #### 2. useTabAnimations
+
 ```typescript
-const { indicatorPosition, scaleAnimations } = useTabAnimations(selectedIndex, tabsLength);
+const { indicatorPosition, scaleAnimations } = useTabAnimations(
+  selectedIndex,
+  tabsLength
+);
 ```
 
 **Funcionalidades:**
+
 - Animación del indicador de posición
 - Efectos de escala en tabs
 - Transiciones suaves con spring physics
 
 #### 3. useTabBadges
+
 ```typescript
 const { totalNotifications, updateBadge } = useTabBadges(tabs);
 ```
 
 **Funcionalidades:**
+
 - Contador total de notificaciones
 - Actualización dinámica de badges
 - Aggregation de conteos
@@ -154,7 +171,7 @@ import { EnhancedTabBar, TabItem } from '../common/EnhancedTabBar';
 
 const FeedTabs: React.FC = () => {
   const [tab, setTab] = useState<TabKey>('Feed');
-  
+
   // Configuración de tabs con badges dinámicos
   const tabs: TabItem[] = useMemo(() => [
     {
@@ -165,7 +182,7 @@ const FeedTabs: React.FC = () => {
     },
     {
       id: 'Trending',
-      label: 'Trending', 
+      label: 'Trending',
       icon: 'fire',
       badgeCount: trending.items?.length,
     },
@@ -219,6 +236,7 @@ const MyTabs: React.FC = () => {
 ## 🎯 Casos de Uso Avanzados
 
 ### 1. Tabs con Badges Dinámicos
+
 ```typescript
 const tabs: TabItem[] = [
   {
@@ -232,11 +250,12 @@ const tabs: TabItem[] = [
     label: 'Notificaciones',
     icon: 'bell',
     badgeText: hasUrgentNotifications ? '!' : undefined,
-  }
+  },
 ];
 ```
 
 ### 2. Tabs Deshabilitados Condicionalmente
+
 ```typescript
 const tabs: TabItem[] = [
   {
@@ -244,16 +263,17 @@ const tabs: TabItem[] = [
     label: 'Premium',
     icon: 'star',
     isDisabled: !user.isPremium,
-  }
+  },
 ];
 ```
 
 ### 3. Diferentes Variantes Según Contexto
+
 ```typescript
 // Navegación principal
 <EnhancedTabBar variant="default" showLabels={true} />
 
-// Sub-navegación compacta  
+// Sub-navegación compacta
 <EnhancedTabBar variant="pills" showLabels={false} iconSize={16} />
 
 // Navegación con indicador
@@ -263,6 +283,7 @@ const tabs: TabItem[] = [
 ## ♿ Características de Accesibilidad
 
 ### Soporte Completo
+
 - **accessibilityRole**: 'tab' para cada elemento
 - **accessibilityState**: selected/disabled states
 - **accessibilityLabel**: Labels descriptivos
@@ -271,6 +292,7 @@ const tabs: TabItem[] = [
 - **High Contrast**: Colores con contraste adecuado
 
 ### Configuración
+
 ```typescript
 <EnhancedTabBar
   enableAccessibility={true}  // Habilitar características
@@ -284,40 +306,45 @@ const tabs: TabItem[] = [
 ## 🎨 Personalización de Temas
 
 ### Colores Personalizados
+
 ```typescript
 // En enhancedTabBar.ts
 const customColors = {
   primary: '#FF6B35',
-  primaryText: '#FFFFFF', 
+  primaryText: '#FFFFFF',
   background: '#1A1A1A',
   // ... más colores
 };
 ```
 
 ### Animaciones Personalizadas
+
 ```typescript
 // Personalizar timing y physics
 Animated.spring(indicatorAnimation, {
   toValue: targetPosition,
   useNativeDriver: false,
-  tension: 150,        // Más rápido
-  friction: 6,         // Menos rebote
+  tension: 150, // Más rápido
+  friction: 6, // Menos rebote
 }).start();
 ```
 
 ## 🔄 Integración con Otros Sistemas
 
-### Navegación Principal (app/(tabs)/_layout.tsx)
+### Navegación Principal (app/(tabs)/\_layout.tsx)
+
 - Reemplazar TabBarIcon básico con EnhancedTabBar
 - Mantener compatibilidad con Expo Router
 - Añadir badges para notificaciones globales
 
 ### Progress Tabs (components/progress/ProgressTabBar.tsx)
+
 - Migrar a EnhancedTabBar con variant="pills"
 - Mantener lógica específica de progreso
 - Añadir indicadores visuales de completado
 
 ### Sub-navegaciones
+
 - FeedTabs: ✅ Ya implementado
 - RoutineTabs: Potencial integración
 - SettingsTabs: Potencial integración
@@ -325,12 +352,14 @@ Animated.spring(indicatorAnimation, {
 ## 📊 Beneficios del Sistema
 
 ### Para Desarrolladores
+
 - **Reutilización**: Un componente para todos los casos
 - **Consistencia**: UI homogénea en toda la app
 - **Mantenibilidad**: Cambios centralizados
 - **TypeScript**: Tipado completo y seguro
 
 ### Para Usuarios
+
 - **UX Mejorada**: Animaciones fluidas y feedback visual
 - **Accesibilidad**: Soporte completo para diferentes capacidades
 - **Consistencia**: Comportamiento predecible
@@ -339,12 +368,14 @@ Animated.spring(indicatorAnimation, {
 ## 🚀 Próximos Pasos
 
 ### Integraciones Pendientes
-1. **Navegación Principal**: Migrar app/(tabs)/_layout.tsx
+
+1. **Navegación Principal**: Migrar app/(tabs)/\_layout.tsx
 2. **Progress Tabs**: Reemplazar ProgressTabBar.tsx
 3. **Estado Global**: Integrar con context para badges globales
 4. **Animaciones**: Añadir más efectos visuales avanzados
 
 ### Optimizaciones Futuras
+
 1. **Virtualization**: Para tabs con muchos elementos
 2. **Lazy Loading**: Cargar contenido de tabs bajo demanda
 3. **Gestures**: Soporte para swipe entre tabs

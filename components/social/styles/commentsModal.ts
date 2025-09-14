@@ -118,6 +118,11 @@ export const makeCommentsModalStyles = (theme: ThemeMode) => {
       color: muted,
       fontSize: 12,
     } as const,
+    commentActions: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+      gap: 8,
+    } as const,
     commentText: {
       color: text,
       fontSize: 14,

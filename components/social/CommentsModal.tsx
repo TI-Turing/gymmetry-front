@@ -16,6 +16,8 @@ import type { FeedComment } from '@/models/FeedComment';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeCommentsModalStyles } from './styles/commentsModal';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { ReportButton } from './ReportButton';
+import { ContentType } from '@/models/ReportContent';
 
 export interface CommentsModalProps {
   visible: boolean;
@@ -120,19 +122,28 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <Text style={styles.commentAuthor}>{authorName}</Text>
           <Text style={styles.commentTime}>{timeAgo}</Text>
         </View>
-        {canDelete && (
-          <TouchableOpacity
-            style={styles.actionsButton}
-            onPress={() => setShowActions(!showActions)}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <ActivityIndicator size="small" color="#666" />
-            ) : (
-              <FontAwesome name="ellipsis-h" size={14} color="#666" />
-            )}
-          </TouchableOpacity>
-        )}
+        <View style={styles.commentActions}>
+          <ReportButton
+            contentId={comment.Id}
+            contentType={ContentType.Comment}
+            contentPreview={comment.Content}
+            style="icon"
+            size="small"
+          />
+          {canDelete && (
+            <TouchableOpacity
+              style={styles.actionsButton}
+              onPress={() => setShowActions(!showActions)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <ActivityIndicator size="small" color="#666" />
+              ) : (
+                <FontAwesome name="ellipsis-h" size={14} color="#666" />
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <Text style={styles.commentText}>{comment.Content}</Text>

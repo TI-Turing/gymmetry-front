@@ -7,8 +7,16 @@ import {
 } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import Button from '@/components/common/Button';
+import { useCustomAlert } from '@/components/common/CustomAlert';
 import SmartImage from '@/components/common/SmartImage';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { sanitizeContent, isValidContent } from '@/utils/securityUtils';
+import {
+  canCreatePost,
+  getRateLimitMessage,
+  rateLimiter,
+} from '@/utils/rateLimitUtils';
+import { useAuth } from '@/contexts/AuthContext';
 import { makePostComposerStyles } from './styles/postComposer';
 
 export interface PostComposerProps {
@@ -24,13 +32,58 @@ export const PostComposer: React.FC<PostComposerProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const styles = useThemedStyles(makePostComposerStyles);
+  const { user } = useAuth();
+  const { showAlert, AlertComponent } = useCustomAlert();
 
-  const handlePublish = () => {
-    if (!text.trim()) return;
-    onSubmit(text.trim(), null);
-    setText('');
-    setOpen(false);
+  const handlePublish = async () => {
+    const trimmedText = text.trim();
+
+    // Validar contenido vacío
+    if (!trimmedText) {
+      showAlert('error', 'Error', 'El post no puede estar vacío');
+      return;
+    }
+
+    // Validar contenido con seguridad
+    if (!isValidContent(trimmedText)) {
+      showAlert(
+        'error',
+        'Error',
+        'El contenido no es válido. Debe tener entre 3 y 5000 caracteres.'
+      );
+      return;
+    }
+
+    // Verificar rate limiting
+    const userId = user?.id || 'anonymous';
+    if (!canCreatePost(userId)) {
+      const timeRemaining = rateLimiter.getTimeUntilReset(
+        `post_create_${userId}`,
+        5 * 60 * 1000
+      );
+      const message = getRateLimitMessage('post', timeRemaining);
+      showAlert('warning', 'Límite alcanzado', message);
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      // Sanitizar contenido antes de enviar
+      const sanitizedContent = sanitizeContent(trimmedText);
+      await onSubmit(sanitizedContent, null);
+      setText('');
+      setOpen(false);
+    } catch (error) {
+      showAlert(
+        'error',
+        'Error',
+        'No se pudo publicar el post. Intenta de nuevo.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -92,10 +145,15 @@ export const PostComposer: React.FC<PostComposerProps> = ({
             />
           </View>
           <View style={styles.modalFooter}>
-            <Button title="Publicar" onPress={handlePublish} />
+            <Button
+              title="Publicar"
+              onPress={handlePublish}
+              disabled={isSubmitting}
+            />
           </View>
         </View>
       </Modal>
+      <AlertComponent />
     </View>
   );
 };

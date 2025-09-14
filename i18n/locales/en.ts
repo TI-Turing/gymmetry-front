@@ -578,6 +578,73 @@ const en: Dict = {
   progress_tabs_muscles: 'Muscles',
   progress_tabs_discipline: 'Discipline',
   progress_tabs_suggestions: 'Suggestions',
+
+  // Block System
+  blockButton_block: 'Block',
+  blockButton_unblock: 'Unblock',
+  blockButton_success_blocked_title: 'User Blocked',
+  blockButton_success_blocked_message:
+    'You have successfully blocked this user',
+  blockButton_success_unblocked_title: 'User Unblocked',
+  blockButton_success_unblocked_message:
+    'You have successfully unblocked this user',
+  blockButton_error_title: 'Block Error',
+  blockButton_error_defaultMessage:
+    'An error occurred while processing the action',
+  blockButton_error_networkError:
+    'Connection error. Check your internet and try again',
+  blockButton_confirm_block_title: 'Confirm Block',
+  blockButton_confirm_block_message:
+    'Are you sure you want to block this user?',
+  blockButton_confirm_unblock_title: 'Confirm Unblock',
+  blockButton_confirm_unblock_message:
+    'Are you sure you want to unblock this user?',
+  blockButton_accessibility_block: 'Block user',
+  blockButton_accessibility_unblock: 'Unblock user',
+  blockButton_accessibility_blockHint: 'Block this user to hide their content',
+  blockButton_accessibility_unblockHint:
+    'Unblock this user to see their content again',
+  blockButton_remaining: 'Remaining',
+
+  // Report System
+  reportModal_title: 'Report Content',
+  reportModal_submit: 'Submit',
+  reportModal_contentPreview: 'Content Preview',
+  reportModal_reasonTitle: 'Report Reason',
+  reportModal_reasonDescription: 'Select the reason for reporting this content',
+  reportModal_descriptionTitle: 'Detailed Description',
+  reportModal_descriptionDescription:
+    'Provide additional details about why you are reporting this content',
+  reportModal_descriptionPlaceholder:
+    'Describe why this content violates community guidelines...',
+  reportModal_priorityTitle: 'Priority',
+  reportModal_priorityDescription: 'Select the urgency level for this report',
+  reportModal_priority_low: 'Low',
+  reportModal_priority_medium: 'Medium',
+  reportModal_priority_high: 'High',
+  reportModal_guidelinesTitle: 'Community Guidelines',
+  reportModal_guidelinesText:
+    'Please only report content that violates our community guidelines. False reports may result in restrictions on your account.',
+  reportModal_validation_title: 'Validation Required',
+  reportModal_validation_reasonRequired:
+    'Please select a reason for the report',
+  reportModal_validation_descriptionTooShort:
+    'Description must be at least 10 characters',
+  reportModal_validation_descriptionTooLong:
+    'Description cannot exceed 500 characters',
+  reportModal_success_title: 'Report Submitted',
+  reportModal_success_message:
+    'Your report has been submitted and will be reviewed by our moderation team',
+  reportModal_error_title: 'Error Submitting',
+  reportModal_error_defaultMessage:
+    'An error occurred while submitting the report',
+  reportModal_error_networkError:
+    'Connection error. Check your internet and try again',
+  reportModal_rateLimit_title: 'Report Limit',
+  reportModal_rateLimit_message:
+    'You have reached the daily report limit. Try again tomorrow.',
+  reportModal_rateLimit_warning: 'Reports remaining today:',
+  reportModal_rateLimit_reached: 'Daily report limit reached',
 };
 
 export default en;
