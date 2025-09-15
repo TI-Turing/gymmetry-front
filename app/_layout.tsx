@@ -27,6 +27,7 @@ import {
   AppSettingsProvider,
   useAppSettings,
 } from '@/contexts/AppSettingsContext';
+import { RealTimeTestingTools } from '@/components/testing/RealTimeTestingTools';
 import {
   scheduleLocalNotificationAsync,
   addNotificationReceivedListener,
@@ -440,6 +441,11 @@ function RootLayoutNav() {
           options={{ presentation: 'modal', headerShown: false }}
         />
       </Stack>
+
+      {/* Herramientas de testing en tiempo real - Solo en modo debug */}
+      {process.env.EXPO_PUBLIC_TESTING_MODE === 'true' && (
+        <RealTimeTestingTools />
+      )}
     </ThemeProvider>
   );
 }

@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '../useColorScheme';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { useI18n } from '../../hooks/useI18n';
 import { ReportButton } from '../social/ReportButton';
 import { BlockButton } from '../social/BlockButton';
 import { ContentType } from '@/models/ReportContent';
-// import { styles } from './styles';
+import { makePostCardStyles } from './styles/PostCardWithReport.styles';
 
 interface PostCardWithReportProps {
   id: string;
@@ -41,8 +41,7 @@ export const PostCardWithReport: React.FC<PostCardWithReportProps> = ({
   onBlockCompleted,
 }) => {
   const { t } = useI18n();
-  const colorScheme = useColorScheme();
-  // const styles = postCardWithReportStyles(colorScheme);
+  const styles = useThemedStyles(makePostCardStyles);
 
   const contentPreview =
     content.length > 100 ? `${content.substring(0, 100)}...` : content;
@@ -86,11 +85,7 @@ export const PostCardWithReport: React.FC<PostCardWithReportProps> = ({
           onPress={onLike}
           accessibilityLabel={t('post.likeAction')}
         >
-          <Ionicons
-            name="heart-outline"
-            size={20}
-            color={Colors[colorScheme].text}
-          />
+          <Ionicons name="heart-outline" size={20} color={Colors.light.text} />
           <Text style={styles.actionText}>{likes}</Text>
         </TouchableOpacity>
 
@@ -102,7 +97,7 @@ export const PostCardWithReport: React.FC<PostCardWithReportProps> = ({
           <Ionicons
             name="chatbubble-outline"
             size={20}
-            color={Colors[colorScheme].text}
+            color={Colors.light.text}
           />
           <Text style={styles.actionText}>{comments}</Text>
         </TouchableOpacity>
