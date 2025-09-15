@@ -6,7 +6,6 @@ import stylesFn from './styles';
 import type { FeedItem, FeedListProps } from '@/types/feedTypes';
 import { UnifiedPostCard } from '../common/UnifiedPostCard';
 import { EnhancedCommentsModal } from '../social/EnhancedCommentsModal';
-import MediaUploadButton from './MediaUploadButton';
 import { useAuth } from '@/contexts/AuthContext';
 
 const FeedList: React.FC<FeedListProps> = React.memo(
@@ -84,10 +83,10 @@ const FeedList: React.FC<FeedListProps> = React.memo(
     if (!items || items.length === 0) {
       return (
         <View style={themed.container}>
-          <Text style={themed.emptyText}>No hay publicaciones disponibles</Text>
-          <MediaUploadButton
-            onMediaUploaded={refetch ? () => refetch() : undefined}
-          />
+          <Text style={themed.emptyText}>
+            No hay publicaciones disponibles.{'\n'}
+            Toca el botón + para crear tu primera publicación.
+          </Text>
         </View>
       );
     }
