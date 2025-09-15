@@ -44,12 +44,13 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
   const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const charactersRemaining = CREATE_POST_CONSTANTS.MAX_CHARACTERS - content.length;
+  const charactersRemaining =
+    CREATE_POST_CONSTANTS.MAX_CHARACTERS - content.length;
   const isValidPost = content.trim().length > 0 && charactersRemaining >= 0;
 
   const handleCancel = () => {
     const closeAction = onClose || (() => router.back());
-    
+
     if (title.trim() || content.trim() || selectedMedia) {
       Alert.alert(
         'Descartar cambios',
@@ -66,12 +67,18 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
 
   const handleSelectImage = () => {
     // TODO: Implementar selección de imagen
-    Alert.alert('Próximamente', 'La selección de imágenes estará disponible pronto');
+    Alert.alert(
+      'Próximamente',
+      'La selección de imágenes estará disponible pronto'
+    );
   };
 
   const handleSelectVideo = () => {
     // TODO: Implementar selección de video
-    Alert.alert('Próximamente', 'La selección de videos estará disponible pronto');
+    Alert.alert(
+      'Próximamente',
+      'La selección de videos estará disponible pronto'
+    );
   };
 
   const handleRemoveMedia = () => {
@@ -85,8 +92,8 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
     setIsLoading(true);
     try {
       // TODO: Implementar creación de post usando postService
-      console.log('Crear post:', { title, content, selectedMedia, mediaType });
-      
+      // Post creation logic will be implemented here
+
       const closeAction = onClose || (() => router.back());
       Alert.alert('Éxito', 'Tu publicación ha sido creada exitosamente', [
         { text: 'OK', onPress: closeAction },
@@ -136,7 +143,7 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
               textAlignVertical="top"
               maxLength={CREATE_POST_CONSTANTS.MAX_CHARACTERS}
             />
-            
+
             <View style={themed.characterCount}>
               <Text
                 style={[
@@ -155,7 +162,9 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
             <View style={themed.mediaPreview}>
               <View style={themed.mediaContainer}>
                 <Text style={themed.mediaText}>
-                  {mediaType === 'image' ? '🖼️ Imagen seleccionada' : '🎥 Video seleccionado'}
+                  {mediaType === 'image'
+                    ? '🖼️ Imagen seleccionada'
+                    : '🎥 Video seleccionado'}
                 </Text>
                 <TouchableOpacity onPress={handleRemoveMedia}>
                   <MaterialIcons name="close" size={24} color="#FF6B6B" />
@@ -166,22 +175,32 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
 
           {/* Media selection buttons */}
           <View style={themed.mediaButtons}>
-            <TouchableOpacity style={themed.mediaButton} onPress={handleSelectImage}>
-              <FontAwesome 
-                name="image" 
-                size={20} 
-                color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} 
+            <TouchableOpacity
+              style={themed.mediaButton}
+              onPress={handleSelectImage}
+            >
+              <FontAwesome
+                name="image"
+                size={20}
+                color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'}
               />
-              <Text style={themed.mediaButtonText}>{CREATE_POST_CONSTANTS.SELECT_IMAGE}</Text>
+              <Text style={themed.mediaButtonText}>
+                {CREATE_POST_CONSTANTS.SELECT_IMAGE}
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={themed.mediaButton} onPress={handleSelectVideo}>
-              <FontAwesome 
-                name="video-camera" 
-                size={20} 
-                color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} 
+            <TouchableOpacity
+              style={themed.mediaButton}
+              onPress={handleSelectVideo}
+            >
+              <FontAwesome
+                name="video-camera"
+                size={20}
+                color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'}
               />
-              <Text style={themed.mediaButtonText}>{CREATE_POST_CONSTANTS.SELECT_VIDEO}</Text>
+              <Text style={themed.mediaButtonText}>
+                {CREATE_POST_CONSTANTS.SELECT_VIDEO}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -193,11 +212,16 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
             onPress={handleCancel}
             disabled={isLoading}
           >
-            <Text style={themed.cancelButtonText}>{CREATE_POST_CONSTANTS.CANCEL_BUTTON}</Text>
+            <Text style={themed.cancelButtonText}>
+              {CREATE_POST_CONSTANTS.CANCEL_BUTTON}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[themed.publishButton, !isValidPost && themed.publishButtonDisabled]}
+            style={[
+              themed.publishButton,
+              !isValidPost && themed.publishButtonDisabled,
+            ]}
             onPress={handlePublish}
             disabled={!isValidPost || isLoading}
           >
@@ -207,7 +231,9 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
                 !isValidPost && themed.publishButtonTextDisabled,
               ]}
             >
-              {isLoading ? 'Publicando...' : CREATE_POST_CONSTANTS.PUBLISH_BUTTON}
+              {isLoading
+                ? 'Publicando...'
+                : CREATE_POST_CONSTANTS.PUBLISH_BUTTON}
             </Text>
           </TouchableOpacity>
         </View>

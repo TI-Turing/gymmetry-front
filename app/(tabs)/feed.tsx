@@ -22,7 +22,7 @@ function FeedScreen() {
       <View style={{ flex: 1 }}>
         <FeedTabs />
         <FloatingCreateButton onPress={handleOpenCreatePost} />
-        
+
         <Modal
           visible={showCreatePost}
           animationType="slide"

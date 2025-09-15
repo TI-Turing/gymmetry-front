@@ -6,7 +6,8 @@ export default (theme: 'light' | 'dark') =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
+      backgroundColor:
+        theme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
     content: {
       flex: 1,
@@ -42,7 +43,10 @@ export default (theme: 'light' | 'dark') =>
     },
     characterCountText: {
       fontSize: 14,
-      color: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
+      color:
+        theme === 'dark'
+          ? Colors.dark.tabIconDefault
+          : Colors.light.tabIconDefault,
     },
     characterCountError: {
       color: theme === 'dark' ? Colors.dark.danger : Colors.light.danger,
@@ -90,8 +94,10 @@ export default (theme: 'light' | 'dark') =>
       gap: SPACING.md,
       padding: SPACING.md,
       borderTopWidth: 1,
-      borderTopColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
-      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
+      borderTopColor:
+        theme === 'dark' ? Colors.dark.border : Colors.light.border,
+      backgroundColor:
+        theme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
     cancelButton: {
       flex: 1,
@@ -100,12 +106,18 @@ export default (theme: 'light' | 'dark') =>
       paddingVertical: SPACING.md,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
+      borderColor:
+        theme === 'dark'
+          ? Colors.dark.tabIconDefault
+          : Colors.light.tabIconDefault,
     },
     cancelButtonText: {
       fontSize: 16,
       fontWeight: '600',
-      color: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
+      color:
+        theme === 'dark'
+          ? Colors.dark.tabIconDefault
+          : Colors.light.tabIconDefault,
     },
     publishButton: {
       flex: 1,
@@ -116,7 +128,10 @@ export default (theme: 'light' | 'dark') =>
       backgroundColor: theme === 'dark' ? Colors.dark.tint : Colors.light.tint,
     },
     publishButtonDisabled: {
-      backgroundColor: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
+      backgroundColor:
+        theme === 'dark'
+          ? Colors.dark.tabIconDefault
+          : Colors.light.tabIconDefault,
       opacity: 0.5,
     },
     publishButtonText: {

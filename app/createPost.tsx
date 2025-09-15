@@ -17,7 +17,7 @@ export default function CreatePostRoute() {
       <View style={styles.container}>
         <Text style={styles.title}>Pantalla de Crear Post</Text>
         <Text style={styles.subtitle}>¡Navegación exitosa!</Text>
-        
+
         <TouchableOpacity style={styles.button} onPress={handleBack}>
           <Text style={styles.buttonText}>Volver</Text>
         </TouchableOpacity>

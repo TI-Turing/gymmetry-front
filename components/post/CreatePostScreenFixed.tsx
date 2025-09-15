@@ -7,12 +7,12 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import { ScreenWrapper } from '@/components/common/ScreenWrapper';
+import { ScreenWrapper } from '../common/ScreenWrapper';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useThemedStyles } from '@/hooks/useThemedStyles';
-import { createPostScreenStyles } from './styles/CreatePostScreenStyles';
+import { useColorScheme } from '../../hooks/useColorScheme';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { createPostScreenStyles } from './createPostStyles';
 
 interface CreatePostScreenProps {
   onClose?: () => void;
@@ -36,13 +36,16 @@ export const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [mediaSelected, setMediaSelected] = useState(false);
   const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
-  
+
   const router = useRouter();
   const colorScheme = useColorScheme();
   const themed = useThemedStyles(createPostScreenStyles);
 
-  const charactersRemaining = CREATE_POST_CONSTANTS.MAX_CHARACTERS - content.length;
-  const isValidPost = content.trim().length > 0 && content.length <= CREATE_POST_CONSTANTS.MAX_CHARACTERS;
+  const charactersRemaining =
+    CREATE_POST_CONSTANTS.MAX_CHARACTERS - content.length;
+  const isValidPost =
+    content.trim().length > 0 &&
+    content.length <= CREATE_POST_CONSTANTS.MAX_CHARACTERS;
 
   const handleSelectImage = () => {
     setMediaSelected(true);
@@ -65,14 +68,12 @@ export const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
     setIsLoading(true);
     try {
       // Simular API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const closeAction = onClose || (() => router.back());
-      Alert.alert(
-        'Éxito',
-        'Tu publicación ha sido creada exitosamente',
-        [{ text: 'OK', onPress: closeAction }]
-      );
+      Alert.alert('Éxito', 'Tu publicación ha sido creada exitosamente', [
+        { text: 'OK', onPress: closeAction },
+      ]);
     } catch (error) {
       Alert.alert(
         'Error',
@@ -110,8 +111,7 @@ export const CreatePostScreen: React.FC<CreatePostScreenProps> = ({
                 charactersRemaining < 50 && themed.characterCountWarning,
               ]}
             >
-              {charactersRemaining}{' '}
-              {CREATE_POST_CONSTANTS.CHARACTERS_REMAINING}
+              {charactersRemaining} {CREATE_POST_CONSTANTS.CHARACTERS_REMAINING}
             </Text>
           </View>
 

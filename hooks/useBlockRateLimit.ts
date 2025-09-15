@@ -78,7 +78,7 @@ export const useBlockRateLimit = (): UseBlockRateLimitReturn => {
         await saveRateLimit(defaultRateLimit);
       }
     } catch (error) {
-      console.warn('Error loading block rate limit:', error);
+      // Error loading block rate limit, use defaults
       // Fallback to default if storage fails
       setRateLimit({
         remainingBlocks: BLOCK_LIMITS.DAILY_BLOCK_LIMIT,
@@ -104,7 +104,7 @@ export const useBlockRateLimit = (): UseBlockRateLimitReturn => {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore));
       }
     } catch (error) {
-      console.warn('Error saving block rate limit:', error);
+      // Error saving block rate limit, will retry on next operation
     }
   };
 

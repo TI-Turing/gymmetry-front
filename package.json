@@ -45,7 +45,7 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": [],
+    "setupFilesAfterEnv": ["<rootDir>/__tests__/setup.ts"],
     "testMatch": [
       "**/__tests__/**/*.(test|spec).(js|jsx|ts|tsx)",
       "**/?(*.)(test|spec).(js|jsx|ts|tsx)"
@@ -130,6 +130,7 @@
     "@babel/plugin-transform-json-strings": "^7.27.1",
     "@babel/plugin-transform-numeric-separator": "^7.27.1",
     "@react-native/eslint-config": "^0.80.2",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.0.10",
     "@types/react-native-vector-icons": "^6.4.18",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
