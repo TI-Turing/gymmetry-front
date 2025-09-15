@@ -27,11 +27,18 @@ const FloatingCreateButton: React.FC<FloatingCreateButtonProps> = ({
   const styles = createStyles(colorScheme);
 
   const handlePress = () => {
+    console.log('FloatingCreateButton: Button pressed');
     if (onPress) {
+      console.log('FloatingCreateButton: Using custom onPress');
       onPress();
     } else {
-      // Navegar a pantalla de crear post
-      router.push('/create-post');
+      console.log('FloatingCreateButton: Navigating to /createPost');
+      try {
+        router.push('/createPost');
+        console.log('FloatingCreateButton: Navigation successful');
+      } catch (error) {
+        console.error('FloatingCreateButton: Navigation failed:', error);
+      }
     }
   };
 

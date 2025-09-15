@@ -1,14 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '@/constants';
+import Colors from '@/constants/Colors';
 import { SPACING } from '@/constants/Theme';
 
-export const createStyles = (colorScheme: 'light' | 'dark') => {
-  const colors = Colors[colorScheme];
-  
-  return StyleSheet.create({
+export default (theme: 'light' | 'dark') =>
+  StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
     content: {
       flex: 1,
@@ -18,28 +16,25 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
       marginBottom: SPACING.md,
     },
     titleInput: {
-      backgroundColor: colors.card,
+      backgroundColor: theme === 'dark' ? Colors.dark.card : Colors.light.card,
       borderRadius: 12,
       padding: SPACING.md,
       fontSize: 18,
       fontWeight: '600',
-      color: colors.text,
+      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
     },
     contentInput: {
-      backgroundColor: colors.card,
+      backgroundColor: theme === 'dark' ? Colors.dark.card : Colors.light.card,
       borderRadius: 12,
       padding: SPACING.md,
       fontSize: 16,
-      color: colors.text,
+      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
       minHeight: 120,
       maxHeight: 200,
       borderWidth: 1,
-      borderColor: colors.border,
-    },
-    placeholderColor: {
-      color: colors.tabIconDefault,
+      borderColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
     },
     characterCount: {
       alignItems: 'flex-end',
@@ -47,10 +42,10 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
     },
     characterCountText: {
       fontSize: 14,
-      color: colors.tabIconDefault,
+      color: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
     },
     characterCountError: {
-      color: '#FF6B6B',
+      color: theme === 'dark' ? Colors.dark.danger : Colors.light.danger,
     },
     mediaPreview: {
       marginBottom: SPACING.md,
@@ -59,15 +54,15 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      backgroundColor: colors.card,
+      backgroundColor: theme === 'dark' ? Colors.dark.card : Colors.light.card,
       borderRadius: 12,
       padding: SPACING.md,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
     },
     mediaText: {
       fontSize: 16,
-      color: colors.text,
+      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
     },
     mediaButtons: {
       flexDirection: 'row',
@@ -80,23 +75,23 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
       alignItems: 'center',
       justifyContent: 'center',
       gap: SPACING.xs,
-      backgroundColor: colors.card,
+      backgroundColor: theme === 'dark' ? Colors.dark.card : Colors.light.card,
       borderRadius: 12,
       padding: SPACING.md,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
     },
     mediaButtonText: {
       fontSize: 16,
-      color: colors.text,
+      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
     },
     actionButtons: {
       flexDirection: 'row',
       gap: SPACING.md,
       padding: SPACING.md,
       borderTopWidth: 1,
-      borderTopColor: colors.border,
-      backgroundColor: colors.background,
+      borderTopColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
+      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
     cancelButton: {
       flex: 1,
@@ -105,12 +100,12 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
       paddingVertical: SPACING.md,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: colors.tabIconDefault,
+      borderColor: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
     },
     cancelButtonText: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.tabIconDefault,
+      color: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
     },
     publishButton: {
       flex: 1,
@@ -118,10 +113,10 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
       justifyContent: 'center',
       paddingVertical: SPACING.md,
       borderRadius: 12,
-      backgroundColor: colors.tint,
+      backgroundColor: theme === 'dark' ? Colors.dark.tint : Colors.light.tint,
     },
     publishButtonDisabled: {
-      backgroundColor: colors.tabIconDefault,
+      backgroundColor: theme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
       opacity: 0.5,
     },
     publishButtonText: {
@@ -134,4 +129,3 @@ export const createStyles = (colorScheme: 'light' | 'dark') => {
       opacity: 0.7,
     },
   });
-};

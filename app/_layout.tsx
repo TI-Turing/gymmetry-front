@@ -435,6 +435,10 @@ function RootLayoutNav() {
           name="create-routine"
           options={{ presentation: 'modal', headerShown: false }}
         />
+        <Stack.Screen
+          name="createPost"
+          options={{ presentation: 'modal', headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );
