@@ -92,68 +92,34 @@ describe('Auth Service', () => {
     });
   });
 
-  describe('register', () => {
-    it('should register successfully with valid data', async () => {
-      const mockResponse = {
-        Success: true,
-        Data: {
-          token: 'mock-jwt-token',
-          user: {
-            id: '1',
-            email: 'newuser@example.com',
-            name: 'New User',
-          },
-        },
-        Message: 'Registration successful',
-        StatusCode: 201,
+  describe('getUserData', () => {
+    it('should get user data successfully', async () => {
+      // Mock the stored user data
+      authService._rawUser = {
+        UserId: '1',
+        Email: 'test@example.com',
+        Name: 'Test User',
+        GymId: 'gym-1',
       };
 
-      mockApiService.post.mockResolvedValue(mockResponse);
-      mockAsyncStorage.setItem.mockResolvedValue();
+      const result = await authService.getUserData();
 
-      const registerData = {
-        email: 'newuser@example.com',
-        password: 'password123',
-        name: 'New User',
-        confirmPassword: 'password123',
-      };
-
-      const result = await authService.register(registerData);
-
-      expect(mockApiService.post).toHaveBeenCalledWith(
-        '/auth/register',
-        registerData
-      );
-      expect(result).toEqual(mockResponse);
-
-      // Should store token on successful registration
-      expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        'auth_token',
-        'mock-jwt-token'
-      );
+      expect(result).toEqual({
+        id: '1',
+        email: 'test@example.com',
+        gymId: 'gym-1',
+        userName: 'Test User',
+        roles: ['user'],
+        isOwner: false,
+      });
     });
 
-    it('should handle registration validation errors', async () => {
-      const mockResponse = {
-        Success: false,
-        Data: null,
-        Message: 'Email already exists',
-        StatusCode: 400,
-      };
+    it('should return null when no user data stored', async () => {
+      authService._rawUser = null;
 
-      mockApiService.post.mockResolvedValue(mockResponse);
+      const result = await authService.getUserData();
 
-      const registerData = {
-        email: 'existing@example.com',
-        password: 'password123',
-        name: 'User',
-        confirmPassword: 'password123',
-      };
-
-      const result = await authService.register(registerData);
-
-      expect(result).toEqual(mockResponse);
-      expect(mockAsyncStorage.setItem).not.toHaveBeenCalled();
+      expect(result).toBeNull();
     });
   });
 
@@ -238,26 +204,27 @@ describe('Auth Service', () => {
       const mockResponse = {
         Success: true,
         Data: {
-          token: 'new-jwt-token',
-          expiresIn: 3600,
+          AccessToken: 'new-jwt-token',
+          RefreshToken: 'new-refresh-token',
+          ExpiresIn: 3600,
         },
         Message: 'Token refreshed',
         StatusCode: 200,
       };
 
       mockApiService.post.mockResolvedValue(mockResponse);
-      mockAsyncStorage.setItem.mockResolvedValue();
 
-      const result = await authService.refreshToken();
+      const request = {
+        RefreshToken: 'old-refresh-token',
+      };
 
-      expect(mockApiService.post).toHaveBeenCalledWith('/auth/refresh');
-      expect(result).toEqual(mockResponse);
+      const result = await authService.refreshToken(request);
 
-      // Should store new token
-      expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        'auth_token',
-        'new-jwt-token'
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/auth/refresh-token',
+        request
       );
+      expect(result).toEqual(mockResponse);
     });
 
     it('should handle refresh token failure', async () => {
@@ -270,45 +237,53 @@ describe('Auth Service', () => {
 
       mockApiService.post.mockResolvedValue(mockResponse);
 
-      const result = await authService.refreshToken();
+      const request = {
+        RefreshToken: 'expired-refresh-token',
+      };
+
+      const result = await authService.refreshToken(request);
 
       expect(result).toEqual(mockResponse);
-      expect(mockAsyncStorage.setItem).not.toHaveBeenCalled();
     });
   });
 
-  describe('getStoredToken', () => {
-    it('should retrieve stored token', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue('stored-token');
+  describe('getUserId', () => {
+    it('should return user ID when user data exists', () => {
+      authService._rawUser = {
+        UserId: '123',
+        Email: 'test@example.com',
+      };
 
-      const token = await authService.getStoredToken();
+      const userId = authService.getUserId();
 
-      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('auth_token');
-      expect(token).toBe('stored-token');
+      expect(userId).toBe('123');
     });
 
-    it('should return null when no token stored', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue(null);
+    it('should return null when no user data exists', () => {
+      authService._rawUser = null;
 
-      const token = await authService.getStoredToken();
+      const userId = authService.getUserId();
 
-      expect(token).toBeNull();
+      expect(userId).toBeNull();
     });
   });
 
   describe('isAuthenticated', () => {
-    it('should return true when token exists', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue('valid-token');
+    it('should return true when user data exists', () => {
+      authService._rawUser = {
+        UserId: '123',
+        Email: 'test@example.com',
+      };
 
-      const isAuth = await authService.isAuthenticated();
+      const isAuth = authService.isAuthenticated();
 
       expect(isAuth).toBe(true);
     });
 
-    it('should return false when no token exists', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue(null);
+    it('should return false when no user data exists', () => {
+      authService._rawUser = null;
 
-      const isAuth = await authService.isAuthenticated();
+      const isAuth = authService.isAuthenticated();
 
       expect(isAuth).toBe(false);
     });
