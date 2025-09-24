@@ -89,7 +89,7 @@ export const jwtValidationUtils = {
       result.payload = payload;
       logger.info('✅ Token decodificado correctamente');
 
-      // 3. Validar estructura básica
+      // 3. Validar estructura básica (solo campos críticos)
       if (!payload.sub && !payload.email) {
         result.errors.push(
           'Token no contiene identificador de usuario (sub o email)'
@@ -100,8 +100,9 @@ export const jwtValidationUtils = {
         result.errors.push('Token no contiene fecha de expiración');
       }
 
+      // iat no es crítico, solo advertir si no está presente
       if (!payload.iat) {
-        result.errors.push('Token no contiene fecha de emisión');
+        logger.warn('⚠️ Token no contiene fecha de emisión (iat), pero continúa validación');
       }
 
       // 4. Verificar expiración

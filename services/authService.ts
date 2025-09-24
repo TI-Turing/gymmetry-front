@@ -80,7 +80,9 @@ export const authService = {
       } catch {}
       // Guardar tokens si existen y configurar Authorization global
       if (response.Data.Token) {
+        // Guardar con ambas claves para compatibilidad
         await AsyncStorage.setItem('authToken', response.Data.Token);
+        await AsyncStorage.setItem('@auth_token', response.Data.Token);
         apiService.setAuthToken(response.Data.Token);
       }
       if (response.Data.RefreshToken) {
@@ -306,7 +308,9 @@ export const authService = {
         RefreshToken: refreshToken,
       });
       if (response.Success && response.Data) {
+        // Guardar con ambas claves para compatibilidad
         await AsyncStorage.setItem('authToken', response.Data.NewToken);
+        await AsyncStorage.setItem('@auth_token', response.Data.NewToken);
         apiService.setAuthToken(response.Data.NewToken);
         try {
           if (response.Data.TokenExpiration)

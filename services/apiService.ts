@@ -234,6 +234,14 @@ class ApiService {
     return `${base}${path}`;
   }
 
+  // Helper: agregar el parámetro code con la Azure Functions key al endpoint
+  private addCodeParam(endpoint: string): string {
+    const key = Environment.API_MAIN_FUNCTIONS_KEY;
+    if (!key) return endpoint;
+    const separator = endpoint.includes('?') ? '&' : '?';
+    return `${endpoint}${separator}code=${encodeURIComponent(key)}`;
+  }
+
   // Helper: fusionar headers por defecto del axiosInstance con los pasados por options
   private mergeHeaders(extra?: Record<string, string>): Record<string, string> {
     const merged: Record<string, string> = {};
@@ -387,11 +395,12 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+      const endpointWithCode = this.addCodeParam(endpoint);
+      // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers));
       // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       // console.log('CURL', __curl);
       const response = await this.axiosInstance.get<BackendApiResponse<T>>(
-        endpoint,
+        endpointWithCode,
         {
           headers: options?.headers,
           timeout: options?.timeout,
@@ -420,12 +429,13 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
+      const endpointWithCode = this.addCodeParam(endpoint);
       //Show curl
-      // const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      // const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers), body);
       // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       // console.log('CURL', __curl);
       const response = await this.axiosInstance.post<BackendApiResponse<T>>(
-        endpoint,
+        endpointWithCode,
         body,
         {
           headers: options?.headers,
@@ -455,10 +465,11 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      const endpointWithCode = this.addCodeParam(endpoint);
+      // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers), body);
       // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.put<BackendApiResponse<T>>(
-        endpoint,
+        endpointWithCode,
         body,
         {
           headers: options?.headers,
@@ -488,10 +499,11 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers), body);
+      const endpointWithCode = this.addCodeParam(endpoint);
+      // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers), body);
       // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.patch<BackendApiResponse<T>>(
-        endpoint,
+        endpointWithCode,
         body,
         {
           headers: options?.headers,
@@ -520,10 +532,11 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpoint), this.mergeHeaders(options?.headers));
+      const endpointWithCode = this.addCodeParam(endpoint);
+      // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers));
       // logger.debug('CURL', __curl); // habilitar si se requiere depuración
       const response = await this.axiosInstance.delete<BackendApiResponse<T>>(
-        endpoint,
+        endpointWithCode,
         {
           headers: options?.headers,
           timeout: options?.timeout,

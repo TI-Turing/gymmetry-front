@@ -18,6 +18,7 @@ interface TokenInfo {
   userData?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   tokenValue?: string;
   lastValidation?: Date;
+  validationErrors?: string[];
 }
 
 interface FloatingTokenInspectorProps {
@@ -45,8 +46,79 @@ export function FloatingTokenInspector({
         return;
       }
 
-      // 2. Validar token con nuestras utilidades
+      // 2. Decodificar token manualmente para debugging
+      let payload = null;
+      const validationErrors: string[] = [];
+      let isTokenValid = false;
+
+      try {
+        // Decodificar manualmente
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+          validationErrors.push(
+            'Token JWT no tiene el formato correcto (3 partes)'
+          );
+        } else {
+          const payloadBase64 = parts[1];
+          const decodedPayload = atob(
+            payloadBase64.replace(/-/g, '+').replace(/_/g, '/')
+          );
+          payload = JSON.parse(decodedPayload);
+
+          // eslint-disable-next-line no-console
+          console.log('🔍 Token decodificado manualmente:', payload);
+
+          // Validación simple
+          if (
+            !payload.sub &&
+            !payload.email &&
+            !payload.userId &&
+            !payload.id
+          ) {
+            validationErrors.push('Token no contiene identificador de usuario');
+          }
+
+          if (payload.exp) {
+            const now = Math.floor(Date.now() / 1000);
+            if (payload.exp <= now) {
+              validationErrors.push('Token está expirado');
+            } else {
+              // eslint-disable-next-line no-console
+              console.log(
+                '✅ Token aún válido por:',
+                payload.exp - now,
+                'segundos'
+              );
+            }
+          } else {
+            validationErrors.push('Token no contiene fecha de expiración');
+          }
+
+          // Si no hay errores, es válido
+          isTokenValid = validationErrors.length === 0;
+
+          // eslint-disable-next-line no-console
+          console.log('🔍 Validación resultado:', {
+            isValid: isTokenValid,
+            errors: validationErrors,
+            payloadKeys: Object.keys(payload),
+          });
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error decodificando token:', error);
+        validationErrors.push(`Error decodificando: ${error}`);
+      }
+
+      // También usar la validación original para comparar
       const validation = await jwtValidationUtils.validateStoredJWT();
+      // eslint-disable-next-line no-console
+      console.log('🔍 Comparación con validador original:', {
+        manualValid: isTokenValid,
+        originalValid: validation.isValid,
+        manualErrors: validationErrors,
+        originalErrors: validation.errors,
+      });
 
       // 3. Obtener datos del usuario actual
       const userData = await authService.getUserData();
@@ -55,8 +127,8 @@ export function FloatingTokenInspector({
       let timeLeft = 'No disponible';
       let expiresAt: Date | undefined;
 
-      if (validation.payload?.exp) {
-        expiresAt = new Date(validation.payload.exp * 1000);
+      if (payload?.exp) {
+        expiresAt = new Date(payload.exp * 1000);
         const now = new Date();
         const diff = expiresAt.getTime() - now.getTime();
 
@@ -71,12 +143,13 @@ export function FloatingTokenInspector({
       }
 
       setTokenInfo({
-        isValid: validation.isValid,
+        isValid: isTokenValid,
         expiresAt,
         timeLeft,
         userData,
         tokenValue: `${token.substring(0, 20)}...${token.substring(token.length - 10)}`,
         lastValidation: new Date(),
+        validationErrors,
       });
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -155,6 +228,19 @@ export function FloatingTokenInspector({
                 </Text>
               </View>
             </View>
+
+            {/* Errores de Validación */}
+            {tokenInfo?.validationErrors &&
+              tokenInfo.validationErrors.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Errores de Validación</Text>
+                  {tokenInfo.validationErrors.map((error, index) => (
+                    <Text key={index} style={styles.errorText}>
+                      • {error}
+                    </Text>
+                  ))}
+                </View>
+              )}
 
             {/* Información de Tiempo */}
             {tokenInfo?.timeLeft && (
@@ -329,5 +415,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 12,
+    marginVertical: 2,
+    fontFamily: 'monospace',
   },
 });

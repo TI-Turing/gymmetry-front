@@ -21,6 +21,13 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   completionPercentage,
 }) => {
   const { styles, colors } = useThemedStyles(makeDisciplineConsistencyStyles);
+  
+  // Debug: Log de datos recibidos por el componente
+  // eslint-disable-next-line no-console
+  console.log(
+    '🎨 DEBUG - DisciplineConsistency data:',
+    JSON.stringify(data, null, 2)
+  );
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':

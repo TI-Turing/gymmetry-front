@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Text, View } from '@/components/Themed';
-import { FlatList } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import stylesFn from './styles';
 import type { FeedItem, FeedListProps } from '@/types/feedTypes';
@@ -82,11 +82,36 @@ const FeedList: React.FC<FeedListProps> = React.memo(
 
     if (!items || items.length === 0) {
       return (
-        <View style={themed.container}>
-          <Text style={themed.emptyText}>
-            No hay publicaciones disponibles.{'\n'}
-            Toca el botón + para crear tu primera publicación.
+        <View style={themed.emptyStateContainer}>
+          <View style={themed.emptyIcon}>
+            <Text style={themed.emptyIconText}>📡</Text>
+          </View>
+          <Text style={themed.emptyTitle}>
+            ¡Tu feed está esperando contenido!
           </Text>
+          <Text style={themed.emptyMessage}>
+            Aún no hay publicaciones{'\n'}disponibles
+          </Text>
+          <Text style={themed.emptySubtext}>
+            Sé el primero en compartir algo increíble
+          </Text>
+          
+          <View style={themed.emptyActions}>
+            <TouchableOpacity
+              style={themed.uploadButton}
+              onPress={() => {
+                // TODO: Abrir modal de subir media o crear post
+              }}
+            >
+              <Text style={themed.uploadButtonIcon}>📷</Text>
+              <Text style={themed.uploadButtonText}>Subir Media</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={themed.refreshButton} onPress={refetch}>
+              <Text style={themed.refreshButtonIcon}>🔄</Text>
+              <Text style={themed.refreshButtonText}>Actualizar feed</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       );
     }
