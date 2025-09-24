@@ -4,7 +4,7 @@
     "slug": "gymmetry-front",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/G.png",
     "scheme": "gymmetryfront",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/G.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true
@@ -26,7 +26,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
+      "favicon": "./assets/images/G.png",
       "name": "Gymmetry",
       "description": "Aplicación de gimnasio para móvil y web",
       "lang": "es",

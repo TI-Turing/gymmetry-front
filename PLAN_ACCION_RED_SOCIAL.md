@@ -442,6 +442,11 @@ _Priorizar soluciones gratuitas/económicas sin sacrificar funcionalidad crític
 - Tests unitarios correspondientes
 
 ---
+---
+
+## ✨ **ACTUALIZACIONES RECIENTES**
+
+- ✅ **24/09/2025:** Se actualizó el branding principal configurando el icono de la app y el favicon para que utilicen `assets/images/G.png`, asegurando consistencia visual en mobile y web.
 
 ---
 
