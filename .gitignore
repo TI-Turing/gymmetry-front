@@ -45,3 +45,6 @@ environment/.env.local
 FitGymApp/
 Gymmetry.Domain/
 Gymmetry.Application/
+
+# docs
+docs/

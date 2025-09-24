@@ -1,4 +1,5 @@
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeDisciplineConsistencyStyles } from './styles/disciplineConsistency';
@@ -14,11 +15,13 @@ interface DisciplineConsistencyData {
 interface DisciplineConsistencyProps {
   data: DisciplineConsistencyData[];
   completionPercentage: number;
+  onPress?: () => void;
 }
 
 const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   data,
   completionPercentage,
+  onPress,
 }) => {
   const { styles, colors } = useThemedStyles(makeDisciplineConsistencyStyles);
   
@@ -57,7 +60,11 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Disciplina y Consistencia</Text>
         <Text style={styles.percentage}>{completionPercentage}%</Text>
@@ -124,7 +131,7 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
           <Text style={styles.legendText}>Falla</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

@@ -310,6 +310,170 @@ export const transformTodayRoutine = (
 };
 
 /**
+ * Genera los datos para la vista detallada de progreso del plan
+ * Calcula cada día desde el inicio hasta el final del plan con su estado y porcentaje
+ */
+export const transformDetailedProgressData = (
+  plan: Plan,
+  dailyRecords: Daily[],
+  routineDays: RoutineDay[]
+): {
+  dayNumber: number;
+  percentage: number;
+  status: 'success' | 'fail' | 'rest';
+}[] => {
+  try {
+    const startDate = new Date(plan.StartDate);
+    const endDate = new Date(plan.EndDate);
+    const today = new Date();
+    
+    // Crear mapa de días de rutina activos (1-7 donde existe RoutineDay)
+    const activeDays = new Set(routineDays.map((rd) => rd.DayNumber));
+    
+    // Calcular días totales del plan
+    const totalDays = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    ) + 1; // +1 para incluir el último día
+    
+    const progressData: {
+      dayNumber: number;
+      percentage: number;
+      status: 'success' | 'fail' | 'rest';
+    }[] = [];
+    
+    for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + dayOffset);
+      
+      // Número del día del mes
+      const dayNumber = currentDate.getDate();
+      
+      // Día de la semana (1 = Lunes, 7 = Domingo)
+      const dayOfWeek = getDayOfWeek(currentDate);
+      
+      // Buscar Daily para este día
+      const dailyForDay = dailyRecords.find((daily) => {
+        const dailyDate = new Date(daily.StartDate);
+        return (
+          dailyDate.getDate() === currentDate.getDate() &&
+          dailyDate.getMonth() === currentDate.getMonth() &&
+          dailyDate.getFullYear() === currentDate.getFullYear()
+        );
+      });
+      
+      let status: 'success' | 'fail' | 'rest';
+      let percentage = 0;
+      
+      if (!activeDays.has(dayOfWeek)) {
+        // Día de descanso
+        status = 'rest';
+        percentage = 0;
+      } else if (dailyForDay) {
+        // Hay registro Daily
+        percentage = dailyForDay.Percentage;
+        status = percentage > 30 ? 'success' : 'fail';
+      } else if (currentDate <= today) {
+        // Día de entrenamiento pasado sin registro = fallido
+        status = 'fail';
+        percentage = 0;
+      } else {
+        // Día futuro de entrenamiento = pendiente (mostrar como rest por ahora)
+        status = 'rest';
+        percentage = 0;
+      }
+      
+      progressData.push({
+        dayNumber,
+        percentage,
+        status,
+      });
+    }
+    
+    return progressData;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Error transforming detailed progress data:', error);
+    return [];
+  }
+};
+
+/**
+ * Genera los datos para la vista detallada de progreso del mes actual
+ * Calcula cada día desde el día 1 del mes actual hasta hoy
+ */
+export const transformCurrentMonthProgressData = (
+  dailyRecords: Daily[],
+  routineDays: RoutineDay[]
+): {
+  dayNumber: number;
+  percentage: number;
+  status: 'success' | 'fail' | 'rest';
+}[] => {
+  try {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    // Crear mapa de días de rutina activos (1-7 donde existe RoutineDay)
+    const activeDays = new Set(routineDays.map((rd) => rd.DayNumber));
+    
+    // Calcular días del mes actual hasta hoy
+    const daysInCurrentMonth = today.getDate(); // Solo hasta el día actual
+    
+    const progressData: {
+      dayNumber: number;
+      percentage: number;
+      status: 'success' | 'fail' | 'rest';
+    }[] = [];
+    
+    for (let dayOfMonth = 1; dayOfMonth <= daysInCurrentMonth; dayOfMonth++) {
+      const currentDate = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
+      
+      // Día de la semana (1 = Lunes, 7 = Domingo)
+      const dayOfWeek = getDayOfWeek(currentDate);
+      
+      // Buscar Daily para este día
+      const dailyForDay = dailyRecords.find((daily) => {
+        const dailyDate = new Date(daily.StartDate);
+        return (
+          dailyDate.getDate() === currentDate.getDate() &&
+          dailyDate.getMonth() === currentDate.getMonth() &&
+          dailyDate.getFullYear() === currentDate.getFullYear()
+        );
+      });
+      
+      let status: 'success' | 'fail' | 'rest';
+      let percentage = 0;
+      
+      if (!activeDays.has(dayOfWeek)) {
+        // Día de descanso
+        status = 'rest';
+        percentage = 0;
+      } else if (dailyForDay) {
+        // Hay registro Daily
+        percentage = dailyForDay.Percentage;
+        status = percentage > 30 ? 'success' : 'fail';
+      } else {
+        // Día de entrenamiento sin registro = fallido
+        status = 'fail';
+        percentage = 0;
+      }
+      
+      progressData.push({
+        dayNumber: dayOfMonth,
+        percentage,
+        status,
+      });
+    }
+    
+    return progressData;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Error transforming current month progress data:', error);
+    return [];
+  }
+};
+
+/**
  * Utilidad para normalizar arrays del backend que pueden venir con $values
  */
 export const normalizeArray = <T>(raw: unknown): T[] => {

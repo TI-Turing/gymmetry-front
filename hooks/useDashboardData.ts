@@ -9,6 +9,8 @@ import {
   transformDisciplineData,
   transformPlanInfo,
   transformTodayRoutine,
+  transformDetailedProgressData,
+  transformCurrentMonthProgressData,
   normalizeArray,
   DisciplineData,
   PlanInfoData,
@@ -28,6 +30,11 @@ export interface DashboardData {
   } | null;
   planInfo: PlanInfoData | null;
   todayRoutine: TodayRoutineData | null;
+  detailedProgress: {
+    dayNumber: number;
+    percentage: number;
+    status: 'success' | 'fail' | 'rest';
+  }[] | null;
 }
 
 export interface DashboardState {
@@ -42,6 +49,7 @@ export const useDashboardData = (): DashboardState => {
     discipline: null,
     planInfo: null,
     todayRoutine: null,
+    detailedProgress: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,6 +162,11 @@ export const useDashboardData = (): DashboardState => {
         recentDailies
       );
 
+      // Generar datos detallados de progreso del plan o mes actual
+      const detailedProgress = activePlan
+        ? transformDetailedProgressData(activePlan, dailyRecords, routineDays)
+        : transformCurrentMonthProgressData(dailyRecords, routineDays);
+
       // 7. Actualizar estado
       setData({
         discipline: {
@@ -162,6 +175,7 @@ export const useDashboardData = (): DashboardState => {
         },
         planInfo,
         todayRoutine,
+        detailedProgress,
       });
     } catch (err) {
       const errorMessage =

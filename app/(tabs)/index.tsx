@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, ActivityIndicator } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
@@ -6,6 +6,7 @@ import DisciplineConsistency from '@/components/home/DisciplineConsistency';
 import PlanInfo from '@/components/home/PlanInfo';
 import TodayRoutine from '@/components/home/TodayRoutine';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
+import DetailedProgressModal from '@/components/home/DetailedProgressModal/DetailedProgressModal';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { router } from 'expo-router';
@@ -18,6 +19,7 @@ function HomeScreen() {
   const styles = useThemedStyles(makeHomeStyles);
   const { showSuccess: _showSuccess, AlertComponent } = useCustomAlert();
   const { data, loading, error, refetch } = useDashboardData();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleFloatingButtonPress = () => {
     router.push('/routine-day');
@@ -25,6 +27,14 @@ function HomeScreen() {
 
   const handleRoutinePress = () => {
     router.push('/routine-day-detail');
+  };
+
+  const handleDisciplinePress = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
   };
 
   // Se elimina el subtítulo bajo el header que mostraba "Hoy: <rutina>"
@@ -81,6 +91,7 @@ function HomeScreen() {
           <DisciplineConsistency
             data={data.discipline.data}
             completionPercentage={data.discipline.completionPercentage}
+            onPress={handleDisciplinePress}
           />
         ) : (
           <View style={styles.emptySection}>
@@ -133,6 +144,13 @@ function HomeScreen() {
         onPress={handleFloatingButtonPress}
         icon="play"
         backgroundColor={styles.colors.tint}
+      />
+
+      {/* Modal de Progreso Detallado */}
+      <DetailedProgressModal
+        visible={modalVisible}
+        onClose={handleCloseModal}
+        progressData={data.detailedProgress || []}
       />
 
       {/* Componente de Alertas */}
