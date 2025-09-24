@@ -31,10 +31,18 @@ export interface DashboardData {
   planInfo: PlanInfoData | null;
   todayRoutine: TodayRoutineData | null;
   detailedProgress: {
-    dayNumber: number;
-    percentage: number;
-    status: 'success' | 'fail' | 'rest';
-  }[] | null;
+    planData: {
+      dayNumber: number;
+      percentage: number;
+      status: 'success' | 'fail' | 'rest';
+    }[];
+    monthData: {
+      dayNumber: number;
+      percentage: number;
+      status: 'success' | 'fail' | 'rest';
+    }[];
+    hasActivePlan: boolean;
+  } | null;
 }
 
 export interface DashboardState {
@@ -162,10 +170,12 @@ export const useDashboardData = (): DashboardState => {
         recentDailies
       );
 
-      // Generar datos detallados de progreso del plan o mes actual
-      const detailedProgress = activePlan
+      // Generar datos detallados de progreso
+      const planData = activePlan
         ? transformDetailedProgressData(activePlan, dailyRecords, routineDays)
-        : transformCurrentMonthProgressData(dailyRecords, routineDays);
+        : [];
+      
+      const monthData = transformCurrentMonthProgressData(dailyRecords, routineDays);
 
       // 7. Actualizar estado
       setData({
@@ -175,7 +185,11 @@ export const useDashboardData = (): DashboardState => {
         },
         planInfo,
         todayRoutine,
-        detailedProgress,
+        detailedProgress: {
+          planData,
+          monthData,
+          hasActivePlan: !!activePlan,
+        },
       });
     } catch (err) {
       const errorMessage =

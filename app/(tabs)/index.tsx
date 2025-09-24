@@ -6,7 +6,8 @@ import DisciplineConsistency from '@/components/home/DisciplineConsistency';
 import PlanInfo from '@/components/home/PlanInfo';
 import TodayRoutine from '@/components/home/TodayRoutine';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
-import DetailedProgressModal from '@/components/home/DetailedProgressModal/DetailedProgressModal';
+import DetailedProgressModalNew from '@/components/home/DetailedProgressModalNew';
+
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
 import { withWebLayout } from '@/components/layout/withWebLayout';
 import { router } from 'expo-router';
@@ -18,8 +19,8 @@ import { makeHomeStyles } from './styles/home';
 function HomeScreen() {
   const styles = useThemedStyles(makeHomeStyles);
   const { showSuccess: _showSuccess, AlertComponent } = useCustomAlert();
+  const [showDetailedProgress, setShowDetailedProgress] = useState(false);
   const { data, loading, error, refetch } = useDashboardData();
-  const [modalVisible, setModalVisible] = useState(false);
 
   const handleFloatingButtonPress = () => {
     router.push('/routine-day');
@@ -30,11 +31,7 @@ function HomeScreen() {
   };
 
   const handleDisciplinePress = () => {
-    setModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalVisible(false);
+    setShowDetailedProgress(true);
   };
 
   // Se elimina el subtítulo bajo el header que mostraba "Hoy: <rutina>"
@@ -147,10 +144,9 @@ function HomeScreen() {
       />
 
       {/* Modal de Progreso Detallado */}
-      <DetailedProgressModal
-        visible={modalVisible}
-        onClose={handleCloseModal}
-        progressData={data.detailedProgress || []}
+      <DetailedProgressModalNew
+        visible={showDetailedProgress}
+        onClose={() => setShowDetailedProgress(false)}
       />
 
       {/* Componente de Alertas */}

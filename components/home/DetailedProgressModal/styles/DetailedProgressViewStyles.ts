@@ -3,13 +3,14 @@ import { StyleSheet } from 'react-native';
 export default () =>
   StyleSheet.create({
     scrollContainer: {
-      flexGrow: 0,
-      paddingVertical: 16,
-      paddingHorizontal: 8,
+      flex: 1,
+      paddingVertical: 20,
+      paddingHorizontal: 16,
     },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
+      gap: 12,
+      paddingHorizontal: 8,
     },
   });

@@ -515,6 +515,40 @@ const en: Dict = {
   progress_dashboard_cancel: 'Cancel',
   progress_dashboard_apply: 'Apply',
 
+  // Detailed progress modal
+  'progress_modal.total_progress': 'Total progress',
+  'progress_modal.completed_days_suffix': 'days completed',
+  'progress_modal.attended_days': 'Attended days',
+  'progress_modal.attended_days_helper': 'Sessions marked attended',
+  'progress_modal.longest_streak': 'Longest streak',
+  'progress_modal.longest_streak_helper': 'Consecutive completed days',
+  'progress_modal.average_progress': 'Average completion',
+  'progress_modal.average_progress_helper': 'Average percentage per day',
+  'progress_modal.consistency_rate': 'Consistency rate',
+  'progress_modal.consistency_rate_helper': 'completed days out of active days',
+  'progress_modal.best_day': 'Best day',
+  'progress_modal.best_day_helper': 'Day with highest progress',
+  'progress_modal.rest_days': 'Rest days',
+  'progress_modal.rest_days_helper': 'Days without activity',
+  'progress_modal.share_dialog_title': 'Share progress',
+  'progress_modal.month_label': 'Monthly',
+  'progress_modal.plan_label': 'Plan',
+  'progress_modal.no_data_title': 'No discipline data yet',
+  'progress_modal.no_data_helper': 'Complete routines to see your progress.',
+  'progress_modal.share_button': 'Share progress',
+  'progress_modal.loading_error_title': 'Error loading data',
+  'progress_modal.capture_unavailable_title': 'Capture unavailable',
+  'progress_modal.capture_unavailable_body':
+    'Make sure the content is visible before sharing.',
+  'progress_modal.sharing_not_supported_title': 'Sharing not available',
+  'progress_modal.sharing_not_supported_body':
+    'This device does not allow sharing images from the app.',
+  'progress_modal.share_error_title': 'Share error',
+  'progress_modal.share_error_body':
+    'We could not share your progress. Please try again.',
+  'progress_modal.preparing_capture': 'Preparing capture...',
+  'progress_modal.watermark': 'Gymmetry',
+
   // Physical Measures
   progress_dashboard_recent_measures: 'Recent physical measurements',
   progress_dashboard_height: 'Height',

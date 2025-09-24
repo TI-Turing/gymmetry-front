@@ -13,6 +13,7 @@ export interface DetailedProgressViewProps {
 export interface DetailedProgressModalProps {
   visible: boolean;
   onClose: () => void;
-  progressData: ProgressDaySquareProps[];
+  planData: ProgressDaySquareProps[];
+  monthData: ProgressDaySquareProps[];
   hasActivePlan: boolean;
 }

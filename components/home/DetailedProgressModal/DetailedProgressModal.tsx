@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, TouchableWithoutFeedback, Text } from 'react-native';
+import { Modal, View, TouchableWithoutFeedback } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import DetailedProgressView from './DetailedProgressView';
 import FilterSelector from './FilterSelector';
@@ -9,11 +9,15 @@ import makeDetailedProgressModalStyles from './styles/DetailedProgressModalStyle
 const DetailedProgressModal: React.FC<DetailedProgressModalProps> = ({ 
   visible, 
   onClose, 
-  progressData,
+  planData,
+  monthData,
   hasActivePlan,
 }) => {
   const styles = useThemedStyles(makeDetailedProgressModalStyles);
   const [filterMode, setFilterMode] = useState<'month' | 'plan'>('month');
+  
+  // Seleccionar datos según el filtro
+  const currentData = filterMode === 'plan' && hasActivePlan ? planData : monthData;
 
   return (
     <Modal
@@ -32,7 +36,7 @@ const DetailedProgressModal: React.FC<DetailedProgressModalProps> = ({
           onFilterChange={setFilterMode}
           hasActivePlan={hasActivePlan}
         />
-        <DetailedProgressView progressData={progressData} />
+        <DetailedProgressView progressData={currentData} />
       </View>
     </Modal>
   );

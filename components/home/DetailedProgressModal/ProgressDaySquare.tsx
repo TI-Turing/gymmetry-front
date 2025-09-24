@@ -10,8 +10,21 @@ const ProgressDaySquare: React.FC<ProgressDaySquareProps> = ({
   status 
 }) => {
   const styles = useThemedStyles(makeProgressDaySquareStyles);
+  const getStatusStyle = () => {
+    switch (status) {
+      case 'success':
+        return styles.success;
+      case 'fail':
+        return styles.fail;
+      case 'rest':
+        return styles.rest;
+      default:
+        return {};
+    }
+  };
+
   return (
-    <View style={[styles.square, styles[status as keyof typeof styles]]}>
+    <View style={[styles.square, getStatusStyle()]}>
       <Text style={styles.dayNumber}>{dayNumber}</Text>
       <Text style={styles.percentage}>{percentage}%</Text>
     </View>

@@ -526,6 +526,40 @@ const es: Dict = {
   progress_dashboard_cancel: 'Cancelar',
   progress_dashboard_apply: 'Aplicar',
 
+  // Detailed progress modal
+  'progress_modal.total_progress': 'Progreso total',
+  'progress_modal.completed_days_suffix': 'días completados',
+  'progress_modal.attended_days': 'Días asistidos',
+  'progress_modal.attended_days_helper': 'Sesiones registradas',
+  'progress_modal.longest_streak': 'Mejor racha',
+  'progress_modal.longest_streak_helper': 'Días consecutivos completados',
+  'progress_modal.average_progress': 'Promedio de avance',
+  'progress_modal.average_progress_helper': 'Porcentaje promedio por día',
+  'progress_modal.consistency_rate': 'Tasa de consistencia',
+  'progress_modal.consistency_rate_helper': 'días completados de días activos',
+  'progress_modal.best_day': 'Mejor día',
+  'progress_modal.best_day_helper': 'Día con mayor avance',
+  'progress_modal.rest_days': 'Días de descanso',
+  'progress_modal.rest_days_helper': 'Días sin actividad',
+  'progress_modal.share_dialog_title': 'Compartir progreso',
+  'progress_modal.month_label': 'Mensual',
+  'progress_modal.plan_label': 'Plan',
+  'progress_modal.no_data_title': 'Sin datos de disciplina todavía',
+  'progress_modal.no_data_helper': 'Completa rutinas para ver tu progreso aquí.',
+  'progress_modal.share_button': 'Compartir progreso',
+  'progress_modal.loading_error_title': 'Error al cargar datos',
+  'progress_modal.capture_unavailable_title': 'Captura no disponible',
+  'progress_modal.capture_unavailable_body':
+    'Asegúrate de que el contenido esté visible antes de compartir.',
+  'progress_modal.sharing_not_supported_title': 'Compartir no disponible',
+  'progress_modal.sharing_not_supported_body':
+    'Este dispositivo no permite compartir imágenes desde la aplicación.',
+  'progress_modal.share_error_title': 'Error al compartir',
+  'progress_modal.share_error_body':
+    'No se pudo compartir el progreso. Inténtalo nuevamente.',
+  'progress_modal.preparing_capture': 'Preparando captura...',
+  'progress_modal.watermark': 'Gymmetry',
+
   // Physical Measures
   progress_dashboard_recent_measures: 'Medidas físicas recientes',
   progress_dashboard_height: 'Altura',

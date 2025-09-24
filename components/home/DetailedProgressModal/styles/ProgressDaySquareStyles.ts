@@ -1,42 +1,52 @@
 import { StyleSheet } from 'react-native';
 import Colors from '../../../../constants/Colors';
 
-export default (theme: 'light' | 'dark') =>
-  StyleSheet.create({
+export default (theme: 'light' | 'dark') => {
+  const palette = Colors[theme];
+  const colors = {
+    text: palette.text,
+    textMuted: palette.textMuted,
+    card: palette.card,
+    tint: palette.tint,
+    rest: palette.textMuted,
+    failBg: 'rgba(255, 99, 0, 0.1)',
+  };
+
+  return StyleSheet.create({
     square: {
-      width: 56,
-      height: 72,
-      borderRadius: 16,
+      width: 60,
+      height: 80,
+      borderRadius: 12,
       justifyContent: 'center',
       alignItems: 'center',
-      marginHorizontal: 4,
-      backgroundColor: theme === 'dark' ? Colors.dark.card : Colors.light.card,
+      marginHorizontal: 6,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
       elevation: 2,
     },
     success: {
-      borderColor: theme === 'dark' ? Colors.dark.success : Colors.light.success,
-      borderWidth: 2,
+      backgroundColor: colors.tint,
     },
     fail: {
-      borderColor: theme === 'dark' ? Colors.dark.danger : Colors.light.danger,
+      backgroundColor: colors.failBg,
+      borderColor: colors.tint,
       borderWidth: 2,
     },
     rest: {
-      borderColor: theme === 'dark' ? Colors.dark.neutral : Colors.light.neutral,
-      borderWidth: 2,
+      backgroundColor: colors.rest,
     },
     dayNumber: {
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: 'bold' as const,
-      color: theme === 'dark' ? Colors.dark.text : Colors.light.text,
+      color: '#FFFFFF',
       marginBottom: 4,
     },
     percentage: {
-      fontSize: 14,
-      color: theme === 'dark' ? Colors.dark.textMuted : Colors.light.textMuted,
+      fontSize: 12,
+      color: '#FFFFFF',
+      opacity: 0.9,
     },
   });
+};

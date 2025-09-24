@@ -198,7 +198,7 @@ Trabajo coordinado frontend-backend en fases priorizadas. Cada funcionalidad req
 
 ---
 
-## 🚀 **FASE 6: SISTEMA DE COMPARTIR** ⏳ PLANIFICADO (0%)
+## 🚀 **FASE 6: SISTEMA DE COMPARTIR** 🔄 EN PROCESO (20%)
 
 ### Backend (PLANIFICADO):
 
@@ -216,8 +216,17 @@ Trabajo coordinado frontend-backend en fases priorizadas. Cada funcionalidad req
 - Analytics de viralidad
 - **MIGRACIÓN DE BD REQUERIDA**
 
-### Frontend (⏳ PLANIFICADO - 0%):
+### Frontend (🔄 EN PROCESO - 55%):
 
+- ✅ Compartir progreso detallado como imagen desde el modal de disciplina (100%)
+  - Captura enriquecida con tarjetas de métricas, textos traducidos y estados vacíos consistentes
+  - Formato vertical optimizado con calendario + métricas apiladas y watermark centrado para redes sociales
+  - Reajuste de distribución: calendario ampliado y tarjetas en dos columnas equilibradas aprovechando todo el ancho
+- ✅ Ajuste responsivo del calendario en el modal en vivo (100%)
+  - Las celdas se recalculan automáticamente en base al ancho y alto disponibles, evitando scroll y solapamientos
+  - Preserva dimensiones específicas en el modo de captura para mantener la consistencia de la imagen compartida
+  - Centrado automático del grid y espaciados consistentes entre semanas en cualquier tamaño de pantalla
+- 📅 Última actualización: 2025-09-24
 - ⏳ Botones de compartir en posts (0%)
 - ⏳ Compartir interno (usuarios de la app) (0%)
 - ⏳ Integración con redes sociales externas (0%)
@@ -438,18 +447,18 @@ _Priorizar soluciones gratuitas/económicas sin sacrificar funcionalidad crític
 
 ## 📊 **PROGRESO GENERAL DEL PROYECTO**
 
-**🎯 Progreso Total: 21.4%**
+**🎯 Progreso Total: 25.5%**
 
 - ✅ **Fase 1 - Seguridad Crítica:** 100% COMPLETADO
 - ✅ **Fase 2 - Sistema de Reportes:** 90% COMPLETADO (Solo falta panel de moderación y notificaciones)
 - ⏳ **Fase 3 - Sistema de Bloqueo:** 0% PLANIFICADO
 - ⏳ **Fase 4 - Moderación de Contenido:** 0% PLANIFICADO
 - ⏳ **Fase 5 - Notificaciones Push:** 0% PLANIFICADO
-- ⏳ **Fase 6 - Sistema de Compartir:** 0% PLANIFICADO
+- 🔄 **Fase 6 - Sistema de Compartir:** 35% EN PROCESO (Modal de progreso enriquecido y captura vertical optimizada con mayor cobertura de calendario y métricas)
 - ⏳ **Fase 7 - Optimización:** 0% PLANIFICADO
 
 ---
 
-_Documento actualizado: 13 de septiembre de 2025_
-_Estado: Fase 1 completada (100%), Fase 2 en progreso (50% - backend completado)_
-_Próximo hito: Implementar frontend completo de sistema de reportes_
+_Documento actualizado: 24 de septiembre de 2025_
+_Estado: Fase 1 completada (100%), Fase 2 en progreso (50% - backend completado), Fase 6 avanzando (35%)_
+_Próximo hito: Implementar botones de compartir en posts y flujo de compartido interno_

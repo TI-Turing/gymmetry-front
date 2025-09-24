@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { DetailedProgressViewProps } from './types';
 import ProgressDaySquare from './ProgressDaySquare';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
@@ -11,12 +11,15 @@ const DetailedProgressView: React.FC<DetailedProgressViewProps> = ({
   const styles = useThemedStyles(makeDetailedProgressViewStyles);
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollContainer}>
-      <View style={styles.row}>
-        {progressData.map((day) => (
-          <ProgressDaySquare key={day.dayNumber} {...day} />
-        ))}
-      </View>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scrollContainer}
+      contentContainerStyle={styles.row}
+    >
+      {progressData.map((day) => (
+        <ProgressDaySquare key={day.dayNumber} {...day} />
+      ))}
     </ScrollView>
   );
 };

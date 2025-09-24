@@ -14,13 +14,9 @@ export default (theme: 'light' | 'dark') =>
     },
     container: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
       backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
-      marginHorizontal: 24,
-      marginVertical: 32,
-      borderRadius: 24,
+      paddingHorizontal: 20,
+      paddingVertical: 16,
       zIndex: 2,
-      elevation: 4,
     },
   });

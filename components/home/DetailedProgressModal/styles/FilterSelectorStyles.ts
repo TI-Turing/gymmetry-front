@@ -4,10 +4,11 @@ import Colors from '../../../../constants/Colors';
 export default (theme: 'light' | 'dark') =>
   StyleSheet.create({
     container: {
-      paddingHorizontal: 16,
-      paddingVertical: 12,
+      paddingHorizontal: 20,
+      paddingVertical: 16,
       borderBottomWidth: 1,
       borderBottomColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
+      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
     title: {
       fontSize: 16,
