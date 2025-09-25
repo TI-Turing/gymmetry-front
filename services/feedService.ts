@@ -29,6 +29,22 @@ export const feedService = {
     const response = await apiService.get<unknown>(`/feed`);
     return response;
   },
+  
+  /**
+   * Crea un feed con archivos multimedia usando FormData
+   */
+  async createFeedWithMedia(formData: FormData): Promise<ApiResponse<unknown>> {
+    const response = await apiService.post<unknown>(
+      `/feed/create-with-media`, 
+      formData, 
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response;
+  },
   // Nuevos endpoints paginados y trending
   async getFeedsPaged(page = 1, size = 20): Promise<ApiResponse<unknown>> {
     return apiService.get<unknown>(`/feed/paged?page=${page}&size=${size}`);

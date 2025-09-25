@@ -11,7 +11,7 @@ import { EnhancedCommentsModal } from '../social/EnhancedCommentsModal';
 import { useAuth } from '@/contexts/AuthContext';
 
 const FeedList: React.FC<FeedListProps> = React.memo(
-  ({ items, loading, error, refetch }) => {
+  ({ items, loading, error, refetch, onCreatePost }) => {
     const themed = useThemedStyles(stylesFn);
     const { user: authUser } = useAuth();
     const colorScheme = useColorScheme();
@@ -108,12 +108,10 @@ const FeedList: React.FC<FeedListProps> = React.memo(
           <View style={themed.emptyActions}>
             <TouchableOpacity
               style={themed.uploadButton}
-              onPress={() => {
-                // TODO: Abrir modal de subir media o crear post
-              }}
+              onPress={onCreatePost}
             >
-              <Text style={themed.uploadButtonIcon}>📷</Text>
-              <Text style={themed.uploadButtonText}>Subir Media</Text>
+              <Text style={themed.uploadButtonIcon}>✍️</Text>
+              <Text style={themed.uploadButtonText}>Crear Publicación</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={themed.refreshButton} onPress={refetch}>

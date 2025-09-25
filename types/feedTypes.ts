@@ -8,6 +8,7 @@ export interface FeedListProps {
   refetch?: () => void;
   onRefresh?: () => void;
   refreshing?: boolean;
+  onCreatePost?: () => void;
 }
 
 export interface FeedItem {

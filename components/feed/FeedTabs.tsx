@@ -13,7 +13,11 @@ import { EnhancedTabBar, TabItem } from '../common/EnhancedTabBar';
 const TABS = ['Feed', 'Trending'] as const;
 type TabKey = (typeof TABS)[number];
 
-const FeedTabs: React.FC = () => {
+interface FeedTabsProps {
+  onCreatePost?: () => void;
+}
+
+const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
   const [tab, setTab] = useState<TabKey>('Feed');
   const themed = useThemedStyles(styles);
   const paged = useFeedPagedAdapter();
@@ -69,6 +73,7 @@ const FeedTabs: React.FC = () => {
           loading={paged.loading}
           error={paged.error}
           refetch={paged.refetch}
+          onCreatePost={onCreatePost}
         />
       )}
       {tab === 'Trending' && (
@@ -77,6 +82,7 @@ const FeedTabs: React.FC = () => {
           loading={trending.loading}
           error={trending.error}
           refetch={trending.refetch}
+          onCreatePost={onCreatePost}
         />
       )}
     </View>

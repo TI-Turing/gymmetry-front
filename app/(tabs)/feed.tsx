@@ -20,7 +20,7 @@ function FeedScreen() {
   return (
     <ScreenWrapper headerTitle="Feed" showBackButton={false}>
       <View style={{ flex: 1 }}>
-        <FeedTabs />
+        <FeedTabs onCreatePost={handleOpenCreatePost} />
         <FloatingCreateButton onPress={handleOpenCreatePost} />
 
         <Modal
