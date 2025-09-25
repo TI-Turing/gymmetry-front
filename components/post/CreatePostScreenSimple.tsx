@@ -13,12 +13,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { CustomAlert } from '@/components/common/CustomAlert';
 import * as ImagePicker from 'expo-image-picker';
 import { feedService, authService } from '@/services';
-import {
-  validateMultipleMediaFiles,
-  compressImage,
-  blobToFile,
-  MEDIA_LIMITS,
-} from '@/utils/mediaUtils';
+import { validateMultipleMediaFiles, MEDIA_LIMITS } from '@/utils/mediaUtils';
 
 interface CreatePostScreenProps {
   onClose?: () => void;
@@ -85,7 +80,8 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
       // Validar archivos multimedia antes del procesamiento
       if (selectedMedia.length > 0) {
         const mediaForValidation = selectedMedia.map((media) => ({
-          type: media.type === 'video' ? ('video' as const) : ('image' as const),
+          type:
+            media.type === 'video' ? ('video' as const) : ('image' as const),
           mimeType: media.mimeType,
           fileSize: media.fileSize,
           fileName: media.fileName || undefined,
@@ -115,15 +111,19 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
         
         if (media.type === 'image') {
           try {
-            // Comprimir imagen
-            const compressed = await compressImage(media.uri, media.mimeType);
-            const file = blobToFile(compressed.blob, media.fileName || `image_${i}.jpg`);
+            // Procesar imagen directamente sin compresión
+            const response = await fetch(media.uri);
+            const blob = await response.blob();
+            const file = new File([blob], media.fileName || `image_${i}.jpg`, {
+              type: blob.type || 'image/jpeg',
+              lastModified: Date.now(),
+            });
             formData.append('files', file);
           } catch (error) {
             showCustomAlert(
               'error',
-              'Error de compresión',
-              `No se pudo comprimir la imagen ${media.fileName}`
+              'Error de archivo',
+              `No se pudo procesar la imagen ${media.fileName}`
             );
             return;
           }
@@ -132,7 +132,10 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
           try {
             const response = await fetch(media.uri);
             const blob = await response.blob();
-            const file = blobToFile(blob, media.fileName || `video_${i}.mp4`);
+            const file = new File([blob], media.fileName || `video_${i}.mp4`, {
+              type: blob.type || 'video/mp4',
+              lastModified: Date.now(),
+            });
             formData.append('files', file);
           } catch (error) {
             showCustomAlert(
