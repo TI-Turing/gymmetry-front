@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
-import { useDashboardData } from '@/hooks/useDashboardData';
+import { useHomeDashboardAdapter } from '../../hooks/useHomeDashboardAdapter';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -149,7 +149,7 @@ function DetailedProgressModalNew({
   visible,
   onClose,
 }: DetailedProgressModalNewProps) {
-  const { data, loading, error } = useDashboardData();
+  const { data, loading, error } = useHomeDashboardAdapter();
   const { t } = useI18n();
   const theme = useColorScheme();
   const colors = Colors[theme];

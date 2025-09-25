@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { View } from 'react-native';
 import FeedList from './FeedList';
-import { useFeedPaged, useFeedTrending } from '../../hooks/useFeed';
+import {
+  useFeedPagedAdapter,
+  useFeedTrendingAdapter,
+} from '../../hooks/useFeedAdapter';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import styles from './styles';
 import { mapFeedToFeedItem } from '@/types/feedTypes';
@@ -13,8 +16,8 @@ type TabKey = (typeof TABS)[number];
 const FeedTabs: React.FC = () => {
   const [tab, setTab] = useState<TabKey>('Feed');
   const themed = useThemedStyles(styles);
-  const paged = useFeedPaged();
-  const trending = useFeedTrending();
+  const paged = useFeedPagedAdapter();
+  const trending = useFeedTrendingAdapter();
 
   // Configuración de tabs para EnhancedTabBar
   const tabs: TabItem[] = useMemo(

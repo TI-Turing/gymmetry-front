@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { Text, View } from '@/components/Themed';
-import { FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { useColorScheme } from '@/components/useColorScheme';
+import Colors from '@/constants/Colors';
 import stylesFn from './styles';
 import type { FeedItem, FeedListProps } from '@/types/feedTypes';
 import { UnifiedPostCard } from '../common/UnifiedPostCard';
@@ -12,7 +14,14 @@ const FeedList: React.FC<FeedListProps> = React.memo(
   ({ items, loading, error, refetch }) => {
     const themed = useThemedStyles(stylesFn);
     const { user: authUser } = useAuth();
+    const colorScheme = useColorScheme();
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+
+    // Colores para RefreshControl
+    const refreshTintColor =
+      colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint;
+    const refreshColor =
+      colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint;
 
     const handleToggleLike = useCallback((postId: string) => {
       // TODO: Implementar toggle like
@@ -95,7 +104,7 @@ const FeedList: React.FC<FeedListProps> = React.memo(
           <Text style={themed.emptySubtext}>
             Sé el primero en compartir algo increíble
           </Text>
-          
+
           <View style={themed.emptyActions}>
             <TouchableOpacity
               style={themed.uploadButton}
@@ -106,7 +115,7 @@ const FeedList: React.FC<FeedListProps> = React.memo(
               <Text style={themed.uploadButtonIcon}>📷</Text>
               <Text style={themed.uploadButtonText}>Subir Media</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={themed.refreshButton} onPress={refetch}>
               <Text style={themed.refreshButtonIcon}>🔄</Text>
               <Text style={themed.refreshButtonText}>Actualizar feed</Text>
@@ -125,6 +134,16 @@ const FeedList: React.FC<FeedListProps> = React.memo(
           showsVerticalScrollIndicator={false}
           contentContainerStyle={themed.listContainer}
           ItemSeparatorComponent={() => <View style={themed.separator} />}
+          refreshControl={
+            refetch ? (
+              <RefreshControl
+                refreshing={!!loading}
+                onRefresh={refetch}
+                tintColor={refreshTintColor}
+                colors={[refreshColor]}
+              />
+            ) : undefined
+          }
         />
 
         {selectedPostId && (

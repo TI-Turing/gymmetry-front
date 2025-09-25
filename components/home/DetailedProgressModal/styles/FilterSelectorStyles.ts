@@ -7,8 +7,10 @@ export default (theme: 'light' | 'dark') =>
       paddingHorizontal: 20,
       paddingVertical: 16,
       borderBottomWidth: 1,
-      borderBottomColor: theme === 'dark' ? Colors.dark.border : Colors.light.border,
-      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
+      borderBottomColor:
+        theme === 'dark' ? Colors.dark.border : Colors.light.border,
+      backgroundColor:
+        theme === 'dark' ? Colors.dark.background : Colors.light.background,
     },
     title: {
       fontSize: 16,
@@ -37,7 +39,8 @@ export default (theme: 'light' | 'dark') =>
     },
     disabledButton: {
       opacity: 0.5,
-      backgroundColor: theme === 'dark' ? Colors.dark.neutral : Colors.light.neutral,
+      backgroundColor:
+        theme === 'dark' ? Colors.dark.neutral : Colors.light.neutral,
     },
     buttonText: {
       fontSize: 14,

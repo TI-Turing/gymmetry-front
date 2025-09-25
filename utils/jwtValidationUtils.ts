@@ -102,7 +102,9 @@ export const jwtValidationUtils = {
 
       // iat no es crítico, solo advertir si no está presente
       if (!payload.iat) {
-        logger.warn('⚠️ Token no contiene fecha de emisión (iat), pero continúa validación');
+        logger.warn(
+          '⚠️ Token no contiene fecha de emisión (iat), pero continúa validación'
+        );
       }
 
       // 4. Verificar expiración

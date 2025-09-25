@@ -36,7 +36,7 @@ const FilterSelector: React.FC<FilterSelectorProps> = ({
             Mes Actual
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[
             styles.filterButton,

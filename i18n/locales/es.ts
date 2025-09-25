@@ -545,7 +545,8 @@ const es: Dict = {
   'progress_modal.month_label': 'Mensual',
   'progress_modal.plan_label': 'Plan',
   'progress_modal.no_data_title': 'Sin datos de disciplina todavía',
-  'progress_modal.no_data_helper': 'Completa rutinas para ver tu progreso aquí.',
+  'progress_modal.no_data_helper':
+    'Completa rutinas para ver tu progreso aquí.',
   'progress_modal.share_button': 'Compartir progreso',
   'progress_modal.loading_error_title': 'Error al cargar datos',
   'progress_modal.capture_unavailable_title': 'Captura no disponible',

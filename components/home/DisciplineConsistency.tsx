@@ -24,7 +24,7 @@ const DisciplineConsistency: React.FC<DisciplineConsistencyProps> = ({
   onPress,
 }) => {
   const { styles, colors } = useThemedStyles(makeDisciplineConsistencyStyles);
-  
+
   // Debug: Log de datos recibidos por el componente
   // eslint-disable-next-line no-console
   console.log(

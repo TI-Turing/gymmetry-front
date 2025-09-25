@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import SmartImage from '@/components/common/SmartImage';
 import { Text, View } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
@@ -21,6 +21,7 @@ export default function GymInfoView({
   onAddBranch,
 }: GymInfoViewProps) {
   const styles = useThemedStyles(makeGymInfoViewStyles);
+  const [refreshing, setRefreshing] = useState(false);
   // const { width } = Dimensions.get('window');
   const router = useRouter();
 
@@ -42,8 +43,26 @@ export default function GymInfoView({
     router.push('/plans');
   };
 
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+    setRefreshing(true);
+    try {
+      await onRefresh();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        ) : undefined
+      }
+    >
       {/* Header del Gym */}
       <View style={styles.header}>
         {gym.LogoUrl ? (

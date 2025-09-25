@@ -16,6 +16,7 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { LogBox } from 'react-native';
 
@@ -33,10 +34,11 @@ import {
   addNotificationReceivedListener,
   addNotificationResponseReceivedListener,
 } from '@/utils/localNotifications';
-import { PreloadProvider } from '@/contexts/PreloadContext';
+import { AppStateProvider } from '@/contexts/AppStateContext';
 import { I18nProvider } from '@/i18n';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeRootLayoutStyles } from './styles/rootLayout';
+import Colors from '@/constants/Colors';
 
 // Importar el watcher para activarlo globalmente
 import '@/services/gymDataWatcher';
@@ -96,11 +98,11 @@ export default function RootLayout() {
   return (
     <AppSettingsProvider>
       <AuthProvider>
-        <PreloadProvider>
+        <AppStateProvider>
           <I18nProvider>
             <RootLayoutNav />
           </I18nProvider>
-        </PreloadProvider>
+        </AppStateProvider>
       </AuthProvider>
     </AppSettingsProvider>
   );
@@ -387,10 +389,28 @@ function RootLayoutNav() {
     settings.activeBreaksIntervalMinutes,
   ]);
 
+  const statusBarStyle = useMemo(
+    () => (resolvedColorScheme === 'dark' ? 'light' : 'dark'),
+    [resolvedColorScheme]
+  );
+
+  const statusBarBackgroundColor = useMemo(
+    () =>
+      resolvedColorScheme === 'dark'
+        ? Colors.dark.background
+        : Colors.light.background,
+    [resolvedColorScheme]
+  );
+
   return (
     <ThemeProvider
       value={resolvedColorScheme === 'dark' ? DarkTheme : DefaultTheme}
     >
+      <StatusBar
+        style={statusBarStyle}
+        backgroundColor={statusBarBackgroundColor}
+        animated
+      />
       {isAuthenticated && <BiometricGate />}
       <Stack>
         {/* Grupo principal con tabs */}

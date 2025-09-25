@@ -11,7 +11,7 @@ export const makeHomeStyles = (theme: ThemeMode) => {
     debugSection: { paddingHorizontal: 16, marginTop: 16 } as const,
     debugLabel: { color: muted, marginBottom: 8 } as const,
     spacer: { height: 80 } as const,
-    
+
     // Estados de loading y error
     centerContainer: {
       flex: 1,
@@ -41,7 +41,7 @@ export const makeHomeStyles = (theme: ThemeMode) => {
     retryButton: {
       marginTop: 8,
     } as const,
-    
+
     // Estados vacíos
     emptySection: {
       backgroundColor: palette.card,
@@ -63,7 +63,7 @@ export const makeHomeStyles = (theme: ThemeMode) => {
       fontSize: 14,
       textAlign: 'center',
     } as const,
-    
+
     colors: { muted, background: palette.background, tint: palette.tint },
   };
 };

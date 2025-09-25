@@ -1,6 +1,12 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { ScrollView, View, Text, ActivityIndicator } from 'react-native';
-import { useProgressSummary } from '../../hooks/useProgress';
+import {
+  ScrollView,
+  View,
+  Text,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+import { useProgressAdapter } from '../../hooks/useProgressAdapter';
 import {
   ProgressSummaryResponse,
   PersonalRecordItem,
@@ -49,6 +55,7 @@ const ProgressDashboard: React.FC = () => {
   const [showPeriodModal, setShowPeriodModal] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [showAllMeasures, setShowAllMeasures] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const colorScheme = useColorScheme();
   const { user } = useAuth();
@@ -153,7 +160,17 @@ const ProgressDashboard: React.FC = () => {
     [user?.id, from, to]
   );
 
-  const { data, loading, error } = useProgressSummary(progressRequest);
+  const { data, loading, error, refetch } = useProgressAdapter(progressRequest);
+
+  // Handle pull-to-refresh
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   // Defensive data validation
   const safeRender = useMemo(() => {
@@ -330,6 +347,15 @@ const ProgressDashboard: React.FC = () => {
         backgroundColor: Colors[colorScheme ?? 'light'].background,
       }}
       contentContainerStyle={{ padding: 16 }}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={Colors[colorScheme ?? 'light'].tint}
+          colors={[Colors[colorScheme ?? 'light'].tint]}
+          progressBackgroundColor={Colors[colorScheme ?? 'light'].background}
+        />
+      }
     >
       {/* Selector de periodo */}
       <PeriodSelector

@@ -4,10 +4,10 @@ import { ProgressDaySquareProps } from './types';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import makeProgressDaySquareStyles from './styles/ProgressDaySquareStyles';
 
-const ProgressDaySquare: React.FC<ProgressDaySquareProps> = ({ 
-  dayNumber, 
-  percentage, 
-  status 
+const ProgressDaySquare: React.FC<ProgressDaySquareProps> = ({
+  dayNumber,
+  percentage,
+  status,
 }) => {
   const styles = useThemedStyles(makeProgressDaySquareStyles);
   const getStatusStyle = () => {

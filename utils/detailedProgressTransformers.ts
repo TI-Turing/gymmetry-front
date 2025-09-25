@@ -28,10 +28,10 @@ export const generatePlanPeriodData = (
   const result: DetailedDayData[] = [];
   const start = new Date(planStartDate);
   const end = new Date(planEndDate);
-  
+
   // Array de días de la semana para mapear
   const daysOfWeek = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-  
+
   // Iterar día por día desde inicio hasta fin del plan
   const currentDate = new Date(start);
   while (currentDate <= end) {
@@ -39,7 +39,7 @@ export const generatePlanPeriodData = (
     const dayOfWeekIndex = currentDate.getDay();
     const dayOfWeek = daysOfWeek[dayOfWeekIndex];
     const dateString = currentDate.toISOString().split('T')[0];
-    
+
     // Buscar si hay datos de daily para este día
     const dailyForDay = dailyData.find((daily) => {
       const dateValue = daily.date || daily.Date;
@@ -47,22 +47,25 @@ export const generatePlanPeriodData = (
       const dailyDate = new Date(dateValue);
       return dailyDate.toISOString().split('T')[0] === dateString;
     });
-    
+
     // Determinar si es día de rutina o descanso
     const isRestDay = !routineDays.some((rd) => {
       const routineDay = rd.dayOfWeek || rd.DayOfWeek;
       return routineDay === dayOfWeekIndex + 1; // Los días en BD van 1-7
     });
-    
+
     let status: 'completed' | 'failed' | 'rest';
     let percentage = 0;
-    
+
     if (isRestDay) {
       status = 'rest';
       percentage = 0;
     } else if (dailyForDay) {
       // Hay datos de entrenamiento para este día
-      const completion = dailyForDay.completionPercentage || dailyForDay.CompletionPercentage || 0;
+      const completion =
+        dailyForDay.completionPercentage ||
+        dailyForDay.CompletionPercentage ||
+        0;
       percentage = Math.round(completion);
       status = percentage >= 80 ? 'completed' : 'failed';
     } else {
@@ -70,7 +73,7 @@ export const generatePlanPeriodData = (
       status = 'failed';
       percentage = 0;
     }
-    
+
     result.push({
       dayOfMonth,
       dayOfWeek,
@@ -78,11 +81,11 @@ export const generatePlanPeriodData = (
       percentage,
       date: dateString,
     });
-    
+
     // Avanzar al siguiente día
     currentDate.setDate(currentDate.getDate() + 1);
   }
-  
+
   return result;
 };
 
@@ -97,6 +100,9 @@ export const formatDisplayDate = (dateString: string): string => {
 };
 
 // Función para obtener el nombre del gym desde los datos
-export const getGymNameFromPlan = (planData: any): string => {
-  return planData?.gym?.name || planData?.Gym?.Name || 'Mi Gimnasio';
+export const getGymNameFromPlan = (planData: unknown): string => {
+  const data = planData as Record<string, unknown>;
+  const gym = data?.gym as Record<string, unknown>;
+  const Gym = data?.Gym as Record<string, unknown>;
+  return (gym?.name as string) || (Gym?.Name as string) || 'Mi Gimnasio';
 };

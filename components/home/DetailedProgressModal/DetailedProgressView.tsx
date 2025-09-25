@@ -5,8 +5,8 @@ import ProgressDaySquare from './ProgressDaySquare';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import makeDetailedProgressViewStyles from './styles/DetailedProgressViewStyles';
 
-const DetailedProgressView: React.FC<DetailedProgressViewProps> = ({ 
-  progressData 
+const DetailedProgressView: React.FC<DetailedProgressViewProps> = ({
+  progressData,
 }) => {
   const styles = useThemedStyles(makeDetailedProgressViewStyles);
 

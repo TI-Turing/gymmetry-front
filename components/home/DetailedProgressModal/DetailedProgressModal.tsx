@@ -6,25 +6,26 @@ import FilterSelector from './FilterSelector';
 import { DetailedProgressModalProps } from './types';
 import makeDetailedProgressModalStyles from './styles/DetailedProgressModalStyles';
 
-const DetailedProgressModal: React.FC<DetailedProgressModalProps> = ({ 
-  visible, 
-  onClose, 
+const DetailedProgressModal: React.FC<DetailedProgressModalProps> = ({
+  visible,
+  onClose,
   planData,
   monthData,
   hasActivePlan,
 }) => {
   const styles = useThemedStyles(makeDetailedProgressModalStyles);
   const [filterMode, setFilterMode] = useState<'month' | 'plan'>('month');
-  
+
   // Seleccionar datos según el filtro
-  const currentData = filterMode === 'plan' && hasActivePlan ? planData : monthData;
+  const currentData =
+    filterMode === 'plan' && hasActivePlan ? planData : monthData;
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
       transparent={true}
-      supportedOrientations={["landscape"]}
+      supportedOrientations={['landscape']}
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>

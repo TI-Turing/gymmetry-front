@@ -14,7 +14,8 @@ export default (theme: 'light' | 'dark') =>
     },
     container: {
       flex: 1,
-      backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.light.background,
+      backgroundColor:
+        theme === 'dark' ? Colors.dark.background : Colors.light.background,
       paddingHorizontal: 20,
       paddingVertical: 16,
       zIndex: 2,

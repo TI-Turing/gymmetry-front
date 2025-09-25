@@ -13,7 +13,7 @@ import { withWebLayout } from '@/components/layout/withWebLayout';
 import { router } from 'expo-router';
 import Button from '@/components/common/Button';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
-import { useHomeDashboardAdapter } from '@/hooks/useHomeDashboardAdapter';
+import { useHomeDashboardAdapter } from '../../hooks/useHomeDashboardAdapter';
 import { makeHomeStyles } from './styles/home';
 
 function HomeScreen() {

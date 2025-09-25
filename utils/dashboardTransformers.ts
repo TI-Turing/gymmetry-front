@@ -60,11 +60,11 @@ export const getWeekBounds = (date: Date): { start: Date; end: Date } => {
   const start = new Date(date);
   start.setDate(date.getDate() - jsDay);
   start.setHours(0, 0, 0, 0);
-  
+
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
   end.setHours(23, 59, 59, 999);
-  
+
   return { start, end };
 };
 
@@ -82,7 +82,7 @@ export const getLast4WeeksBounds = (): {
     end: Date;
     weekNumber: number;
   }[] = [];
-  
+
   for (let i = 3; i >= 0; i--) {
     const weekDate = new Date(today);
     weekDate.setDate(today.getDate() - i * 7);
@@ -92,7 +92,7 @@ export const getLast4WeeksBounds = (): {
       weekNumber: 4 - i,
     });
   }
-  
+
   return weeks;
 };
 
@@ -105,10 +105,10 @@ export const transformDisciplineData = (
 ): DisciplineData[] => {
   const weeks = getLast4WeeksBounds();
   const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D']; // Lunes a Domingo
-  
+
   // Crear mapa de días de rutina activos (1-7 donde existe RoutineDay)
   const activeDays = new Set(routineDays.map((rd) => rd.DayNumber));
-  
+
   // Debug: Log de días activos
   // eslint-disable-next-line no-console
   console.log('🔍 DEBUG - Días activos en rutina:', Array.from(activeDays));
@@ -117,10 +117,10 @@ export const transformDisciplineData = (
     '🔍 DEBUG - RoutineDays:',
     routineDays.map((rd) => ({ day: rd.DayNumber, name: rd.Name }))
   );
-  
+
   return weeks.map((week) => {
     const weekDays = [];
-    
+
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
       // Ajustar para empezar en lunes: domingo=0, lunes=1, entonces lunes sería dayOffset=1
       // Pero queremos que lunes sea dayOffset=0, entonces: (dayOffset + 1) % 7
@@ -128,13 +128,13 @@ export const transformDisciplineData = (
       // Mejor: empezar desde lunes del week.start
       const mondayOfWeek = new Date(week.start);
       mondayOfWeek.setDate(week.start.getDate() + 1); // week.start es domingo, +1 = lunes
-      
+
       const currentDate = new Date(mondayOfWeek);
       currentDate.setDate(mondayOfWeek.getDate() + dayOffset);
-      
+
       const dayNumber = getDayOfWeek(currentDate);
       const dayLabel = dayLabels[dayOffset];
-      
+
       // Debug: Log detallado por día
       if (dayLabel === 'L') {
         // Solo log para Lunes
@@ -143,7 +143,7 @@ export const transformDisciplineData = (
           `🔍 DEBUG - Lunes: dayOffset=${dayOffset}, dayNumber=${dayNumber}, currentDate=${currentDate.toISOString().split('T')[0]}, isActive=${activeDays.has(dayNumber)}`
         );
       }
-      
+
       // Buscar Daily para este día
       const dailyForDay = dailyRecords.find((daily) => {
         const dailyDate = new Date(daily.StartDate);
@@ -153,9 +153,9 @@ export const transformDisciplineData = (
           dailyDate.getFullYear() === currentDate.getFullYear()
         );
       });
-      
+
       let status: DayStatus;
-      
+
       if (!activeDays.has(dayNumber)) {
         // Día de descanso (no hay RoutineDay para este día)
         status = 'rest';
@@ -184,20 +184,20 @@ export const transformDisciplineData = (
           );
         }
       }
-      
+
       weekDays.push({
         day: dayLabel,
         status,
         date: currentDate.toISOString().split('T')[0], // Para debugging
       });
-      
+
       // Debug final para lunes
       if (dayLabel === 'L') {
         // eslint-disable-next-line no-console
         console.log(`🔍 DEBUG - Lunes FINAL: status=${status}`);
       }
     }
-    
+
     return {
       week: week.weekNumber,
       days: weekDays,
@@ -213,20 +213,20 @@ export const calculatePlanProgress = (plan: Plan): number => {
     const startDate = new Date(plan.StartDate);
     const endDate = new Date(plan.EndDate);
     const today = new Date();
-    
+
     // Si el plan no ha comenzado
     if (today < startDate) return 0;
-    
+
     // Si el plan ya terminó
     if (today > endDate) return 100;
-    
+
     const totalDays = Math.ceil(
       (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     );
     const daysPassed = Math.ceil(
       (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     );
-    
+
     return Math.min(Math.round((daysPassed / totalDays) * 100), 100);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -258,17 +258,17 @@ export const getTodayRoutineName = (
   routineDays: RoutineDay[]
 ): string => {
   const today = getDayOfWeek();
-  
+
   // Buscar RoutineDay para el día actual
   const todayRoutine = routineDays.find((rd) => rd.DayNumber === today);
-  
+
   if (todayRoutine) {
     return (
       todayRoutine.Name ||
       `Día ${today} - ${routineAssigned.RoutineTemplate?.Name || 'Rutina'}`
     );
   }
-  
+
   return 'Día de descanso';
 };
 
@@ -278,13 +278,13 @@ export const getTodayRoutineName = (
 export const hasAttendedToday = (dailyRecords: Daily[]): boolean => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const todayDaily = dailyRecords.find((daily) => {
     const dailyDate = new Date(daily.StartDate);
     dailyDate.setHours(0, 0, 0, 0);
     return dailyDate.getTime() === today.getTime();
   });
-  
+
   return todayDaily ? todayDaily.Percentage > 30 : false;
 };
 
@@ -302,7 +302,7 @@ export const transformTodayRoutine = (
       hasAttended: false,
     };
   }
-  
+
   return {
     routineName: getTodayRoutineName(routineAssigned, routineDays),
     hasAttended: hasAttendedToday(dailyRecords),
@@ -326,31 +326,32 @@ export const transformDetailedProgressData = (
     const startDate = new Date(plan.StartDate);
     const endDate = new Date(plan.EndDate);
     const today = new Date();
-    
+
     // Crear mapa de días de rutina activos (1-7 donde existe RoutineDay)
     const activeDays = new Set(routineDays.map((rd) => rd.DayNumber));
-    
+
     // Calcular días totales del plan
-    const totalDays = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-    ) + 1; // +1 para incluir el último día
-    
+    const totalDays =
+      Math.ceil(
+        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      ) + 1; // +1 para incluir el último día
+
     const progressData: {
       dayNumber: number;
       percentage: number;
       status: 'success' | 'fail' | 'rest';
     }[] = [];
-    
+
     for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + dayOffset);
-      
+
       // Número del día del mes
       const dayNumber = currentDate.getDate();
-      
+
       // Día de la semana (1 = Lunes, 7 = Domingo)
       const dayOfWeek = getDayOfWeek(currentDate);
-      
+
       // Buscar Daily para este día
       const dailyForDay = dailyRecords.find((daily) => {
         const dailyDate = new Date(daily.StartDate);
@@ -360,10 +361,10 @@ export const transformDetailedProgressData = (
           dailyDate.getFullYear() === currentDate.getFullYear()
         );
       });
-      
+
       let status: 'success' | 'fail' | 'rest';
       let percentage = 0;
-      
+
       if (!activeDays.has(dayOfWeek)) {
         // Día de descanso
         status = 'rest';
@@ -381,14 +382,14 @@ export const transformDetailedProgressData = (
         status = 'rest';
         percentage = 0;
       }
-      
+
       progressData.push({
         dayNumber,
         percentage,
         status,
       });
     }
-    
+
     return progressData;
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -411,26 +412,30 @@ export const transformCurrentMonthProgressData = (
 }[] => {
   try {
     const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    
+    const _firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
     // Crear mapa de días de rutina activos (1-7 donde existe RoutineDay)
     const activeDays = new Set(routineDays.map((rd) => rd.DayNumber));
-    
+
     // Calcular días del mes actual hasta hoy
     const daysInCurrentMonth = today.getDate(); // Solo hasta el día actual
-    
+
     const progressData: {
       dayNumber: number;
       percentage: number;
       status: 'success' | 'fail' | 'rest';
     }[] = [];
-    
+
     for (let dayOfMonth = 1; dayOfMonth <= daysInCurrentMonth; dayOfMonth++) {
-      const currentDate = new Date(today.getFullYear(), today.getMonth(), dayOfMonth);
-      
+      const currentDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        dayOfMonth
+      );
+
       // Día de la semana (1 = Lunes, 7 = Domingo)
       const dayOfWeek = getDayOfWeek(currentDate);
-      
+
       // Buscar Daily para este día
       const dailyForDay = dailyRecords.find((daily) => {
         const dailyDate = new Date(daily.StartDate);
@@ -440,10 +445,10 @@ export const transformCurrentMonthProgressData = (
           dailyDate.getFullYear() === currentDate.getFullYear()
         );
       });
-      
+
       let status: 'success' | 'fail' | 'rest';
       let percentage = 0;
-      
+
       if (!activeDays.has(dayOfWeek)) {
         // Día de descanso
         status = 'rest';
@@ -457,14 +462,14 @@ export const transformCurrentMonthProgressData = (
         status = 'fail';
         percentage = 0;
       }
-      
+
       progressData.push({
         dayNumber: dayOfMonth,
         percentage,
         status,
       });
     }
-    
+
     return progressData;
   } catch (error) {
     // eslint-disable-next-line no-console
