@@ -1,3 +1,5 @@
+import { fixLocalMediaUrl } from '@/utils/mediaUtils';
+
 export type FeedItemType = 'post' | 'media' | 'achievement' | 'workout';
 
 export interface FeedListProps {
@@ -49,6 +51,59 @@ export interface FeedApiResponse<T = unknown> {
 
 export function mapFeedToFeedItem(apiData: unknown): FeedItem {
   const data = apiData as Record<string, unknown>;
+
+  console.log('📦 [mapFeedToFeedItem] Datos recibidos:', {
+    postId: data.id || data.Id,
+    hasMediaFiles: !!(data.FeedMediaFiles || data.feedMediaFiles),
+    FeedMediaFiles: data.FeedMediaFiles,
+  });
+
+  // Mapear mediaUrls con todas las variaciones posibles
+  let mediaUrlsArray: string[] = [];
+  const mediaUrlsRaw =
+    data.FeedMediaFiles ||
+    data.feedMediaFiles ||
+    data.mediaUrls ||
+    data.MediaUrls ||
+    data.mediaUrl ||
+    data.MediaUrl ||
+    data.media ||
+    data.Media ||
+    data.feedMedias ||
+    data.FeedMedias;
+
+  if (Array.isArray(mediaUrlsRaw)) {
+    // Si es un array de objetos con estructura {Url, MediaUrl, url, etc.}
+    mediaUrlsArray = mediaUrlsRaw
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const obj = item as Record<string, unknown>;
+          return (
+            obj.Url ||
+            obj.url ||
+            obj.MediaUrl ||
+            obj.mediaUrl ||
+            obj.FileUrl ||
+            obj.fileUrl ||
+            ''
+          );
+        }
+        return '';
+      })
+      .filter((url): url is string => typeof url === 'string' && url.length > 0)
+      // Transformar URLs de localhost a IP de desarrollo en entorno local
+      .map((url) => fixLocalMediaUrl(url));
+  } else if (typeof mediaUrlsRaw === 'string' && mediaUrlsRaw) {
+    mediaUrlsArray = [fixLocalMediaUrl(mediaUrlsRaw)];
+  }
+
+  console.log('🖼️ [mapFeedToFeedItem] URLs procesadas:', {
+    postId: data.id || data.Id,
+    mediaUrlsArray,
+    count: mediaUrlsArray.length,
+  });
+
   return {
     id: String(data.id || data.Id || ''),
     type: String(data.type || data.Type || 'post') as FeedItemType,
@@ -57,8 +112,10 @@ export function mapFeedToFeedItem(apiData: unknown): FeedItem {
     userProfilePicture: data.userProfilePicture
       ? String(data.userProfilePicture)
       : undefined,
-    content: String(data.content || data.Content || ''),
-    mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls.map(String) : [],
+    content: String(
+      data.content || data.Content || data.description || data.Description || ''
+    ),
+    mediaUrls: mediaUrlsArray,
     createdAt: String(
       data.createdAt || data.CreatedAt || new Date().toISOString()
     ),
@@ -66,7 +123,8 @@ export function mapFeedToFeedItem(apiData: unknown): FeedItem {
     commentsCount: Number(data.commentsCount || data.CommentsCount || 0),
     isLiked: Boolean(data.isLiked || data.IsLiked),
     // Campos adicionales
-    title: data.title ? String(data.title) : undefined,
+    title:
+      data.title || data.Title ? String(data.title || data.Title) : undefined,
     isPublic: data.isPublic !== undefined ? Boolean(data.isPublic) : undefined,
     author: data.author
       ? {
@@ -88,7 +146,16 @@ export function mapFeedToFeedItem(apiData: unknown): FeedItem {
         : String(data.tags)
       : undefined,
     updatedAt: data.updatedAt ? String(data.updatedAt) : undefined,
-    mediaUrl: data.mediaUrl ? String(data.mediaUrl) : undefined,
-    mediaType: data.mediaType ? String(data.mediaType) : undefined,
+    mediaUrl:
+      mediaUrlsArray.length > 0
+        ? mediaUrlsArray[0]
+        : data.mediaUrl
+          ? String(data.mediaUrl)
+          : undefined,
+    mediaType: data.mediaType
+      ? String(data.mediaType)
+      : data.MediaType
+        ? String(data.MediaType)
+        : undefined,
   };
 }

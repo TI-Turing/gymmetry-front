@@ -14,6 +14,7 @@ export const appStateService = {
       const response = await apiService.get<AppStateOverviewResponse>(
         `${base}/overview`
       );
+
       return response;
     } catch (error) {
       logger.error('Error fetching app state overview:', error);

@@ -7,7 +7,7 @@ import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { ReactionsBar, useReactions } from '../common/ReactionsBar';
 import { ReactionAnimation } from '../common/ReactionAnimation';
 import { EditPostButton } from '../common/EditPostButton';
-import { ReportButton } from '../common/ReportButton';
+import { PostDetailModal } from '../common/PostDetailModal';
 import { createUnifiedPostCardStyles } from './styles/unifiedPostCard';
 import type { FeedItem } from '@/types/feedTypes';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,7 +22,6 @@ export interface UnifiedPostCardProps {
   currentUserId?: string;
   showActions?: boolean;
   showEdit?: boolean;
-  showReport?: boolean;
   variant?: 'default' | 'compact' | 'detailed';
 }
 
@@ -36,7 +35,6 @@ export const UnifiedPostCard: React.FC<UnifiedPostCardProps> = ({
   currentUserId,
   showActions = true,
   showEdit = true,
-  showReport = true,
   variant = 'default',
 }) => {
   const themed = useThemedStyles(createUnifiedPostCardStyles) as ReturnType<
@@ -46,6 +44,7 @@ export const UnifiedPostCard: React.FC<UnifiedPostCardProps> = ({
   const [animatingReaction, setAnimatingReaction] = useState<string | null>(
     null
   );
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   // Usar el usuario real del contexto de autenticación
   const realCurrentUserId = currentUserId || authUser?.id;
@@ -102,17 +101,34 @@ export const UnifiedPostCard: React.FC<UnifiedPostCardProps> = ({
   const timeAgo = useMemo(() => {
     if (!post.createdAt) return 'Sin fecha';
 
-    const now = new Date();
-    const created = new Date(post.createdAt);
-    const diffMs = now.getTime() - created.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
+    try {
+      const now = new Date();
+      const created = new Date(post.createdAt);
 
-    if (diffMins < 60) return `hace ${diffMins}m`;
-    if (diffHours < 24) return `hace ${diffHours}h`;
-    if (diffDays < 7) return `hace ${diffDays}d`;
-    return created.toLocaleDateString();
+      // Validar que la fecha sea válida
+      if (isNaN(created.getTime())) {
+        return 'Fecha inválida';
+      }
+
+      const diffMs = now.getTime() - created.getTime();
+
+      // Si la diferencia es negativa, la fecha está en el futuro
+      if (diffMs < 0) {
+        return 'Recién ahora';
+      }
+
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffMins < 1) return 'Recién ahora';
+      if (diffMins < 60) return `hace ${diffMins}m`;
+      if (diffHours < 24) return `hace ${diffHours}h`;
+      if (diffDays < 7) return `hace ${diffDays}d`;
+      return created.toLocaleDateString();
+    } catch (error) {
+      return 'Fecha inválida';
+    }
   }, [post.createdAt]);
 
   // Handlers para acciones
@@ -156,151 +172,203 @@ export const UnifiedPostCard: React.FC<UnifiedPostCardProps> = ({
     variant === 'compact' && themed.contentCompact,
   ];
 
-  return (
-    <View style={cardStyle}>
-      {/* Animación de reacción */}
-      <ReactionAnimation
-        emoji={animatingReaction || ''}
-        visible={!!animatingReaction}
-        onAnimationComplete={() => setAnimatingReaction(null)}
-      />
+  const handleOpenDetail = useCallback(() => {
+    setShowDetailModal(true);
+  }, []);
 
-      {/* Header con usuario */}
-      <View style={themed.header}>
-        <SmartImage
-          uri={userInfo.avatarUrl}
-          style={themed.avatar}
-          deferOnDataSaver={false}
+  return (
+    <>
+      <View style={cardStyle}>
+        {/* Animación de reacción */}
+        <ReactionAnimation
+          emoji={animatingReaction || ''}
+          visible={!!animatingReaction}
+          onAnimationComplete={() => setAnimatingReaction(null)}
         />
 
-        <View style={themed.userInfo}>
-          <Text style={themed.userName}>{userInfo.userName}</Text>
-          <Text style={themed.time}>{timeAgo}</Text>
-        </View>
+        {/* Touchable content area */}
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={handleOpenDetail}
+          disabled={variant === 'detailed'}
+        >
+          {/* Header con usuario */}
+          <View style={themed.header}>
+            <SmartImage
+              uri={userInfo.avatarUrl}
+              style={themed.avatar}
+              deferOnDataSaver={false}
+            />
 
-        {variant !== 'compact' && (
-          <View style={themed.headerActions}>
-            {/* Status indicator */}
-            <View
-              style={[
-                themed.statusBadge,
-                post.isPublic ? themed.statusPublic : themed.statusPrivate,
-              ]}
-            >
-              <Text style={themed.statusText}>
-                {post.isPublic ? '🌍' : '🔒'}
-              </Text>
+            <View style={themed.userInfo}>
+              <Text style={themed.userName}>{userInfo.userName}</Text>
+              <Text style={themed.time}>{timeAgo}</Text>
             </View>
 
-            {/* Menu button */}
-            <TouchableOpacity style={themed.menuButton}>
-              <FontAwesome name="ellipsis-h" size={16} color="#B0B0B0" />
-            </TouchableOpacity>
+            {variant !== 'compact' && (
+              <View style={themed.headerActions}>
+                {/* Menu button */}
+                <TouchableOpacity style={themed.menuButton}>
+                  <FontAwesome name="ellipsis-h" size={16} color="#B0B0B0" />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-        )}
-      </View>
 
-      {/* Título (si existe) */}
-      {post.title && variant !== 'compact' && (
-        <Text style={themed.title}>{post.title}</Text>
-      )}
+          {/* Título (si existe) */}
+          {post.title && variant !== 'compact' && (
+            <Text style={themed.title}>{post.title}</Text>
+          )}
 
-      {/* Contenido */}
-      {post.content && (
-        <Text
-          style={contentStyle}
-          numberOfLines={variant === 'compact' ? 3 : undefined}
-        >
-          {post.content}
-        </Text>
-      )}
+          {/* Contenido */}
+          {post.content && (
+            <Text
+              style={contentStyle}
+              numberOfLines={variant === 'compact' ? 3 : undefined}
+            >
+              {post.content}
+            </Text>
+          )}
 
-      {/* Media (si existe) */}
-      {post.mediaUrl && (
-        <SmartImage
-          uri={post.mediaUrl}
-          style={[themed.media, variant === 'compact' && themed.mediaCompact]}
-          deferOnDataSaver
-          label="Cargar imagen"
-        />
-      )}
+          {/* Media (si existe) */}
+          {post.mediaUrl && (
+            <SmartImage
+              uri={post.mediaUrl}
+              style={[
+                themed.media,
+                variant === 'compact' && themed.mediaCompact,
+              ]}
+              deferOnDataSaver
+              label="Cargar imagen"
+            />
+          )}
 
-      {/* Tags */}
-      {post.tags && variant !== 'compact' && (
-        <View style={themed.tagsContainer}>
-          <Text style={themed.tags}>
-            #
-            {Array.isArray(post.tags)
-              ? post.tags.join(' #')
-              : post.tags.replace(/,/g, ' #')}
-          </Text>
-        </View>
-      )}
+          {/* Media array (múltiples archivos) */}
+          {post.mediaUrls && post.mediaUrls.length > 0 && (
+            <View>
+              {post.mediaUrls.map((mediaUrl, index) => (
+                <SmartImage
+                  key={`${post.id}-media-${index}`}
+                  uri={mediaUrl}
+                  style={[
+                    themed.media,
+                    variant === 'compact' && themed.mediaCompact,
+                    index > 0 && { marginTop: 8 },
+                  ]}
+                  deferOnDataSaver
+                  label="Cargar imagen"
+                />
+              ))}
+            </View>
+          )}
 
-      {/* Barra de reacciones */}
-      <ReactionsBar
-        reactions={reactions}
-        onReactionPress={handleReactionPress}
-        onAddReaction={handleAddReaction}
-        totalReactions={totalReactions}
-        maxVisible={variant === 'compact' ? 3 : 5}
-        showAddButton={variant !== 'compact'}
-      />
+          {/* Placeholder si tiene MediaType pero no URLs (backend pendiente) */}
+          {!post.mediaUrl &&
+            (!post.mediaUrls || post.mediaUrls.length === 0) &&
+            post.mediaType && (
+              <View
+                style={[
+                  themed.media,
+                  {
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#f0f0f0',
+                  },
+                ]}
+              >
+                <Text style={{ color: '#888', fontSize: 14 }}>
+                  📷 Imagen no disponible
+                </Text>
+                <Text
+                  style={{
+                    color: '#888',
+                    fontSize: 12,
+                    marginTop: 4,
+                  }}
+                >
+                  (Pendiente configuración backend)
+                </Text>
+              </View>
+            )}
 
-      {/* Acciones principales */}
-      {showActions && (
-        <View style={themed.actions}>
-          <TouchableOpacity style={themed.actionButton} onPress={handleLike}>
-            <FontAwesome name="heart-o" size={18} color="#B0B0B0" />
-            <Text style={themed.actionText}>{post.likesCount || 0}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={themed.actionButton}
-            onPress={handleComments}
-          >
-            <FontAwesome name="comment-o" size={18} color="#B0B0B0" />
-            <Text style={themed.actionText}>{post.commentsCount || 0}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={themed.actionButton} onPress={handleShare}>
-            <FontAwesome name="share" size={18} color="#B0B0B0" />
-            <Text style={themed.actionText}>{post.sharesCount || 0}</Text>
-          </TouchableOpacity>
-
-          {/* Total de reacciones */}
-          {totalReactions > 0 && (
-            <View style={themed.totalReactions}>
-              <Text style={themed.totalReactionsText}>
-                {totalReactions} reacciones
+          {/* Tags */}
+          {post.tags && variant !== 'compact' && (
+            <View style={themed.tagsContainer}>
+              <Text style={themed.tags}>
+                #
+                {Array.isArray(post.tags)
+                  ? post.tags.join(' #')
+                  : post.tags.replace(/,/g, ' #')}
               </Text>
             </View>
           )}
-        </View>
-      )}
+        </TouchableOpacity>
 
-      {/* Acciones de moderación */}
-      {(showEdit || showReport) && variant !== 'compact' && (
-        <View style={themed.moderationActions}>
-          {showEdit && (
+        {/* Barra de reacciones */}
+        <ReactionsBar
+          reactions={reactions}
+          onReactionPress={handleReactionPress}
+          onAddReaction={handleAddReaction}
+          totalReactions={totalReactions}
+          maxVisible={variant === 'compact' ? 3 : 5}
+          showAddButton={variant !== 'compact'}
+        />
+
+        {/* Acciones principales */}
+        {showActions && (
+          <View style={themed.actions}>
+            <TouchableOpacity style={themed.actionButton} onPress={handleLike}>
+              <FontAwesome name="heart-o" size={18} color="#B0B0B0" />
+              <Text style={themed.actionText}>{post.likesCount || 0}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={themed.actionButton}
+              onPress={handleComments}
+            >
+              <FontAwesome name="comment-o" size={18} color="#B0B0B0" />
+              <Text style={themed.actionText}>{post.commentsCount || 0}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={themed.actionButton} onPress={handleShare}>
+              <FontAwesome name="share" size={18} color="#B0B0B0" />
+              <Text style={themed.actionText}>{post.sharesCount || 0}</Text>
+            </TouchableOpacity>
+
+            {/* Total de reacciones */}
+            {totalReactions > 0 && (
+              <View style={themed.totalReactions}>
+                <Text style={themed.totalReactionsText}>
+                  {totalReactions} reacciones
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Acciones de moderación */}
+        {showEdit && variant !== 'compact' && (
+          <View style={themed.moderationActions}>
             <EditPostButton
               post={post}
               onPostUpdated={onPostUpdated}
               canEdit={post.author?.id === currentUserId}
             />
-          )}
+          </View>
+        )}
+      </View>
 
-          {showReport && (
-            <ReportButton
-              contentId={post.id}
-              contentType="post"
-              size="small"
-              showText={false}
-            />
-          )}
-        </View>
-      )}
-    </View>
+      {/* Post Detail Modal */}
+      <PostDetailModal
+        visible={showDetailModal}
+        post={post}
+        onClose={() => setShowDetailModal(false)}
+        onToggleLike={onToggleLike}
+        onPostUpdated={onPostUpdated}
+        currentUserId={realCurrentUserId}
+        isAnonymousActive={isAnonymousActive}
+      />
+    </>
   );
 };
 

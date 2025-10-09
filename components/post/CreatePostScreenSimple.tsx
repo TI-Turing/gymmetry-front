@@ -12,11 +12,17 @@ import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/components/useColorScheme';
 import { CustomAlert } from '@/components/common/CustomAlert';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { feedService, authService } from '@/services';
 import { validateMultipleMediaFiles, MEDIA_LIMITS } from '@/utils/mediaUtils';
 
+// Constante para el tamaño máximo de imagen (500KB)
+const MAX_IMAGE_SIZE_KB = 500;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_KB * 1024;
+
 interface CreatePostScreenProps {
   onClose?: () => void;
+  onPostCreated?: () => void | Promise<void>;
 }
 
 const CREATE_POST_CONSTANTS = {
@@ -27,7 +33,54 @@ const CREATE_POST_CONSTANTS = {
   MAX_CHARACTERS: 500,
 };
 
-export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
+/**
+ * Comprime una imagen hasta que sea menor o igual a 500KB
+ */
+async function compressImageToMaxSize(
+  uri: string,
+  maxSizeBytes: number
+): Promise<{ uri: string; width: number; height: number }> {
+  let quality = 0.9; // Calidad inicial
+  let compressedImage = await ImageManipulator.manipulateAsync(
+    uri,
+    [{ resize: { width: 1920 } }], // Redimensionar a máximo 1920px de ancho
+    { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+  );
+
+  // Si la imagen sigue siendo muy grande, reducir calidad iterativamente
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  while (compressedImage.uri && attempts < maxAttempts && quality > 0.1) {
+    // Verificar tamaño aproximado basado en dimensiones
+    // (cada intento reduce calidad y dimensiones)
+    const estimatedSize =
+      (compressedImage.width * compressedImage.height * quality) / 4;
+
+    if (estimatedSize <= maxSizeBytes) {
+      break; // Imagen probablemente dentro del límite
+    }
+
+    // Reducir calidad para siguiente intento
+    quality -= 0.15;
+    compressedImage = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: Math.floor(1920 * (quality + 0.3)) } }],
+      {
+        compress: Math.max(quality, 0.1),
+        format: ImageManipulator.SaveFormat.JPEG,
+      }
+    );
+    attempts++;
+  }
+
+  return compressedImage;
+}
+
+export default function CreatePostScreen({
+  onClose,
+  onPostCreated,
+}: CreatePostScreenProps) {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<
@@ -77,8 +130,31 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
         return;
       }
 
-      // Validar archivos multimedia antes del procesamiento
-      if (selectedMedia.length > 0) {
+      let response;
+
+      // Si NO hay archivos multimedia, usar endpoint simple
+      if (selectedMedia.length === 0) {
+        const requestData = {
+          UserId: userData.id,
+          Title: null,
+          Description: content.trim(),
+          Media: null,
+          MediaType: null,
+          FileName: null,
+          Id: '',
+          FeedId: '',
+          ContentType: null,
+          Hashtag: null,
+          IsAnonymous: false,
+        };
+        console.log(
+          '🔍 [CreatePost] Enviando feed sin multimedia:',
+          requestData
+        );
+        response = await feedService.createFeed(requestData);
+        console.log('🔍 [CreatePost] Respuesta del backend:', response);
+      } else {
+        // Si HAY archivos multimedia, validar y usar endpoint con media
         const mediaForValidation = selectedMedia.map((media) => ({
           type:
             media.type === 'video' ? ('video' as const) : ('image' as const),
@@ -97,61 +173,70 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
           );
           return;
         }
-      }
 
-      // Crear FormData
-      const formData = new FormData();
-      formData.append('description', content.trim());
-      formData.append('userId', userData.id);
-      formData.append('isAnonymous', 'false');
+        // Crear FormData
+        const formData = new FormData();
+        formData.append('description', content.trim());
+        formData.append('userId', userData.id);
+        formData.append('isAnonymous', 'false');
 
-      // Procesar y comprimir archivos
-      for (let i = 0; i < selectedMedia.length; i++) {
-        const media = selectedMedia[i];
-        
-        if (media.type === 'image') {
-          try {
-            // Procesar imagen directamente sin compresión
-            const response = await fetch(media.uri);
-            const blob = await response.blob();
-            const file = new File([blob], media.fileName || `image_${i}.jpg`, {
-              type: blob.type || 'image/jpeg',
-              lastModified: Date.now(),
-            });
-            formData.append('files', file);
-          } catch (error) {
-            showCustomAlert(
-              'error',
-              'Error de archivo',
-              `No se pudo procesar la imagen ${media.fileName}`
-            );
-            return;
-          }
-        } else {
-          // Para videos, crear File desde URI
-          try {
-            const response = await fetch(media.uri);
-            const blob = await response.blob();
-            const file = new File([blob], media.fileName || `video_${i}.mp4`, {
-              type: blob.type || 'video/mp4',
-              lastModified: Date.now(),
-            });
-            formData.append('files', file);
-          } catch (error) {
-            showCustomAlert(
-              'error',
-              'Error de archivo',
-              `No se pudo procesar el video ${media.fileName}`
-            );
-            return;
+        // Procesar y comprimir archivos
+        for (let i = 0; i < selectedMedia.length; i++) {
+          const media = selectedMedia[i];
+
+          if (media.type === 'image') {
+            try {
+              // Comprimir imagen a máximo 500KB
+              const compressedImage = await compressImageToMaxSize(
+                media.uri,
+                MAX_IMAGE_SIZE_BYTES
+              );
+
+              // En React Native, FormData puede recibir directamente el objeto con uri
+              const fileToUpload = {
+                uri: compressedImage.uri,
+                type: media.mimeType || 'image/jpeg',
+                name: media.fileName || `image_${i}.jpg`,
+              } as unknown as Blob;
+              formData.append('files', fileToUpload);
+            } catch (error) {
+              showCustomAlert(
+                'error',
+                'Error de archivo',
+                `No se pudo procesar la imagen ${media.fileName}`
+              );
+              return;
+            }
+          } else {
+            // Para videos, mismo formato (sin compresión)
+            try {
+              const fileToUpload = {
+                uri: media.uri,
+                type: media.mimeType || 'video/mp4',
+                name: media.fileName || `video_${i}.mp4`,
+              } as unknown as Blob;
+              formData.append('files', fileToUpload);
+            } catch (error) {
+              showCustomAlert(
+                'error',
+                'Error de archivo',
+                `No se pudo procesar el video ${media.fileName}`
+              );
+              return;
+            }
           }
         }
+
+        // Enviar con multimedia
+        response = await feedService.createFeedWithMedia(formData);
       }
 
-      // Enviar al backend
-      const response = await feedService.createFeedWithMedia(formData);
-
       if (response?.Success) {
+        // Llamar callback para refrescar el feed
+        if (onPostCreated) {
+          await onPostCreated();
+        }
+
         const closeAction = onClose || (() => router.back());
         showCustomAlert(
           'success',

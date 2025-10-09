@@ -32,6 +32,12 @@ export function SmartImage({
     !settings.dataSaver || !deferOnDataSaver
   );
 
+  console.log('🖼️ [SmartImage] Renderizando:', {
+    uri,
+    shouldLoad,
+    dataSaver: settings.dataSaver,
+  });
+
   if (!uri) {
     return <View style={[styles.placeholder, style as ImageStyle]} />;
   }
@@ -51,7 +57,22 @@ export function SmartImage({
     );
   }
 
-  return <Image source={{ uri }} style={style} resizeMode={resizeMode} />;
+  return (
+    <Image
+      source={{ uri }}
+      style={style}
+      resizeMode={resizeMode}
+      onError={(error) => {
+        console.error('❌ [SmartImage] Error cargando:', {
+          uri,
+          error: error.nativeEvent.error,
+        });
+      }}
+      onLoad={() => {
+        console.log('✅ [SmartImage] Imagen cargada exitosamente');
+      }}
+    />
+  );
 }
 
 export default SmartImage;

@@ -29,14 +29,14 @@ export const feedService = {
     const response = await apiService.get<unknown>(`/feed`);
     return response;
   },
-  
+
   /**
    * Crea un feed con archivos multimedia usando FormData
    */
   async createFeedWithMedia(formData: FormData): Promise<ApiResponse<unknown>> {
     const response = await apiService.post<unknown>(
-      `/feed/create-with-media`, 
-      formData, 
+      `/feed/create-with-media`,
+      formData,
       {
         headers: {
           'Content-Type': 'multipart/form-data',

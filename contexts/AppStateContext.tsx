@@ -71,13 +71,16 @@ export const AppStateProvider: React.FC<AppStateProviderProps> = ({
 
   // Función para bootstrap inicial - carga todas las secciones
   const bootstrapAppState = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      logger.debug('[AppState] Skip bootstrap - not authenticated');
+      return;
+    }
 
     setIsBootstrapping(true);
     setBootstrapError(null);
 
     try {
-      logger.debug('Starting app state bootstrap...');
+      logger.debug('[AppState] Starting app state bootstrap...');
       const startTime = Date.now();
 
       const response = await appStateService.getOverview();
@@ -85,18 +88,29 @@ export const AppStateProvider: React.FC<AppStateProviderProps> = ({
       if (response?.Success && response.Data) {
         setAppStateData(response.Data);
         const duration = Date.now() - startTime;
-        logger.debug(`App state bootstrap completed in ${duration}ms`);
+        logger.debug(`[AppState] Bootstrap completed in ${duration}ms`);
       } else {
         const errorMsg = response?.Message || 'Failed to load app state';
         setBootstrapError(errorMsg);
-        logger.error('App state bootstrap failed:', errorMsg);
+        logger.error('[AppState] Bootstrap failed:', {
+          message: errorMsg,
+          statusCode: response?.StatusCode,
+          success: response?.Success,
+        });
+        // No lanzar error - permitir que la app continúe funcionando
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       setBootstrapError(errorMsg);
-      logger.error('App state bootstrap error:', error);
+      logger.error('[AppState] Bootstrap exception:', {
+        error,
+        message: errorMsg,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      // No re-lanzar - permitir que la app funcione sin AppState
     } finally {
       setIsBootstrapping(false);
+      logger.debug('[AppState] Bootstrap finished (with or without data)');
     }
   }, [isAuthenticated]);
 

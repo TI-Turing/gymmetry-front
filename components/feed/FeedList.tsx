@@ -29,6 +29,7 @@ const FeedList: React.FC<FeedListProps> = React.memo(
     }, []);
 
     const handleOpenComments = useCallback((postId: string) => {
+      console.log('🔍 [FeedList] Abriendo comentarios para post:', postId);
       setSelectedPostId(postId);
     }, []);
 
@@ -53,7 +54,6 @@ const FeedList: React.FC<FeedListProps> = React.memo(
           currentUserId={authUser?.id}
           showActions={true}
           showEdit={true}
-          showReport={true}
           variant="default"
         />
       ),
