@@ -13,7 +13,6 @@ import {
   Platform,
   Pressable,
   TextInput,
-  Switch,
 } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
@@ -35,6 +34,7 @@ import { scheduleLocalNotificationAsync } from '@/utils/localNotifications';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeExerciseModalStyles } from './styles/exerciseModal';
 import { useI18n } from '@/i18n';
+import { AdMobBanner } from '@/components/ad';
 
 interface ExerciseModalProps {
   visible: boolean;
@@ -506,6 +506,20 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           }}
           disabled={isExecuting}
         />
+
+        {/* Banner AdMob en parte superior del backdrop */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 40,
+            alignSelf: 'center',
+            zIndex: 10,
+            width: '92%',
+          }}
+        >
+          <AdMobBanner size="ADAPTIVE_BANNER" />
+        </View>
+
         <View style={styles.modalCard}>
           {/* Header */}
           <View style={styles.modalHeader}>
@@ -650,7 +664,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
           {/* Botones de acción */}
           <View style={styles.buttonContainer}>
             {/* Toggle sonido */}
-            {timeSpec && (
+            {/* {timeSpec && (
               <View style={styles.controlRow}>
                 <Text style={[styles.controlLabel, { marginRight: 8 }]}>
                   Sonido
@@ -671,7 +685,7 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                   }
                 />
               </View>
-            )}
+            )} */}
             {isCompleted ? (
               <>
                 <Text style={styles.completedText}>Ejercicio completado</Text>
