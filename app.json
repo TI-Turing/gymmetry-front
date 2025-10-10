@@ -14,14 +14,20 @@
       "backgroundColor": "#000000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gymmetry.app",
+      "infoPlist": {
+        "GADApplicationIdentifier": "ca-app-pub-9653039234308284~9961057670"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/G.png",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.gymmetry.app",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -37,9 +43,40 @@
       "orientation": "portrait-primary",
       "preferRelatedApplications": false
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9653039234308284~9630402104",
+          "iosAppId": "ca-app-pub-9653039234308284~9961057670"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      "expo-font",
+      "expo-web-browser"
+    ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3c17fa5b-dc58-4e99-9ef8-4fb2381ed412"
+      }
+    },
+    "owner": "jlap11"
   }
 }

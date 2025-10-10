@@ -105,6 +105,139 @@ Conciso, accionable y específico al proyecto. Usa este documento como guía ope
    - Documentar cambios y decisiones
    - Actualizar plan de acción con progreso
 
+### 📦 EAS Build y Deployment (CRÍTICO)
+
+**Aprendizajes de Fase 14 - Production Builds (9/oct/2025):**
+
+1. **NODE_ENV=production y Dependencies:**
+   - ⚠️ **CRÍTICO:** Con `NODE_ENV=production` en `eas.json`, npm ejecuta `npm install --production`
+   - Esto **IGNORA** todas las `devDependencies` durante el build
+   - **Solución:** Paquetes necesarios en build (como `babel-plugin-module-resolver`) deben estar en `dependencies`
+   - **Ejemplo del problema:** Build #3 y #4 fallaron porque `babel-plugin-module-resolver` estaba en `devDependencies`
+   - **Fix aplicado:** Mover a `dependencies` en `package.json` (Build #5 exitoso)
+
+2. **Path Resolution en EAS Build:**
+   - TypeScript paths (`@/`) no funcionan en Metro Bundler por defecto
+   - **Solución implementada:**
+     ```json
+     // babel.config.js
+     plugins: [
+       ['module-resolver', {
+         alias: {
+           '@': './',
+           '@/components': './components',
+           // ... otros 10 aliases
+         }
+       }]
+     ]
+     
+     // metro.config.js
+     config.resolver.extraNodeModules = {
+       '@': path.resolve(__dirname),
+       // ... otros aliases con path.resolve
+     }
+     ```
+   - **IMPORTANTE:** Ambos archivos deben estar commiteados al repo
+
+3. **Variables de Entorno en EAS:**
+   - Archivos `.env.*` están en `.gitignore` → No disponibles en EAS Build
+   - **Solución:** Declarar TODAS las variables en `eas.json` profile:
+     ```json
+     "production": {
+       "env": {
+         "NODE_ENV": "production",
+         "EXPO_PUBLIC_API_BASE_URL": "https://...",
+         "EXPO_PUBLIC_ADMOB_ANDROID_APP_ID": "ca-app-pub-...",
+         // ... 17 variables en total
+       }
+     }
+     ```
+   - **Verificar:** EAS Build logs deben mostrar "17 environment variables loaded"
+
+4. **TypeScript Errors en Build:**
+   - EAS Build usa modo strict de TypeScript
+   - Errores que pasan localmente pueden fallar en build
+   - **Siempre ejecutar antes de build:** `npm run type-check`
+   - **Errores comunes encontrados:**
+     - `BannerAdSize` usado como type en vez de `typeof BannerAdSize[keyof typeof BannerAdSize]`
+     - Props no existentes pasados a componentes (`onOpenComments`)
+     - `setInterval` retorna `number` pero se espera `NodeJS.Timeout` (requiere cast)
+
+5. **Build Types según Objetivo:**
+   ```json
+   // Para testing en dispositivo (instalación manual)
+   "buildType": "apk"  // ✅ Más rápido, fácil de instalar
+   
+   // Para subir a Play Store
+   "buildType": "app-bundle"  // ✅ Formato AAB requerido
+   ```
+
+6. **Conectividad Backend en APK:**
+   - URLs locales (`http://192.168.0.16:7160`) solo funcionan en misma red WiFi
+   - **Opciones de solución:**
+     - **Temporal (testing):** Túnel público con `localtunnel` o `ngrok`
+     - **Producción:** Backend desplegado en Azure con URL pública
+   - **Configuración actual:** Usando `https://gymmetry-api.loca.lt` (temporal)
+   - **Próximo paso:** Cambiar a Azure URLs cuando esté desplegado
+
+7. **Checklist Pre-Build (Para evitar fallos):**
+   - [ ] `npm run type-check` sin errores
+   - [ ] Todas las env vars declaradas en `eas.json`
+   - [ ] `babel-plugin-module-resolver` en `dependencies` (no `devDependencies`)
+   - [ ] `babel.config.js` y `metro.config.js` commiteados
+   - [ ] Backend accesible desde internet (no solo localhost)
+   - [ ] AdMob IDs correctos (Test o Real según ambiente)
+   - [ ] Git clean (todos los cambios commiteados)
+
+8. **Historial de Builds (Aprendizajes):**
+   - **Build #1:** ❌ 8 errores TypeScript → Fix: Corrección de types
+   - **Build #2:** ❌ .env missing + path resolution → Fix: eas.json env vars + babel config
+   - **Build #3:** ❌ babel-plugin no encontrado → Fix: Commitear cambios
+   - **Build #4:** ❌ babel-plugin en devDependencies → Fix: Mover a dependencies
+   - **Build #5:** ✅ Exitoso con todas las correcciones
+   - **Build #6:** ⏳ Pendiente (con Azure URLs)
+
+### 🎯 AdMob Integration (CRÍTICO)
+
+**Sistema de anuncios implementado (Fase 13):**
+
+1. **Configuración AdMob:**
+   - SDK: `react-native-google-mobile-ads` v15.8.0
+   - Requiere: `google-services.json` con App ID real
+   - **Test IDs vs Real IDs:**
+     ```typescript
+     // Controlado por env var
+     EXPO_PUBLIC_ADMOB_USE_TEST_IDS: "true"  // Development
+     EXPO_PUBLIC_ADMOB_USE_TEST_IDS: "false" // Production (cuando genere revenue)
+     ```
+
+2. **Componentes de Anuncios:**
+   - `AdMobBanner.native.tsx`: Banners de Google AdMob (solo React Native)
+   - `AdMobBanner.web.tsx`: Stub vacío para web (AdMob no disponible)
+   - `AdCard.tsx`: Anuncios propios del backend (sponsors)
+   - **Importante:** Usar imports específicos de plataforma en `index.ts`
+
+3. **Mezcla de Anuncios (Hybrid Ads):**
+   - Hook `useMixedAds()` combina anuncios propios + AdMob
+   - Configuración dinámica desde backend:
+     ```typescript
+     PostsPerAd: 5      // Un anuncio cada 5 posts
+     AdMobPercentage: 60 // 60% AdMob, 40% propios
+     ```
+   - Tracking automático de impresiones/clicks para anuncios propios
+   - AdMob maneja su propio tracking
+
+4. **Admin Settings (Solo para jlap11):**
+   - Whitelist en `SettingsScreen.tsx`
+   - Secciones protegidas: "Publicidad" y "Diagnóstico y Caché"
+   - Permite ajustar `PostsPerAd` (3-10) y `AdMobPercentage` (0-100) en vivo
+
+5. **Problemas Comunes AdMob:**
+   - **No funciona en Expo Go:** Requiere development build o production APK
+   - **Banner no aparece:** Verificar App ID en `google-services.json` y `app.json`
+   - **Test ads no cargan:** Verificar que `EXPO_PUBLIC_ADMOB_USE_TEST_IDS="true"`
+   - **Width issues:** Usar `maxWidth: '92%'` + `marginHorizontal: 16` para match posts
+
 ### 🏗️ Arquitectura y Escalabilidad
 
 **Principios para una app robusta y profesional:**
@@ -488,9 +621,123 @@ Notas:
 
 ---
 
+## 🚨 Troubleshooting Guide
+
+### **EAS Build Failures**
+
+**Problema: "Cannot find module 'babel-plugin-module-resolver'"**
+- **Causa:** Paquete en `devDependencies` con `NODE_ENV=production`
+- **Solución:** Mover a `dependencies` en `package.json`
+- **Verificar:** `git diff package.json` antes de push
+
+**Problema: "Unable to resolve module @/components/..."**
+- **Causa:** Metro/Babel no resuelve paths TypeScript
+- **Solución:** Configurar `babel-plugin-module-resolver` en `babel.config.js` + `extraNodeModules` en `metro.config.js`
+- **Verificar:** Ambos archivos commiteados
+
+**Problema: "Environment file not found: .env.production"**
+- **Causa:** Archivos `.env.*` en `.gitignore`
+- **Solución:** Declarar todas las variables en `eas.json` → `production.env`
+- **Verificar:** Logs de build muestran "X environment variables loaded"
+
+**Problema: TypeScript errors en build (pero no en local)**
+- **Causa:** EAS Build usa modo strict
+- **Solución:** Ejecutar `npm run type-check` antes de cada build
+- **Fix común:** Añadir type casts explícitos (`as`, `typeof`)
+
+### **AdMob Issues**
+
+**Problema: Banners no aparecen**
+- **Causa 1:** App ID incorrecto en `google-services.json`
+- **Solución:** Verificar que coincide con `app.json` → `android.googleServicesFile`
+- **Causa 2:** Test IDs deshabilitados en desarrollo
+- **Solución:** `EXPO_PUBLIC_ADMOB_USE_TEST_IDS="true"` en `eas.json`
+
+**Problema: AdMob no funciona en Expo Go**
+- **Causa:** `react-native-google-mobile-ads` requiere native modules
+- **Solución:** Usar development build o production APK
+- **Comando:** `eas build --profile development --platform android`
+
+**Problema: Banner width mayor que posts**
+- **Causa:** Estilos no limitados
+- **Solución:** `maxWidth: '92%'` + `marginHorizontal: 16` en styles
+
+### **Backend Connectivity**
+
+**Problema: APK no conecta al backend**
+- **Causa 1:** URLs locales (`192.168.0.x`) solo funcionan en misma red WiFi
+- **Solución Temporal:** Usar túnel público (`localtunnel`, `ngrok`)
+- **Solución Producción:** Desplegar backend en Azure con URL pública
+
+**Problema: Firewall bloqueando puerto del backend**
+- **Causa:** Windows Firewall bloquea puerto 7160
+- **Solución:** Ejecutar como admin:
+  ```powershell
+  netsh advfirewall firewall add rule name="Backend 7160" dir=in action=allow protocol=TCP localport=7160
+  ```
+
+**Problema: CORS errors desde APK**
+- **Causa:** Backend no permite origen de la app
+- **Solución:** Configurar CORS en backend .NET:
+  ```csharp
+  builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", policy => {
+      policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+  });
+  ```
+
+### **Git y Deployment**
+
+**Problema: Cambios no reflejados en EAS Build**
+- **Causa:** Archivos no commiteados al repo
+- **Solución:** Verificar `git status` antes de build
+- **Recordar:** EAS Build usa código del repositorio Git, no local
+
+**Problema: Build infinito "Computing project fingerprint"**
+- **Causa:** Caché de EAS Build corrupta
+- **Solución:** `eas build:cancel` → Reiniciar build
+- **Alternativa:** Cambiar algo en `eas.json` para invalidar caché
+
+### **Performance Issues**
+
+**Problema: Scroll lag en feed con 100+ items**
+- **Causa:** No hay virtualización
+- **Solución:** Usar `FlatList` con `windowSize`, `maxToRenderPerBatch`, `removeClippedSubviews`
+
+**Problema: Memory leak en feed**
+- **Causa:** Timers/intervals no limpiados
+- **Solución:** `useEffect` cleanup con `clearInterval`/`clearTimeout`
+
+**Problema: Bundle size >50MB**
+- **Causa:** Demasiadas dependencias/assets
+- **Solución:** Analizar con `npx react-native-bundle-visualizer`
+- **Fix:** Code splitting, lazy loading, optimizar imágenes
+
+---
+
+## 📚 Recursos y Referencias
+
+**EAS Build:**
+- [Environment Variables](https://docs.expo.dev/eas/environment-variables/)
+- [Build Types (APK vs AAB)](https://docs.expo.dev/build/android-builds/)
+- [Troubleshooting](https://docs.expo.dev/build-reference/troubleshooting/)
+
+**AdMob:**
+- [react-native-google-mobile-ads Docs](https://docs.page/invertase/react-native-google-mobile-ads)
+- [Test IDs](https://developers.google.com/admob/android/test-ads)
+- [AdMob Policy](https://support.google.com/admob/answer/6128543)
+
+**Azure Deployment:**
+- [Deploy .NET to Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-vs)
+- [CORS Configuration](https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings)
+
+---
+
 Actualiza este documento si:
 
 - Se añade un nuevo patrón cross-cutting.
 - Cambia la forma de crear Dailies o registrar ejercicios.
 - Se altera la carga multi-entorno.
 - Se establecen nuevos estándares de costos o metodología.
+- Se descubren nuevos problemas recurrentes de build/deployment.

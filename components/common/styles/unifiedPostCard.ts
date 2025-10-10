@@ -83,9 +83,46 @@ export const createUnifiedPostCardStyles = (theme: 'light' | 'dark') => {
 
     // Menu button
     menuButton: {
-      padding: SPACING.xs,
+      padding: SPACING.sm,
       borderRadius: BORDER_RADIUS.sm,
       backgroundColor: isDark ? '#2a2a2a' : '#f8f8f8',
+    },
+
+    // Avatar placeholder
+    avatarPlaceholder: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0',
+    },
+
+    // Options menu
+    optionsMenu: {
+      backgroundColor: isDark ? '#2a2a2a' : '#fff',
+      borderRadius: BORDER_RADIUS.md,
+      marginTop: SPACING.sm,
+      marginBottom: SPACING.sm,
+      borderWidth: 1,
+      borderColor: isDark ? '#333' : '#e0e0e0',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    optionItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.md,
+      gap: SPACING.sm,
+    },
+    optionText: {
+      fontSize: FONT_SIZES.md,
+      color: palette.text,
+    },
+    optionDivider: {
+      height: 1,
+      backgroundColor: isDark ? '#333' : '#e0e0e0',
     },
 
     // Content sections

@@ -7,6 +7,9 @@ export type { ApiResponse } from '@/dto/common/ApiResponse';
 export { authService } from './authService';
 export { userSessionService } from './userSessionService';
 
+// Servicio de anuncios
+export { advertisementService } from './advertisementService';
+
 // Servicios de usuario y perfil
 export { userService } from './userService';
 export { fitUserService } from './fitUserService';

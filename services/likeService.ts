@@ -18,21 +18,24 @@ export const likeService = {
     const response = await apiService.get<unknown>(`/like/${id}`);
     return response;
   },
-  async getLikesByPost(): Promise<ApiResponse<unknown>> {
-    const response = await apiService.get<unknown>(`/like/post/{postId:guid}`);
+  async getLikesByPost(postId: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.get<unknown>(`/like/post/${postId}`);
     return response;
   },
-  async getLikesByUser(): Promise<ApiResponse<unknown>> {
-    const response = await apiService.get<unknown>(`/like/user/{userId:guid}`);
+  async getLikesByUser(userId: string): Promise<ApiResponse<unknown>> {
+    const response = await apiService.get<unknown>(`/like/user/${userId}`);
     return response;
   },
   async getAllLikes(): Promise<ApiResponse<unknown>> {
     const response = await apiService.get<unknown>(`/like`);
     return response;
   },
-  async getLikeByPostAndUser(): Promise<ApiResponse<unknown>> {
+  async getLikeByPostAndUser(
+    postId: string,
+    userId: string
+  ): Promise<ApiResponse<unknown>> {
     const response = await apiService.get<unknown>(
-      `/like/post/{postId:guid}/user/{userId:guid}`
+      `/like/post/${postId}/user/${userId}`
     );
     return response;
   },

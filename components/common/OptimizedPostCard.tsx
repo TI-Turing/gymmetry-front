@@ -19,7 +19,6 @@ const OptimizedPostCard = React.memo<OptimizedPostCardProps>(
       prevProps.isAnonymousActive !== nextProps.isAnonymousActive ||
       prevProps.currentUserId !== nextProps.currentUserId ||
       prevProps.showEdit !== nextProps.showEdit ||
-      prevProps.showReport !== nextProps.showReport ||
       prevProps.post.id !== nextProps.post.id
     ) {
       return false;

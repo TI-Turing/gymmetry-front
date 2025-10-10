@@ -56,8 +56,8 @@ export const PostCard: React.FC<PostCardProps> = ({
       isAnonymousActive &&
       (!post.User?.Id || post.User?.Id === currentUserId)
     )
-      return 'https://via.placeholder.com/40?text=Anon';
-    return post.User?.ProfileImageUrl || 'https://via.placeholder.com/40';
+      return require('@/assets/images/icon.png');
+    return post.User?.ProfileImageUrl || require('@/assets/images/icon.png');
   }, [post, isAnonymousActive, currentUserId]);
 
   const onPressLike = () => {

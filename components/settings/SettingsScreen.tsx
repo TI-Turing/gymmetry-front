@@ -5,6 +5,7 @@ import {
   View as RNView,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import ScreenWrapper from '@/components/layout/ScreenWrapper';
@@ -18,17 +19,51 @@ import {
 import { useI18n } from '@/i18n';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeSettingsStyles } from './styles';
+import { useAdConfigManager } from '@/hooks';
+import { CustomAlert } from '@/components/common/CustomAlert';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SOUND_KEY = '@sound_cues_enabled';
 const PREP_KEY = '@prep_seconds';
 
+// Admin users whitelist
+const ADMIN_USERS = ['jlap11'];
+
 export default function SettingsScreen() {
   const { settings, setSettings } = useAppSettings();
+  const { user: authUser } = useAuth();
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [prepSeconds, setPrepSeconds] = useState<number>(10);
   const styles = useThemedStyles(makeSettingsStyles);
+
+  // Ad Configuration
+  const {
+    config: adConfig,
+    loading: adConfigLoading,
+    error: adConfigError,
+    updateConfig: updateAdConfig,
+  } = useAdConfigManager();
+  const [postsPerAd, setPostsPerAd] = useState<number>(5);
+  const [admobPercentage, setAdmobPercentage] = useState<number>(60);
+  const [isSavingAdConfig, setIsSavingAdConfig] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  // Check if current user is admin
+  const isAdmin = authUser?.userName
+    ? ADMIN_USERS.includes(authUser.userName.toLowerCase())
+    : false;
+
+  // Sincronizar valores de ad config cuando cambia
+  useEffect(() => {
+    if (adConfig) {
+      setPostsPerAd(adConfig.PostsPerAd);
+      setAdmobPercentage(adConfig.AdMobPercentage);
+    }
+  }, [adConfig]);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,6 +164,41 @@ export default function SettingsScreen() {
       { seconds: 5 },
       { settings }
     );
+  };
+
+  const handleSaveAdConfig = async () => {
+    // Validaciones
+    if (postsPerAd < 3 || postsPerAd > 10) {
+      setAlertMessage(t('ad_config_validation_error'));
+      setShowErrorAlert(true);
+      return;
+    }
+    if (admobPercentage < 0 || admobPercentage > 100) {
+      setAlertMessage(t('ad_config_validation_error'));
+      setShowErrorAlert(true);
+      return;
+    }
+
+    setIsSavingAdConfig(true);
+    try {
+      const success = await updateAdConfig({
+        PostsPerAd: postsPerAd,
+        AdMobPercentage: admobPercentage,
+      });
+
+      if (success) {
+        setAlertMessage(t('ad_config_saved'));
+        setShowSuccessAlert(true);
+      } else {
+        setAlertMessage(adConfigError || t('ad_config_error'));
+        setShowErrorAlert(true);
+      }
+    } catch (err) {
+      setAlertMessage(t('ad_config_error'));
+      setShowErrorAlert(true);
+    } finally {
+      setIsSavingAdConfig(false);
+    }
   };
 
   return (
@@ -407,9 +477,109 @@ export default function SettingsScreen() {
           </RNView>
         </View>
 
-        {/* Diagnóstico y caché */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>{t('diagnostics_cache')}</Text>
+        {/* CONFIGURACIONES DE ADMINISTRADOR */}
+        {isAdmin && (
+          <>
+            {/* Separador visual */}
+            <View style={styles.adminDivider}>
+              <Text style={styles.adminDividerText}>
+                🔧 {t('admin_settings')}
+              </Text>
+            </View>
+
+            {/* Publicidad */}
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>{t('advertising')}</Text>
+
+              {adConfigLoading ? (
+            <RNView style={styles.loadingContainer}>
+              <ActivityIndicator size="small" />
+              <Text style={styles.rowSub}>{t('ad_config_loading')}</Text>
+            </RNView>
+          ) : (
+            <>
+              {/* Frecuencia de anuncios */}
+              <RNView style={styles.row}>
+                <View style={styles.rowLeft}>
+                  <Text style={styles.rowTitle}>{t('ad_frequency')}</Text>
+                  <Text style={styles.rowSub}>
+                    {t('ad_frequency_description')}
+                  </Text>
+                </View>
+                <RNView style={styles.chipRow}>
+                  {[3, 4, 5, 6, 7, 8, 9, 10].map((val) => (
+                    <RNView key={val}>
+                      <TouchableOpacity
+                        onPress={() => setPostsPerAd(val)}
+                        style={[
+                          styles.chip,
+                          val === postsPerAd
+                            ? styles.chipSelected
+                            : styles.chipUnselected,
+                        ]}
+                      >
+                        <Text style={styles.chipText}>{val}</Text>
+                      </TouchableOpacity>
+                    </RNView>
+                  ))}
+                </RNView>
+              </RNView>
+
+              {/* Distribución AdMob vs Propios */}
+              <RNView style={styles.row}>
+                <View style={styles.rowLeft}>
+                  <Text style={styles.rowTitle}>{t('ad_ratio')}</Text>
+                  <Text style={styles.rowSub}>
+                    {t('ad_ratio_description')}
+                  </Text>
+                  <Text style={styles.adRatioInfo}>
+                    {t('admob_percentage')}: {admobPercentage}% |{' '}
+                    {t('own_ads_percentage')}: {100 - admobPercentage}%
+                  </Text>
+                </View>
+              </RNView>
+
+              {/* Slider de porcentaje AdMob */}
+              <RNView style={styles.sliderRow}>
+                {[0, 20, 40, 60, 80, 100].map((val) => (
+                  <RNView key={val}>
+                    <TouchableOpacity
+                      onPress={() => setAdmobPercentage(val)}
+                      style={[
+                        styles.chip,
+                        val === admobPercentage
+                          ? styles.chipSelected
+                          : styles.chipUnselected,
+                      ]}
+                    >
+                      <Text style={styles.chipText}>{val}%</Text>
+                    </TouchableOpacity>
+                  </RNView>
+                ))}
+              </RNView>
+
+              {/* Botón guardar */}
+              <RNView style={styles.saveButtonContainer}>
+                <TouchableOpacity
+                  onPress={handleSaveAdConfig}
+                  disabled={isSavingAdConfig}
+                  style={[
+                    styles.saveButton,
+                    isSavingAdConfig && styles.saveButtonDisabled,
+                  ]}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {isSavingAdConfig ? t('saving') : t('save_ad_config')}
+                  </Text>
+                </TouchableOpacity>
+              </RNView>
+            </>
+          )}
+            </View>
+
+            {/* Diagnóstico y caché (Solo Admin) */}
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>{t('diagnostics_cache')}</Text>
           <RNView style={styles.row}>
             <View style={styles.rowLeft}>
               <Text style={styles.rowTitle}>{t('analytics')}</Text>
@@ -459,7 +629,11 @@ export default function SettingsScreen() {
               onValueChange={(v) => setSettings({ enableOfflineCache: v })}
             />
           </RNView>
-        </View>
+            </View>
+          </>
+        )}
+        {/* FIN CONFIGURACIONES DE ADMINISTRADOR */}
+
         {/* Sección: Entrenamiento */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>{t('training')}</Text>
@@ -511,6 +685,22 @@ export default function SettingsScreen() {
           Más opciones de configuración estarán disponibles próximamente.
         </Text>
       </ScrollView>
+
+      {/* Alerts */}
+      <CustomAlert
+        visible={showSuccessAlert}
+        type="success"
+        title="✅"
+        message={alertMessage}
+        onClose={() => setShowSuccessAlert(false)}
+      />
+      <CustomAlert
+        visible={showErrorAlert}
+        type="error"
+        title="❌"
+        message={alertMessage}
+        onClose={() => setShowErrorAlert(false)}
+      />
     </ScreenWrapper>
   );
 }

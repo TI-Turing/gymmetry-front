@@ -42,7 +42,6 @@ const VirtualizedFeedList: React.FC<VirtualizedFeedListProps> = ({
   currentUserId,
   isAnonymousActive = false,
   onToggleLike,
-  onOpenComments,
   onShare,
   onPostUpdated,
 }) => {
@@ -69,7 +68,6 @@ const VirtualizedFeedList: React.FC<VirtualizedFeedListProps> = ({
         currentUserId={currentUserId}
         isAnonymousActive={isAnonymousActive}
         onToggleLike={onToggleLike}
-        onOpenComments={onOpenComments}
         onShare={onShare}
         onPostUpdated={onPostUpdated}
       />
@@ -80,7 +78,6 @@ const VirtualizedFeedList: React.FC<VirtualizedFeedListProps> = ({
       currentUserId,
       isAnonymousActive,
       onToggleLike,
-      onOpenComments,
       onShare,
       onPostUpdated,
     ]

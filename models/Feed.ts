@@ -16,5 +16,9 @@ export interface Feed {
   IsDeleted: boolean;
   LikesCount?: number; // nuevo backend: contadores
   CommentsCount?: number;
+  SharesCount?: number;
+  IsLiked?: boolean; // Flag si el usuario actual dio like
+  IsLikedByCurrentUser?: boolean; // Alias alternativo
+  UserLikeId?: string; // ID del like del usuario (si existe)
   User: User;
 }

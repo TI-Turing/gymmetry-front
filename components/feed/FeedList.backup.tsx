@@ -39,13 +39,11 @@ const FeedList: React.FC<FeedListProps> = React.memo(
         <UnifiedPostCard
           post={item}
           onToggleLike={handleToggleLike}
-          onOpenComments={handleOpenComments}
           onShare={handleShare}
           onPostUpdated={handlePostUpdated}
           currentUserId={authUser?.id}
           showActions={true}
           showEdit={true}
-          showReport={true}
           variant="default"
         />
       ),

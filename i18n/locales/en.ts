@@ -679,6 +679,26 @@ const en: Dict = {
     'You have reached the daily report limit. Try again tomorrow.',
   reportModal_rateLimit_warning: 'Reports remaining today:',
   reportModal_rateLimit_reached: 'Daily report limit reached',
+
+  // Admin Settings
+  admin_settings: 'ADMIN SETTINGS',
+
+  // Ad Configuration
+  advertising: 'Advertising',
+  ad_frequency: 'Ad Frequency',
+  ad_frequency_description: 'How many posts between each ad in the feed',
+  posts_per_ad: 'Posts per ad',
+  ad_ratio: 'Ad Distribution',
+  ad_ratio_description: 'Percentage of AdMob ads vs own ads',
+  admob_percentage: 'AdMob Percentage',
+  own_ads_percentage: 'Own',
+  save_ad_config: 'Save Configuration',
+  saving: 'Saving...',
+  ad_config_saved: 'Configuration saved successfully',
+  ad_config_error: 'Error saving configuration',
+  ad_config_validation_error: 'Invalid values. PostsPerAd must be between 3 and 10, and AdMobPercentage between 0 and 100',
+  ad_config_current: 'Current configuration',
+  ad_config_loading: 'Loading configuration...',
 };
 
 export default en;

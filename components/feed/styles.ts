@@ -339,4 +339,16 @@ export default (theme: 'light' | 'dark') =>
     separator: {
       height: SPACING.sm,
     },
+    // Infinite scroll footer
+    footerContainer: {
+      padding: SPACING.xl,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    footerText: {
+      fontSize: FONT_SIZES.sm,
+      color: '#888888',
+      textAlign: 'center',
+      fontStyle: 'italic',
+    },
   });

@@ -92,8 +92,8 @@ export const PostComposer: React.FC<PostComposerProps> = ({
         <SmartImage
           uri={
             isAnonymous
-              ? 'https://via.placeholder.com/40?text=Anon'
-              : avatarUrl || 'https://via.placeholder.com/40'
+              ? require('@/assets/images/icon.png')
+              : avatarUrl || require('@/assets/images/icon.png')
           }
           style={styles.avatar}
           deferOnDataSaver={false}

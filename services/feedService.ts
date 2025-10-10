@@ -63,6 +63,25 @@ export const feedService = {
       `/feed/trending?hours=${hours}&take=${take}`
     );
   },
+
+  // Feed View Tracking - Sistema de feeds vistos
+  /**
+   * Obtiene feeds NO vistos por el usuario autenticado con paginación
+   * Incluye contadores HasMore y UnviewedCount para infinite scroll
+   */
+  async getUnviewedFeeds(page = 1, size = 20): Promise<ApiResponse<unknown>> {
+    return apiService.get<unknown>(`/feed/unviewed?page=${page}&size=${size}`);
+  },
+
+  /**
+   * Marca una lista de feeds como vistos por el usuario autenticado
+   * Límite: 50 feeds por request (batch processing automático en hook)
+   */
+  async markFeedsAsViewed(feedIds: string[]): Promise<ApiResponse<boolean>> {
+    return apiService.post<boolean>(`/feed/mark-viewed`, {
+      FeedIds: feedIds,
+    });
+  },
   // Likes
   async like(feedId: string): Promise<ApiResponse<unknown>> {
     return apiService.post<unknown>(`/feed/${feedId}/like`, {});

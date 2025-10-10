@@ -72,7 +72,6 @@ export const UnifiedFeedList: React.FC<UnifiedFeedListProps> = ({
       <UnifiedPostCard
         post={item}
         onToggleLike={handleToggleLike}
-        onOpenComments={handleOpenComments}
         onShare={handleShare}
         onPostUpdated={handlePostUpdated}
         isAnonymousActive={isAnonymousActive}
@@ -80,7 +79,6 @@ export const UnifiedFeedList: React.FC<UnifiedFeedListProps> = ({
         variant={variant}
         showActions={true}
         showEdit={true}
-        showReport={true}
       />
     ),
     [

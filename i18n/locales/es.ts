@@ -720,6 +720,26 @@ const es: Dict = {
 
   // Blocked Users Screen
   blockedUsers_title: 'Usuarios Bloqueados',
+
+  // Admin Settings
+  admin_settings: 'CONFIGURACIONES DE ADMINISTRADOR',
+
+  // Ad Configuration
+  advertising: 'Publicidad',
+  ad_frequency: 'Frecuencia de anuncios',
+  ad_frequency_description: 'Cada cuántos posts se muestra un anuncio en el feed',
+  posts_per_ad: 'Posts por anuncio',
+  ad_ratio: 'Distribución de anuncios',
+  ad_ratio_description: 'Porcentaje de anuncios AdMob vs anuncios propios',
+  admob_percentage: 'Porcentaje AdMob',
+  own_ads_percentage: 'Propios',
+  save_ad_config: 'Guardar configuración',
+  saving: 'Guardando...',
+  ad_config_saved: 'Configuración guardada exitosamente',
+  ad_config_error: 'Error al guardar la configuración',
+  ad_config_validation_error: 'Valores inválidos. PostsPerAd debe estar entre 3 y 10, y AdMobPercentage entre 0 y 100',
+  ad_config_current: 'Configuración actual',
+  ad_config_loading: 'Cargando configuración...',
 };
 
 export default es;

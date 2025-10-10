@@ -1,26 +1,33 @@
 import React, { useState, useMemo } from 'react';
 import { View } from 'react-native';
 import FeedList from './FeedList';
-import {
-  useFeedPagedAdapter,
-  useFeedTrendingAdapter,
-} from '../../hooks/useFeedAdapter';
+import { useFeedTrendingAdapter } from '../../hooks/useFeedAdapter';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import styles from './styles';
-import { mapFeedToFeedItem } from '@/types/feedTypes';
+import { mapFeedToFeedItem, type FeedItem } from '@/types/feedTypes';
 import { EnhancedTabBar, TabItem } from '../common/EnhancedTabBar';
+import { useInfiniteFeedWithTracking } from '@/hooks/useInfiniteFeedWithTracking';
 
 const TABS = ['Feed', 'Trending'] as const;
 type TabKey = (typeof TABS)[number];
 
 interface FeedTabsProps {
   onCreatePost?: () => void;
+  onScrollDirectionChange?: (isScrollingDown: boolean) => void;
 }
 
-const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
+const FeedTabs: React.FC<FeedTabsProps> = ({
+  onCreatePost,
+  onScrollDirectionChange,
+}) => {
   const [tab, setTab] = useState<TabKey>('Feed');
   const themed = useThemedStyles(styles);
-  const paged = useFeedPagedAdapter();
+
+  // Nuevo sistema: infinite scroll con tracking de feeds vistos
+  const { state: infiniteFeedState, actions: feedActions } =
+    useInfiniteFeedWithTracking();
+
+  // Trending sigue usando el sistema anterior (no requiere tracking)
   const trending = useFeedTrendingAdapter();
 
   // Configuración de tabs para EnhancedTabBar
@@ -30,7 +37,7 @@ const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
         id: 'Feed',
         label: 'Feed',
         icon: 'home',
-        badgeCount: paged.data?.items?.length,
+        badgeCount: infiniteFeedState.unviewedCount || undefined,
       },
       {
         id: 'Trending',
@@ -39,13 +46,13 @@ const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
         badgeCount: trending.items?.length,
       },
     ],
-    [paged.data?.items?.length, trending.items?.length]
+    [infiniteFeedState.unviewedCount, trending.items?.length]
   );
 
   // Mapear datos del backend a la estructura del frontend
   const feedItems = useMemo(() => {
-    return (paged.data?.items || []).map(mapFeedToFeedItem);
-  }, [paged.data?.items]);
+    return infiniteFeedState.feeds.map(mapFeedToFeedItem);
+  }, [infiniteFeedState.feeds]);
 
   const trendingItems = useMemo(() => {
     return (trending.items || []).map(mapFeedToFeedItem);
@@ -55,6 +62,24 @@ const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
     setTab(tabId as TabKey);
   };
 
+  // Wrapper para convertir actualizaciones de FeedItem (camelCase) a Feed (PascalCase)
+  const handleFeedItemUpdate = (feedId: string, updates: Partial<FeedItem>) => {
+    const backendUpdates: Record<string, unknown> = {};
+
+    if (updates.likesCount !== undefined)
+      backendUpdates.LikesCount = updates.likesCount;
+    if (updates.isLiked !== undefined) {
+      backendUpdates.IsLiked = updates.isLiked;
+      backendUpdates.IsLikedByCurrentUser = updates.isLiked; // Alias alternativo
+    }
+    if (updates.commentsCount !== undefined)
+      backendUpdates.CommentsCount = updates.commentsCount;
+    if (updates.sharesCount !== undefined)
+      backendUpdates.SharesCount = updates.sharesCount;
+
+    feedActions.updateFeedItem(feedId, backendUpdates);
+  };
+
   return (
     <View style={themed.container}>
       <EnhancedTabBar
@@ -62,18 +87,26 @@ const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
         selectedTabId={tab}
         onTabPress={handleTabPress}
         variant="underline"
-        showLabels={true}
+        showLabels={false}
         animated={true}
         iconSize={20}
       />
+      
+      {/* Espaciado entre tabs y contenido */}
+      <View style={{ height: 16 }} />
 
       {tab === 'Feed' && (
         <FeedList
           items={feedItems}
-          loading={paged.loading}
-          error={paged.error}
-          refetch={paged.refetch}
+          loading={infiniteFeedState.loading}
+          error={infiniteFeedState.error}
+          refetch={feedActions.refresh}
           onCreatePost={onCreatePost}
+          onEndReached={feedActions.loadMore}
+          hasMore={infiniteFeedState.hasMore}
+          unviewedCount={infiniteFeedState.unviewedCount}
+          onFeedItemUpdate={handleFeedItemUpdate}
+          onScrollDirectionChange={onScrollDirectionChange}
         />
       )}
       {tab === 'Trending' && (
@@ -83,6 +116,7 @@ const FeedTabs: React.FC<FeedTabsProps> = ({ onCreatePost }) => {
           error={trending.error}
           refetch={trending.refetch}
           onCreatePost={onCreatePost}
+          onScrollDirectionChange={onScrollDirectionChange}
         />
       )}
     </View>

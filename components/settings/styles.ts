@@ -66,5 +66,60 @@ export const makeSettingsStyles = (theme: ThemeMode) => {
     },
     testButtonText: { color: palette.onTint, fontWeight: '600' },
     footerText: { opacity: 0.7, fontSize: 12, color: subtle },
+    // Ad Configuration
+    loadingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingVertical: 12,
+    },
+    adRatioInfo: {
+      marginTop: 8,
+      fontSize: 13,
+      fontWeight: '600',
+      color: palette.tint,
+    },
+    sliderRow: {
+      flexDirection: 'row',
+      gap: 8,
+      flexWrap: 'wrap',
+      paddingVertical: 8,
+    },
+    saveButtonContainer: {
+      marginTop: 12,
+      alignItems: 'center',
+    },
+    saveButton: {
+      backgroundColor: palette.tint,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 8,
+      minWidth: 200,
+      alignItems: 'center',
+    },
+    saveButtonDisabled: {
+      opacity: 0.5,
+    },
+    saveButtonText: {
+      color: palette.onTint,
+      fontWeight: '600',
+      fontSize: 15,
+    },
+    // Admin Section
+    adminDivider: {
+      backgroundColor: palette.card,
+      borderRadius: 8,
+      padding: 12,
+      marginBottom: 12,
+      borderWidth: 2,
+      borderColor: palette.warning || '#FF6B35',
+      alignItems: 'center',
+    },
+    adminDividerText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: palette.warning || '#FF6B35',
+      letterSpacing: 1,
+    },
   });
 };

@@ -12,7 +12,7 @@ import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { makeSmartImageStyles } from './styles/smartImage';
 
 type Props = {
-  uri?: string | null;
+  uri?: string | number | null; // Acepta string (URL remota) o number (require local)
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'cover' | 'contain' | 'stretch' | 'center' | 'repeat';
   deferOnDataSaver?: boolean; // si true, con ahorro de datos no carga hasta que el usuario toque
@@ -31,18 +31,26 @@ export function SmartImage({
   const [shouldLoad, setShouldLoad] = useState(
     !settings.dataSaver || !deferOnDataSaver
   );
+  const [hasError, setHasError] = useState(false);
 
-  console.log('🖼️ [SmartImage] Renderizando:', {
-    uri,
-    shouldLoad,
-    dataSaver: settings.dataSaver,
-  });
+  // Determinar si es recurso local (number) o remoto (string)
+  const isLocalResource = typeof uri === 'number';
 
   if (!uri) {
     return <View style={[styles.placeholder, style as ImageStyle]} />;
   }
 
-  if (!shouldLoad) {
+  // Mostrar mensaje de error elegante si la imagen falló
+  if (hasError) {
+    return (
+      <View style={[styles.errorContainer, style as ImageStyle]}>
+        <Text style={styles.errorText}>Imagen no disponible</Text>
+      </View>
+    );
+  }
+
+  // Recursos locales siempre se cargan (no aplica data saver)
+  if (!shouldLoad && !isLocalResource) {
     return (
       <TouchableOpacity
         accessibilityRole="button"
@@ -57,19 +65,18 @@ export function SmartImage({
     );
   }
 
+  // Para recursos locales: usar directamente el número
+  // Para URLs remotas: usar { uri: string }
+  const imageSource = isLocalResource ? uri : { uri: uri as string };
+
   return (
     <Image
-      source={{ uri }}
+      source={imageSource}
       style={style}
       resizeMode={resizeMode}
-      onError={(error) => {
-        console.error('❌ [SmartImage] Error cargando:', {
-          uri,
-          error: error.nativeEvent.error,
-        });
-      }}
-      onLoad={() => {
-        console.log('✅ [SmartImage] Imagen cargada exitosamente');
+      onError={() => {
+        // Silenciar error completamente y mostrar fallback visual
+        setHasError(true);
       }}
     />
   );

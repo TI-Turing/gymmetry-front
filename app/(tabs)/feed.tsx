@@ -9,6 +9,7 @@ import { useAppState } from '@/contexts/AppStateContext';
 
 function FeedScreen() {
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [showFloatingButton, setShowFloatingButton] = useState(true);
   const { refreshAll } = useAppState();
 
   const handleOpenCreatePost = () => {
@@ -24,11 +25,21 @@ function FeedScreen() {
     await refreshAll();
   };
 
+  const handleScrollDirectionChange = (isScrollingDown: boolean) => {
+    setShowFloatingButton(!isScrollingDown);
+  };
+
   return (
     <ScreenWrapper headerTitle="Feed" showBackButton={false}>
       <View style={{ flex: 1 }}>
-        <FeedTabs onCreatePost={handleOpenCreatePost} />
-        <FloatingCreateButton onPress={handleOpenCreatePost} />
+        <FeedTabs
+          onCreatePost={handleOpenCreatePost}
+          onScrollDirectionChange={handleScrollDirectionChange}
+        />
+        <FloatingCreateButton
+          onPress={handleOpenCreatePost}
+          visible={showFloatingButton}
+        />
 
         <Modal
           visible={showCreatePost}

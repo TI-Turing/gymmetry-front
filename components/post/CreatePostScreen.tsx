@@ -95,9 +95,8 @@ export default function CreatePostScreen({ onClose }: CreatePostScreenProps) {
       // Post creation logic will be implemented here
 
       const closeAction = onClose || (() => router.back());
-      Alert.alert('Éxito', 'Tu publicación ha sido creada exitosamente', [
-        { text: 'OK', onPress: closeAction },
-      ]);
+      // Cerrar inmediatamente sin mostrar alert de éxito
+      closeAction();
     } catch (error) {
       Alert.alert(
         'Error',

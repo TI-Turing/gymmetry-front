@@ -6,8 +6,11 @@ export const createStyles = (colorScheme: 'light' | 'dark') =>
   StyleSheet.create({
     container: {
       position: 'absolute',
-      right: SPACING.lg,
-      bottom: SPACING.xl + 60, // Espacio para tab bar
+      right: SPACING.xl + 10, // Más a la izquierda
+      bottom: SPACING.xl + 80, // Más abajo
+      zIndex: 1000,
+    },
+    button: {
       width: 56,
       height: 56,
       borderRadius: 28,
@@ -20,6 +23,5 @@ export const createStyles = (colorScheme: 'light' | 'dark') =>
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
-      zIndex: 1000,
     },
   });

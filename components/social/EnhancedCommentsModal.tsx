@@ -23,6 +23,8 @@ import type { ThemeMode } from '@/hooks/useThemedStyles';
 export interface EnhancedCommentsModalProps {
   visible: boolean;
   feedId: string;
+  postContent?: string; // Contenido del post
+  postAuthor?: string; // Autor del post
   onClose: () => void;
   isAnonymousActive?: boolean;
   currentUserId?: string;
@@ -83,8 +85,26 @@ const createEnhancedCommentsModalStyles = (theme: ThemeMode) => {
       fontWeight: '600',
       color: colors.text,
     },
+    postPreview: {
+      marginTop: SPACING.sm,
+      paddingTop: SPACING.sm,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    postAuthor: {
+      fontSize: FONT_SIZES.xs,
+      fontWeight: '600',
+      color: colors.textMuted,
+      marginBottom: SPACING.xs,
+    },
+    postContent: {
+      fontSize: FONT_SIZES.sm,
+      color: colors.text,
+      lineHeight: 18,
+    },
     closeButton: {
       padding: SPACING.sm,
+      alignSelf: 'flex-start',
     },
     commentsContainer: {
       flex: 1,
@@ -586,6 +606,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
 export const EnhancedCommentsModal: React.FC<EnhancedCommentsModalProps> = ({
   visible,
   feedId,
+  postContent,
+  postAuthor,
   onClose,
   isAnonymousActive = false,
   currentUserId,
@@ -615,7 +637,15 @@ export const EnhancedCommentsModal: React.FC<EnhancedCommentsModalProps> = ({
       ) as FeedComment[];
 
       const filtered = await filterBlockedComments(validComments);
-      setFilteredComments(filtered);
+      
+      // Ordenar por fecha, más recientes primero
+      const sorted = filtered.sort((a, b) => {
+        const dateA = new Date(a.CreatedAt || 0).getTime();
+        const dateB = new Date(b.CreatedAt || 0).getTime();
+        return dateB - dateA; // Orden descendente (más recientes primero)
+      });
+      
+      setFilteredComments(sorted);
     };
 
     filterComments();
@@ -736,13 +766,33 @@ export const EnhancedCommentsModal: React.FC<EnhancedCommentsModalProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
-        <View style={[styles.container, { maxHeight }]}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>
-              Comentarios ({commentsData.total || 0})
-            </Text>
+      <TouchableOpacity
+        style={styles.backdrop}
+        activeOpacity={1}
+        onPress={onClose}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={(e) => e.stopPropagation()}
+        >
+          <View style={[styles.container, { maxHeight }]}>
+            {/* Header */}
+            <View style={styles.header}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.title}>
+                Comentarios ({commentsData.total || 0})
+              </Text>
+              {(postContent || postAuthor) && (
+                <View style={styles.postPreview}>
+                  {postAuthor && (
+                    <Text style={styles.postAuthor}>{postAuthor}</Text>
+                  )}
+                  <Text style={styles.postContent} numberOfLines={2}>
+                    {postContent || '(Sin contenido)'}
+                  </Text>
+                </View>
+              )}
+            </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <FontAwesome name="times" size={20} color="#666" />
             </TouchableOpacity>
@@ -818,7 +868,8 @@ export const EnhancedCommentsModal: React.FC<EnhancedCommentsModalProps> = ({
             <Text style={styles.counterText}>{newComment.length}/500</Text>
           </View>
         </View>
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     </Modal>
   );
 };
