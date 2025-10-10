@@ -80,9 +80,13 @@ export default function TabLayout() {
           tabBarShowLabel: false,
         }}
       />
-      {/* Ocultar rutas que existen dentro de (tabs) pero no deben mostrarse como pestañas */}
+      {/* Ocultar rutas que existen dentro de (tabs), pero no deben mostrarse como pestañas */}
       <Tabs.Screen name="physical-assessment" options={{ href: null }} />
       <Tabs.Screen name="user-exercise-max" options={{ href: null }} />
+      <Tabs.Screen name="index.new" options={{ href: null }} />
+      <Tabs.Screen name="index.tsx.backup" options={{ href: null }} />
+      <Tabs.Screen name="option-2" options={{ href: null }} />
+      <Tabs.Screen name="option-3" options={{ href: null }} />
     </Tabs>
   );
 }
