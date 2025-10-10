@@ -147,5 +147,36 @@ export const makeExerciseModalStyles = (theme: ThemeMode) => {
       letterSpacing: 1,
     },
     buttonOnTintText: { color: onTint },
+    
+    // Rep counter styles
+    repCounterContainer: {
+      alignItems: 'center',
+      gap: 16,
+      backgroundColor: cardBg,
+    },
+    repCounterLabel: {
+      color: subtle,
+      fontSize: 14,
+      fontWeight: '500',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    repControlRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 32,
+      backgroundColor: cardBg,
+    },
+    repButton: {
+      padding: 8,
+    },
+    repCounterText: {
+      color: palette.tint,
+      fontSize: 56,
+      fontWeight: '700',
+      minWidth: 80,
+      textAlign: 'center',
+    },
   });
 };

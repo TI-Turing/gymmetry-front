@@ -12,10 +12,10 @@ import {
   Vibration,
   Platform,
   Pressable,
-  TextInput,
 } from 'react-native';
 import { View, Text } from '@/components/Themed';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '@/components/common/Button';
 import type { RoutineDay } from '@/models/RoutineDay';
@@ -32,6 +32,7 @@ import {
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { scheduleLocalNotificationAsync } from '@/utils/localNotifications';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { useColorScheme } from '@/components/useColorScheme';
 import { makeExerciseModalStyles } from './styles/exerciseModal';
 import { useI18n } from '@/i18n';
 import { AdMobBanner } from '@/components/ad';
@@ -56,8 +57,10 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   completedSets,
 }) => {
   const { t } = useI18n();
+  const colorScheme = useColorScheme();
   const styles = useThemedStyles(makeExerciseModalStyles);
   const { settings } = useAppSettings();
+  const tintColor = Colors[colorScheme].tint;
   const [isExecuting, setIsExecuting] = useState(false);
   const [pulseAnim] = useState(new Animated.Value(1));
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -66,8 +69,11 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const nextSetNumber = exercise
     ? Math.min(completedSets + 1, exercise.Sets)
     : 1;
-  const [showRepsPrompt, setShowRepsPrompt] = useState(false);
-  const [repsValue, setRepsValue] = useState<string>('');
+
+  // Sistema de conteo automático de repeticiones
+  const [currentReps, setCurrentReps] = useState<number>(0);
+  const repsTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // Timer para ejercicios de tiempo
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [timerRemaining, setTimerRemaining] = useState<number>(0);
@@ -310,10 +316,10 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
             else Vibration.vibrate([0, 100, 60, 100]);
           } catch {}
         }
-        // Marcar set completado automáticamente sin prompt de reps
+        // Marcar set completado automáticamente (ejercicios de tiempo no tienen reps)
         // Defer para evitar actualizar el padre durante el render de este componente
         setTimeout(() => {
-          commitFinishSet(false);
+          commitFinishSet(0);
         }, 0);
         return 0;
       });
@@ -416,51 +422,102 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     }).start();
   }, [fadeAnim, pulseAnim]);
 
+  // Calcular intervalo adaptativo según el set actual (más lento en sets finales)
+  const getRepInterval = () => {
+    if (!exercise) return 2500; // Default 2.5s por rep
+    const progress = completedSets / exercise.Sets; // 0 a 1
+    // Sets iniciales: 2s, sets medios: 2.5s, sets finales: 3.5s
+    const baseInterval = 2000 + progress * 1500; // 2000ms a 3500ms
+    return Math.round(baseInterval);
+  };
+
+  // Iniciar contador automático de repeticiones
+  const startRepsCounter = () => {
+    if (!exercise) return;
+    setCurrentReps(0);
+    setIsExecuting(true);
+
+    const targetReps =
+      Number.parseInt(
+        String(exercise.Repetitions || '0').replace(/\D/g, ''),
+        10
+      ) || 10;
+    const interval = getRepInterval();
+
+    // Limpiar timer previo si existe
+    if (repsTimerRef.current) {
+      clearInterval(repsTimerRef.current);
+      repsTimerRef.current = null;
+    }
+
+    repsTimerRef.current = setInterval(() => {
+      setCurrentReps((prev) => {
+        // Auto-incremento hasta el target, pero no detener (usuario puede exceder)
+        if (prev < targetReps) {
+          return prev + 1;
+        }
+        return prev; // Mantener en el target, botones manuales pueden aumentar
+      });
+    }, interval);
+  };
+
+  // Detener contador de repeticiones
+  const stopRepsCounter = () => {
+    if (repsTimerRef.current) {
+      clearInterval(repsTimerRef.current);
+      repsTimerRef.current = null;
+    }
+  };
+
   const handleStartSet = () => {
     if (!exercise) return;
     if (isCompleted) return; // No iniciar si ya terminó todos los sets
 
     // Vibración leve al iniciar
     Vibration.vibrate(50);
+
     if (timeSpec) {
+      // Ejercicios basados en tiempo (mantener lógica original)
       startTimer();
     } else {
+      // Ejercicios basados en repeticiones (nuevo sistema)
       startPulseAnimation();
+      startRepsCounter();
     }
   };
 
-  const handleFinishSet = () => {
+  const handleFinishSet = async () => {
     if (!exercise) return;
     stopPulseAnimation();
+    stopRepsCounter();
+
     try {
       if (Platform.OS === 'web') Vibration.vibrate(50);
       else Vibration.vibrate([0, 50, 100, 50]);
     } catch {}
 
-    // Preparar prompt de repeticiones con un valor sugerido
-    const planned = String(exercise.Repetitions || '').trim();
-    const match = planned.match(/\d+/);
-    const suggested = match ? match[0] : '';
-    setRepsValue(suggested);
-    setShowRepsPrompt(true);
+    // Guardar repeticiones automáticamente (sin modal)
+    await commitFinishSet(currentReps);
   };
 
-  const commitFinishSet = async (saveReps: boolean) => {
+  const commitFinishSet = async (repsCompleted: number) => {
     if (!exercise) return;
+    
+    // Detener ejecución (volver a mostrar botón de iniciar)
+    setIsExecuting(false);
+    
     const nextCompleted = Math.min(completedSets + 1, exercise.Sets);
 
-    // Guardar reps realizadas por set (opcional)
-    if (saveReps) {
-      const repsKey = keyExerciseReps(exercise.Id);
-      try {
-        const stored = await rsGetJSON<{ sets?: number[] }>(repsKey);
-        const arr = Array.isArray(stored?.sets) ? [...stored!.sets] : [];
-        const idx = nextCompleted - 1; // índice del set recién completado
-        const val = Math.max(0, Number.parseInt(repsValue || '0', 10) || 0);
-        arr[idx] = val;
-        await rsSetJSON(repsKey, { sets: arr });
-      } catch {}
-    }
+    // Guardar reps realizadas por set
+    const repsKey = keyExerciseReps(exercise.Id);
+    try {
+      const stored = await rsGetJSON<{ sets?: number[] }>(repsKey);
+      const arr = Array.isArray(stored?.sets) ? [...stored!.sets] : [];
+      const idx = nextCompleted - 1; // índice del set recién completado
+      const val = Math.max(0, repsCompleted);
+      arr[idx] = val;
+      await rsSetJSON(repsKey, { sets: arr });
+    } catch {}
 
     // Actualizar progreso de sets
     // Defer para evitar el warning de React sobre actualizar otro componente durante el render
@@ -483,13 +540,16 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     }
   };
 
-  // Limpiar animaciones al cerrar
+  // Limpiar animaciones y timers al cerrar
   useEffect(() => {
     if (!visible) {
       stopPulseAnimation();
+      stopRepsCounter();
       clearTimer();
       setTimerPhase(null);
       timerPhaseRef.current = null;
+      setIsExecuting(false);
+      setCurrentReps(0);
     }
   }, [visible, stopPulseAnimation, clearTimer]);
 
@@ -725,75 +785,46 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
                 textStyle={styles.buttonOnTintText}
               />
             ) : (
-              <Button
-                title={t('finish_set')}
-                onPress={handleFinishSet}
-                style={styles.finishButton}
-              />
+              <View style={styles.repCounterContainer}>
+                <Text style={styles.repCounterLabel}>
+                  {t('reps_completed')}
+                </Text>
+                <View style={styles.repControlRow}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setCurrentReps((prev) => Math.max(0, prev - 1))
+                    }
+                    style={styles.repButton}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons
+                      name="remove-circle"
+                      size={56}
+                      color={tintColor}
+                    />
+                  </TouchableOpacity>
+
+                  <Text style={styles.repCounterText}>{currentReps}</Text>
+
+                  <TouchableOpacity
+                    onPress={() => setCurrentReps((prev) => prev + 1)}
+                    style={styles.repButton}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="add-circle" size={56} color={tintColor} />
+                  </TouchableOpacity>
+                </View>
+
+                <Button
+                  title={t('finish_set')}
+                  onPress={handleFinishSet}
+                  style={styles.finishButton}
+                />
+              </View>
             )}
           </View>
         </View>
       </View>
-
-      {/* Prompt de repeticiones realizadas */}
-      {exercise && (
-        <Modal
-          visible={showRepsPrompt}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowRepsPrompt(false)}
-        >
-          <Pressable
-            style={styles.promptOverlay}
-            onPress={() => setShowRepsPrompt(false)}
-          >
-            <Pressable style={styles.promptCard} onPress={() => undefined}>
-              <Text style={styles.promptTitle}>
-                {t('repetitions_completed')}
-              </Text>
-              <Text style={styles.promptSubtitle}>
-                {t('set_of')
-                  .replace(
-                    '{current}',
-                    String(Math.min(completedSets + 1, exercise.Sets))
-                  )
-                  .replace('{total}', String(exercise.Sets))}
-              </Text>
-              <TextInput
-                style={styles.promptInput}
-                value={repsValue}
-                onChangeText={(text) =>
-                  setRepsValue(text.replace(/[^0-9]/g, ''))
-                }
-                placeholder={t('reps_placeholder')}
-                placeholderTextColor={styles.placeholder.color as string}
-                keyboardType="number-pad"
-                maxLength={3}
-                inputMode="numeric"
-              />
-              <View style={styles.promptButtonsRow}>
-                <Button
-                  title={t('skip')}
-                  variant="secondary"
-                  style={styles.promptButton}
-                  onPress={async () => {
-                    setShowRepsPrompt(false);
-                    await commitFinishSet(false);
-                  }}
-                />
-                <Button
-                  title={t('save_reps')}
-                  style={styles.promptButton}
-                  onPress={async () => {
-                    setShowRepsPrompt(false);
-                    await commitFinishSet(true);
-                  }}
-                />
-              </View>
-            </Pressable>
-          </Pressable>
-        </Modal>
-      )}
     </Modal>
   );
 };
