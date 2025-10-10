@@ -264,10 +264,17 @@ export function mapAdvertisementToFeedItem(
     TargetUrl: string;
     DisplayPriority?: number;
   },
-  isAdMob: boolean = false
+  isAdMob: boolean = false,
+  instanceId?: string // Identificador único para esta instancia del anuncio
 ): FeedItem {
   // Evitar duplicar el prefijo "ad_" si el ID ya lo tiene
-  const adId = ad.Id.startsWith('ad_') ? ad.Id : `ad_${ad.Id}`;
+  let adId = ad.Id.startsWith('ad_') ? ad.Id : `ad_${ad.Id}`;
+  
+  // Si se proporciona instanceId, agregarlo para garantizar unicidad
+  // Esto permite que el mismo anuncio aparezca múltiples veces en el feed
+  if (instanceId) {
+    adId = `${adId}_${instanceId}`;
+  }
 
   return {
     id: adId,

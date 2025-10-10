@@ -89,7 +89,9 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
           // Usuario con plan de pago: solo mostrar anuncios propios
           if (ads.length > 0) {
             const ad = ads[ownAdIndex];
-            const ownAdFeedItem = mapAdvertisementToFeedItem(ad, false);
+            // Agregar identificador único basado en posición para evitar duplicados
+            const instanceId = `pos${index}_${admobIdBase}`;
+            const ownAdFeedItem = mapAdvertisementToFeedItem(ad, false, instanceId);
             result.push(ownAdFeedItem);
             ownAdIndex = (ownAdIndex + 1) % ads.length;
           }
@@ -122,7 +124,13 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
           } else if (ads.length > 0) {
             // Insertar anuncio propio (solo si hay disponibles)
             const ad = ads[ownAdIndex];
-            const ownAdFeedItem = mapAdvertisementToFeedItem(ad, false);
+            // Agregar identificador único basado en posición para evitar duplicados
+            const instanceId = `pos${index}_${admobIdBase}`;
+            const ownAdFeedItem = mapAdvertisementToFeedItem(
+              ad,
+              false,
+              instanceId
+            );
             result.push(ownAdFeedItem);
 
             // Rotar al siguiente anuncio propio (circular)

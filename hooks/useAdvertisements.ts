@@ -127,7 +127,9 @@ export function useFeedWithAds(
 
       if (shouldInsertAd && adIndex < ads.length) {
         const ad = ads[adIndex];
-        const adFeedItem = mapAdvertisementToFeedItem(ad, false);
+        // Agregar identificador único basado en posición para evitar duplicados
+        const instanceId = `p${index}`;
+        const adFeedItem = mapAdvertisementToFeedItem(ad, false, instanceId);
         result.push(adFeedItem);
 
         // Rotar al siguiente anuncio (circular)
