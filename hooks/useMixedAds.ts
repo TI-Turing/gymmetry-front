@@ -1,7 +1,11 @@
 import { useMemo } from 'react';
 import { useAdvertisements, useAdConfig } from '@/hooks';
+import { usePlanState } from '@/contexts/AppStateContext';
 import type { FeedItem } from '@/types/feedTypes';
 import { mapAdvertisementToFeedItem } from '@/types/feedTypes';
+
+// ID del plan gratuito por defecto
+const FREE_PLAN_ID = '4aa8380c-8479-4334-8236-3909be9c842b';
 
 /**
  * Hook para mezclar posts con anuncios híbridos (propios 40% + AdMob 60%)
@@ -44,6 +48,17 @@ import { mapAdvertisementToFeedItem } from '@/types/feedTypes';
 export function useMixedAds(posts: FeedItem[]): FeedItem[] {
   const { ads } = useAdvertisements();
   const config = useAdConfig();
+  const planInfo = usePlanState();
+
+  // Verificar si el usuario debe ver anuncios de Google AdMob
+  // Solo se muestran anuncios si:
+  // 1. No tiene plan activo (planInfo es null)
+  // 2. Está usando el plan gratuito por defecto (IsFallbackFreePlan)
+  // 3. Tiene explícitamente el plan gratuito (PlanTypeId === FREE_PLAN_ID)
+  const shouldShowAdMobAds =
+    !planInfo || // No tiene plan
+    planInfo.IsFallbackFreePlan || // Plan gratis por defecto
+    planInfo.PlanTypeId?.toLowerCase() === FREE_PLAN_ID.toLowerCase(); // Plan gratis explícito
 
   const feedWithMixedAds = useMemo(() => {
     // Si no hay posts, retornar vacío
@@ -67,61 +82,80 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
       const shouldInsertAd = (index + 1) % config.postsPerAd === 0;
 
       if (shouldInsertAd) {
-        // Decidir: anuncio propio o AdMob usando ratio
-        // Si Math.random() < 0.6 → AdMob (60%)
-        // Si Math.random() >= 0.6 → Propio (40%)
-        const shouldShowAdMob = Math.random() < admobRatio;
-
-        if (shouldShowAdMob) {
-          // Insertar anuncio de AdMob
-          const admobFeedItem: FeedItem = {
-            id: `admob_${admobAdCounter++}`,
-            type: 'admob_ad',
-            userId: 'system',
-            userName: 'Anuncio',
-            userProfilePicture: undefined,
-            content: '',
-            mediaUrls: [],
-            createdAt: new Date().toISOString(),
-            likesCount: 0,
-            commentsCount: 0,
-            isLiked: false,
-            isAd: true,
-            isAdMob: true,
-          };
-          result.push(admobFeedItem);
-        } else if (ads.length > 0) {
-          // Insertar anuncio propio (solo si hay disponibles)
-          const ad = ads[ownAdIndex];
-          const ownAdFeedItem = mapAdvertisementToFeedItem(ad, false);
-          result.push(ownAdFeedItem);
-
-          // Rotar al siguiente anuncio propio (circular)
-          ownAdIndex = (ownAdIndex + 1) % ads.length;
+        // Verificar si el usuario debe ver anuncios de AdMob según su plan
+        if (!shouldShowAdMobAds) {
+          // Usuario con plan de pago: solo mostrar anuncios propios
+          if (ads.length > 0) {
+            const ad = ads[ownAdIndex];
+            const ownAdFeedItem = mapAdvertisementToFeedItem(ad, false);
+            result.push(ownAdFeedItem);
+            ownAdIndex = (ownAdIndex + 1) % ads.length;
+          }
+          // Si no hay anuncios propios, no mostrar nada (no AdMob)
         } else {
-          // Fallback: si no hay ads propios, mostrar AdMob
-          const admobFeedItem: FeedItem = {
-            id: `admob_${admobAdCounter++}`,
-            type: 'admob_ad',
-            userId: 'system',
-            userName: 'Anuncio',
-            userProfilePicture: undefined,
-            content: '',
-            mediaUrls: [],
-            createdAt: new Date().toISOString(),
-            likesCount: 0,
-            commentsCount: 0,
-            isLiked: false,
-            isAd: true,
-            isAdMob: true,
-          };
-          result.push(admobFeedItem);
+          // Usuario con plan gratuito: mostrar anuncios híbridos (propios + AdMob)
+          // Decidir: anuncio propio o AdMob usando ratio
+          // Si Math.random() < 0.6 → AdMob (60%)
+          // Si Math.random() >= 0.6 → Propio (40%)
+          const shouldShowAdMob = Math.random() < admobRatio;
+
+          if (shouldShowAdMob) {
+            // Insertar anuncio de AdMob
+            const admobFeedItem: FeedItem = {
+              id: `admob_${admobAdCounter++}`,
+              type: 'admob_ad',
+              userId: 'system',
+              userName: 'Anuncio',
+              userProfilePicture: undefined,
+              content: '',
+              mediaUrls: [],
+              createdAt: new Date().toISOString(),
+              likesCount: 0,
+              commentsCount: 0,
+              isLiked: false,
+              isAd: true,
+              isAdMob: true,
+            };
+            result.push(admobFeedItem);
+          } else if (ads.length > 0) {
+            // Insertar anuncio propio (solo si hay disponibles)
+            const ad = ads[ownAdIndex];
+            const ownAdFeedItem = mapAdvertisementToFeedItem(ad, false);
+            result.push(ownAdFeedItem);
+
+            // Rotar al siguiente anuncio propio (circular)
+            ownAdIndex = (ownAdIndex + 1) % ads.length;
+          } else {
+            // Fallback: si no hay ads propios, mostrar AdMob
+            const admobFeedItem: FeedItem = {
+              id: `admob_${admobAdCounter++}`,
+              type: 'admob_ad',
+              userId: 'system',
+              userName: 'Anuncio',
+              userProfilePicture: undefined,
+              content: '',
+              mediaUrls: [],
+              createdAt: new Date().toISOString(),
+              likesCount: 0,
+              commentsCount: 0,
+              isLiked: false,
+              isAd: true,
+              isAdMob: true,
+            };
+            result.push(admobFeedItem);
+          }
         }
       }
     });
 
     return result;
-  }, [posts, ads, config.postsPerAd, config.admobPercentage]);
+  }, [
+    posts,
+    ads,
+    config.postsPerAd,
+    config.admobPercentage,
+    shouldShowAdMobAds,
+  ]);
 
   return feedWithMixedAds;
 }
