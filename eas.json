@@ -1,0 +1,64 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": false
+      },
+      "env": {
+        "NODE_ENV": "development",
+        "EXPO_PUBLIC_ADMOB_USE_TEST_IDS": "true",
+        "EXPO_PUBLIC_ADMOB_ANDROID_TEST_BANNER_ID": "ca-app-pub-3940256099942544/6300978111",
+        "EXPO_PUBLIC_ADMOB_IOS_TEST_BANNER_ID": "ca-app-pub-3940256099942544/2934735716"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.16:7160/api",
+        "EXPO_PUBLIC_CATALOGS_API_BASE_URL": "http://192.168.0.16:7071/api",
+        "EXPO_PUBLIC_API_FUNCTIONS_KEY": "local-functions-key",
+        "EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY": "local-main-functions-key",
+        "EXPO_PUBLIC_ENVIRONMENT": "production",
+        "EXPO_PUBLIC_DEBUG": "false",
+        "EXPO_PUBLIC_TESTING_MODE": "false",
+        "EXPO_PUBLIC_MP_PUBLIC_KEY": "APP_USR-37f1ad45-e21a-4f45-9e8b-c8a83c4905fc",
+        "EXPO_PUBLIC_ADMOB_ANDROID_APP_ID": "ca-app-pub-9653039234308284~9630402104",
+        "EXPO_PUBLIC_ADMOB_ANDROID_BANNER_ID": "ca-app-pub-9653039234308284/5564725084",
+        "EXPO_PUBLIC_ADMOB_IOS_APP_ID": "ca-app-pub-9653039234308284~9961057670",
+        "EXPO_PUBLIC_ADMOB_IOS_BANNER_ID": "ca-app-pub-9653039234308284/4102226339",
+        "EXPO_PUBLIC_ADMOB_USE_TEST_IDS": "true",
+        "EXPO_PUBLIC_ADMOB_ANDROID_TEST_BANNER_ID": "ca-app-pub-3940256099942544/6300978111",
+        "EXPO_PUBLIC_ADMOB_IOS_TEST_BANNER_ID": "ca-app-pub-3940256099942544/2934735716"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
