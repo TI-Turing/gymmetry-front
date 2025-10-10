@@ -85,8 +85,8 @@ export default function TabLayout() {
       <Tabs.Screen name="user-exercise-max" options={{ href: null }} />
       <Tabs.Screen name="index.new" options={{ href: null }} />
       <Tabs.Screen name="index.tsx.backup" options={{ href: null }} />
-      <Tabs.Screen name="option-2" options={{ href: null }} />
-      <Tabs.Screen name="option-3" options={{ href: null }} />
+      <Tabs.Screen name="option2" options={{ href: null }} />
+      <Tabs.Screen name="option3" options={{ href: null }} />
     </Tabs>
   );
 }

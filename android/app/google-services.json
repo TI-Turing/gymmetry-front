@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "123456789",
+    "project_id": "gymmetry-app",
+    "storage_bucket": "gymmetry-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789:android:abcdef1234567890",
+        "android_client_info": {
+          "package_name": "com.gymmetry.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDummyKeyForAdMobOnly123456789"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-9653039234308284~9630402104"
+    }
+  ],
+  "configuration_version": "1"
+}
