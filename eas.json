@@ -34,8 +34,7 @@
     "production": {
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease",
-        "config": "release-no-minify.gradle"
+        "gradleCommand": ":app:assembleRelease"
       },
       "ios": {
         "simulator": false
