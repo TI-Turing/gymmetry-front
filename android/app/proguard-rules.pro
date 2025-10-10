@@ -3,15 +3,17 @@
 # in /usr/local/Cellar/android-sdk/24.3.3/tools/proguard/proguard-android.txt
 
 # ===== COIL 3 IMAGE LOADING LIBRARY =====
-# Keep all Coil3 classes - DO NOT REMOVE
--keep class coil3.** { *; }
--keep interface coil3.** { *; }
--keep enum coil3.** { *; }
+# CRITICAL: Prevent R8 from removing Coil3 classes
+-keep,allowobfuscation class coil3.** { *; }
+-keep,allowobfuscation interface coil3.** { *; }
+-keep,allowobfuscation enum coil3.** { *; }
 -keepclassmembers class coil3.** { *; }
+-keepnames class coil3.** { *; }
 
 # Keep Coil3 PlatformContext (specifically needed for OkHttp integration)
--keep class coil3.PlatformContext { *; }
--keep interface coil3.PlatformContext { *; }
+-keep,allowobfuscation class coil3.PlatformContext { *; }
+-keep,allowobfuscation interface coil3.PlatformContext { *; }
+-keepnames class coil3.PlatformContext { *; }
 
 # Keep Coil3 network classes
 -keep class coil3.network.** { *; }
@@ -80,6 +82,17 @@
 }
 
 # ===== AGGRESSIVE KEEP RULES FOR MISSING CLASSES =====
+# Force R8 to NOT remove classes that are used via reflection
+-keepclassmembers,allowobfuscation class * {
+    @coil3.annotation.** <methods>;
+}
+
+# Prevent stripping of classes referenced by Coil3 network layer
+-keep class * implements coil3.network.NetworkFetcher { *; }
+-keep class * implements coil3.network.ConnectivityChecker { *; }
+
 # If R8 still complains about missing classes, keep everything
 -ignorewarnings
+-dontoptimize
+-dontobfuscate
 -keep,allowobfuscation,allowshrinking class * { *; }
