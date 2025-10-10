@@ -65,15 +65,16 @@
             "compileSdkVersion": 35,
             "targetSdkVersion": 34,
             "buildToolsVersion": "34.0.0",
-            "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true,
-            "extraProguardRules": "-keep public class * { public *; }"
+            "enableProguardInReleaseBuilds": false,
+            "enableShrinkResourcesInReleaseBuilds": false,
+            "minifyEnabled": false
           },
           "ios": {
             "deploymentTarget": "15.1"
           }
         }
       ],
+      "./plugins/withDisableR8.js",
       "expo-font",
       "expo-web-browser"
     ],
