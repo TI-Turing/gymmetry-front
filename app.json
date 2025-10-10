@@ -27,7 +27,9 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.gymmetry.app",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 1,
+      "enableDangerousExperimentalLeanBuilds": true
     },
     "web": {
       "bundler": "metro",
@@ -58,7 +60,10 @@
           "android": {
             "compileSdkVersion": 35,
             "targetSdkVersion": 34,
-            "buildToolsVersion": "34.0.0"
+            "buildToolsVersion": "34.0.0",
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "extraProguardRules": "-keep public class * { public *; }"
           },
           "ios": {
             "deploymentTarget": "15.1"
