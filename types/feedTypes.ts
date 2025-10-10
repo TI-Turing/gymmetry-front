@@ -266,8 +266,11 @@ export function mapAdvertisementToFeedItem(
   },
   isAdMob: boolean = false
 ): FeedItem {
+  // Evitar duplicar el prefijo "ad_" si el ID ya lo tiene
+  const adId = ad.Id.startsWith('ad_') ? ad.Id : `ad_${ad.Id}`;
+
   return {
-    id: `ad_${ad.Id}`,
+    id: adId,
     type: isAdMob ? 'admob_ad' : 'ad',
     userId: 'system',
     userName: 'Anuncio',

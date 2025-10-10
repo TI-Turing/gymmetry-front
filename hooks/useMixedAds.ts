@@ -68,6 +68,8 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
 
     const result: FeedItem[] = [];
     let ownAdIndex = 0; // Índice para rotar anuncios propios
+    // Usar timestamp + random para IDs únicos de AdMob en cada render
+    const admobIdBase = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     let admobAdCounter = 0; // Contador para IDs únicos de AdMob
 
     // Convertir admobPercentage a decimal (60% = 0.6)
@@ -100,9 +102,9 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
           const shouldShowAdMob = Math.random() < admobRatio;
 
           if (shouldShowAdMob) {
-            // Insertar anuncio de AdMob
+            // Insertar anuncio de AdMob con ID único basado en timestamp
             const admobFeedItem: FeedItem = {
-              id: `admob_${admobAdCounter++}`,
+              id: `admob_${admobIdBase}_${admobAdCounter++}`,
               type: 'admob_ad',
               userId: 'system',
               userName: 'Anuncio',
@@ -126,9 +128,9 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
             // Rotar al siguiente anuncio propio (circular)
             ownAdIndex = (ownAdIndex + 1) % ads.length;
           } else {
-            // Fallback: si no hay ads propios, mostrar AdMob
+            // Fallback: si no hay ads propios, mostrar AdMob con ID único
             const admobFeedItem: FeedItem = {
-              id: `admob_${admobAdCounter++}`,
+              id: `admob_${admobIdBase}_${admobAdCounter++}`,
               type: 'admob_ad',
               userId: 'system',
               userName: 'Anuncio',
