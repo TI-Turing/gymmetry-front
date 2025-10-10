@@ -3,8 +3,11 @@ import { ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useCustomAlert } from '@/components/common/CustomAlert';
 import DisciplineConsistency from '@/components/home/DisciplineConsistency';
+import NoDisciplineData from '@/components/home/NoDisciplineData';
 import PlanInfo from '@/components/home/PlanInfo';
+import NoPlanActive from '@/components/home/NoPlanActive';
 import TodayRoutine from '@/components/home/TodayRoutine';
+import NoRoutineAssigned from '@/components/home/NoRoutineAssigned';
 import FloatingActionButton from '@/components/home/FloatingActionButton';
 import DetailedProgressModalNew from '@/components/home/DetailedProgressModalNew';
 
@@ -24,15 +27,20 @@ function HomeScreen() {
   const { data, loading, error, refetch } = useHomeDashboardAdapter();
 
   const handleFloatingButtonPress = () => {
+    // Ambos botones (FAB y card de rutina) van a la misma pantalla
     router.push('/routine-day');
   };
 
   const handleRoutinePress = () => {
-    router.push('/routine-day-detail');
+    router.push('/routine-day');
   };
 
   const handleDisciplinePress = () => {
     setShowDetailedProgress(true);
+  };
+
+  const handleSelectRoutine = () => {
+    router.push('/routine-templates');
   };
 
   const handleRefresh = async () => {
@@ -110,11 +118,7 @@ function HomeScreen() {
             onPress={handleDisciplinePress}
           />
         ) : (
-          <View style={styles.emptySection}>
-            <Text style={styles.emptyText}>
-              No hay datos de disciplina disponibles
-            </Text>
-          </View>
+          <NoDisciplineData />
         )}
 
         {/* Sección 2: Información del Plan Actual */}
@@ -126,12 +130,7 @@ function HomeScreen() {
             progress={data.planInfo.progress}
           />
         ) : (
-          <View style={styles.emptySection}>
-            <Text style={styles.emptyText}>No tienes un plan activo</Text>
-            <Text style={styles.emptySubtext}>
-              Contacta con tu gimnasio para activar un plan
-            </Text>
-          </View>
+          <NoPlanActive />
         )}
 
         {/* Sección 3: Rutina de Hoy */}
@@ -143,24 +142,21 @@ function HomeScreen() {
             showTitle={false}
           />
         ) : (
-          <View style={styles.emptySection}>
-            <Text style={styles.emptyText}>No hay rutina asignada</Text>
-            <Text style={styles.emptySubtext}>
-              Solicita una rutina a tu entrenador
-            </Text>
-          </View>
+          <NoRoutineAssigned onSelectRoutine={handleSelectRoutine} />
         )}
 
-        {/* Espacio extra para el botón flotante */}
-        <View style={styles.spacer} />
+        {/* Espacio extra para el botón flotante (solo si hay rutina) */}
+        {data.todayRoutine && <View style={styles.spacer} />}
       </ScrollView>
 
-      {/* Botón Flotante */}
-      <FloatingActionButton
-        onPress={handleFloatingButtonPress}
-        icon="play"
-        backgroundColor={styles.colors.tint}
-      />
+      {/* Botón Flotante - Solo mostrar si hay rutina asignada */}
+      {data.todayRoutine && (
+        <FloatingActionButton
+          onPress={handleFloatingButtonPress}
+          icon="play"
+          backgroundColor={styles.colors.tint}
+        />
+      )}
 
       {/* Modal de Progreso Detallado */}
       <DetailedProgressModalNew

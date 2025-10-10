@@ -67,29 +67,59 @@ export const useHomeDashboardAdapter = (): DashboardState => {
         detailedProgress: null,
       };
     }
-    // Transformar datos de disciplina - por ahora datos simplificados
-    const discipline = homeData.Discipline
-      ? {
-          data: generateDisciplineData(homeData.Discipline),
-          completionPercentage: homeData.Discipline.CompletionPercentage,
-        }
-      : null;
-    // Transformar datos del plan
-    const planInfo = homeData.PlanInfo
-      ? {
-          startDate: formatDateToLocal(homeData.PlanInfo.StartDate),
-          endDate: formatDateToLocal(homeData.PlanInfo.EndDate),
-          currentGym: 'Gimnasio no especificado', // TODO: Obtener del contexto
-          progress: homeData.PlanInfo.ProgressPercentage,
-        }
-      : null;
+
+    // Debug temporal: ver qué llega del backend
+    // eslint-disable-next-line no-console
+    console.log('🏠 ============ HOME ADAPTER PROCESSING ============');
+    // eslint-disable-next-line no-console
+    console.log('Has TodayRoutine?', !!homeData.TodayRoutine);
+    // eslint-disable-next-line no-console
+    console.log('RoutineName:', homeData.TodayRoutine?.RoutineName);
+    // eslint-disable-next-line no-console
+    console.log('TodayRoutineDayId:', homeData.TodayRoutine?.TodayRoutineDayId);
+    // eslint-disable-next-line no-console
+    console.log('HasTrainedToday:', homeData.TodayRoutine?.HasTrainedToday);
+    // eslint-disable-next-line no-console
+    console.log('Full TodayRoutine Object:', homeData.TodayRoutine);
+    // eslint-disable-next-line no-console
+    console.log('===================================================');
+    // Transformar datos de disciplina - solo si hay datos válidos
+    const discipline =
+      homeData.Discipline &&
+      homeData.Discipline.CompletedDays !== undefined &&
+      homeData.Discipline.TotalExpectedDays > 0
+        ? {
+            data: generateDisciplineData(homeData.Discipline),
+            completionPercentage: homeData.Discipline.CompletionPercentage,
+          }
+        : null;
+    // Transformar datos del plan - solo si hay plan activo con datos válidos
+    const planInfo =
+      homeData.PlanInfo &&
+      homeData.PlanInfo.StartDate &&
+      homeData.PlanInfo.EndDate &&
+      !homeData.PlanInfo.StartDate.includes('0001') // Validar que no sea fecha por defecto de .NET
+        ? {
+            startDate: formatDateToLocal(homeData.PlanInfo.StartDate),
+            endDate: formatDateToLocal(homeData.PlanInfo.EndDate),
+            currentGym: 'Gimnasio no especificado', // TODO: Obtener del contexto
+            progress: homeData.PlanInfo.ProgressPercentage,
+          }
+        : null;
     // Transformar datos de rutina de hoy
-    const todayRoutine = homeData.TodayRoutine
-      ? {
-          routineName: homeData.TodayRoutine.RoutineName,
-          hasAttended: homeData.TodayRoutine.HasTrainedToday,
-        }
-      : null;
+    // WORKAROUND: El backend NO está enviando RoutineName ni TodayRoutineDayId
+    // Por ahora, si existe TodayRoutine con TodayExercises, asumimos que hay rutina
+    const todayRoutine =
+      homeData.TodayRoutine &&
+      (homeData.TodayRoutine.RoutineName ||
+        (homeData.TodayRoutine.TodayExercises &&
+          homeData.TodayRoutine.TodayExercises.length >= 0))
+        ? {
+            routineName:
+              homeData.TodayRoutine.RoutineName || 'Rutina del día',
+            hasAttended: homeData.TodayRoutine.HasTrainedToday || false,
+          }
+        : null;
     // Transformar datos de progreso detallado - datos simplificados por ahora
     const detailedProgress = homeData.DetailedProgress
       ? {

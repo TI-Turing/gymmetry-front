@@ -57,10 +57,13 @@ export interface DisciplineDataDto {
 
 export interface PlanInfoDto {
   PlanId: string;
+  PlanTypeId: string;
   PlanTypeName: string;
   StartDate: string;
   EndDate: string;
   IsActive: boolean;
+  IsFallbackFreePlan: boolean; // True si es el plan gratis por defecto (no seleccionado explícitamente)
+  Price: number;
   ProgressPercentage: number;
   DaysRemaining: number;
 }

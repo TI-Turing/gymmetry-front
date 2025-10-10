@@ -15,6 +15,22 @@ export const appStateService = {
         `${base}/overview`
       );
 
+      // Debug: Imprimir respuesta completa del endpoint
+      // eslint-disable-next-line no-console
+      console.log('📥 ============ APP-STATE OVERVIEW RESPONSE ============');
+      // eslint-disable-next-line no-console
+      console.log('Success:', response?.Success);
+      // eslint-disable-next-line no-console
+      console.log('StatusCode:', response?.StatusCode);
+      // eslint-disable-next-line no-console
+      console.log('Message:', response?.Message);
+      // eslint-disable-next-line no-console
+      console.log('Home.TodayRoutine:', JSON.stringify(response?.Data?.Home?.TodayRoutine, null, 2));
+      // eslint-disable-next-line no-console
+      console.log('Full Home Data:', JSON.stringify(response?.Data?.Home, null, 2));
+      // eslint-disable-next-line no-console
+      console.log('======================================================');
+
       return response;
     } catch (error) {
       logger.error('Error fetching app state overview:', error);

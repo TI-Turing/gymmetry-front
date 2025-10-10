@@ -56,6 +56,11 @@ export const useProfileState = () => {
   return appStateData?.Profile || null;
 };
 
+export const usePlanState = () => {
+  const { appStateData } = useAppState();
+  return appStateData?.Home?.PlanInfo || null;
+};
+
 interface AppStateProviderProps {
   children: React.ReactNode;
 }
