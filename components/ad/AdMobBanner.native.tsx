@@ -135,6 +135,7 @@ export const AdMobBanner: React.FC<AdMobBannerProps> = ({
    * Handler cuando el anuncio falla al cargar
    */
   const handleAdFailedToLoad = (error: Error) => {
+    console.log('❌ [AdMobBanner] Error al cargar:', error.message);
     setIsLoaded(false);
     setAdError(error.message);
     onAdFailedToLoad?.(error);
@@ -154,10 +155,32 @@ export const AdMobBanner: React.FC<AdMobBannerProps> = ({
     onAdClosed?.();
   };
 
-  // Si AdMob no está disponible (Expo Go), no renderizar nada
+  // Si AdMob no está disponible (Expo Go), mostrar placeholder
   if (!BannerAd || !BannerAdSize || !TestIds) {
-    return null; // Silenciosamente no mostrar en Expo Go
+    console.log('⚠️ [AdMobBanner] Módulos no disponibles (Expo Go), mostrando placeholder');
+    return (
+      <View style={styles.container}>
+        <View style={styles.badgeContainer}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>ANUNCIO (PLACEHOLDER)</Text>
+          </View>
+        </View>
+        <View style={[styles.bannerContainer, { backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center', height: 50 }]}>
+          <Text style={{ color: '#999', fontSize: 12 }}>
+            📱 AdMob Banner (requiere development build o APK)
+          </Text>
+        </View>
+      </View>
+    );
   }
+
+  console.log('🎯 [AdMobBanner] Renderizando banner:', {
+    adUnitId,
+    useTestIds,
+    bannerSize,
+    isLoaded,
+    adError,
+  });
 
   return (
     <View style={styles.container}>

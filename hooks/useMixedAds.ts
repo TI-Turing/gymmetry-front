@@ -51,12 +51,13 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
   const planInfo = usePlanState();
 
   // Verificar si el usuario debe ver anuncios de Google AdMob
-  // Solo se muestran anuncios si:
-  // 1. No tiene plan activo (planInfo es null)
+  // Se muestran anuncios de AdMob si:
+  // 1. No tiene plan activo (planInfo es null O IsActive es false)
   // 2. Está usando el plan gratuito por defecto (IsFallbackFreePlan)
   // 3. Tiene explícitamente el plan gratuito (PlanTypeId === FREE_PLAN_ID)
   const shouldShowAdMobAds =
     !planInfo || // No tiene plan
+    !planInfo.IsActive || // Plan expirado/inactivo (comportarse como free)
     planInfo.IsFallbackFreePlan || // Plan gratis por defecto
     planInfo.PlanTypeId?.toLowerCase() === FREE_PLAN_ID.toLowerCase(); // Plan gratis explícito
 
@@ -84,8 +85,10 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
       const shouldInsertAd = (index + 1) % config.postsPerAd === 0;
 
       if (shouldInsertAd) {
+        console.log(`📍 [AdSlot] pos=${index}, shouldShowAdMobAds=${shouldShowAdMobAds}`);
         // Verificar si el usuario debe ver anuncios de AdMob según su plan
         if (!shouldShowAdMobAds) {
+          console.log('🔒 [Premium] Usuario con plan de pago, solo anuncios propios');
           // Usuario con plan de pago: solo mostrar anuncios propios
           if (ads.length > 0) {
             const ad = ads[ownAdIndex];
@@ -101,7 +104,9 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
           // Decidir: anuncio propio o AdMob usando ratio
           // Si Math.random() < 0.6 → AdMob (60%)
           // Si Math.random() >= 0.6 → Propio (40%)
-          const shouldShowAdMob = Math.random() < admobRatio;
+          const randomValue = Math.random();
+          const shouldShowAdMob = randomValue < admobRatio;
+          console.log(`🎲 [Random] pos=${index}, random=${randomValue.toFixed(3)}, ratio=${admobRatio}, shouldShowAdMob=${shouldShowAdMob}`);
 
           if (shouldShowAdMob) {
             // Insertar anuncio de AdMob con ID único basado en timestamp
@@ -120,6 +125,7 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
               isAd: true,
               isAdMob: true,
             };
+            console.log('🟢 [AdMob] Insertando anuncio AdMob en posición', index, admobFeedItem.id);
             result.push(admobFeedItem);
           } else if (ads.length > 0) {
             // Insertar anuncio propio (solo si hay disponibles)
@@ -131,6 +137,7 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
               false,
               instanceId
             );
+            console.log('🔵 [OwnAd] Insertando anuncio propio en posición', index, ownAdFeedItem.id);
             result.push(ownAdFeedItem);
 
             // Rotar al siguiente anuncio propio (circular)
@@ -159,12 +166,14 @@ export function useMixedAds(posts: FeedItem[]): FeedItem[] {
     });
 
     return result;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     posts,
     ads,
     config.postsPerAd,
     config.admobPercentage,
     shouldShowAdMobAds,
+    planInfo,
   ]);
 
   return feedWithMixedAds;

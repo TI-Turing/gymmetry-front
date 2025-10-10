@@ -140,15 +140,7 @@ export function fixLocalMediaUrl(url: string): string {
   // Solo transformar si es entorno local y la URL contiene localhost
   const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || 'local';
 
-  console.log('🔧 [fixLocalMediaUrl] DEBUG:', {
-    url,
-    environment,
-    hasLocalhost: url.includes('127.0.0.1'),
-    apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
-  });
-
   if (environment !== 'local' || !url.includes('127.0.0.1')) {
-    console.log('⏭️ [fixLocalMediaUrl] Saltando transformación');
     return url;
   }
 
@@ -159,11 +151,7 @@ export function fixLocalMediaUrl(url: string): string {
   if (ipMatch && ipMatch[1]) {
     const devIp = ipMatch[1];
     const transformedUrl = url.replace('127.0.0.1', devIp);
-    console.log('✅ [fixLocalMediaUrl] Transformado:', {
-      original: url,
-      transformed: transformedUrl,
-      devIp,
-    });
+
     return transformedUrl;
   }
 
