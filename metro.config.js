@@ -7,6 +7,33 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
+// Enable minification and tree-shaking
+config.transformer = {
+  ...config.transformer,
+  minifierConfig: {
+    keep_classnames: false,
+    keep_fnames: false,
+    mangle: {
+      keep_classnames: false,
+      keep_fnames: false,
+    },
+    output: {
+      ascii_only: true,
+      quote_style: 3,
+      wrap_iife: true,
+    },
+    sourceMap: {
+      includeSources: false,
+    },
+    toplevel: false,
+    compress: {
+      reduce_funcs: true,
+      drop_console: true, // Remove console.logs in production
+      drop_debugger: true,
+    },
+  },
+};
+
 // Configuración específica para web
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
 

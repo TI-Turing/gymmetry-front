@@ -85,7 +85,6 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
-    "@lottiefiles/dotlottie-react": "^0.6.5",
     "@mercadopago/sdk-react": "^1.0.4",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
