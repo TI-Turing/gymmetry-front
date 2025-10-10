@@ -40,8 +40,8 @@
       },
       "env": {
         "NODE_ENV": "production",
-        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.16:7160/api",
-        "EXPO_PUBLIC_CATALOGS_API_BASE_URL": "http://192.168.0.16:7071/api",
+        "EXPO_PUBLIC_API_BASE_URL": "https://gymmetry-api.loca.lt/api",
+        "EXPO_PUBLIC_CATALOGS_API_BASE_URL": "https://gymmetry-api.loca.lt/api",
         "EXPO_PUBLIC_API_FUNCTIONS_KEY": "local-functions-key",
         "EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY": "local-main-functions-key",
         "EXPO_PUBLIC_ENVIRONMENT": "production",
