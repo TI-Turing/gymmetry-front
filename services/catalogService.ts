@@ -22,7 +22,7 @@ class CatalogService {
     this.catalogsAPI = axios.create({
       baseURL: Environment.CATALOGS_API_BASE_URL,
       headers: {
-        'x-functions-key': Environment.API_FUNCTIONS_KEY,
+        // ✅ AWS Lambda no usa function keys (eliminado)
         'Content-Type': 'application/json',
       },
     });
@@ -34,9 +34,7 @@ class CatalogService {
           config.headers = axios.AxiosHeaders.from({});
         }
 
-        if (!config.headers['x-functions-key']) {
-          config.headers['x-functions-key'] = Environment.API_FUNCTIONS_KEY;
-        }
+        // ✅ AWS Lambda no requiere x-functions-key (eliminado)
 
         if (Environment.DEBUG) {
           const fullUrl = `${config.baseURL}${config.url}`;

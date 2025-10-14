@@ -28,15 +28,14 @@ class ApiService {
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: Environment.API_BASE_URL,
-      timeout: 10000,
+      timeout: 12000, // ✅ Aumentado de 10s a 12s para manejar cold starts de AWS Lambda
       headers: {
         'Content-Type': 'application/json',
         Accept: '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         Connection: 'keep-alive',
         'User-Agent': 'ExpoApp/1.0.0',
-        // Azure Functions (API principal)
-        'x-functions-key': Environment.API_MAIN_FUNCTIONS_KEY,
+        // ✅ AWS Lambda usa solo JWT en Authorization header (no function keys)
       },
     });
 
@@ -62,11 +61,9 @@ class ApiService {
             config.headers['Host'] = 'localhost:7160';
           }
           config.headers['Cache-Control'] = 'no-cache';
-          // Asegurar la clave de funciones para el API principal
-          if (!config.headers['x-functions-key']) {
-            config.headers['x-functions-key'] =
-              Environment.API_MAIN_FUNCTIONS_KEY;
-          }
+          
+          // ✅ AWS Lambda no requiere x-functions-key (eliminado)
+          // La autenticación se maneja únicamente con JWT en Authorization header
 
           // Inyectar Authorization si no viene en el request y hay token guardado
           const hasAuthHeader =
@@ -119,23 +116,18 @@ class ApiService {
           const headerValue = isAuth
             ? 'Bearer ****'
             : String(value).replace(/"/g, '\\"');
-          curlCommand += ` ^
-  -H "${key}: ${headerValue}"`;
+          curlCommand += ` ^\n  -H "${key}: ${headerValue}"`;
         }
       });
       if (data != null && ['POST', 'PUT', 'PATCH'].includes(method)) {
         const jsonData = typeof data === 'string' ? data : JSON.stringify(data);
         const escapedData = jsonData.replace(/"/g, '\\"');
-        curlCommand += ` ^
-  -d "${escapedData}"`;
+        curlCommand += ` ^\n  -d "${escapedData}"`;
         if (!headers['Content-Type'] && !headers['content-type']) {
-          curlCommand += ` ^
-  -H "Content-Type: application/json"`;
+          curlCommand += ` ^\n  -H "Content-Type: application/json"`;
         }
       }
-      // Agregar URL al final
-      curlCommand += ` ^
-  "${url}"`;
+      curlCommand += ` ^\n  "${url}"`;
       return curlCommand;
     }
 
@@ -222,6 +214,66 @@ class ApiService {
     );
   }
 
+  /**
+   * ✅ Detecta si el error es por cold start de AWS Lambda
+   * @param error Error de Axios
+   * @returns true si es cold start
+   */
+  private isColdStartError(error: AxiosError): boolean {
+    // Timeout o 503 pueden indicar cold start
+    if (error.code === 'ECONNABORTED' || error.response?.status === 503) {
+      return true;
+    }
+
+    // Lambda devuelve 502/504 durante cold start a veces
+    if (error.response?.status === 502 || error.response?.status === 504) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * ✅ Ejecuta request con retry automático en caso de cold start
+   * @param config Configuración de Axios
+   * @param retryCount Intentos realizados
+   * @returns Response de Axios
+   */
+  private async requestWithRetry(
+    config: AxiosRequestConfig,
+    retryCount = 0
+  ): Promise<AxiosResponse> {
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY = 1000; // 1 segundo
+
+    try {
+      return await this.axiosInstance.request(config);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+
+      // Si es cold start y no hemos alcanzado el límite de reintentos
+      if (this.isColdStartError(axiosError) && retryCount < MAX_RETRIES) {
+        logger.warn(
+          `⚠️ Cold start detected (attempt ${retryCount + 1}/${MAX_RETRIES}). Retrying in ${RETRY_DELAY}ms...`
+        );
+
+        // Esperar antes de reintentar
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+
+        // Reintentar con timeout más largo
+        const retryConfig: AxiosRequestConfig = {
+          ...config,
+          timeout: 15000, // 15 segundos para cold start
+        };
+
+        return this.requestWithRetry(retryConfig, retryCount + 1);
+      }
+
+      // Si no es cold start o ya reintentamos lo suficiente, lanzar error
+      throw error;
+    }
+  }
+
   // Helper: construir URL absoluta con baseURL + endpoint
   private buildFullUrl(endpoint: string): string {
     // Si ya es absoluta, regresar tal cual
@@ -234,13 +286,13 @@ class ApiService {
     return `${base}${path}`;
   }
 
-  // Helper: agregar el parámetro code con la Azure Functions key al endpoint
-  private addCodeParam(endpoint: string): string {
-    const key = Environment.API_MAIN_FUNCTIONS_KEY;
-    if (!key) return endpoint;
-    const separator = endpoint.includes('?') ? '&' : '?';
-    return `${endpoint}${separator}code=${encodeURIComponent(key)}`;
-  }
+  // ❌ DEPRECATED: AWS Lambda no usa function keys (eliminado)
+  // private addCodeParam(endpoint: string): string {
+  //   const key = Environment.API_MAIN_FUNCTIONS_KEY;
+  //   if (!key) return endpoint;
+  //   const separator = endpoint.includes('?') ? '&' : '?';
+  //   return `${endpoint}${separator}code=${encodeURIComponent(key)}`;
+  // }
 
   // Helper: fusionar headers por defecto del axiosInstance con los pasados por options
   private mergeHeaders(extra?: Record<string, string>): Record<string, string> {
@@ -395,18 +447,14 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      const endpointWithCode = this.addCodeParam(endpoint);
-      // const __curl = this.generateWindowsCurl('GET', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers));
-      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      // console.log('CURL', __curl);
-      const response = await this.axiosInstance.get<BackendApiResponse<T>>(
-        endpointWithCode,
-        {
-          headers: options?.headers,
-          timeout: options?.timeout,
-          signal: options?.signal,
-        }
-      );
+      // ✅ AWS Lambda no requiere code param (eliminado addCodeParam)
+      const response = await this.requestWithRetry({
+        method: 'GET',
+        url: endpoint,
+        headers: options?.headers,
+        timeout: options?.timeout,
+        signal: options?.signal,
+      }) as AxiosResponse<BackendApiResponse<T>>;
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
@@ -429,20 +477,15 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      const endpointWithCode = this.addCodeParam(endpoint);
-      //Show curl
-      // const __curl = this.generateWindowsCurl('POST', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers), body);
-      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      // console.log('CURL', __curl);
-      const response = await this.axiosInstance.post<BackendApiResponse<T>>(
-        endpointWithCode,
-        body,
-        {
-          headers: options?.headers,
-          timeout: options?.timeout,
-          signal: options?.signal,
-        }
-      );
+      // ✅ AWS Lambda no requiere code param
+      const response = await this.requestWithRetry({
+        method: 'POST',
+        url: endpoint,
+        data: body,
+        headers: options?.headers,
+        timeout: options?.timeout,
+        signal: options?.signal,
+      }) as AxiosResponse<BackendApiResponse<T>>;
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
@@ -465,18 +508,15 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      const endpointWithCode = this.addCodeParam(endpoint);
-      // const __curl = this.generateWindowsCurl('PUT', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers), body);
-      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      const response = await this.axiosInstance.put<BackendApiResponse<T>>(
-        endpointWithCode,
-        body,
-        {
-          headers: options?.headers,
-          timeout: options?.timeout,
-          signal: options?.signal,
-        }
-      );
+      // ✅ AWS Lambda no requiere code param
+      const response = await this.requestWithRetry({
+        method: 'PUT',
+        url: endpoint,
+        data: body,
+        headers: options?.headers,
+        timeout: options?.timeout,
+        signal: options?.signal,
+      }) as AxiosResponse<BackendApiResponse<T>>;
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
@@ -499,18 +539,15 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      const endpointWithCode = this.addCodeParam(endpoint);
-      // const __curl = this.generateWindowsCurl('PATCH', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers), body);
-      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      const response = await this.axiosInstance.patch<BackendApiResponse<T>>(
-        endpointWithCode,
-        body,
-        {
-          headers: options?.headers,
-          timeout: options?.timeout,
-          signal: options?.signal,
-        }
-      );
+      // ✅ AWS Lambda no requiere code param
+      const response = await this.requestWithRetry({
+        method: 'PATCH',
+        url: endpoint,
+        data: body,
+        headers: options?.headers,
+        timeout: options?.timeout,
+        signal: options?.signal,
+      }) as AxiosResponse<BackendApiResponse<T>>;
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;
@@ -532,17 +569,14 @@ class ApiService {
     options?: RequestOptions
   ): Promise<BackendApiResponse<T>> {
     try {
-      const endpointWithCode = this.addCodeParam(endpoint);
-      // const __curl = this.generateWindowsCurl('DELETE', this.buildFullUrl(endpointWithCode), this.mergeHeaders(options?.headers));
-      // logger.debug('CURL', __curl); // habilitar si se requiere depuración
-      const response = await this.axiosInstance.delete<BackendApiResponse<T>>(
-        endpointWithCode,
-        {
-          headers: options?.headers,
-          timeout: options?.timeout,
-          signal: options?.signal,
-        }
-      );
+      // ✅ AWS Lambda no requiere code param
+      const response = await this.requestWithRetry({
+        method: 'DELETE',
+        url: endpoint,
+        headers: options?.headers,
+        timeout: options?.timeout,
+        signal: options?.signal,
+      }) as AxiosResponse<BackendApiResponse<T>>;
 
       // El backend ya devuelve la estructura ApiResponse correcta
       return response.data;

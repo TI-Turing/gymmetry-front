@@ -10,14 +10,12 @@ const createConfig = () => {
   const environment =
     process.env.EXPO_PUBLIC_ENVIRONMENT || process.env.ENVIRONMENT || 'local';
   const debug = (process.env.EXPO_PUBLIC_DEBUG || process.env.DEBUG) === 'true';
-  const apiFunctionsKey =
-    process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY ||
-    process.env.API_FUNCTIONS_KEY ||
-    '';
-  const apiMainFunctionsKey =
-    process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY ||
-    process.env.API_MAIN_FUNCTIONS_KEY ||
-    '';
+  
+  // ❌ DEPRECATED: AWS Lambda no usa function keys (eliminado)
+  // Solo se mantiene JWT authentication en Authorization header
+  // const apiFunctionsKey = process.env.EXPO_PUBLIC_API_FUNCTIONS_KEY || '';
+  // const apiMainFunctionsKey = process.env.EXPO_PUBLIC_API_MAIN_FUNCTIONS_KEY || '';
+  
   const payCardInApp =
     (process.env.EXPO_PUBLIC_PAY_CARD_INAPP || 'true') === 'true';
   const mpPublicKey = process.env.EXPO_PUBLIC_MP_PUBLIC_KEY || '';
@@ -27,8 +25,9 @@ const createConfig = () => {
     CATALOGS_API_BASE_URL: catalogsApiBaseUrl,
     ENVIRONMENT: environment,
     DEBUG: debug,
-    API_FUNCTIONS_KEY: apiFunctionsKey,
-    API_MAIN_FUNCTIONS_KEY: apiMainFunctionsKey,
+    // ❌ DEPRECATED: AWS Lambda no usa function keys
+    // API_FUNCTIONS_KEY: apiFunctionsKey,
+    // API_MAIN_FUNCTIONS_KEY: apiMainFunctionsKey,
     PAY_CARD_INAPP: payCardInApp,
     MP_PUBLIC_KEY: mpPublicKey,
   };
@@ -45,8 +44,9 @@ export interface Config {
   CATALOGS_API_BASE_URL: string;
   ENVIRONMENT: string;
   DEBUG: boolean;
-  API_FUNCTIONS_KEY: string;
-  API_MAIN_FUNCTIONS_KEY: string;
+  // ❌ DEPRECATED: AWS Lambda no usa function keys
+  // API_FUNCTIONS_KEY: string;
+  // API_MAIN_FUNCTIONS_KEY: string;
   PAY_CARD_INAPP: boolean;
   MP_PUBLIC_KEY: string;
 }
